@@ -1,0 +1,97 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+
+const BLOG='https://nhunnhun.tistory.com';
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser;
+function assert(c,m){if(!c) throw new Error(m)}
+async function inspect(context,path,w,h){
+  const p=await context.newPage();
+  try{
+    await p.setViewportSize({width:w,height:h});
+    await p.goto(BLOG+path,{waitUntil:'domcontentloaded'});
+    await p.waitForTimeout(1200);
+    return await p.evaluate(()=>{
+      const q=(s)=>document.querySelector(s);
+      const meta=(sel)=>q(sel)?.getAttribute('content')||null;
+      return {
+        title:q('h1')?.textContent?.trim()||document.title,
+        canonical:q('link[rel="canonical"]')?.href||null,
+        robots:meta('meta[name="robots"]'),
+        ogImage:meta('meta[property="og:image"]'),
+        bodyText:document.body.innerText,
+        links:[...document.querySelectorAll('a[href]')].map(a=>a.href),
+        searchInput:(()=>{const e=q('#search-input');if(!e)return null;const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {h:Math.round(r.height),display:s.display,aria:e.getAttribute('aria-label')}})(),
+        searchButton:(()=>{const e=q('button.search-icon');if(!e)return null;const r=e.getBoundingClientRect();return {w:Math.round(r.width),h:Math.round(r.height),aria:e.getAttribute('aria-label')}})()
+      };
+    });
+  }finally{await p.close();}
+}
+
+try{
+  browser=await chromium.connectOverCDP(session.connectUrl);
+  const context=browser.contexts()[0];
+
+  const [home,apple195,fish352,apple356,mobile356]=await Promise.all([
+    inspect(context,'/',1440,1000),
+    inspect(context,'/195',1440,1000),
+    inspect(context,'/352',1440,1000),
+    inspect(context,'/356',1440,1000),
+    inspect(context,'/356',390,844)
+  ]);
+
+  assert(apple195.title==='사과 품종·고르는 법·보관법·활용법 총정리','E_195_TITLE');
+  assert(apple195.links.includes(BLOG+'/356'),'E_195_INTERNAL');
+  assert(apple195.bodyText.includes('맛있는 사과 고르는 법'),'E_195_SELECTION');
+  assert(apple195.bodyText.includes('사과 보관법'),'E_195_STORAGE');
+  assert(!apple195.bodyText.includes('사과의 핵심 영양소 효과와 효능 작용 구조는?'),'E_195_OLD_HEALTH');
+  assert(!apple195.links.some(x=>x.includes('iryan.kr')),'E_195_COMMERCIAL');
+
+  assert(!fish352.bodyText.includes('{{표시 텍스트}}'),'E_352_TEMPLATE');
+  assert(apple356.title==='사과 효능·영양성분·부작용 총정리','E_356_TITLE');
+  assert(apple356.canonical===BLOG+'/356','E_356_CANONICAL');
+  assert(apple356.robots?.includes('index'),'E_356_ROBOTS_INDEX');
+  assert(apple356.robots?.includes('max-image-preview:large'),'E_356_ROBOTS_IMAGE');
+  assert(apple356.ogImage && !apple356.ogImage.includes('opengraph.png'),'E_356_OG');
+
+  for(const v of [home,apple195,apple356,mobile356]){
+    assert(!v.bodyText.includes('Designed by'),'E_OLD_FOOTER');
+    assert(!v.bodyText.includes('쭈미로운 생활'),'E_OLD_BRAND');
+    assert(!v.bodyText.includes('format_list_bulleted'),'E_LIGATURE_LIST');
+    assert(!v.bodyText.includes('textsms'),'E_LIGATURE_COMMENT');
+    if(v.searchButton) assert(v.searchButton.w>=48&&v.searchButton.h>=48,'E_SEARCH_BUTTON');
+    if(v.searchInput&&v.searchInput.display!=='none'){
+      assert(v.searchInput.h>=48,'E_SEARCH_INPUT_HEIGHT');
+      assert(v.searchInput.aria==='검색어 입력','E_SEARCH_INPUT_ARIA');
+    }
+  }
+
+  const infra=await context.request.get(BLOG+'/robots.txt');
+  const sm=await context.request.get(BLOG+'/sitemap.xml');
+  const robotsText=await infra.text();
+  const sitemapText=await sm.text();
+  assert(infra.status()===200,'E_ROBOTS_HTTP');
+  assert(sm.status()===200,'E_SITEMAP_HTTP');
+  assert(/User-agent:/i.test(robotsText),'E_ROBOTS_BODY');
+  for(const id of ['/195','/352','/356']) assert(sitemapText.includes(id),'E_SITEMAP_'+id);
+
+  console.log('PASS_FINAL_LIVE_VERIFY '+JSON.stringify({
+    home:{title:home.title},
+    post195:{title:apple195.title,internal356:true,oldCommercial:false},
+    post352:{templateArtifact:false},
+    post356:{title:apple356.title,canonical:apple356.canonical,robots:apple356.robots,ogImage:apple356.ogImage},
+    mobile356:{searchButton:mobile356.searchButton},
+    robots:{status:infra.status()},
+    sitemap:{status:sm.status(),contains:['/195','/352','/356']}
+  }));
+}finally{
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
