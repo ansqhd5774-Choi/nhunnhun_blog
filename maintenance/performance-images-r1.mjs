@@ -73,8 +73,12 @@ function replaceKnownImageUrls(html){
   return html.replaceAll(oldHero,HERO).replaceAll(oldSliced,SLICED);
 }
 async function setPostHtml(page,html){
-  const cm=page.locator('.CodeMirror:visible');
-  await cm.evaluate((el,value)=>{ if(!el?.CodeMirror) throw new Error('E_CODEMIRROR'); el.CodeMirror.setValue(value); el.CodeMirror.save?.(); },html);
+  const code=page.locator('.CodeMirror:visible .CodeMirror-code');
+  await code.waitFor({state:'visible'});
+  await code.click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText(html);
+  await page.waitForTimeout(500);
   await page.locator('#publish-layer-btn').click();
   let submit=null;
   for(const name of ['공개 발행','수정','변경사항 저장','완료']){
