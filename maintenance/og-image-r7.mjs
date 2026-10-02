@@ -79,6 +79,7 @@ try{
     cclDerive:0,
     type:'post',
     attachments:[kageRef],
+    thumbnail:'kage@'+up.key+'/'+up.filename,
     recaptchaValue:'',
     draftSequence:null,
     totalWritingTimeMs:0
