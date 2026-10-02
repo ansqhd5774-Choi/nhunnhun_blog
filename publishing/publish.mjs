@@ -223,7 +223,7 @@ try {
         const quickCards=[...root.querySelectorAll('p')].filter(p => /이것만 먼저 보세요$/.test(p.textContent.trim()) && /background:\s*#f7f9fc/.test(p.parentElement?.getAttribute('style')||''));
         const qs=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='Q.');
         const as=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='A.');
-        const latest=[...root.querySelectorAll('aside')].filter(x => /최신 근거\s*·?\s*\d{4}/.test(x.textContent));
+        const latest=[...root.querySelectorAll('div')].filter(x => /최신 근거\s*·?\s*\d{4}/.test(x.textContent) && /background:\s*#fbfcfe/.test(x.getAttribute('style')||''));
         const summary=[...h2].find(x=>x.textContent.trim()==='핵심 정리');
         const related=[...h2].find(x=>x.textContent.trim()==='함께 보면 좋은 글');
         const sources=[...h2].find(x=>x.textContent.trim()==='자료 출처');
