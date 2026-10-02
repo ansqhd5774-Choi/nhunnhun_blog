@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
+import { applyEditorialTemplate } from '../publishing/editorial.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
@@ -42,4 +43,15 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
   assert.equal(workflow.jobs.publish.needs, 'validate');
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm run publish'));
+});
+
+test('editorial template gives new posts the shared visual hierarchy', () => {
+  const html='<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입</p><h2>1. 제목</h2><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><h2>질문</h2><p><strong>Q. 테스트?</strong><br>답변</p><h2>핵심 정리</h2><ul><li>정리</li></ul>';
+  const styled=applyEditorialTemplate(html);
+  assert.match(styled,/width:34px;height:4px/);
+  assert.match(styled,/font-size:26px/);
+  assert.match(styled,/font-size:20px/);
+  assert.match(styled,/overflow-x:auto/);
+  assert.match(styled,/>A\.<\/span>/);
+  assert.match(styled,/background:#f8fafc/);
 });
