@@ -9,6 +9,7 @@
   "cloudLogin": "NOT_VERIFIED",
   "livePublication": "NOT_RUN",
   "publishEnabled": false,
-  "approval": "PENDING",
-  "githubActions": "VALIDATION_STEPS_PASS-RUN_36984014986"
+  "approval": "APPROVED_FREE_BROWSERBASE_SESSION_AND_GITHUB_SECRETS",
+  "githubActions": "VALIDATION_STEPS_PASS-RUN_36984014986",
+  "connectionAutomation": "AUTOMATION_BLOCKED_BROWSER_CONTROL_TIMEOUT_CHROME_AND_IAB"
 }
