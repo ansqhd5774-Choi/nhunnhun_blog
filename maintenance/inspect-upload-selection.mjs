@@ -37,7 +37,15 @@ try{
     text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,140),
     title:e.getAttribute('title'),aria:e.getAttribute('aria-label')
   })).filter(x=>/대표|썸네일|원본|삭제|정렬|크기/.test([x.text,x.title,x.aria].join(' '))).slice(0,120));
-  console.log('IMAGE_SELECTED_UI '+JSON.stringify(reps));
+  const frameUi=await frame.locator('[class*="image"],[class*="photo"],[class*="represent"],[class*="cover"],button,a,span,div').evaluateAll(els=>els.map((e,i)=>{
+    const cs=getComputedStyle(e),r=e.getBoundingClientRect();
+    return {i,tag:e.tagName,id:e.id,cls:String(e.className||'').slice(0,180),text:(e.innerText||e.textContent||'').trim().replace(/\\s+/g,' ').slice(0,140),title:e.getAttribute('title'),aria:e.getAttribute('aria-label'),visible:cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>0&&r.height>0};
+  }).filter(x=>x.visible&&(/image|photo|represent|cover|대표|삭제|원본|크기|정렬/i.test([x.id,x.cls,x.text,x.title,x.aria].join(' ')))).slice(0,120));
+  const outerUi=await page.locator('[class*="image"],[class*="photo"],[class*="represent"],[class*="cover"],button,a,span,div').evaluateAll(els=>els.map((e,i)=>{
+    const cs=getComputedStyle(e),r=e.getBoundingClientRect();
+    return {i,tag:e.tagName,id:e.id,cls:String(e.className||'').slice(0,180),text:(e.innerText||e.textContent||'').trim().replace(/\\s+/g,' ').slice(0,140),title:e.getAttribute('title'),aria:e.getAttribute('aria-label'),visible:cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>0&&r.height>0};
+  }).filter(x=>x.visible&&(/image|photo|represent|cover|대표|삭제|원본|크기|정렬/i.test([x.id,x.cls,x.text,x.title,x.aria].join(' ')))).slice(0,120));
+  console.log('IMAGE_SELECTED_UI '+JSON.stringify({reps,frameUi,outerUi}));
 }finally{
   try{await browser?.close();}catch{}
   try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
