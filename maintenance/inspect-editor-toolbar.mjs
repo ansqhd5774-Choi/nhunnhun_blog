@@ -5,9 +5,7 @@ import { writeFile } from 'node:fs/promises';
 const BLOG='https://nhunnhun.tistory.com', POST_ID='356';
 const IMAGE_URL='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
 for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
-
-const bytes=Buffer.from(await (await fetch(IMAGE_URL)).arrayBuffer());
-await writeFile('/tmp/apple.jpg',bytes);
+await writeFile('/tmp/apple.jpg',Buffer.from(await (await fetch(IMAGE_URL)).arrayBuffer()));
 
 const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
 const session=await client.sessions.create({projectId:process.env.BROWSERBASE_PROJECT_ID,browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},timeout:300});
@@ -25,23 +23,25 @@ try{
   await page.locator('#attach-image').click();
   const chooser=await chooserPromise;
   await chooser.setFiles('/tmp/apple.jpg');
-  await page.waitForTimeout(3000);
 
-  const data=await page.evaluate(()=>({
-    editors:[...document.querySelectorAll('iframe')].map((f,i)=>({
-      i,id:f.id,cls:String(f.className||'').slice(0,120),title:f.title,src:f.src
-    })),
-    representative:[...document.querySelectorAll('button,[role="button"],label,input')].map((e,i)=>({
-      i,tag:e.tagName,id:e.id,cls:String(e.className||'').slice(0,120),
-      text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,120),
-      title:e.getAttribute('title'),aria:e.getAttribute('aria-label'),type:e.getAttribute('type')
-    })).filter(x=>/대표|썸네일|thumbnail|representative/i.test([x.text,x.title,x.aria,x.id,x.cls].join(' '))),
-    images:[...document.querySelectorAll('img')].map((e,i)=>({
-      i,src:e.src,alt:e.alt,cls:String(e.className||'').slice(0,120),
-      width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height
-    })).filter(x=>/apple|blob|kakao|daumcdn/i.test(x.src)).slice(-20)
+  const frame=page.frameLocator('#editor-tistory_ifr');
+  await frame.locator('img').last().waitFor({state:'visible',timeout:15000});
+  const count=await frame.locator('img').count();
+  const last=frame.locator('img').nth(count-1);
+  const imgInfo=await last.evaluate(e=>({
+    src:e.getAttribute('src'),dataFilename:e.getAttribute('data-filename'),alt:e.getAttribute('alt'),
+    outer:e.outerHTML.slice(0,1200),parent:e.parentElement?.outerHTML?.slice(0,2200)
   }));
-  console.log('AFTER_IMAGE_UPLOAD '+JSON.stringify(data));
+  await last.click();
+  await page.waitForTimeout(600);
+
+  const controls=await page.evaluate(()=>[...document.querySelectorAll('button,[role="button"],label,input,span,a')].map((e,i)=>({
+    i,tag:e.tagName,id:e.id,cls:String(e.className||'').slice(0,140),
+    text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,120),
+    title:e.getAttribute('title'),aria:e.getAttribute('aria-label'),type:e.getAttribute('type')
+  })).filter(x=>/대표|썸네일|thumbnail|cover/i.test([x.text,x.title,x.aria,x.id,x.cls].join(' '))).slice(0,80));
+
+  console.log('UPLOADED_IMAGE '+JSON.stringify({imgInfo,controls}));
 }finally{
   try{await browser?.close();}catch{}
   try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
