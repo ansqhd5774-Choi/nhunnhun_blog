@@ -76,7 +76,7 @@ test('new public article requires complete editorial source structure', () => {
     representativeImageUrl:'https://example.org/apple.jpg',
     status:'ready',
     approved:true,
-    bodyHtml:'<p><img src="https://example.org/apple.jpg" alt="사과"></p><p>도입</p><h2>1. 하나</h2><p><a href="https://example.org/a">A</a></p><h2>2. 둘</h2><p><a href="https://example.net/b">B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
+    bodyHtml:'<p><img src="https://example.org/apple.jpg" alt="사과"></p><p>도입</p><h2>1. 하나</h2><p><a href="https://example.org/a">A</a></p><h2>2. 둘</h2><p><a href="https://example.net/b">B</a></p><h2>3. 셋</h2><p>본문</p><h2>4. 넷</h2><p>본문</p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
   };
   assert.doesNotThrow(()=>assertEditorialSource(valid));
   assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:undefined}),/E_REPRESENTATIVE_IMAGE_REQUIRED/);
