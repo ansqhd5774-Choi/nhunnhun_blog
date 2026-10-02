@@ -32,6 +32,8 @@ test('relative assets and credential-bearing content URLs rejected', () => {
 test('cloud workflow has serial execution and an explicit main-only activation gate', () => {
   const workflow = parse(readFileSync(new URL('../.github/workflows/publish-posts.yml', import.meta.url),'utf8'));
   assert.equal(workflow.concurrency['cancel-in-progress'], false);
+  assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-publish');
+  assert.equal(workflow.jobs.publish.concurrency['cancel-in-progress'], false);
   assert.deepEqual(workflow.permissions, {contents:'read'});
   assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
   assert.equal(workflow.jobs.publish.needs, 'validate');

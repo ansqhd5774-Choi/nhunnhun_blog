@@ -1,4 +1,4 @@
-name: Cloud Tistory login (no publication)
+name: Cloud Tistory login (no publication, interactive)
 on:
   workflow_dispatch:
   push:
