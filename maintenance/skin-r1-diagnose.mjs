@@ -15,87 +15,50 @@ try{
   const context=browser.contexts()[0];
   const page=await context.newPage();
   page.setDefaultTimeout(20000);
-  await page.goto(BLOG+'/manage',{waitUntil:'domcontentloaded'});
-  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
-  const snap=async label=>{
-    const data=await page.evaluate(()=>({
-      url:location.href,
-      title:document.title,
-      body:(document.body?.innerText||'').slice(0,12000),
-      links:[...document.querySelectorAll('a')].map(a=>({t:(a.innerText||'').trim(),h:a.href})).filter(x=>/스킨|꾸미기|html|css|디자인/i.test(x.t+' '+x.h)).slice(0,100),
-      buttons:[...document.querySelectorAll('button')].map(b=>(b.innerText||b.getAttribute('aria-label')||'').trim()).filter(Boolean).slice(0,100),
-      textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name})),
-      codeMirrors:document.querySelectorAll('.CodeMirror').length,
-      iframes:[...document.querySelectorAll('iframe')].map(x=>({src:x.src,title:x.title,name:x.name})).slice(0,20)
-    }));
-    console.log('SNAP_'+label+' '+JSON.stringify(data));
-  };
-  await snap('MANAGE');
-
   await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
-  await page.waitForTimeout(2500);
-  await snap('DIRECT_EDIT');
+  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+  await page.waitForTimeout(2200);
 
-  const htmlBtn=page.getByText('html 편집',{exact:true});
-  if(await htmlBtn.count()){
-    const el=htmlBtn.first();
-    console.log('HTML_BTN_OUTER '+JSON.stringify(await el.evaluate(e=>e.outerHTML)));
-    const before=context.pages().length;
-    await el.click();
-    await page.waitForTimeout(1800);
-    const pages=context.pages();
-    console.log('PAGE_COUNT '+before+'->'+pages.length);
-    for(let i=0;i<pages.length;i++){
-      const p=pages[i];
-      console.log('PAGE_'+i+' '+p.url());
-      try{
-        const info=await p.evaluate(()=>({title:document.title,body:(document.body?.innerText||'').slice(0,5000),cms:document.querySelectorAll('.CodeMirror').length,textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name}))}));
-        console.log('PAGE_INFO_'+i+' '+JSON.stringify(info));
-      }catch{}
-    }
-    const editorProbe=await page.evaluate(()=>({
-      codeMirror:document.querySelectorAll('.CodeMirror').length,
-      ace:document.querySelectorAll('.ace_editor').length,
-      monaco:document.querySelectorAll('.monaco-editor').length,
-      textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name,display:getComputedStyle(x).display,vis:getComputedStyle(x).visibility})),
-      editables:[...document.querySelectorAll('[contenteditable="true"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id,txt:(x.textContent||'').slice(0,200)})).slice(0,20),
-      suspects:[...document.querySelectorAll('[class*="html"],[class*="css"],[class*="code"],[class*="editor"],[class*="edit"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id,display:getComputedStyle(x).display,txt:(x.innerText||'').slice(0,120)})).slice(0,100)
-    }));
-    console.log('EDITOR_PROBE '+JSON.stringify(editorProbe));
-    const reactProbe=await page.evaluate(()=>{
-      const el=document.querySelector('.btn-edit-html');
-      if(!el) return null;
-      const keys=Object.keys(el);
-      const propKey=keys.find(k=>k.startsWith('__reactProps    await snap('AFTER_HTML_EDIT');
-  } else {
-    console.log('NO_HTML_EDIT_BUTTON');
-  }
-} finally {
-  try{await browser?.close();}catch{}
-  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
-}
-));
-      const fiberKey=keys.find(k=>k.startsWith('__reactFiber    await snap('AFTER_HTML_EDIT');
-  } else {
-    console.log('NO_HTML_EDIT_BUTTON');
-  }
-} finally {
-  try{await browser?.close();}catch{}
-  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
-}
-));
-      const props=propKey?el[propKey]:null;
-      return {
-        keys:keys.filter(k=>k.startsWith('__react')).slice(0,10),
-        propKeys:props?Object.keys(props):[],
-        onClick:props?.onClick ? String(props.onClick).slice(0,4000) : null,
-        fiberTag:fiberKey?el[fiberKey]?.tag:null
-      };
-    });
-    console.log('REACT_PROBE '+JSON.stringify(reactProbe));
-    await snap('AFTER_HTML_EDIT');
-  } else {
-    console.log('NO_HTML_EDIT_BUTTON');
+  const btn=page.locator('button.btn-edit-html');
+  await btn.waitFor({state:'visible'});
+  console.log('HTML_BTN_OUTER '+JSON.stringify(await btn.evaluate(e=>e.outerHTML)));
+
+  const beforeProbe=await page.evaluate(()=>{
+    const e=document.querySelector('.btn-edit-html');
+    const keys=e?Object.keys(e):[];
+    const pk=keys.find(k=>k.startsWith('__reactProps'));
+    const props=pk?e[pk]:null;
+    return {
+      reactKeys:keys.filter(k=>k.startsWith('__react')).slice(0,10),
+      propKeys:props?Object.keys(props):[],
+      onClick:props&&props.onClick?String(props.onClick).slice(0,3000):null
+    };
+  });
+  console.log('REACT_PROBE_BEFORE '+JSON.stringify(beforeProbe));
+
+  await btn.click();
+  await page.waitForTimeout(1800);
+
+  const after=await page.evaluate(()=>({
+    url:location.href,
+    codeMirror:document.querySelectorAll('.CodeMirror').length,
+    ace:document.querySelectorAll('.ace_editor').length,
+    monaco:document.querySelectorAll('.monaco-editor').length,
+    textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name,display:getComputedStyle(x).display})),
+    editables:[...document.querySelectorAll('[contenteditable="true"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id})).slice(0,20),
+    body:(document.body?.innerText||'').slice(0,8000)
+  }));
+  console.log('EDITOR_AFTER '+JSON.stringify(after));
+
+  const scripts=await page.locator('script[src]').evaluateAll(xs=>xs.map(x=>x.src).filter(Boolean));
+  for(const src of scripts){
+    try{
+      const res=await page.request.get(src,{timeout:15000});
+      if(!res.ok()) continue;
+      const txt=await res.text();
+      const i=txt.indexOf('btn-edit-html');
+      if(i>=0) console.log('SCRIPT_MATCH '+src+' '+JSON.stringify(txt.slice(Math.max(0,i-1500),i+3000)));
+    }catch{}
   }
 } finally {
   try{await browser?.close();}catch{}
