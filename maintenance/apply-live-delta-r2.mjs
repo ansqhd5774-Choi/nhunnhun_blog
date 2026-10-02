@@ -104,7 +104,10 @@ try{
     await inspect(context,BLOG+'/',1440,1000),
     await inspect(context,BLOG+'/356',1440,1000),
     await inspect(context,BLOG+'/356',390,844),
-    await inspect(context,BLOG+'/category/Healthy%20Life/%EC%9D%8C%EC%8B%9D',390,844)
+    await inspect(context,BLOG+'/356',768,1024),
+    await inspect(context,BLOG+'/category/Healthy%20Life/%EC%9D%8C%EC%8B%9D',390,844),
+    await inspect(context,BLOG+'/search/%EC%82%AC%EA%B3%BC',390,844),
+    await inspect(context,BLOG+'/tag/%EC%82%AC%EA%B3%BC',390,844)
   ];
   for(const x of checks){
     if(!x.title) throw new Error('E_TITLE');
