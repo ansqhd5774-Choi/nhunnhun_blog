@@ -14,12 +14,14 @@ Target: 신규 티스토리 공개 글
 
 신규 공개 글 최소 Gate:
 - H2 4개 이상
+- 본문 첫 구간은 대표 이미지 → 도입 문단 순서 필수
+- `핵심만 먼저:` quick summary 필수
 - 대표 이미지 1개 이상
 - `representativeImageUrl` 필수
 - 대표 이미지는 본문 이미지 중 하나와 정확히 일치
 - `핵심 정리` 필수
 - `자료 출처` 필수
-- 외부 근거 링크 2개 이상
+- `자료 출처` 영역에 서로 다른 외부 근거 URL 2개 이상
 - 위험 HTML·비HTTPS URL 금지
 
 ## 3. Editorial Render Contract
