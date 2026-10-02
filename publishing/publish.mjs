@@ -1,8 +1,67 @@
 import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
 import { execFileSync } from 'node:child_process';
+import { writeFile } from 'node:fs/promises';
 import { BLOG, loadPosts, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
+
+
+function imageSources(html) {
+  return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m => m[2]);
+}
+async function downloadImage(url, path) {
+  let last = '';
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent':'Mozilla/5.0',
+        'Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+      },
+      signal:AbortSignal.timeout(20000),
+    });
+    if (response.ok) {
+      const type = response.headers.get('content-type') ?? '';
+      if (!type.toLowerCase().startsWith('image/')) throw new Error('E_IMAGE_CONTENT_TYPE');
+      const bytes = Buffer.from(await response.arrayBuffer());
+      if (!bytes.length || bytes.length > 12 * 1024 * 1024) throw new Error('E_IMAGE_SIZE');
+      await writeFile(path, bytes);
+      return;
+    }
+    last = String(response.status);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  throw new Error('E_IMAGE_DOWNLOAD_' + last);
+}
+async function uploadImage(page, sourceUrl, index) {
+  const path = `/tmp/tistory-image-${index}.bin`;
+  await downloadImage(sourceUrl, path);
+  await page.evaluate(() => document.querySelectorAll('#attach-layer-btn')[0]?.click());
+  const responsePromise = page.waitForResponse(res =>
+    res.url().includes('/manage/post/attach.json') &&
+    res.request().method() === 'POST' &&
+    res.status() === 200
+  , {timeout:30000});
+  await page.locator('#attach-image').setInputFiles(path);
+  const data = await (await responsePromise).json();
+  if (!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_IMAGE_UPLOAD');
+  return data.url;
+}
+function replaceImageSources(html, mapping, representativeSource) {
+  let first = true;
+  return html.replace(/<img\b[^>]*>/gi, tag => {
+    const match = tag.match(/\bsrc=(["'])(.*?)\1/i);
+    if (!match) return tag;
+    const source = match[2];
+    const target = mapping.get(source);
+    if (!target) throw new Error('E_IMAGE_MAPPING');
+    let out = tag.replace(match[0], `src="${target}"`);
+    out = out.replace(/\s(?:loading|decoding|fetchpriority)=(["']).*?\1/gi, '');
+    const isPriority = source === representativeSource || first;
+    out = out.replace(/>$/, ` loading="${isPriority ? 'eager' : 'lazy'}" decoding="async"${isPriority ? ' fetchpriority="high"' : ''}>`);
+    first = false;
+    return out;
+  });
+}
 
 let browser, client, session, editorPage;
 let stage = 'configuration';
@@ -42,6 +101,13 @@ try {
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       stage = 'editor-content';
       await page.locator('#post-title-inp').fill(post.title);
+      stage = 'image-upload';
+      const sources = [...new Set(imageSources(post.bodyHtml))];
+      const representativeSource = post.representativeImageUrl || sources[0] || null;
+      const uploadOrder = representativeSource ? [representativeSource, ...sources.filter(src => src !== representativeSource)] : sources;
+      const imageMap = new Map();
+      for (let i = 0; i < uploadOrder.length; i++) imageMap.set(uploadOrder[i], await uploadImage(page, uploadOrder[i], i));
+      const bodyHtml = sources.length ? replaceImageSources(post.bodyHtml, imageMap, representativeSource) : post.bodyHtml;
       stage = 'mode-menu';
       await page.locator('#editor-mode-layer-btn-open').click();
       stage = 'html-mode';
@@ -49,7 +115,7 @@ try {
       stage = 'html-body';
       await page.locator('.CodeMirror:visible .CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
-      await page.keyboard.insertText(post.bodyHtml);
+      await page.keyboard.insertText(bodyHtml);
       stage = 'category-tags';
       await page.locator('#category-btn').click();
       await page.locator('#category-list').waitFor({state:'visible'});
@@ -62,6 +128,7 @@ try {
       for (const tag of post.tags) { await page.locator('#tagText').fill(tag); await page.locator('#tagText').press('Enter'); }
       await page.locator('#publish-layer-btn').click();
       stage = 'publish-dialog';
+      if (representativeSource && await page.locator('.publish_editor .box_thumb').count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
       await page.getByLabel('공개', {exact:true}).check();
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
       await publishButton.waitFor({state:'visible'});
@@ -88,6 +155,14 @@ try {
       // Parse text entities through the browser to avoid HTML entity mismatches.
       const expectedText = await publicPage.evaluate(html => { const doc = new DOMParser().parseFromString(html,'text/html'); return doc.body.textContent.replace(/\s+/g,' ').trim(); }, textHtml(post.bodyHtml));
       if (!expected || !actual.includes(expectedText)) throw new Error('E_BODY_UNVERIFIED');
+      if (sources.length) {
+        const publicImages = await content.locator('img').evaluateAll(imgs => imgs.map(img => img.src));
+        if (publicImages.length < sources.length || publicImages.slice(0, sources.length).some(src => !src.includes('kakaocdn.net'))) throw new Error('E_IMAGE_UNVERIFIED');
+      }
+      if (representativeSource) {
+        const og = await publicPage.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
+        if (!og || og.includes('opengraph.png')) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+      }
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
       await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,timestamp:new Date().toISOString()}, state.sha);
