@@ -32,23 +32,14 @@ try{
   };
   await snap('MANAGE');
 
-  await page.goto(BLOG+'/manage/design/skin',{waitUntil:'domcontentloaded'});
-  await page.waitForTimeout(1200);
-  const edit=page.getByText('편집',{exact:true});
-  if(await edit.count()){
-    await edit.first().click();
-    await page.waitForTimeout(1800);
-    await snap('AFTER_EDIT_CLICK');
-  } else {
-    await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
-    await page.waitForTimeout(1800);
-    await snap('DIRECT_EDIT');
-  }
+  await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+  await page.waitForTimeout(2500);
+  await snap('DIRECT_EDIT');
 
   const htmlBtn=page.getByText('HTML 편집',{exact:true});
   if(await htmlBtn.count()){
     await htmlBtn.first().click();
-    await page.waitForTimeout(1800);
+    await page.waitForTimeout(2500);
     await snap('AFTER_HTML_EDIT');
   } else {
     console.log('NO_HTML_EDIT_BUTTON');
