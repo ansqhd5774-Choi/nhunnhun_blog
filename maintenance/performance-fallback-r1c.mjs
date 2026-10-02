@@ -4,7 +4,7 @@ import { chromium } from 'playwright-core';
 const BLOG='https://nhunnhun.tistory.com';
 const MARK_HTML='<!-- ZG perf fallback R1C -->';
 const MARK_CSS='/* ZG perf fallback R1C */';
-const HERO='https://upload.wikimedia.org/wikipedia/commons/0/06/Red_apple_fruits.jpg';
+const HERO='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
 
 const HEAD_PATCH=`
 ${MARK_HTML}
@@ -14,7 +14,7 @@ ${MARK_HTML}
   try{
     var pc=document.createElement('link');
     pc.rel='preconnect';
-    pc.href='https://upload.wikimedia.org';
+    pc.href='https://thumb.wikimedia.org';
     pc.crossOrigin='';
     document.head.appendChild(pc);
 
@@ -33,14 +33,14 @@ ${MARK_HTML}
       }
       list.forEach(function(img){
         if(img.alt==='붉은 사과 두 개'){
-          img.setAttribute('width','720');
-          img.setAttribute('height','454');
+          img.setAttribute('width','960');
+          img.setAttribute('height','605');
           img.setAttribute('loading','eager');
           img.setAttribute('fetchpriority','high');
           img.setAttribute('decoding','async');
         } else if(img.alt==='반으로 자른 사과'){
-          img.setAttribute('width','720');
-          img.setAttribute('height','480');
+          img.setAttribute('width','960');
+          img.setAttribute('height','640');
           img.setAttribute('loading','lazy');
           img.setAttribute('decoding','async');
         }
@@ -66,13 +66,13 @@ ${MARK_CSS}
   width:100% !important;
   max-width:720px !important;
   height:auto !important;
-  aspect-ratio:720 / 454;
+  aspect-ratio:960 / 605;
 }
 #tt-body-page .contents_style img[alt="반으로 자른 사과"]{
   width:100% !important;
   max-width:720px !important;
   height:auto !important;
-  aspect-ratio:720 / 480;
+  aspect-ratio:960 / 640;
 }
 `;
 
@@ -157,8 +157,8 @@ try{
   const mobile=await verify(context,390,844);
   for(const v of [desktop,mobile]){
     if(!v.hero||!v.sliced) throw new Error('E_IMG_VERIFY');
-    if(v.hero.width!=='720'||v.hero.height!=='454'||v.hero.fetchpriority!=='high'||v.hero.loading!=='eager') throw new Error('E_HERO_ATTRS');
-    if(v.sliced.width!=='720'||v.sliced.height!=='480'||v.sliced.loading!=='lazy') throw new Error('E_SLICED_ATTRS');
+    if(v.hero.width!=='960'||v.hero.height!=='605'||v.hero.fetchpriority!=='high'||v.hero.loading!=='eager') throw new Error('E_HERO_ATTRS');
+    if(v.sliced.width!=='960'||v.sliced.height!=='640'||v.sliced.loading!=='lazy') throw new Error('E_SLICED_ATTRS');
     if(!v.preloads.some(x=>x.includes('Red_apple_fruits.jpg'))) throw new Error('E_PRELOAD');
   }
   console.log('PASS_PERF_FALLBACK_R1C '+JSON.stringify({changed,desktop,mobile}));
