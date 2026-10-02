@@ -36,9 +36,13 @@ export function assertEditorialSource(post){
   const firstImage=html.search(/<img\b/i);
   const firstH2=html.indexOf('<h2>');
   if(firstImage<0 || firstH2<0 || firstImage>firstH2) throw new Error('E_EDITORIAL_HERO_REQUIRED');
+  if(!/^\s*<p>\s*<img\b[^>]*>\s*<\/p>\s*<p>/i.test(html)) throw new Error('E_EDITORIAL_LEAD_REQUIRED');
+  if(!/<blockquote><strong>핵심만 먼저:<\/strong>[\s\S]*?<\/blockquote>/.test(html.slice(0,firstH2))) throw new Error('E_EDITORIAL_QUICK_REQUIRED');
   if(!post.representativeImageUrl) throw new Error('E_REPRESENTATIVE_IMAGE_REQUIRED');
   if(!images.includes(post.representativeImageUrl)) throw new Error('E_REPRESENTATIVE_IMAGE_NOT_IN_BODY');
-  if(externalLinks(html).length<2) throw new Error('E_EDITORIAL_EVIDENCE_REQUIRED');
+  const sourceBlock=html.match(/<h2>자료 출처<\/h2>\s*<ul>([\s\S]*?)<\/ul>/);
+  if(!sourceBlock) throw new Error('E_EDITORIAL_SOURCES_REQUIRED');
+  if(new Set(externalLinks(sourceBlock[1])).size<2) throw new Error('E_EDITORIAL_EVIDENCE_REQUIRED');
   return post;
 }
 
