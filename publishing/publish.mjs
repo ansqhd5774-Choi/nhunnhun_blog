@@ -133,7 +133,19 @@ try {
       for (const tag of post.tags) { await page.locator('#tagText').fill(tag); await page.locator('#tagText').press('Enter'); }
       await page.locator('#publish-layer-btn').click();
       stage = 'publish-dialog';
-      if (representativeSource && await page.locator('.publish_editor .box_thumb').count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+      if (representativeSource) {
+        const thumb = page.locator('.publish_editor .box_thumb');
+        if (await thumb.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+        const text = (await thumb.innerText().catch(()=>'')) || '';
+        if (text.includes('대표이미지 추가')) {
+          const repPath = '/tmp/tistory-representative.bin';
+          await downloadImage(representativeSource, repPath);
+          const input = thumb.locator('input[type="file"]');
+          if (await input.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+          await input.setInputFiles(repPath);
+          await page.waitForTimeout(1500);
+        }
+      }
       await page.getByLabel('공개', {exact:true}).check();
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
       await publishButton.waitFor({state:'visible'});
