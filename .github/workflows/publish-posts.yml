@@ -48,19 +48,14 @@ jobs:
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
           BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
           BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
-      - name: Inspect Tistory skin editor
-        run: node maintenance/inspect-skin-editor.mjs
+      - name: Fix Tistory article image responsiveness
+        run: node maintenance/fix-skin-images.mjs
         env:
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
           BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
           BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
 
-# inspect-html-editor-r2
 
-# inspect-editor-route-r3
 
-# inspect-network-r4
 
-# inspect-current-json-r5
 
-# inspect-all-io-r6
