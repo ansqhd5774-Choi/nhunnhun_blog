@@ -81,7 +81,7 @@ try {
       const publicPage = await publicContext.newPage();
       await publicPage.goto(url, {waitUntil:'domcontentloaded'});
       if (!(await publicPage.locator('body').innerText()).includes(post.title)) throw new Error('E_PUBLICATION_UNCERTAIN');
-      const content = publicPage.locator('.tt_article_useless_p_margin');
+      const content = publicPage.locator('.contents_style');
       if (await content.count() !== 1) throw new Error('E_BODY_UNVERIFIED');
       const actual = (await content.innerText()).replace(/\s+/g,' ').trim();
       const expected = plainText(post.bodyHtml);

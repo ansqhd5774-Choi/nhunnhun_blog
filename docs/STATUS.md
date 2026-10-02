@@ -1,6 +1,6 @@
 # 현재 상태
 
-자동 게시: GitHub Actions → Browserbase 클라우드 브라우저 → 티스토리 에디터 구성 작성. 사용자 요구는 PC가 꺼져 있어도 실행되는 방식이다. 새 서비스 계정 연결 및 로그인 세션 보관 승인 대기. 현재 발행 비활성 / 실제 클라우드 발행 미검증. docs/AUTO_PUBLISH.md 참조.
+자동 게시: 활성화 완료. Browserbase 무료 계정 연결·GitHub Secrets 등록·새 세션 로그인 유지 검증 완료. GitHub Actions에서 /355를 실제 공개 발행했고 제목·전체 본문·음식 카테고리·블로그소식 태그를 공개 브라우저로 확인했다. 본문 검증 selector 불일치를 수정하고 submitting 기록을 published로 복구했다. 재발행은 하지 않았다. 로그인 만료 또는 무료 이용량 소진 시 중단될 수 있다. docs/AUTO_PUBLISH.md 참조.
 
 GitHub 연결 완료: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main). 로컬 origin 연결, 관리 문서·서식·검토용 HTML/CSS commit 및 push 완료. 로컬/원격 커밋 일치와 GitHub 연결 도구의 인수인계 문서 읽기 성공 확인. 원본 백업과 수집 원자료는 제외. 실제 원격 반영 증거는 evidence/github-20261002.json에서 확인한다. 다른 일반 ChatGPT 대화의 접근/쓰기 권한은 아직 미검증.
 

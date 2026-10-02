@@ -1,0 +1,12 @@
+{
+  "url": "https://nhunnhun.tistory.com/355",
+  "run": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/36991277106",
+  "cloudEditorPublication": "CONFIRMED",
+  "publicTitle": "PASS",
+  "publicFullBodyExactComparison": "PASS",
+  "category": "음식",
+  "tag": "블로그소식",
+  "verificationDiscrepancy": "Old body selector missing; corrected to observed .contents_style",
+  "checkpointReconciliation": "published after public verification; no resubmission",
+  "publishEnabled": true
+}

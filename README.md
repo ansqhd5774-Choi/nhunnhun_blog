@@ -6,7 +6,7 @@ GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
 
 이 프로젝트는 작업 파일과 증거를 관리한다. GitHub 연결을 사용할 수 있는 ChatGPT에서는 저장소의 문서를 읽어 작업을 이어간다. 저장/수정/PR 기능은 해당 대화의 실제 도구와 권한을 별도로 확인한다. 로컬 프로젝트 생성과 GitHub 연결은 ChatGPT 클라우드 실행 환경 생성이나 티스토리 로그인 공유를 의미하지 않는다.
 
-PC를 꺼도 실행되는 자동 발행 코드는 [docs/AUTO_PUBLISH.md](docs/AUTO_PUBLISH.md)에 설명했다. posts/*.json 변경으로 GitHub Actions가 검증을 시작하며, 실제 게시에는 별도 클라우드 로그인 연결과 발행 활성화가 필요하다. 현재 발행은 비활성 상태다.
+PC를 꺼도 실행되는 자동 발행은 [docs/AUTO_PUBLISH.md](docs/AUTO_PUBLISH.md)에 설명했다. 클라우드 로그인 유지와 /355의 실제 공개 발행을 검증했고 현재 활성화했다. posts/*.json의 status=ready, approved=true인 새 글 1개를 main에 저장하면 GitHub Actions가 검증·게시한다. 초안은 발행하지 않는다. 로그인 만료 시 재로그인이 필요하다.
 
 ChatGPT 인수인계: [docs/CHATGPT_HANDOFF.md](docs/CHATGPT_HANDOFF.md). GitHub에 올린 skin/reference/skin.html은 인증·광고 식별자를 제거한 검토용 소스다. 실제 적용 파일로 사용하지 않는다. 원본 백업과 수집 원자료는 로컬에만 보존한다.
 

@@ -44,5 +44,6 @@ GitHub에는 BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, BROWSERBASE_CONTEXT_ID
 
 로컬: 승인 상태·중복 게시·불명 상태 재시도 방지·본문 변경·대상 URL·HTML 위험 요소·워크플로 활성화 제한 등 14개 테스트 통과. 예시 글 형식 검사 통과, 발행 대기 글 0개. 발행 비활성 경로 실행 확인.
 사용자 Chrome: 관리자 글쓰기 화면의 제목·모드·카테고리·태그·완료 버튼과 실제 글 관리 목록의 공개 URL 구조 읽기 확인. 글 발행 없음.
-클라우드 브라우저: 계정 미연결 / 로그인 미확인 / 에디터 입력·공개 발행 미검증.
+클라우드 브라우저: 사용자 승인 후 무료 계정 연결 완료. 새 세션 로그인 유지 PASS. 2026-10-02 테스트 글 /355 공개 발행 확인. 공개 본문 전체 일치 PASS, 음식 카테고리·블로그소식 태그 확인. 현재 TISTORY_PUBLISH_ENABLED=true.
+실제 실행 중 확인된 HTML 모드 안내문과 보이는 CodeMirror 입력 영역에 맞춰 수정했다. 공개 본문 영역은 .contents_style이며 최초 검증은 과거 selector로 실패했다. 실제 글이 정상임을 확인해 published 기록을 복구했고 중복 발행하지 않았다.
 GitHub Actions: 실행 결과는 evidence의 별도 검증 기록을 확인한다.
