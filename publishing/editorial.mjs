@@ -1,8 +1,22 @@
+export const EDITORIAL_TEMPLATE_VERSION='R2';
+
 const ACCENT='<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;border-radius:999px;margin:48px 0 10px;"></div>';
 const H2='<h2 style="margin:0 0 18px;padding:0;font-size:26px;line-height:1.4;font-weight:800;letter-spacing:-0.02em;color:#111827;border:0;background:none;">';
 const H3='<h3 style="margin:30px 0 10px;padding:0;font-size:20px;line-height:1.45;font-weight:800;letter-spacing:-0.01em;color:#1f2937;border:0;background:none;">';
 const SOURCE='margin:8px 0 24px;padding-top:8px;border-top:1px solid #eef1f4;font-size:12px;line-height:1.6;color:#6b7280;';
 
+function count(html,re){ return [...html.matchAll(re)].length; }
+function topicFromTitle(title=''){
+  const first=String(title).trim().split(/[\s·:—-]+/)[0];
+  return first || '';
+}
+function imageSources(html){
+  return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
+}
+function externalLinks(html){
+  return [...html.matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/[^"']+)\1[^>]*>/gi)]
+    .map(m=>m[2]).filter(url=>!url.startsWith('https://nhunnhun.tistory.com/'));
+}
 function styleTable(inner){
   let t=inner;
   t=t.replace(/<thead><tr>/g,'<thead><tr style="background:#f5f6f8;">');
@@ -11,8 +25,42 @@ function styleTable(inner){
   return '<div style="overflow-x:auto;margin:14px 0 10px;border:1px solid #e5e7eb;border-radius:8px;"><table style="width:100%;min-width:520px;border-collapse:collapse;margin:0;background:#fff;font-size:14px;line-height:1.55;">'+t+'</table></div>';
 }
 
-export function applyEditorialTemplate(html){
+export function assertEditorialSource(post){
+  const html=post.bodyHtml;
+  const h2=count(html,/<h2>/g);
+  const images=imageSources(html);
+  if(h2<4) throw new Error('E_EDITORIAL_SOURCE_TOO_THIN');
+  if(!/<h2>핵심 정리<\/h2>/.test(html)) throw new Error('E_EDITORIAL_SUMMARY_REQUIRED');
+  if(!/<h2>자료 출처<\/h2>/.test(html)) throw new Error('E_EDITORIAL_SOURCES_REQUIRED');
+  if(images.length<1) throw new Error('E_EDITORIAL_IMAGE_REQUIRED');
+  const firstImage=html.search(/<img\b/i);
+  const firstH2=html.indexOf('<h2>');
+  if(firstImage<0 || firstH2<0 || firstImage>firstH2) throw new Error('E_EDITORIAL_HERO_REQUIRED');
+  if(!post.representativeImageUrl) throw new Error('E_REPRESENTATIVE_IMAGE_REQUIRED');
+  if(!images.includes(post.representativeImageUrl)) throw new Error('E_REPRESENTATIVE_IMAGE_NOT_IN_BODY');
+  if(externalLinks(html).length<2) throw new Error('E_EDITORIAL_EVIDENCE_REQUIRED');
+  return post;
+}
+
+export function editorialExpectations(sourceHtml){
+  const latest=count(sourceHtml,/<h2>최신 근거\s*·?\s*\d{4}<\/h2>\s*<blockquote>/g);
+  return {
+    h2:count(sourceHtml,/<h2>/g)-latest,
+    h3:count(sourceHtml,/<h3>/g),
+    tables:count(sourceHtml,/<table>/g),
+    images:count(sourceHtml,/<img\b/g),
+    faq:count(sourceHtml,/<p><strong>Q\.\s*[^<]+<\/strong><br\/?/g),
+    latest,
+    quick:/<blockquote><strong>핵심만 먼저:<\/strong>/g.test(sourceHtml) ? 1 : 0,
+    summary:/<h2>핵심 정리<\/h2>/.test(sourceHtml) ? 1 : 0,
+    related:/<h2>함께 보면 좋은 글<\/h2>/.test(sourceHtml) ? 1 : 0,
+    sources:/<h2>자료 출처<\/h2>/.test(sourceHtml) ? 1 : 0,
+  };
+}
+
+export function applyEditorialTemplate(html,{title=''}={}){
   let out=html;
+  const topic=topicFromTitle(title);
 
   // Hero and lead.
   out=out.replace(
@@ -20,47 +68,47 @@ export function applyEditorialTemplate(html){
     (_m,img)=>'<p>'+img.replace(/>$/, ' loading="eager" fetchpriority="high" decoding="async" style="width:100%;max-width:720px;height:auto;display:block;margin:18px auto 24px;">')+'</p><p style="margin:0 0 20px;font-size:16px;line-height:1.8;color:#374151;">'
   );
 
-  // Remaining plain image paragraphs get responsive treatment without changing visible text.
+  // Remaining plain image paragraphs.
   out=out.replace(/<p>\s*(<img\b[^>]*>)\s*<\/p>/gi,(_m,img)=>{
     if(/style=/.test(img)) return '<p>'+img+'</p>';
     return '<p>'+img.replace(/>$/, ' loading="lazy" decoding="async" style="width:100%;max-width:720px;height:auto;display:block;margin:18px auto 24px;">')+'</p>';
   });
 
-  // Latest-evidence section is an aside rather than another major numbered section.
+  // Opening quick summary becomes the standard top information card.
+  out=out.replace(
+    /<blockquote><strong>핵심만 먼저:<\/strong>\s*([\s\S]*?)<\/blockquote>/,
+    '<div style="margin:20px 0 28px;padding:18px 20px;background:#f7f9fc;border:1px solid #e5eaf0;border-radius:10px;"><p style="margin:0 0 10px;font-size:19px;font-weight:800;color:#111827;">'+(topic?topic+', ':'')+'이것만 먼저 보세요</p><p style="margin:0;line-height:1.8;color:#374151;">$1</p></div>'
+  );
+
+  // Latest evidence is subordinate to the numbered content flow.
   out=out.replace(
     /<h2>(최신 근거\s*·?\s*\d{4})<\/h2>\s*<blockquote>([\s\S]*?)<\/blockquote>/g,
     '<aside style="margin:28px 0 32px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:8px;background:#fbfcfe;"><div style="margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#2563eb;">$1</div>$2</aside>'
   );
 
-  // Major/minor hierarchy.
   out=out.replace(/<h2>/g,ACCENT+H2);
   out=out.replace(/<h3>/g,H3);
 
-  // Tables.
   out=out.replace(/<table>\s*([\s\S]*?)\s*<\/table>/g,(_m,inner)=>styleTable(inner));
 
-  // Existing blockquotes become restrained editorial callouts.
   out=out.replace(/<blockquote>/g,'<blockquote style="margin:18px 0 28px;padding:16px 18px;background:#f8fafc;border-left:4px solid #334155;color:#1f2937;">');
 
-  // External evidence links at paragraph end are separated from prose.
+  // Inline evidence is separated from prose.
   out=out.replace(
     /<p>([\s\S]*?)\s+(<a href="https:\/\/(?!nhunnhun\.tistory\.com)[^"]+"[^>]*>[^<]+<\/a>)<\/p>/g,
     '<p>$1</p><p style="'+SOURCE+'">근거: $2</p>'
   );
 
-  // FAQ cards, preserving question text while adding explicit answer label.
   out=out.replace(
     /<p><strong>Q\.\s*([^<]+)<\/strong><br\/?>([\s\S]*?)<\/p>/g,
     '<div style="margin:0 0 24px;padding:16px 18px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;"><p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#111827;"><span style="display:inline-block;margin-right:6px;color:#2563eb;">Q.</span>$1</p><p style="margin:0;color:#374151;line-height:1.75;"><span style="font-weight:700;color:#6b7280;margin-right:6px;">A.</span>$2</p></div>'
   );
 
-  // End summary.
   out=out.replace(
     /(<h2[^>]*>핵심 정리<\/h2>)\s*<ul>([\s\S]*?)<\/ul>/,
     '$1<div style="margin:0 0 12px;padding:16px 18px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;"><ul style="margin:0;padding-left:20px;line-height:1.85;">$2</ul></div>'
   );
 
-  // Related links.
   out=out.replace(
     /(<h2[^>]*>함께 보면 좋은 글<\/h2>)((?:\s*<p><a href="https:\/\/nhunnhun\.tistory\.com\/[^"]+"><strong>[^<]+<\/strong><\/a><\/p>)+)/,
     (_m,head,block)=>{
@@ -71,11 +119,42 @@ export function applyEditorialTemplate(html){
     }
   );
 
-  // Sources are deliberately quieter.
   out=out.replace(
     /(<h2[^>]*>자료 출처<\/h2>)\s*<ul>/,
     '$1<ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.75;color:#4b5563;">'
   );
 
   return out;
+}
+
+export function assertEditorialContract(renderedHtml,sourceHtml){
+  const e=editorialExpectations(sourceHtml);
+  const h2=count(renderedHtml,/<h2\b/g);
+  const h2Styled=count(renderedHtml,/<h2\b[^>]*font-size:26px[^>]*font-weight:800[^>]*>/g);
+  const accents=count(renderedHtml,/<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;/g);
+  const h3=count(renderedHtml,/<h3\b/g);
+  const h3Styled=count(renderedHtml,/<h3\b[^>]*font-size:20px[^>]*font-weight:800[^>]*>/g);
+  const tables=count(renderedHtml,/<table\b/g);
+  const tableWraps=count(renderedHtml,/<div style="overflow-x:auto;[^"]*"><table\b/g);
+  const images=count(renderedHtml,/<img\b/g);
+  const responsiveImages=count(renderedHtml,/<img\b[^>]*style="[^"]*width:100%;[^"]*max-width:720px;[^"]*"/g);
+  const q=count(renderedHtml,/>Q\.<\/span>/g);
+  const a=count(renderedHtml,/>A\.<\/span>/g);
+  if(h2!==e.h2 || h2Styled!==e.h2 || accents!==e.h2) throw new Error('E_EDITORIAL_H2_CONTRACT');
+  if(h3!==e.h3 || h3Styled!==e.h3) throw new Error('E_EDITORIAL_H3_CONTRACT');
+  if(tables!==e.tables || tableWraps!==e.tables) throw new Error('E_EDITORIAL_TABLE_CONTRACT');
+  if(images!==e.images || responsiveImages!==e.images) throw new Error('E_EDITORIAL_IMAGE_CONTRACT');
+  if(q!==e.faq || a!==e.faq) throw new Error('E_EDITORIAL_FAQ_CONTRACT');
+  if(e.latest && count(renderedHtml,/<aside\b[^>]*>[^]*?최신 근거\s*·?\s*\d{4}[^]*?<\/aside>/g)!==e.latest) throw new Error('E_EDITORIAL_LATEST_CONTRACT');
+  if(e.quick && !/이것만 먼저 보세요<\/p>/.test(renderedHtml)) throw new Error('E_EDITORIAL_QUICK_CONTRACT');
+  if(e.summary && !/핵심 정리<\/h2><div style="margin:0 0 12px;padding:16px 18px;background:#f8fafc;/.test(renderedHtml)) throw new Error('E_EDITORIAL_SUMMARY_CONTRACT');
+  if(e.related && !/함께 보면 좋은 글<\/h2>[\s\S]*text-decoration:none;/.test(renderedHtml)) throw new Error('E_EDITORIAL_RELATED_CONTRACT');
+  if(e.sources && !/자료 출처<\/h2><ul style="margin:0;padding-left:20px;font-size:14px;/.test(renderedHtml)) throw new Error('E_EDITORIAL_SOURCES_CONTRACT');
+  return renderedHtml;
+}
+
+export function renderEditorialPost(post){
+  assertEditorialSource(post);
+  const rendered=applyEditorialTemplate(post.bodyHtml,{title:post.title});
+  return assertEditorialContract(rendered,post.bodyHtml);
 }
