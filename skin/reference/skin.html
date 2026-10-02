@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8" />
 <link rel="preconnect" href="https://t1.daumcdn.net/" crossorigin>
 <link rel="preconnect" href="https://tistory1.daumcdn.net/" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +20,6 @@
 <!-- REDACTED: site verification retained only in local original -->
 <!-- REDACTED: site verification retained only in local original -->
 <!--메타태그 -->
-
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1.0, maximum-scale=5.0" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
@@ -83,17 +81,17 @@
 						<a href="[##_blog_link_##]">[##_title_##]</a>
 					</div>
 					<div id="search-bar">
-						<button class="search-icon" aria-label="검색" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
+						<button type="button" class="search-icon" aria-label="검색" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
 							<svg width="20" height="20" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg" data-svg="search-icon">
 								<circle fill="none" stroke="#666" stroke-width="1.5" cx="11" cy="11" r="8"></circle>
 								<path fill="none" stroke="#4682B4" stroke-width="1.8" d="M23,23 L20,20 L19.2,19.2"></path>
 							</svg>
 						</button>
 						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
-					<button class="search-close-icon" aria-label="검색 닫기" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
+					<button type="button" class="search-close-icon" aria-label="검색 닫기" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
 					</div>
 					<div id="header-ico">
-						<button class="btn_topMenu" id="btn_topbtn" aria-label="topMenu">					
+						<button type="button" class="btn_topMenu" id="btn_topbtn" aria-label="메뉴 열기">					
 							<div class="menu-icon"></div>
 							<div class="menu-icon"></div>
 							<div class="menu-icon"></div>			
@@ -105,9 +103,9 @@
 		<!--드랍다운 메뉴-->
 		<div class="dropdown-content">
 			<div class="lb-data">
-				<div class="btn_close">
+				<button type="button" class="btn_close" aria-label="메뉴 닫기">
 					<svg class="close-icon" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
-				</div>
+				</button>
 			</div>
 			<div class="dropdown-profile">
 				<div class="dropdown-profile_bg">
