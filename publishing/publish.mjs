@@ -5,6 +5,7 @@ import { BLOG, loadPosts, eligible, fingerprint, assertArticleUrl, plainText, te
 import { Ledger } from './ledger.mjs';
 
 let browser, client, session;
+let stage = 'configuration';
 try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
     console.log('DISABLED: 클라우드 연결과 운영 검증 전에는 발행하지 않습니다.');
@@ -18,13 +19,15 @@ try {
     if (queue.length > 1) throw new Error('E_ONE_POST_PER_RUN');
     if (queue.length) {
       const post = queue[0];
+      stage = 'cloud-connect';
       client = new Browserbase({ apiKey:process.env.BROWSERBASE_API_KEY });
       session = await client.sessions.create({
         projectId:process.env.BROWSERBASE_PROJECT_ID,
         browserSettings: { context:{ id:process.env.BROWSERBASE_CONTEXT_ID, persist:true }, recordSession:false, logSession:false, solveCaptchas:false },
-        timeout:600,
+        timeout:300,
       });
       browser = await chromium.connectOverCDP(session.connectUrl);
+      stage = 'editor-open';
       const context = browser.contexts()[0];
       const page = await context.newPage();
       page.setDefaultTimeout(20000);
@@ -36,12 +39,14 @@ try {
       await page.goto(`${BLOG}/manage/post`, { waitUntil:'domcontentloaded' });
       if (new URL(page.url()).origin !== BLOG) throw new Error('E_LOGIN_REQUIRED');
       await page.locator('#post-title-inp').waitFor({state:'visible'});
+      stage = 'editor-content';
       await page.locator('#post-title-inp').fill(post.title);
       await page.locator('#editor-mode-layer-btn-open').click();
       await page.locator('#editor-mode-html').click();
       await page.locator('.CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(post.bodyHtml);
+      stage = 'category-tags';
       await page.locator('#category-btn').click();
       await page.locator('#category-list').waitFor({state:'visible'});
       const matches = [];
@@ -52,6 +57,7 @@ try {
       await matches[0].click();
       for (const tag of post.tags) { await page.locator('#tagText').fill(tag); await page.locator('#tagText').press('Enter'); }
       await page.locator('#publish-layer-btn').click();
+      stage = 'publish-dialog';
       await page.getByLabel('공개', {exact:true}).check();
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
       await publishButton.waitFor({state:'visible'});
@@ -59,11 +65,13 @@ try {
       // Durable checkpoint BEFORE the irreversible final click. A timeout must never resubmit blindly.
       const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
       await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, timestamp:new Date().toISOString()});
+      stage = 'final-submit';
       await publishButton.click();
       await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname));
       const articleLink = page.getByRole('link', {name:post.title,exact:true});
       if (await articleLink.count() !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
       const url = assertArticleUrl(new URL(await articleLink.getAttribute('href'), BLOG).href);
+      stage = 'public-verification';
       // Verify anonymously, so an owner-only/private page cannot count as published.
       const publicContext = await browser.newContext();
       const publicPage = await publicContext.newPage();
@@ -82,7 +90,9 @@ try {
       console.log(`PUBLISHED: ${post.id} ${url}`);
     } else console.log('NO_PENDING_POSTS');
   }
-} catch {
+} catch (error) {
+  const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
+  console.error(`DIAGNOSTIC: ${stage} ${code}`);
   // Provider exceptions can carry credentials/connect URLs: never log raw exceptions.
   console.error('STOP: 클라우드 설정·로그인·에디터·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
   process.exitCode = 1;
