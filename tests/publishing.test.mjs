@@ -107,6 +107,8 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/renderEditorialPost\(post\)/);
   assert.match(publish,/assertEditorialContract\(stagedHtml, post\.bodyHtml\)/);
   assert.match(publish,/E_EDITORIAL_PUBLIC_CONTRACT/);
+  assert.match(publish,/host\.innerText\|\|host\.textContent/);
+  assert.doesNotMatch(publish,/DOMParser\(\)\.parseFromString/);
   assert.match(publish,/editorialSnapshot\.responsiveImages/);
   assert.match(publish,/editorialSnapshot\.quickCards/);
   assert.match(publish,/editorialSnapshot\.relatedCards/);
