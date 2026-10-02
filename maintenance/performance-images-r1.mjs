@@ -65,14 +65,12 @@ async function openPostHtml(page){
   await cm.waitFor({state:'visible'});
   return cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
 }
-function replaceSrc(html,alt,newSrc){
-  const re=new RegExp('(<img\\b[^>]*alt=["\\\']'+alt.replace(/[.*+?^$(){|}[\\]\\]/g,'\\$&')+'["\\\'][^>]*\\bsrc=["\\\'])[^"\\\']+(["\\\'][^>]*>)','i');
-  if(!re.test(html)){
-    const re2=new RegExp('(<img\\b[^>]*\\bsrc=["\\\'])[^"\\\']+(["\\\'][^>]*alt=["\\\']'+alt.replace(/[.*+?^$(){|}[\\]\\]/g,'\\$&')+'["\\\'][^>]*>)','i');
-    if(!re2.test(html)) throw new Error('E_IMG_NOT_FOUND_'+alt);
-    return html.replace(re2,'$1'+newSrc+'$2');
-  }
-  return html.replace(re,'$1'+newSrc+'$2');
+function replaceKnownImageUrls(html){
+  const oldHero='https://upload.wikimedia.org/wikipedia/commons/0/06/Red_apple_fruits.jpg';
+  const oldSliced='https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg';
+  if(!html.includes(oldHero)) throw new Error('E_HERO_URL_NOT_FOUND');
+  if(!html.includes(oldSliced)) throw new Error('E_SLICED_URL_NOT_FOUND');
+  return html.replaceAll(oldHero,HERO).replaceAll(oldSliced,SLICED);
 }
 async function setPostHtml(page,html){
   const cm=page.locator('.CodeMirror:visible');
@@ -138,8 +136,7 @@ try{
   post.setDefaultTimeout(25000);
   post.on('dialog',async d=>{try{await d.accept();}catch{}});
   originalPost=await openPostHtml(post);
-  let next=replaceSrc(originalPost,'붉은 사과 두 개',HERO);
-  next=replaceSrc(next,'반으로 자른 사과',SLICED);
+  const next=replaceKnownImageUrls(originalPost);
   if(next!==originalPost){
     await setPostHtml(post,next);
     postChanged=true;
