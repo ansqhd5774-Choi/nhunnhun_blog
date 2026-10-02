@@ -13,18 +13,19 @@ try{
   if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
   await page.locator('#post-title-inp').waitFor({state:'visible'});
   await page.locator('#mceu_0-open').click();
-  await page.waitForTimeout(500);
+  await page.locator('#attach-image').click();
+  await page.waitForTimeout(700);
   const data=await page.evaluate(()=>({
-    visibleMenuItems:[...document.querySelectorAll('.mce-menu-item')].filter(e=>getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0).map((e,i)=>({
-      i,id:e.id,cls:String(e.className||'').slice(0,140),
-      text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,120),
-      aria:e.getAttribute('aria-label')
+    fileInputs:[...document.querySelectorAll('input[type="file"]')].map((e,i)=>({
+      i,id:e.id,name:e.name,accept:e.accept,multiple:e.multiple,
+      cls:String(e.className||'').slice(0,140),outer:e.outerHTML.slice(0,500)
     })),
-    visibleInputs:[...document.querySelectorAll('input')].filter(e=>getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0).map((e,i)=>({
-      i,id:e.id,type:e.type,name:e.name,accept:e.accept,cls:String(e.className||'').slice(0,120)
+    dialogs:[...document.querySelectorAll('[role="dialog"],.mce-window')].filter(e=>getComputedStyle(e).display!=='none').map((e,i)=>({
+      i,id:e.id,cls:String(e.className||'').slice(0,140),
+      text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,500)
     }))
   }));
-  console.log('ATTACH_MENU '+JSON.stringify(data));
+  console.log('IMAGE_UPLOAD_UI '+JSON.stringify(data));
 }finally{
   try{await browser?.close();}catch{}
   try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
