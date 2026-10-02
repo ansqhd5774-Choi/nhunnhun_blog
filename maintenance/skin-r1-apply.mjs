@@ -168,7 +168,7 @@ async function verify(viewport){
   });
   await context.close();
   const ok=result.imageWidth!==null &&
-    result.imageWidth<=result.contentWidth+1 &&
+    result.imageWidth<=result.contentWidth+1 && result.imageWidth<=720.5 &&
     result.ulStyle && result.ulStyle!=='none' &&
     result.olStyle && result.olStyle!=='none' &&
     result.linkDecoration?.includes('underline') &&
