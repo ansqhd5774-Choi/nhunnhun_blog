@@ -88,7 +88,7 @@ export function applyEditorialTemplate(html,{title=''}={}){
   // Latest evidence is subordinate to the numbered content flow.
   out=out.replace(
     /<h2>(최신 근거\s*·?\s*\d{4})<\/h2>\s*<blockquote>([\s\S]*?)<\/blockquote>/g,
-    '<aside style="margin:28px 0 32px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:8px;background:#fbfcfe;"><div style="margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#2563eb;">$1</div>$2</aside>'
+    '<div style="margin:28px 0 32px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:8px;background:#fbfcfe;"><p style="margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#2563eb;">$1</p>$2</div>'
   );
 
   out=out.replace(/<h2>/g,ACCENT+H2);
@@ -150,7 +150,7 @@ export function assertEditorialContract(renderedHtml,sourceHtml){
   if(tables!==e.tables || tableWraps!==e.tables) throw new Error('E_EDITORIAL_TABLE_CONTRACT');
   if(images!==e.images || responsiveImages!==e.images) throw new Error('E_EDITORIAL_IMAGE_CONTRACT');
   if(q!==e.faq || a!==e.faq) throw new Error('E_EDITORIAL_FAQ_CONTRACT');
-  if(e.latest && count(renderedHtml,/<aside\b[^>]*>[^]*?최신 근거\s*·?\s*\d{4}[^]*?<\/aside>/g)!==e.latest) throw new Error('E_EDITORIAL_LATEST_CONTRACT');
+  if(e.latest && count(renderedHtml,/<div\b[^>]*background:#fbfcfe;[^>]*>[\s\S]*?최신 근거\s*·?\s*\d{4}[\s\S]*?<\/div>/g)!==e.latest) throw new Error('E_EDITORIAL_LATEST_CONTRACT');
   if(e.quick && !/이것만 먼저 보세요<\/p>/.test(renderedHtml)) throw new Error('E_EDITORIAL_QUICK_CONTRACT');
   if(e.summary && !/핵심 정리<\/h2><div style="margin:0 0 12px;padding:16px 18px;background:#f8fafc;/.test(renderedHtml)) throw new Error('E_EDITORIAL_SUMMARY_CONTRACT');
   if(e.related && !/함께 보면 좋은 글<\/h2>[\s\S]*text-decoration:none;/.test(renderedHtml)) throw new Error('E_EDITORIAL_RELATED_CONTRACT');
