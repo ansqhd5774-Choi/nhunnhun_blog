@@ -7,10 +7,14 @@ async function get(path){
 }
 function assert(c,m){if(!c) throw new Error(m)}
 function meta(html,name,prop=false){
-  const re=prop
-    ? new RegExp('<meta\\s+[^>]*property=["\\']'+name.replace(/[.*+?^$()|[\]{}\\]/g,'\\$&')+'["\\'][^>]*content=["\\']([^"\\']*)["\\']','i')
-    : new RegExp('<meta\\s+[^>]*name=["\\']'+name.replace(/[.*+?^$()|[\]{}\\]/g,'\\$&')+'["\\'][^>]*content=["\\']([^"\\']*)["\\']','i');
-  const m=html.match(re); return m?m[1]:null;
+  const attr=prop?'property':'name';
+  const tags=html.match(/<meta\\b[^>]*>/gi)||[];
+  for(const tag of tags){
+    const key=tag.match(new RegExp(attr+'=["\\\']([^"\\\']+)["\\\']','i'))?.[1];
+    if(key!==name) continue;
+    return tag.match(/content=["']([^"']*)["']/i)?.[1]||null;
+  }
+  return null;
 }
 function canonical(html){const m=html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)||html.match(/<link\s+[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i);return m?m[1]:null}
 function title(html){const m=html.match(/<title>([\s\S]*?)<\/title>/i);return m?m[1].replace(/<[^>]+>/g,'').trim():null}
