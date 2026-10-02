@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
+import { applyEditorialTemplate } from './editorial.mjs';
 
 
 function imageSources(html) {
@@ -105,12 +106,13 @@ try {
       stage = 'editor-content';
       await page.locator('#post-title-inp').fill(post.title);
       stage = 'image-upload';
-      const sources = [...new Set(imageSources(post.bodyHtml))];
+      const editorialHtml = applyEditorialTemplate(post.bodyHtml);
+      const sources = [...new Set(imageSources(editorialHtml))];
       const representativeSource = post.representativeImageUrl || sources[0] || null;
       const uploadOrder = representativeSource ? [representativeSource, ...sources.filter(src => src !== representativeSource)] : sources;
       const imageMap = new Map();
       for (let i = 0; i < uploadOrder.length; i++) imageMap.set(uploadOrder[i], await uploadImage(page, uploadOrder[i], i));
-      const bodyHtml = sources.length ? replaceImageSources(post.bodyHtml, imageMap, representativeSource) : post.bodyHtml;
+      const bodyHtml = sources.length ? replaceImageSources(editorialHtml, imageMap, representativeSource) : editorialHtml;
       stage = 'mode-menu';
       await page.locator('#editor-mode-layer-btn-open').click();
       stage = 'html-mode';
@@ -154,9 +156,9 @@ try {
       const content = publicPage.locator('.contents_style');
       if (await content.count() !== 1) throw new Error('E_BODY_UNVERIFIED');
       const actual = (await content.innerText()).replace(/\s+/g,' ').trim();
-      const expected = plainText(post.bodyHtml);
-      // Parse text entities through the browser to avoid HTML entity mismatches.
-      const expectedText = await publicPage.evaluate(html => { const doc = new DOMParser().parseFromString(html,'text/html'); return doc.body.textContent.replace(/\s+/g,' ').trim(); }, textHtml(post.bodyHtml));
+      const expected = plainText(bodyHtml);
+      // Compare against the final editorial HTML inserted into Tistory, not the raw authoring source.
+      const expectedText = await publicPage.evaluate(html => { const doc = new DOMParser().parseFromString(html,'text/html'); return doc.body.textContent.replace(/\s+/g,' ').trim(); }, textHtml(bodyHtml));
       if (!expected || !actual.includes(expectedText)) throw new Error('E_BODY_UNVERIFIED');
       if (sources.length) {
         const publicImages = await content.locator('img').evaluateAll(imgs => imgs.map(img => img.src));
