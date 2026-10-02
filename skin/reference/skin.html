@@ -90,7 +90,7 @@
 								<path fill="none" stroke="#4682B4" stroke-width="1.8" d="M23,23 L20,20 L19.2,19.2"></path>
 							</svg>
 						</button>
-						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
+						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
 					<button class="search-close-icon" aria-label="검색 닫기" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
 					</div>
 					<div id="header-ico">
@@ -107,7 +107,7 @@
 		<div class="dropdown-content">
 			<div class="lb-data">
 				<div class="btn_close">
-					<span class="material-icons-outlined close-icon">close</span>
+					<svg class="close-icon" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
 				</div>
 			</div>
 			<div class="dropdown-profile">
@@ -175,7 +175,7 @@
 													</div>
 													<div class="list_detail_wrap">
 														<h2 class="post_title">[##_article_rep_title_##]</h2>
-														<p class="post_text"> [##_article_rep_summary_##]
+														<p class="post_text">[##_article_rep_summary_##]</p>
 													</div>
 												</a>
 												<ul class="post_list">
@@ -213,11 +213,11 @@
 												</s_ad_div>
 												<span class="wide-button-wrap">
 													<a href="#" class="widely-text" id="widen-btn">
-														<span class="material-icons-outlined wide-icon">fullscreen</span>
+														<svg class="wide-icon" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="M4 9V4h5v2H6v3H4Zm11-3V4h5v5h-2V6h-3Zm3 9h2v5h-5v-2h3v-3ZM9 18v2H4v-5h2v3h3Z"/></svg>
 														<span>넓게보기</span>
 													</a>
 													<a href="#" class="widely-text" id="original-btn" style="display: none;">
-														<span class="material-icons-outlined wide-icon">fullscreen_exit</span>
+														<svg class="wide-icon" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="M9 4v5H4V7h3V4h2Zm6 0h2v3h3v2h-5V4ZM4 15h5v5H7v-3H4v-2Zm11 0h5v2h-3v3h-2v-5Z"/></svg>
 														<span>원래대로</span>
 													</a>
 												</span>
@@ -235,7 +235,7 @@
 												</span>
 											</div>
 											<div id="popupContainer" class="popup-container">
-												<ui id="duplicateWordsContainer"></ui>
+												<ul id="duplicateWordsContainer"></ul>
 												<button id="closeButton">닫기</button>
 											</div>
 										</s_ad_div>
