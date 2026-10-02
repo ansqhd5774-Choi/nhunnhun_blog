@@ -83,10 +83,7 @@ async function openPostHtml(page){
   await page.locator('#editor-mode-html').click();
   const cm=page.locator('.CodeMirror:visible');
   await cm.waitFor({state:'visible'});
-  return page.evaluate(()=>{
-    const el=document.querySelector('.CodeMirror:visible');
-    return el?.CodeMirror?.getValue?.()||'';
-  });
+  return cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
 }
 
 function optimizePostHtml(html){
@@ -100,8 +97,9 @@ function optimizePostHtml(html){
 }
 
 async function setPostHtml(page,html){
-  await page.evaluate(value=>{
-    const el=document.querySelector('.CodeMirror:visible');
+  const cm=page.locator('.CodeMirror:visible');
+  await cm.waitFor({state:'visible'});
+  await cm.evaluate((el,value)=>{
     if(!el?.CodeMirror) throw new Error('E_CODEMIRROR');
     el.CodeMirror.setValue(value);
     el.CodeMirror.save?.();
