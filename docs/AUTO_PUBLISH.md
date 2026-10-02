@@ -47,3 +47,9 @@ GitHub에는 BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, BROWSERBASE_CONTEXT_ID
 클라우드 브라우저: 사용자 승인 후 무료 계정 연결 완료. 새 세션 로그인 유지 PASS. 2026-10-02 테스트 글 /355 공개 발행 확인. 공개 본문 전체 일치 PASS, 음식 카테고리·블로그소식 태그 확인. 현재 TISTORY_PUBLISH_ENABLED=true.
 실제 실행 중 확인된 HTML 모드 안내문과 보이는 CodeMirror 입력 영역에 맞춰 수정했다. 공개 본문 영역은 .contents_style이며 최초 검증은 과거 selector로 실패했다. 실제 글이 정상임을 확인해 published 기록을 복구했고 중복 발행하지 않았다.
 GitHub Actions: 실행 결과는 evidence의 별도 검증 기록을 확인한다.
+
+
+## Editorial Publish Standard R2
+신규 글은 `docs/EDITORIAL_PUBLISH_STANDARD_R2.md`의 ACTIVE 계약을 따른다.
+validate와 publish는 같은 editorial renderer를 사용하고, 최종 공개 페이지에서도 디자인 DOM 계약과 대표 `og:image`를 다시 검증한다.
+게시물별 임시 신규발행 workflow는 금지하며 표준 `publish-posts.yml`만 신규 글을 생성한다.
