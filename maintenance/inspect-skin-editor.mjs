@@ -10,21 +10,28 @@ try{
  const context=browser.contexts()[0];
  const page=await context.newPage();
  page.setDefaultTimeout(25000);
+ const events=[];
+ page.on('request',req=>{
+   const rt=req.resourceType();
+   if(['xhr','fetch','document'].includes(rt)) events.push({type:'request',rt,method:req.method(),url:req.url(),postData:(req.postData()||'').slice(0,1000)});
+ });
+ page.on('response',async res=>{
+   const req=res.request(),rt=req.resourceType();
+   if(['xhr','fetch','document'].includes(rt)){
+     let body='';
+     try{
+       const ct=res.headers()['content-type']||'';
+       if(/json|text|javascript|xml|html/.test(ct)) body=(await res.text()).slice(0,2500);
+     }catch{}
+     events.push({type:'response',rt,status:res.status(),url:res.url(),ct:res.headers()['content-type']||'',body});
+   }
+ });
  await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
- const data=await page.evaluate(async()=>{
-   const r=await fetch('/manage/design/skin/current.json',{credentials:'include'});
-   const text=await r.text();
-   let json=null; try{json=JSON.parse(text)}catch{}
-   const summarize=(v)=>{
-     if(typeof v==='string') return {type:'string',len:v.length,head:v.slice(0,500)};
-     if(Array.isArray(v)) return {type:'array',len:v.length,head:v.slice(0,5)};
-     if(v&&typeof v==='object') return {type:'object',keys:Object.keys(v).slice(0,100)};
-     return {type:typeof v,value:v};
-   };
-   return {status:r.status,headers:Object.fromEntries([...r.headers.entries()].filter(([k])=>['content-type','etag','last-modified'].includes(k))),keys:json?Object.keys(json):[],summary:json?Object.fromEntries(Object.entries(json).map(([k,v])=>[k,summarize(v)])):null,rawHead:text.slice(0,3000)};
- });
- console.log('SKIN_CURRENT_JSON '+JSON.stringify(data));
+ events.length=0;
+ await page.locator('button.btn-edit-html').click({force:true});
+ await page.waitForTimeout(3500);
+ console.log('SKIN_EDIT_ALL_IO '+JSON.stringify(events));
 } finally {
  try{await browser?.close();}catch{}
  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
