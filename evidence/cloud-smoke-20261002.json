@@ -1,0 +1,11 @@
+{
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/36989414594",
+  "sourceCommit": "c6d8735534e575c3293a19896a342fe058d92f30",
+  "execution": "GITHUB_HOSTED_UBUNTU",
+  "localTests": "PASS_14_BUNDLED_NODE",
+  "cloudConnection": "PASS",
+  "tistoryLogin": "REQUIRED",
+  "publication": "NOT_ATTEMPTED",
+  "sessionRelease": "REQUESTED",
+  "automaticPublishing": "DISABLED"
+}
