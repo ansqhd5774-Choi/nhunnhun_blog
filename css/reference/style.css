@@ -2481,3 +2481,18 @@ html,body,button,input,select,textarea {
 #tt-body-page #header_wrap.shrink {
   transition: none !important;
 }
+
+
+/* BLOG HEADER A11Y R2 */
+.btn_close {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.btn_close:focus-visible,
+.btn_topMenu:focus-visible,
+.search-icon:focus-visible,
+.search-close-icon:focus-visible {
+  outline: 2px solid #0052B3;
+  outline-offset: 2px;
+}
