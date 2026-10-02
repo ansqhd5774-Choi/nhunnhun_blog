@@ -587,7 +587,7 @@ header {
 	font-size:12px;
 	line-height:30px;
 	padding:10px 20px;
-	justify-content:space-between;
+	justify-content:center;
 }
 #footer a {
 	color:#000;
