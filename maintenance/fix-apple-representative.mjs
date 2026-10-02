@@ -1,0 +1,177 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+import { writeFile } from 'node:fs/promises';
+
+const BLOG='https://nhunnhun.tistory.com';
+const POST_ID='356';
+const EXPECTED_TITLE='사과 효능·영양성분·부작용 총정리';
+const HERO='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) {
+  if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+}
+
+const resp=await fetch(HERO);
+if(!resp.ok) throw new Error('E_IMAGE_FETCH');
+const file='/tmp/apple-representative.jpg';
+await writeFile(file,Buffer.from(await resp.arrayBuffer()));
+
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser;
+let originalHtml='';
+
+async function clickVisible(page,selector){
+  const ok=await page.evaluate(sel=>{
+    const es=[...document.querySelectorAll(sel)];
+    const e=es.find(x=>{
+      const r=x.getBoundingClientRect(),s=getComputedStyle(x);
+      return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';
+    })||es[0];
+    if(!e) return false;
+    e.click();
+    return true;
+  },selector);
+  if(!ok) throw new Error('E_CLICK_'+selector);
+}
+
+async function switchHtml(page){
+  await clickVisible(page,'#editor-mode-layer-btn-open');
+  await page.waitForTimeout(150);
+  await clickVisible(page,'#editor-mode-html');
+  await page.locator('.CodeMirror:visible').waitFor({state:'visible'});
+}
+
+async function switchBasic(page){
+  await clickVisible(page,'#editor-mode-layer-btn-open');
+  await page.waitForTimeout(150);
+  const ok=await page.evaluate(()=>{
+    const es=[...document.querySelectorAll('*')].filter(e=>(e.textContent||'').trim()==='기본모드');
+    const e=es.find(x=>{
+      const r=x.getBoundingClientRect(),s=getComputedStyle(x);
+      return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';
+    });
+    if(!e) return false;
+    e.click();
+    return true;
+  });
+  if(!ok) throw new Error('E_BASIC_MODE');
+  await page.waitForTimeout(400);
+}
+
+async function getHtml(page){
+  const cm=page.locator('.CodeMirror:visible');
+  await cm.waitFor({state:'visible'});
+  return cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+}
+
+async function setHtml(page,html){
+  const code=page.locator('.CodeMirror:visible .CodeMirror-code');
+  await code.waitFor({state:'visible'});
+  await code.click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText(html);
+  await page.waitForTimeout(400);
+}
+
+async function closePublishLayer(page){
+  const closed=await page.evaluate(()=>{
+    const sels=['.layer_publish .btn_close','.publish_layer .btn_close','.layer_body .btn_close','button.btn_close'];
+    for(const sel of sels){
+      const es=[...document.querySelectorAll(sel)];
+      const e=es.find(x=>{const r=x.getBoundingClientRect(),s=getComputedStyle(x);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';});
+      if(e){e.click();return true;}
+    }
+    return false;
+  });
+  if(!closed) await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+function textOf(html){
+  return html.replace(/<script[\s\S]*?<\/script>/gi,' ')
+             .replace(/<style[\s\S]*?<\/style>/gi,' ')
+             .replace(/<[^>]+>/g,' ')
+             .replace(/&nbsp;/g,' ')
+             .replace(/\s+/g,' ').trim();
+}
+
+try{
+  browser=await chromium.connectOverCDP(session.connectUrl);
+  const context=browser.contexts()[0];
+  const page=await context.newPage();
+  page.setDefaultTimeout(30000);
+  page.on('dialog',async d=>{ if(d.type()==='confirm') await d.accept(); else await d.dismiss(); });
+
+  await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
+  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+  await page.locator('#post-title-inp').waitFor({state:'visible'});
+  if((await page.locator('#post-title-inp').inputValue()).trim()!==EXPECTED_TITLE) throw new Error('E_WRONG_POST');
+
+  // Exact body checkpoint.
+  await switchHtml(page);
+  originalHtml=await getHtml(page);
+  if(originalHtml.length<4000) throw new Error('E_ORIGINAL_SHORT');
+  const expectedText=textOf(originalHtml);
+
+  // Upload through the official Tistory editor so Tistory owns the representative image.
+  await switchBasic(page);
+  await page.evaluate(()=>document.querySelectorAll('#attach-layer-btn')[0]?.click());
+  await page.locator('#attach-image').setInputFiles(file);
+  await page.waitForTimeout(6000);
+
+  // Confirm Tistory generated a representative thumbnail.
+  await page.locator('#publish-layer-btn').click();
+  await page.waitForTimeout(500);
+  if(await page.locator('.publish_editor .box_thumb').count()!==1) throw new Error('E_REP_NOT_CREATED');
+  await closePublishLayer(page);
+
+  // Remove the temporary body insertion while retaining representative attachment.
+  await switchHtml(page);
+  await setHtml(page,originalHtml);
+
+  // Confirm representative survived body restoration.
+  await page.locator('#publish-layer-btn').click();
+  await page.waitForTimeout(500);
+  if(await page.locator('.publish_editor .box_thumb').count()!==1) throw new Error('E_REP_LOST_AFTER_RESTORE');
+
+  // Existing post update button.
+  let submit=null;
+  for(const name of ['수정','변경사항 저장','완료','공개 발행']){
+    const b=page.getByRole('button',{name,exact:true});
+    if(await b.count()){ submit=b.last(); break; }
+  }
+  if(!submit) throw new Error('E_UPDATE_BUTTON');
+  const submitText=(await submit.innerText()).trim();
+  await submit.click();
+  await page.waitForTimeout(3500);
+
+  // Public verification: body unchanged and OG image no longer the Tistory default.
+  const publicPage=await context.newPage();
+  await publicPage.goto(BLOG+'/'+POST_ID,{waitUntil:'domcontentloaded'});
+  await publicPage.locator('.contents_style').waitFor({state:'visible'});
+  const actualText=(await publicPage.locator('.contents_style').innerText()).replace(/\s+/g,' ').trim();
+  if(!actualText.includes(expectedText.slice(0,Math.min(900,expectedText.length)))) throw new Error('E_BODY_CHANGED');
+
+  let og='';
+  for(let i=0;i<6;i++){
+    await publicPage.reload({waitUntil:'domcontentloaded'});
+    og=await publicPage.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null)||'';
+    if(og && !og.includes('tistory_admin/static/images/openGraph/opengraph.png') && !og.includes('opengraph.png')) break;
+    await publicPage.waitForTimeout(2500);
+  }
+  if(!og || og.includes('opengraph.png')) throw new Error('E_OG_STILL_DEFAULT');
+
+  console.log('PASS_APPLE_REPRESENTATIVE '+JSON.stringify({submitText,og,bodyLength:originalHtml.length}));
+}catch(err){
+  console.error('APPLE_REPRESENTATIVE_FAIL '+(err?.stack||err));
+  // No blind second submit. If failure occurs before final update, editor session simply closes without saving.
+  throw err;
+}finally{
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
