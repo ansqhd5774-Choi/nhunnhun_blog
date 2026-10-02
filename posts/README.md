@@ -12,3 +12,10 @@
 published 기록이 있는 글을 수정해도 기존 티스토리 글 자동 수정이나 재게시를 하지 않는다. 해당 기능은 별도 작업이다.
 발행 결과가 불명확하면 publishing/state의 submitting 기록을 유지하고 중단한다. 기록을 삭제해 임의 재시도하지 않는다.
 현재 활성화 상태와 검증 범위는 docs/AUTO_PUBLISH.md를 확인한다.
+
+
+## 신규 글 디자인·게시 ACTIVE 기준
+신규 공개 글은 `docs/EDITORIAL_PUBLISH_STANDARD_R2.md`를 따른다.
+디자인은 게시물마다 직접 복제하지 않고 `publishing/editorial.mjs`의 공통 renderer가 적용한다.
+본문 이미지가 있으면 `representativeImageUrl`을 반드시 지정하고 본문 이미지 URL과 일치시킨다.
+신규 발행은 `.github/workflows/publish-posts.yml` 단일 경로만 사용한다.
