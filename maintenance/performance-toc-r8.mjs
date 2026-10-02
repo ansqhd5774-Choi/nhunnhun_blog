@@ -1,0 +1,98 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+
+const BLOG='https://nhunnhun.tistory.com';
+const MARK='/* ZG inline TOC no-layout-shift R8 */';
+const PATCH=`
+${MARK}
+/* Auto TOC is injected after initial paint and caused ~0.20 desktop / ~0.53 mobile CLS.
+   Hide the layout-affecting inline TOC at every viewport. Floating TOC remains independent. */
+#tt-body-page .e-content.post-content > .toc-space{
+  display:none !important;
+}
+`;
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']){
+  if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+}
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser,original=null,changed=false;
+
+async function fetchSkin(page){
+  return page.evaluate(async()=>{
+    const r=await fetch('/manage/design/skin/html.json',{credentials:'include'});
+    if(!r.ok) throw new Error('E_GET_SKIN_'+r.status);
+    return r.json();
+  });
+}
+async function saveSkin(page,html,css){
+  return page.evaluate(async({html,css})=>{
+    const r=await fetch('/manage/design/skin/html.json',{
+      method:'POST',credentials:'include',headers:{'content-type':'application/json'},
+      body:JSON.stringify({html,css,isPreview:false})
+    });
+    return {ok:r.ok,status:r.status,text:(await r.text()).slice(0,300)};
+  },{html,css});
+}
+try{
+  browser=await chromium.connectOverCDP(session.connectUrl);
+  const context=browser.contexts()[0];
+  const admin=await context.newPage();
+  admin.setDefaultTimeout(25000);
+  await admin.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+  if(new URL(admin.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+
+  original=await fetchSkin(admin);
+  let css=original.css;
+  if(!css.includes(MARK)) css+='\n\n'+PATCH+'\n';
+
+  if(css!==original.css){
+    const s=await saveSkin(admin,original.html,css);
+    if(!s.ok) throw new Error('E_SAVE_'+s.status);
+    changed=true;
+  }
+
+  const now=await fetchSkin(admin);
+  if(!now.css.includes(MARK)) throw new Error('E_NOT_PERSISTED');
+
+  const results=[];
+  for(const vp of [{w:390,h:844,label:'mobile'},{w:1440,h:1000,label:'desktop'}]){
+    const p=await context.newPage();
+    await p.setViewportSize({width:vp.w,height:vp.h});
+    await p.goto(BLOG+'/356',{waitUntil:'domcontentloaded'});
+    await p.waitForTimeout(1200);
+    results.push(await p.evaluate(label=>{
+      const toc=document.querySelector('.e-content.post-content > .toc-space');
+      const post=document.querySelector('.e-content.post-content');
+      const content=document.querySelector('.contents_style');
+      return {
+        label,title:document.title,
+        toc:toc?{display:getComputedStyle(toc).display,height:toc.getBoundingClientRect().height}:null,
+        postY:post?.getBoundingClientRect().y||null,
+        contentY:content?.getBoundingClientRect().y||null
+      };
+    },vp.label));
+    await p.close();
+  }
+  if(results.some(x=>x.toc&&x.toc.display!=='none')) throw new Error('E_TOC_VISIBLE');
+  console.log('PASS_TOC_R8 '+JSON.stringify({changed,cssDelta:now.css.length-original.css.length,results}));
+}catch(err){
+  console.error('TOC_R8_FAIL '+(err?.stack||err));
+  if(changed&&original&&browser){
+    try{
+      const context=browser.contexts()[0];
+      const a=context.pages().find(p=>p.url().includes('/manage/design/skin/edit'))||await context.newPage();
+      if(!a.url().includes('/manage/design/skin/edit')) await a.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+      console.error('ROLLBACK_TOC_R8 '+JSON.stringify(await saveSkin(a,original.html,original.css)));
+    }catch(e){console.error('ROLLBACK_TOC_R8_FAIL '+(e?.stack||e));}
+  }
+  throw err;
+}finally{
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
