@@ -3,8 +3,8 @@ import { chromium } from 'playwright-core';
 
 const BLOG='https://nhunnhun.tistory.com';
 const POST_ID='356';
-const HERO='https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/720px-Red_apple_fruits.jpg';
-const SLICED='https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Sliced_apple.jpg/720px-Sliced_apple.jpg';
+const HERO='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
+const SLICED='https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Sliced_apple.jpg/960px-Sliced_apple.jpg';
 const MARK='/* ZG apple image perf R1 */';
 const CSS_PATCH=`
 ${MARK}
@@ -12,13 +12,13 @@ ${MARK}
   width:100% !important;
   max-width:720px !important;
   height:auto !important;
-  aspect-ratio:720 / 454;
+  aspect-ratio:960 / 605;
 }
 #tt-body-page .contents_style img[alt="반으로 자른 사과"] {
   width:100% !important;
   max-width:720px !important;
   height:auto !important;
-  aspect-ratio:720 / 480;
+  aspect-ratio:960 / 640;
 }
 `;
 
@@ -146,9 +146,9 @@ try{
   const mobile=await verify(context,390,844);
   for(const v of [desktop,mobile]){
     if(!v.hero||!v.sliced) throw new Error('E_VERIFY_IMAGES');
-    if(!v.hero.src.includes('/thumb/0/06/Red_apple_fruits.jpg/720px-Red_apple_fruits.jpg')) throw new Error('E_HERO_SRC');
-    if(!v.sliced.src.includes('/thumb/9/92/Sliced_apple.jpg/720px-Sliced_apple.jpg')) throw new Error('E_SLICED_SRC');
-    if(v.hero.naturalWidth>720||v.sliced.naturalWidth>720) throw new Error('E_OVERSIZED_IMAGE');
+    if(!v.hero.src.includes('/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg')) throw new Error('E_HERO_SRC');
+    if(!v.sliced.src.includes('/thumb/9/92/Sliced_apple.jpg/960px-Sliced_apple.jpg')) throw new Error('E_SLICED_SRC');
+    if(v.hero.naturalWidth>960||v.sliced.naturalWidth>960) throw new Error('E_OVERSIZED_IMAGE');
     if(v.hero.aspectRatio==='auto'||v.sliced.aspectRatio==='auto') throw new Error('E_ASPECT_RATIO');
   }
   console.log('PASS_APPLE_IMAGE_PERF_R1 '+JSON.stringify({postChanged,skinChanged,desktop,mobile}));
