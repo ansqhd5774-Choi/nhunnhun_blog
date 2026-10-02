@@ -135,8 +135,9 @@ async function verifyMobile(browser,target){
     const page=await context.newPage();
     await page.goto(state.url+'?syncverify=mobile',{waitUntil:'domcontentloaded'});
     await page.waitForTimeout(1000);
-    const body=(await page.locator('body').innerText()).replace(/\s+/g,' ').trim();
-    const expected=await materializedText(page,target);
+    const normalizeMobileText=s=>String(s||'').replace(/\s+/g,'').trim();
+    const body=normalizeMobileText(await page.locator('body').innerText());
+    const expected=normalizeMobileText(await materializedText(page,target));
     if(!expected || !body.includes(expected)) throw new Error('E_MOBILE_BODY');
     const imageAlts=[...post.bodyHtml.matchAll(/<img\b[^>]*\balt=(["'])(.*?)\1/gi)].map(m=>m[2]);
     const metrics=await page.evaluate(alts=>{
