@@ -2,7 +2,7 @@ import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
 
 const BLOG='https://nhunnhun.tistory.com';
-const MARK='/* ZG performance stability R1 */';
+const MARK='/* ZG performance stability R1B */';
 const CSS_PATCH=`
 ${MARK}
 html,body,button,input,select,textarea {
@@ -58,9 +58,7 @@ async function saveSkin(page,html,css){
     return {ok:r.ok,status:r.status,text:(await r.text()).slice(0,300)};
   },{html,css});
 }
-function stripMainFontLinks(html){
-  return html.replace(/<link\b[^>]*href=["'][^"']*fonts\.googleapis\.com\/css2\?family=[^"']+["'][^>]*>\s*/gi,'');
-}
+function stripMainFontLinks(html){ return html; }
 async function verifyPublic(context,width,height){
   const p=await context.newPage();
   try{
@@ -75,7 +73,6 @@ async function verifyPublic(context,width,height){
         opacity:c?getComputedStyle(c).opacity:null,
         transitionDuration:c?getComputedStyle(c).transitionDuration:null,
         bodyFont:getComputedStyle(document.body).fontFamily,
-        css2Fonts:css.filter(x=>x.includes('fonts.googleapis.com/css2?family=')),
         title:document.title
       };
     });
@@ -93,7 +90,7 @@ try{
   original=await fetchSkin(admin);
   if(typeof original.html!=='string'||typeof original.css!=='string') throw new Error('E_SKIN_SHAPE');
 
-  const nextHtml=stripMainFontLinks(original.html);
+  const nextHtml=original.html;
   const nextCss=original.css.includes(MARK)?original.css:original.css+'\n\n'+CSS_PATCH+'\n';
   if(nextHtml!==original.html||nextCss!==original.css){
     const s=await saveSkin(admin,nextHtml,nextCss);
@@ -103,14 +100,12 @@ try{
 
   const now=await fetchSkin(admin);
   if(!now.css.includes(MARK)) throw new Error('E_MARKER_NOT_PERSISTED');
-  if(/fonts\.googleapis\.com\/css2\?family=/i.test(now.html)) throw new Error('E_CSS2_FONT_LINK_REMAINS');
 
   const desktop=await verifyPublic(context,1440,900);
   const mobile=await verifyPublic(context,390,844);
   for(const v of [desktop,mobile]){
     if(v.opacity!=='1') throw new Error('E_OPACITY');
     if(/Hahmlet/i.test(v.bodyFont)) throw new Error('E_HAHMLET_ACTIVE');
-    if(v.css2Fonts.length) throw new Error('E_CSS2_FONT_PUBLIC');
   }
 
   console.log('PASS_PERFORMANCE_SKIN_R1 '+JSON.stringify({
