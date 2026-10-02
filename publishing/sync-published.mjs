@@ -94,7 +94,17 @@ async function verifyDesktop(browser,target){
     if(await content.count()!==1) throw new Error('E_PC_CONTENT');
     const actual=(await content.innerText()).replace(/\s+/g,' ').trim();
     const expected=await materializedText(page,target);
-    if(!expected || actual!==expected) throw new Error('E_PC_BODY');
+    if(!expected || actual!==expected) {
+      let i=0;
+      const max=Math.min(actual.length,expected.length);
+      while(i<max && actual[i]===expected[i]) i++;
+      const from=Math.max(0,i-120), to=i+220;
+      console.error('E_PC_BODY_DIAG '+JSON.stringify({
+        actualLength:actual.length,expectedLength:expected.length,firstDiff:i,
+        actualContext:actual.slice(from,to),expectedContext:expected.slice(from,to)
+      }));
+      throw new Error('E_PC_BODY');
+    }
     const og=await page.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
     if(!og || og.includes('opengraph.png') || !og.includes('kakaocdn.net')) throw new Error('E_PC_OG');
     const metrics=await content.evaluate(root=>({
