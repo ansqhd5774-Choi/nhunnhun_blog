@@ -27,12 +27,14 @@ export function checkPost(post, filename) {
     if (url.protocol !== 'https:' || url.username || url.password || /[?&](key|token|access_token|api_key)=/i.test(url.search)) throw new Error('E_CONTENT_URL');
   }
   // The sanitizer is a validator here: transformations must be reviewed, never silently published.
+  // HTML void elements may be serialized as <img ...> or <img ... /> with identical semantics.
   const clean = sanitizeHtml(post.bodyHtml, {
     allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span'],
     allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'] },
     allowedSchemes: ['https'], allowProtocolRelative: false,
   });
-  if (clean !== post.bodyHtml) throw new Error('E_HTML_REQUIRES_REVIEW');
+  const normalizeVoidSyntax = html => html.replace(/<(img|br|hr)(\b[^>]*?)\s*\/?\s*>/gi, '<$1$2>');
+  if (normalizeVoidSyntax(clean) !== normalizeVoidSyntax(post.bodyHtml)) throw new Error('E_HTML_REQUIRES_REVIEW');
   return post;
 }
 export function textHtml(html) { return html.replace(/<\/(?:p|h[2-4]|li|tr|blockquote)>|<br\s*\/?>/gi, ' '); }
