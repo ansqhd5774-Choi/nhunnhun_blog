@@ -4,7 +4,7 @@ on:
     branches: [main]
     paths: ['publishing/sync-request.json']
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: nhunnhun-tistory-published-sync
   cancel-in-progress: false
@@ -24,6 +24,7 @@ jobs:
       - run: pnpm test
       - run: node publishing/sync-published.mjs
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
           BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
           BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
