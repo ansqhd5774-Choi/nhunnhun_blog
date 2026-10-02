@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { checkPost, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
+import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
-test('approved ready post accepted', () => assert.equal(eligible(checkPost({...base,status:'ready',approved:true},'first-post.json'),null),true));
+test('approved ready post accepted', () => assert.equal(eligible(checkPublishHtml(checkPost({...base,status:'ready',approved:true},'first-post.json')),null),true));
 test('same publication is skipped', () => assert.equal(eligible({...base,status:'ready',approved:true},{phase:'published',fingerprint:fingerprint(base)}),false));
 test('uncertain final click never retries', () => assert.throws(() => eligible({...base,status:'ready',approved:true},{phase:'submitting',fingerprint:fingerprint(base)})));
-test('changed published content requires review rather than another article', () => assert.throws(() => eligible({...base,status:'ready',approved:true,bodyHtml:'<p>변경</p>'},{phase:'published',fingerprint:fingerprint(base)})));
+test('changed published content never creates another article', () => assert.equal(eligible({...base,status:'ready',approved:true,bodyHtml:'<p>변경</p>'},{phase:'published',fingerprint:fingerprint(base)}),false));
 test('arbitrary fields and path injection are rejected', () => {
   assert.throws(() => checkPost({...base,id:'../bad'},'../bad.json'));
   assert.throws(() => checkPost({...base,blog:'https://other.tistory.com'},'first-post.json'));
@@ -18,6 +18,10 @@ test('executable HTML and invalid URL schemes rejected', () => {
   for (const bodyHtml of ['<script>alert(1)</script>','<p onclick="x()">내용</p>','<a href="javascript:alert(1)">내용</a>','<img src="http://host/image.png" />','<p>{{남은문구}}</p>']) assert.throws(() => checkPost({...base,bodyHtml},'first-post.json'));
 });
 test('HTTPS references and Unicode content preserved', () => assert.equal(checkPost({...base,bodyHtml:'<p>영양 100g <a href="https://example.org/">출처</a></p>'},'first-post.json').title,'첫 글'));
+test('rich archival HTML is allowed by schema but rejected for new publication', () => {
+  const rich=checkPost({...base,bodyHtml:'<p style="color:red">내용</p>'},'first-post.json');
+  assert.throws(() => checkPublishHtml(rich));
+});
 test('post hash changes with category tags title and body', () => {
   for (const delta of [{category:'영양소'},{tags:['건강']},{title:'새 글'},{bodyHtml:'<p>수정</p>'}]) assert.notEqual(fingerprint(base),fingerprint({...base,...delta}));
 });
