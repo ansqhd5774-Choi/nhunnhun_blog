@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-03",
+  "project": "nhunnhun.tistory.com",
+  "repo": "ansqhd5774-Choi/nhunnhun_blog",
+  "base_main_sha": "39e22c09e1674f052f4bd73b1893984d90f63180",
+  "reference_restored": {
+    "skin_sha": "5ffab50749a6dc55693ec8516228e162bdf52bd4",
+    "css_sha": "d747f32e9aa0d821fcb484de7352458f9fc77dd8",
+    "verified_equal_to_base": true
+  },
+  "proposal": {
+    "html_path": "skin/proposals/20261003-seo-a11y-r2.html",
+    "css_path": "css/proposals/20261003-seo-a11y-r2.css",
+    "deploy_wholesale": false,
+    "reason": "sanitized reference contains REDACTED identifiers; apply delta only to latest live Tistory source"
+  },
+  "validation": {
+    "workflow": "Validate blog source",
+    "run_id": 37044258639,
+    "conclusion": "success",
+    "gates": {
+      "head_single": true,
+      "charset_single": true,
+      "generic_meta_duplicates": 0,
+      "robots_preview": true,
+      "crawler_ligatures": 0,
+      "legacy_footer": false,
+      "search_aria_count": 1,
+      "required_css_markers": true
+    }
+  },
+  "seo_audit": {
+    "old_apple_url": "https://nhunnhun.tistory.com/195",
+    "new_apple_url": "https://nhunnhun.tistory.com/356",
+    "cannibalization_risk": true,
+    "plan_path": "changes/20261003-apple-cannibalization.md",
+    "live_existing_post_edit": false
+  },
+  "blockers": {
+    "tinyfish": "quota exhausted",
+    "remote_desktop_commander": "device offline and remote calls left 0%",
+    "firecrawl": "insufficient credits",
+    "gsc_wizard": "trial/subscription inactive"
+  },
+  "live_apply": false,
+  "paid_upgrade": false
+}
