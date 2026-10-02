@@ -92,8 +92,9 @@ async function verifyDesktop(browser,target){
     await page.goto(state.url+'?syncverify=desktop',{waitUntil:'domcontentloaded'});
     const content=page.locator('.contents_style');
     if(await content.count()!==1) throw new Error('E_PC_CONTENT');
-    const actual=(await content.innerText()).replace(/\s+/g,' ').trim();
-    const expected=await materializedText(page,target);
+    const normalizeText=s=>String(s||'').replace(/\s+/g,' ').replace(/\s*([:])/g,'$1').trim();
+    const actual=normalizeText(await content.innerText());
+    const expected=normalizeText(await materializedText(page,target));
     if(!expected || actual!==expected) {
       let i=0;
       const max=Math.min(actual.length,expected.length);
