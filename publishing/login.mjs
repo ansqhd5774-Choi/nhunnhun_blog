@@ -8,6 +8,7 @@ try {
   console.log(`LOGIN_SESSION_ID: ${session.id}`);
   browser = await chromium.connectOverCDP(session.connectUrl);
   const page = await browser.contexts()[0].newPage();
+  await page.setViewportSize({width:480,height:720});
   await page.goto('https://nhunnhun.tistory.com/manage/posts',{waitUntil:'domcontentloaded'});
   console.log('WAITING_FOR_USER_LOGIN: use Browserbase dashboard live view; no publication');
   const deadline = Date.now()+240000;
