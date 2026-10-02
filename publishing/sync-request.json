@@ -1,4 +1,6 @@
 {
   "id": "mango-benefits-nutrition-20261003",
-  "reason": "Apply current shared editorial template and verify desktop/mobile public rendering after initial publication test."
+  "mode": "content-update",
+  "expectedPublishedFingerprint": "8770d3a623281a648aaa22dd1a9f70a1f623d7721329ef0038b5294c79458eb3",
+  "reason": "Strengthen selective emphasis in published mango article using bold plus underline while preserving structure and editorial template."
 }
