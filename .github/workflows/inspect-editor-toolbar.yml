@@ -18,7 +18,7 @@ jobs:
           node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Inspect toolbar
+      - name: Inspect editor toolbar
         run: node maintenance/inspect-editor-toolbar.mjs
         env:
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
