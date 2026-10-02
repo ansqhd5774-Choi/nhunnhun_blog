@@ -3,8 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'skin/reference/**'
-      - 'css/reference/**'
+      - 'skin/proposals/**'
+      - 'css/proposals/**'
       - 'maintenance/validate-blog-source.mjs'
       - '.github/workflows/validate-blog-source.yml'
   workflow_dispatch:
