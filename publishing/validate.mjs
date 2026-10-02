@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
-import { loadPosts } from './core.mjs';
+import { loadPosts, checkPublishHtml, eligible } from './core.mjs';
+import { Ledger } from './ledger.mjs';
 
 function diagnoseHtml(html) {
   const clean = sanitizeHtml(html, {
@@ -20,7 +21,16 @@ function diagnoseHtml(html) {
 
 try {
   const posts = await loadPosts();
-  console.log(`PASS: ${posts.length} posts validated; ${posts.filter(p => p.status === 'ready').length} ready.`);
+  const ledger = new Ledger();
+  let pending = 0;
+  for (const post of posts) {
+    const state = await ledger.read(post.id);
+    if (eligible(post, state)) {
+      checkPublishHtml(post);
+      pending++;
+    }
+  }
+  console.log(`PASS: ${posts.length} posts validated; ${pending} pending new publication.`);
 } catch (error) {
   const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_VALIDATE_RUNTIME';
   if (code === 'E_HTML_REQUIRES_REVIEW') {
