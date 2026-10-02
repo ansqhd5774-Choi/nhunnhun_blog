@@ -62,6 +62,37 @@ try{
       suspects:[...document.querySelectorAll('[class*="html"],[class*="css"],[class*="code"],[class*="editor"],[class*="edit"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id,display:getComputedStyle(x).display,txt:(x.innerText||'').slice(0,120)})).slice(0,100)
     }));
     console.log('EDITOR_PROBE '+JSON.stringify(editorProbe));
+    const reactProbe=await page.evaluate(()=>{
+      const el=document.querySelector('.btn-edit-html');
+      if(!el) return null;
+      const keys=Object.keys(el);
+      const propKey=keys.find(k=>k.startsWith('__reactProps    await snap('AFTER_HTML_EDIT');
+  } else {
+    console.log('NO_HTML_EDIT_BUTTON');
+  }
+} finally {
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
+));
+      const fiberKey=keys.find(k=>k.startsWith('__reactFiber    await snap('AFTER_HTML_EDIT');
+  } else {
+    console.log('NO_HTML_EDIT_BUTTON');
+  }
+} finally {
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
+));
+      const props=propKey?el[propKey]:null;
+      return {
+        keys:keys.filter(k=>k.startsWith('__react')).slice(0,10),
+        propKeys:props?Object.keys(props):[],
+        onClick:props?.onClick ? String(props.onClick).slice(0,4000) : null,
+        fiberTag:fiberKey?el[fiberKey]?.tag:null
+      };
+    });
+    console.log('REACT_PROBE '+JSON.stringify(reactProbe));
     await snap('AFTER_HTML_EDIT');
   } else {
     console.log('NO_HTML_EDIT_BUTTON');
