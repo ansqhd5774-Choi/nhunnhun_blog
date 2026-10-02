@@ -1,0 +1,107 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+
+const BLOG='https://nhunnhun.tistory.com';
+const MARK='<!-- NHUNNHUN CRITICAL CSS R8 -->';
+const CRITICAL=`
+:root{--color-alpha-80:#3A4954CC;--color-alpha-70:#3A4954B3}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-width:320px;color:#3A4954;background:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+body{font-weight:400;letter-spacing:.2px}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+img{max-width:100%;height:auto;box-sizing:border-box}
+#content,#content.show{opacity:1!important;transition:none!important}
+#header_wrap{width:100%;background:rgba(255,255,255,.95);z-index:99;position:fixed;top:0;left:0;line-height:85px;min-width:300px}
+#header_wrap.shrink{line-height:50px;box-shadow:0 1px 10px rgba(0,0,0,.1)}
+#header_wrap #header_gnb{max-width:1200px;margin:5px auto 0;position:relative;display:flex;align-items:center}
+#header_wrap #header_gnb #header-title{padding-left:30px;margin-right:auto}
+#header_wrap #header_gnb #header-title a{font-size:19px;font-weight:600}
+#header-ico{padding-right:20px}
+#search-bar{display:flex;padding:5px 10px;margin:0 10px 3px;background:rgba(0,0,0,.025);border-radius:10px}
+#wrap{width:100%;position:relative;min-height:100vh;margin-top:92px;display:inline-block}
+#wrap #container{width:1200px;max-width:100%;margin:0 auto;min-height:100vh}
+#main.sidebarPosition.right{display:flex;margin:20px;padding-left:10px}
+#main.sidebarPosition.left{display:flex;flex-direction:row-reverse;margin:20px}
+#container #main #content{flex:2.85;overflow:hidden;position:relative;min-width:0}
+#container #main #sidebar{flex:1;max-width:302px;min-width:302px;height:fit-content}
+#container #main #sidebar.right{margin-left:45px}
+#container #main #sidebar.left{margin-right:45px}
+.h-entry{max-width:100%;width:100%;margin:0 auto;background:inherit}
+.h-entry .content-width{width:100%;max-width:810px;margin:0 auto}
+.hd{border-bottom:2px dotted #dadce0}
+.hd .hd-heading{display:inline-block;margin:5px 0 10px;font-size:1.5rem;line-height:1.4}
+.hd .sub-info{color:#66737d;font-size:14px;position:relative;margin:0 5px 0 2px}
+.post-content,.contents_style{max-width:100%;padding-bottom:0;font-size:16px;margin-top:20px;overflow-wrap:anywhere}
+.post-content p,.contents_style p{line-height:1.9}
+.post-content h2,.contents_style h2{margin:20px 0 15px;font-size:1.2rem;padding-left:.75rem;border-left:5px solid #b5d5e8;line-height:1.45}
+.post-content h3,.contents_style h3{margin:20px 0 12px;font-size:1.1rem;line-height:1.45}
+.post-content img,.contents_style img{max-width:100%!important;height:auto!important;display:block;margin-left:auto;margin-right:auto}
+.post-content figure,.contents_style figure{max-width:100%}
+.post-content table,.contents_style table{width:100%;max-width:100%;border-collapse:collapse}
+.post-content th,.post-content td,.contents_style th,.contents_style td{padding:8px;border:1px solid #e5e7eb;vertical-align:top}
+.post-content ul,.contents_style ul{list-style:disc outside;padding-left:1.4rem}
+.post-content ol,.contents_style ol{list-style:decimal outside;padding-left:1.4rem}
+.post-content a,.contents_style a{color:#0052B3;text-decoration:underline;text-underline-offset:2px}
+#tt-body-page .post-reply{content-visibility:auto;contain:layout paint;contain-intrinsic-size:auto 360px;min-height:72px}
+#tt-body-page [data-tistory-react-app="Namecard"]{min-height:80px;contain:layout paint}
+#tt-body-page [data-tistory-react-app="Comment"],#tt-body-page [id^="entry"][id$="Comment"]{min-height:280px;content-visibility:auto;contain:layout paint;contain-intrinsic-size:auto 280px}
+#tt-body-page ins.adsbygoogle{min-height:100px!important}
+#tt-body-page ins.adsbygoogle[data-ad-slot="5613406766"],#tt-body-page ins.adsbygoogle[data-ad-slot="5411757567"]{min-height:90px!important}
+#tt-body-page ins.adsbygoogle[data-ad-slot="4164841163"]{min-height:250px!important}
+@media(max-width:1023px){
+  #main.sidebarPosition.right,#main.sidebarPosition.left{display:block;margin:0;padding:0}
+  #container #main #sidebar{min-width:0;max-width:none;margin:0!important;padding:20px 10px}
+  .h-entry{width:auto!important;padding:0 20px 0 24px}
+  .h-entry .content-width{max-width:900px}
+}
+@media(max-width:600px){
+  #header_wrap{line-height:63px}
+  #header_wrap #header_gnb #header-title{padding-left:18px}
+  #header_wrap #header_gnb #header-title a{font-size:17px}
+  #header-ico{padding-right:14px}
+  #wrap{margin-top:70px}
+  .h-entry{padding:0 14px 0 18px}
+  .hd .hd-heading{font-size:1.4rem}
+  .post-content,.contents_style{font-size:16px}
+  .post-content table,.contents_style table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+`;
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser,original,changed=false;
+async function fetchSkin(page){return page.evaluate(async()=>{const r=await fetch('/manage/design/skin/html.json',{credentials:'include'});if(!r.ok)throw new Error('E_GET_SKIN_'+r.status);return r.json();});}
+async function saveSkin(page,html,css){return page.evaluate(async({html,css})=>{const r=await fetch('/manage/design/skin/html.json',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({html,css,isPreview:false})});return {ok:r.ok,status:r.status,text:(await r.text()).slice(0,300)};},{html,css});}
+async function verify(context,url,width,height){
+ const p=await context.newPage();try{
+  await p.setViewportSize({width,height});await p.goto(url,{waitUntil:'domcontentloaded'});await p.waitForTimeout(1600);
+  return await p.evaluate(()=>({title:document.title,content:!!document.querySelector('#content'),header:!!document.querySelector('#header_wrap'),critical:!!document.querySelector('style[data-nhun-r8="1"]'),skinLinks:[...document.querySelectorAll('link[href*="/skin/style.css"]')].map(x=>({rel:x.rel,media:x.media,href:x.href})),bodyFont:getComputedStyle(document.body).fontFamily,bodyWidth:document.body.scrollWidth,viewport:innerWidth}));
+ }finally{await p.close();}
+}
+try{
+ browser=await chromium.connectOverCDP(session.connectUrl);const context=browser.contexts()[0];const admin=await context.newPage();admin.setDefaultTimeout(25000);
+ await admin.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});if(new URL(admin.url()).origin!==BLOG)throw new Error('E_LOGIN_REQUIRED');
+ original=await fetchSkin(admin);if(typeof original.html!=='string'||typeof original.css!=='string')throw new Error('E_SKIN_SHAPE');
+ let html=original.html;
+ html=html.replace(/\s*<!-- NHUNNHUN INLINE CSS R7 -->[\s\S]*?<style data-nhun-r7=["']1["']>[\s\S]*?<\/style>\s*/i,'\n');
+ html=html.replace(/\s*<!-- NHUNNHUN CRITICAL CSS R8 -->[\s\S]*?<noscript><link rel=["']stylesheet["'] href=["']\.\/style\.css["']><\/noscript>\s*/i,'\n');
+ html=html.replace(/\s*<link\b[^>]*href=["']\.\/style\.css["'][^>]*>\s*/ig,'\n');
+ const block='\n'+MARK+'\n<style data-nhun-r8="1">'+CRITICAL.replace(/<\/style/gi,'<\\/style')+'</style>\n<link rel="stylesheet" href="./style.css" media="print" onload="this.media=\'all\'">\n<noscript><link rel="stylesheet" href="./style.css"></noscript>\n';
+ if(!html.includes('</head>'))throw new Error('E_NO_HEAD');
+ html=html.replace('</head>',block+'</head>');
+ if(html!==original.html){const s=await saveSkin(admin,html,original.css);if(!s.ok)throw new Error('E_SAVE_'+s.status);changed=true;}
+ const now=await fetchSkin(admin);if(!now.html.includes(MARK)||!now.html.includes('data-nhun-r8="1"'))throw new Error('E_NOT_PERSISTED');
+ const checks=[await verify(context,BLOG+'/',1440,1000),await verify(context,BLOG+'/356',1440,1000),await verify(context,BLOG+'/356',390,844),await verify(context,BLOG+'/354',390,844)];
+ for(const c of checks){if(!c.title||!c.content||!c.header||!c.critical||c.bodyWidth>c.viewport+40)throw new Error('E_PUBLIC_VERIFY');}
+ console.log('PASS_CRITICAL_R8 '+JSON.stringify({changed,htmlBefore:original.html.length,htmlAfter:now.html.length,criticalBytes:CRITICAL.length,checks}));
+}catch(err){
+ console.error('CRITICAL_R8_FAIL '+(err?.stack||err));
+ if(changed&&original&&browser){try{const context=browser.contexts()[0];const a=context.pages().find(p=>p.url().includes('/manage/design/skin/edit'))||await context.newPage();if(!a.url().includes('/manage/design/skin/edit'))await a.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});console.error('ROLLBACK '+JSON.stringify(await saveSkin(a,original.html,original.css)));}catch(e){console.error('ROLLBACK_FAIL '+(e?.stack||e));}}
+ throw err;
+}finally{try{await browser?.close();}catch{} try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}}
