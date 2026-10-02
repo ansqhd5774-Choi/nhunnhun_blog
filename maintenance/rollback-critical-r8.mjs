@@ -1,0 +1,35 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+
+const BLOG='https://nhunnhun.tistory.com';
+const MARK='<!-- ZG critical css R8 -->';
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({projectId:process.env.BROWSERBASE_PROJECT_ID,browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},timeout:300});
+let browser;
+async function fetchSkin(page){const r=await page.evaluate(async()=>{const x=await fetch('/manage/design/skin/html.json',{credentials:'include'});return x.json()});return r;}
+async function saveSkin(page,html,css){return page.evaluate(async({html,css})=>{const r=await fetch('/manage/design/skin/html.json',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({html,css,isPreview:false})});return {ok:r.ok,status:r.status,text:await r.text()}},{html,css});}
+
+try{
+ browser=await chromium.connectOverCDP(session.connectUrl);
+ const context=browser.contexts()[0], admin=await context.newPage();
+ admin.setDefaultTimeout(25000);
+ await admin.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+ if(new URL(admin.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+ const original=await fetchSkin(admin);
+ let html=original.html;
+ html=html.replace(/<!-- ZG critical css R8 -->\s*<style>[\s\S]*?<\/style>\s*/i,'');
+ html=html.replace(/<link([^>]*href=["'][^"']*style\.css[^"']*["'][^>]*)media=["']print["'][^>]*onload=["'][^"']*["']([^>]*)rel=["']stylesheet["']([^>]*)>/i,'<link$1$2rel="stylesheet"$3>');
+ html=html.replace(/<link([^>]*href=["'][^"']*style\.css[^"']*["'][^>]*)rel=["']stylesheet["']([^>]*)media=["']print["'][^>]*onload=["'][^"']*["']([^>]*)>/i,'<link$1rel="stylesheet"$2$3>');
+ html=html.replace(/<noscript>\s*<link[^>]*href=["'][^"']*style\.css[^"']*["'][^>]*>\s*<\/noscript>/i,'');
+ const s=await saveSkin(admin,html,original.css);
+ if(!s.ok) throw new Error('E_SAVE_'+s.status);
+ const now=await fetchSkin(admin);
+ if(now.html.includes(MARK)) throw new Error('E_MARK_REMAINS');
+ if(/style\.css[^>]*media=["']print["']/i.test(now.html)||/media=["']print["'][^>]*style\.css/i.test(now.html)) throw new Error('E_NONBLOCK_REMAINS');
+ console.log('PASS_ROLLBACK_R8');
+}finally{
+ try{await browser?.close();}catch{}
+ try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}
