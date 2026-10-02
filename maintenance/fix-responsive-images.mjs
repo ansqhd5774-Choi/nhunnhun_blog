@@ -1,10 +1,21 @@
 import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
+import { readFile } from 'node:fs/promises';
 
 const BLOG='https://nhunnhun.tistory.com';
-for (const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) {
-  if (!process.env[k]) throw new Error('E_CONFIG');
-}
+const POST_ID='356';
+const post=JSON.parse(await readFile('posts/apple-benefits-20261002.json','utf8'));
+const hero='https://upload.wikimedia.org/wikipedia/commons/0/06/Red_apple_fruits.jpg';
+const sliced='https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg';
+const imgStyle='width:100%;max-width:720px;height:auto;display:block;margin:16px auto;';
+
+let html=post.bodyHtml;
+const heroBlock='<p><img src="'+hero+'" alt="붉은 사과 두 개" style="'+imgStyle+'"></p>';
+const slicedBlock='<p><img src="'+sliced+'" alt="반으로 자른 사과" style="'+imgStyle+'"></p>';
+html=heroBlock+html;
+html=html.replace('<h2>3. 사과는 하루에 얼마나 먹으면 좋을까?</h2>',slicedBlock+'<h2>3. 사과는 하루에 얼마나 먹으면 좋을까?</h2>');
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG');
 const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
 const session=await client.sessions.create({
   projectId:process.env.BROWSERBASE_PROJECT_ID,
@@ -18,58 +29,60 @@ try{
   const page=await context.newPage();
   page.setDefaultTimeout(20000);
   page.on('dialog',async d=>{ if(d.type()==='confirm') await d.accept(); else await d.dismiss(); });
-  await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+
+  await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
   if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+  await page.locator('#post-title-inp').waitFor({state:'visible'});
+  if((await page.locator('#post-title-inp').inputValue()).trim()!==post.title) throw new Error('E_WRONG_POST');
 
-  // Find the CodeMirror instance that contains the skin CSS.
-  await page.waitForFunction(() => document.querySelectorAll('.CodeMirror').length > 0);
-  const found = await page.evaluate(() => {
-    const editors=[...document.querySelectorAll('.CodeMirror')].map((el,i)=>({i,cm:el.CodeMirror,value:el.CodeMirror?.getValue?.()||''}));
-    const css=editors.find(x=>x.value.includes('@charset') && x.value.includes('.post-content'));
-    return css ? {index:css.i,length:css.value.length} : null;
-  });
-  if(!found) throw new Error('E_CSS_EDITOR_NOT_FOUND');
+  await page.locator('#editor-mode-layer-btn-open').click();
+  await page.locator('#editor-mode-html').click();
+  const code=page.locator('.CodeMirror:visible .CodeMirror-code');
+  await code.waitFor({state:'visible'});
+  await code.click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText(html);
 
-  const marker='/* ZG responsive article images */';
-  await page.evaluate(({index,marker})=>{
-    const el=document.querySelectorAll('.CodeMirror')[index];
-    const cm=el.CodeMirror;
-    let css=cm.getValue();
-    if(!css.includes(marker)){
-      css += '\n\n'+marker+'\n.post-content img, .contents_style img {\n  max-width: 100% !important;\n  height: auto !important;\n}\n.post-content p > img, .contents_style p > img {\n  display: block;\n  margin-left: auto;\n  margin-right: auto;\n}\n';
-      cm.setValue(css);
-      cm.save?.();
-    }
-  },{index:found.index,marker});
-
-  // Save/apply. Try exact common labels first, then any visible save-like button.
-  const labels=['적용','저장','변경사항 저장'];
-  let clicked=false;
-  for(const label of labels){
-    const b=page.getByRole('button',{name:label,exact:true});
-    if(await b.count()){ await b.last().click(); clicked=true; break; }
+  await page.locator('#publish-layer-btn').click();
+  let submit=null;
+  for(const name of ['공개 발행','수정','변경사항 저장','완료']){
+    const b=page.getByRole('button',{name,exact:true});
+    if(await b.count()){submit=b.last();break;}
   }
-  if(!clicked){
-    const b=page.locator('button').filter({hasText:/적용|저장/});
-    if(await b.count()){ await b.last().click(); clicked=true; }
-  }
-  if(!clicked) throw new Error('E_SAVE_BUTTON');
+  if(!submit) throw new Error('E_SUBMIT_BUTTON');
+  await submit.click();
   await page.waitForTimeout(2500);
 
-  // Verify live post image computed width never exceeds article content width.
-  const pub=await context.newPage();
-  await pub.goto(BLOG+'/356',{waitUntil:'domcontentloaded'});
-  const result=await pub.evaluate(()=>{
-    const content=document.querySelector('.contents_style');
-    const imgs=[...content.querySelectorAll('img')];
-    return {
-      contentWidth:content?.getBoundingClientRect().width||0,
-      images:imgs.map(img=>({alt:img.alt,width:img.getBoundingClientRect().width,naturalWidth:img.naturalWidth,maxWidth:getComputedStyle(img).maxWidth,height:getComputedStyle(img).height}))
-    };
-  });
-  const bad=result.images.filter(x=>x.width>result.contentWidth+1);
-  if(!result.images.length || bad.length) throw new Error('E_SIZE_VERIFY');
-  console.log('PASS_RESPONSIVE_IMAGES '+JSON.stringify(result));
+  async function verify(viewport){
+    const p=await context.newPage();
+    await p.setViewportSize(viewport);
+    await p.goto(BLOG+'/'+POST_ID,{waitUntil:'domcontentloaded'});
+    const result=await p.evaluate(()=>{
+      const content=document.querySelector('.contents_style');
+      const imgs=[...content.querySelectorAll('img')].filter(img=>/사과/.test(img.alt));
+      return {
+        contentWidth:content?.getBoundingClientRect().width||0,
+        images:imgs.map(img=>({
+          alt:img.alt,
+          width:Math.round(img.getBoundingClientRect().width),
+          height:Math.round(img.getBoundingClientRect().height),
+          naturalWidth:img.naturalWidth,
+          naturalHeight:img.naturalHeight,
+          style:img.getAttribute('style')||''
+        }))
+      };
+    });
+    await p.close();
+    if(result.images.length!==2) throw new Error('E_IMAGE_COUNT');
+    for(const img of result.images){
+      if(img.width>720.5 || img.width>result.contentWidth+1 || img.height<=0) throw new Error('E_SIZE_VERIFY');
+    }
+    return result;
+  }
+
+  const desktop=await verify({width:1440,height:1200});
+  const mobile=await verify({width:390,height:900});
+  console.log('PASS_IMAGE_SIZE '+JSON.stringify({desktop,mobile}));
 } finally {
   try{await browser?.close();}catch{}
   try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
