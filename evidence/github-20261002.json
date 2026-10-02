@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-02",
+  "repository": "https://github.com/ansqhd5774-Choi/nhunnhun_blog",
+  "visibility": "private",
+  "branch": "main",
+  "verifiedProjectCommit": "3fb107bfda6c56757d455fa5d84ee2726d0f2a64",
+  "localRemoteCommitMatch": true,
+  "trackedFiles": 22,
+  "excludedRawFilesInGit": 0,
+  "connectorRead": "CONFIRMED-CHATGPT_HANDOFF-main",
+  "tistoryChanges": "NONE",
+  "ordinaryChatGPTSessionAccess": "NOT_VERIFIED",
+  "notes": "검토용 HTML/CSS의 원본 공백 경고는 보존. 운영 원본 변경 없음."
+}

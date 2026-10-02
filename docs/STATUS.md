@@ -1,6 +1,6 @@
 # 현재 상태
 
-GitHub 연결: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main). 로컬 origin 연결. 관리 문서·서식·검토용 HTML/CSS를 업로드 대상으로 준비했다. 원본 백업과 수집 원자료는 제외. 실제 원격 반영 증거는 evidence/github-20261002.json에서 확인한다.
+GitHub 연결 완료: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main). 로컬 origin 연결, 관리 문서·서식·검토용 HTML/CSS commit 및 push 완료. 로컬/원격 커밋 일치와 GitHub 연결 도구의 인수인계 문서 읽기 성공 확인. 원본 백업과 수집 원자료는 제외. 실제 원격 반영 증거는 evidence/github-20261002.json에서 확인한다. 다른 일반 ChatGPT 대화의 접근/쓰기 권한은 아직 미검증.
 
 2026-10-02 / DONE: 로컬 반복 관리 구조와 초기 백업 준비 완료.
 

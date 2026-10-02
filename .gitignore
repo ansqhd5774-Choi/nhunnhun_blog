@@ -6,3 +6,4 @@ css/current/**
 js/current/**
 .env*
 *.log
+evidence/*.png
