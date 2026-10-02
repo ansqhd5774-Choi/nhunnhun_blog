@@ -103,3 +103,5 @@ jobs:
             try { await client.sessions.update(session.id, { projectId: process.env.BROWSERBASE_PROJECT_ID, status: 'REQUEST_RELEASE' }); } catch {}
           }
           NODE
+
+# trigger
