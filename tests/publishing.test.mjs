@@ -104,7 +104,11 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs', import.meta.url),'utf8');
   const validate=readFileSync(new URL('../publishing/validate.mjs', import.meta.url),'utf8');
   assert.match(publish,/renderEditorialPost\(post\)/);
+  assert.match(publish,/assertEditorialContract\(stagedHtml, post\.bodyHtml\)/);
   assert.match(publish,/E_EDITORIAL_PUBLIC_CONTRACT/);
+  assert.match(publish,/editorialSnapshot\.responsiveImages/);
+  assert.match(publish,/editorialSnapshot\.quickCards/);
+  assert.match(publish,/editorialSnapshot\.relatedCards/);
   assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);
   assert.match(publish,/E_REPRESENTATIVE_UNVERIFIED/);
   assert.match(publish,/E_SOURCE_DRIFT/);
