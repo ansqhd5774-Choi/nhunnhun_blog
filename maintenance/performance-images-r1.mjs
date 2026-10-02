@@ -68,9 +68,33 @@ async function openPostHtml(page){
 function replaceKnownImageUrls(html){
   const oldHero='https://upload.wikimedia.org/wikipedia/commons/0/06/Red_apple_fruits.jpg';
   const oldSliced='https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg';
-  if(!html.includes(oldHero)) throw new Error('E_HERO_URL_NOT_FOUND');
-  if(!html.includes(oldSliced)) throw new Error('E_SLICED_URL_NOT_FOUND');
-  return html.replaceAll(oldHero,HERO).replaceAll(oldSliced,SLICED);
+  let next=html.replaceAll(oldHero,HERO).replaceAll(oldSliced,SLICED);
+  return next;
+}
+function addImageAttrs(html){
+  const heroRe=/<img\b[^>]*alt=["']붉은 사과 두 개["'][^>]*>/i;
+  const slicedRe=/<img\b[^>]*alt=["']반으로 자른 사과["'][^>]*>/i;
+  if(!heroRe.test(html)) throw new Error('E_HERO_TAG_NOT_FOUND');
+  if(!slicedRe.test(html)) throw new Error('E_SLICED_TAG_NOT_FOUND');
+  html=html.replace(heroRe,tag=>{
+    return tag
+      .replace(/\swidth=["'][^"']*["']/ig,'')
+      .replace(/\sheight=["'][^"']*["']/ig,'')
+      .replace(/\sloading=["'][^"']*["']/ig,'')
+      .replace(/\sfetchpriority=["'][^"']*["']/ig,'')
+      .replace(/\sdecoding=["'][^"']*["']/ig,'')
+      .replace(/>$/,' width="960" height="605" loading="eager" fetchpriority="high" decoding="async">');
+  });
+  html=html.replace(slicedRe,tag=>{
+    return tag
+      .replace(/\swidth=["'][^"']*["']/ig,'')
+      .replace(/\sheight=["'][^"']*["']/ig,'')
+      .replace(/\sloading=["'][^"']*["']/ig,'')
+      .replace(/\sfetchpriority=["'][^"']*["']/ig,'')
+      .replace(/\sdecoding=["'][^"']*["']/ig,'')
+      .replace(/>$/,' width="960" height="640" loading="lazy" decoding="async">');
+  });
+  return html;
 }
 async function setPostHtml(page,html){
   const code=page.locator('.CodeMirror:visible .CodeMirror-code');
@@ -140,7 +164,8 @@ try{
   post.setDefaultTimeout(25000);
   post.on('dialog',async d=>{try{await d.accept();}catch{}});
   originalPost=await openPostHtml(post);
-  const next=replaceKnownImageUrls(originalPost);
+  let next=replaceKnownImageUrls(originalPost);
+  next=addImageAttrs(next);
   if(next!==originalPost){
     await setPostHtml(post,next);
     postChanged=true;
@@ -154,6 +179,7 @@ try{
     if(!v.sliced.src.includes('/thumb/9/92/Sliced_apple.jpg/960px-Sliced_apple.jpg')) throw new Error('E_SLICED_SRC');
     if(v.hero.naturalWidth>960||v.sliced.naturalWidth>960) throw new Error('E_OVERSIZED_IMAGE');
     if(v.hero.aspectRatio==='auto'||v.sliced.aspectRatio==='auto') throw new Error('E_ASPECT_RATIO');
+    if(v.hero.renderedWidth<=0||v.sliced.renderedWidth<=0) throw new Error('E_RENDERED_SIZE');
   }
   console.log('PASS_APPLE_IMAGE_PERF_R1 '+JSON.stringify({postChanged,skinChanged,desktop,mobile}));
 } catch(err){
