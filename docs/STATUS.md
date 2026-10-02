@@ -63,16 +63,32 @@ Proposal 개선 범위:
 - /195 삭제/병합/리라이트는 사용자 승인 없는 실제 기존글 변경이므로 미실행.
 
 LIVE APPLY 상태:
-- proposal 신규 변경분은 실제 티스토리 관리자에 아직 미반영.
-- TinyFish: 할당량 소진.
+- GitHub Actions + 기존 Browserbase persisted context 우회 경로로 proposal delta를 실제 티스토리 운영 스킨에 적용 완료.
+- 적용 workflow run: `37045048765` — SUCCESS.
+- 재실행 결과 `changed:false`로 idempotent 확인.
+- TinyFish는 할당량 소진 상태라 사용하지 않음.
 - Remote Desktop Commander: device offline + remote calls left 0%.
 - Firecrawl: credits 부족.
 - GSC Wizard: trial/subscription 종료.
 - 추가 과금 없이 진행 원칙에 따라 유료 충전/가입은 실행하지 않음.
 
-현재 완료 가능한 범위:
+실제 화면 회귀검증:
+- PC 홈: PASS.
+- PC /356 글: PASS.
+- 모바일 /356: PASS.
+- 태블릿 /356: PASS.
+- 모바일 음식 카테고리: PASS.
+- 모바일 검색(사과): PASS.
+- 모바일 태그(사과): PASS.
+- 검색 버튼 최소 48x48 충족.
+- 데스크톱/태블릿 검색 입력 높이 50px, aria-label 정상.
+- legacy footer 문구 노출 0.
+- 목록 crawler ligature 노이즈 0.
+
+현재 완료 범위:
 - GitHub proposal 작성/검증: PASS.
 - reference 원본 보존: PASS.
+- 실제 티스토리 스킨 delta 적용: PASS.
+- PC/태블릿/모바일 주요 페이지 회귀검증: PASS.
 - Evidence/상태 기록: PASS.
-- 실제 티스토리 스킨 delta 적용 및 PC/태블릿/모바일 회귀검증: BLOCKED_BY_BROWSER_CONTROL.
-- GSC 색인/검색성과 검증: BLOCKED_BY_GSC_ACCESS.
+- GSC 색인/검색성과 검증만 BLOCKED_BY_GSC_ACCESS.
