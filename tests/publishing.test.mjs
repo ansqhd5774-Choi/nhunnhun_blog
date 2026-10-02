@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
-import { applyEditorialTemplate } from '../publishing/editorial.mjs';
+import { applyEditorialTemplate, renderEditorialPost, assertEditorialSource, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from '../publishing/editorial.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
@@ -46,12 +46,62 @@ test('cloud workflow has serial execution and an explicit main-only activation g
 });
 
 test('editorial template gives new posts the shared visual hierarchy', () => {
-  const html='<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입</p><h2>1. 제목</h2><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><h2>질문</h2><p><strong>Q. 테스트?</strong><br>답변</p><h2>핵심 정리</h2><ul><li>정리</li></ul>';
-  const styled=applyEditorialTemplate(html);
-  assert.match(styled,/width:34px;height:4px/);
-  assert.match(styled,/font-size:26px/);
-  assert.match(styled,/font-size:20px/);
-  assert.match(styled,/overflow-x:auto/);
-  assert.match(styled,/>A\.<\/span>/);
-  assert.match(styled,/background:#f8fafc/);
+  const post={
+    id:'banana-test',
+    title:'바나나 테스트 글',
+    category:'음식',
+    tags:['바나나'],
+    representativeImageUrl:'https://example.org/a.jpg',
+    status:'ready',
+    approved:true,
+    bodyHtml:'<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입 문장입니다.</p><blockquote><strong>핵심만 먼저:</strong> 핵심 요약입니다.</blockquote><h2>1. 첫 항목</h2><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><p>설명 <a href="https://example.org/source-a">출처 A</a></p><h2>2. 두 번째</h2><p>설명 <a href="https://example.net/source-b">출처 B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/source-a">출처 A</a></li><li><a href="https://example.net/source-b">출처 B</a></li></ul>'
+  };
+  const rendered=renderEditorialPost(post);
+  assert.equal(EDITORIAL_TEMPLATE_VERSION,'R2');
+  assert.match(rendered,/바나나, 이것만 먼저 보세요/);
+  assert.match(rendered,/width:34px;height:4px/);
+  assert.match(rendered,/font-size:26px/);
+  assert.match(rendered,/font-size:20px/);
+  assert.match(rendered,/overflow-x:auto/);
+  assert.match(rendered,/background:#f8fafc/);
+  assert.doesNotThrow(()=>assertEditorialContract(rendered,post.bodyHtml));
+});
+
+test('new public article requires complete editorial source structure', () => {
+  const valid={
+    id:'editorial-post',
+    title:'사과 테스트 글',
+    category:'음식',
+    tags:['사과'],
+    representativeImageUrl:'https://example.org/apple.jpg',
+    status:'ready',
+    approved:true,
+    bodyHtml:'<p><img src="https://example.org/apple.jpg" alt="사과"></p><p>도입</p><h2>1. 하나</h2><p><a href="https://example.org/a">A</a></p><h2>2. 둘</h2><p><a href="https://example.net/b">B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
+  };
+  assert.doesNotThrow(()=>assertEditorialSource(valid));
+  assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:undefined}),/E_REPRESENTATIVE_IMAGE_REQUIRED/);
+  assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:'https://example.org/other.jpg'}),/E_REPRESENTATIVE_IMAGE_NOT_IN_BODY/);
+  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<h2>핵심 정리</h2>','')}),/E_EDITORIAL_SUMMARY_REQUIRED/);
+  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<h2>자료 출처</h2>','')}),/E_EDITORIAL_SOURCES_REQUIRED/);
+});
+
+test('only canonical publish workflow may invoke the public publisher', () => {
+  const dir=new URL('../.github/workflows/', import.meta.url);
+  const offenders=[];
+  for(const name of readdirSync(dir).filter(n=>/\.ya?ml$/.test(n))){
+    if(name==='publish-posts.yml') continue;
+    const content=readFileSync(new URL(name,dir),'utf8');
+    if(/pnpm\s+(?:run\s+)?publish\b|publishing\/publish\.mjs/.test(content)) offenders.push(name);
+  }
+  assert.deepEqual(offenders,[]);
+});
+
+test('publish pipeline keeps the required recurrence-prevention gates', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs', import.meta.url),'utf8');
+  const validate=readFileSync(new URL('../publishing/validate.mjs', import.meta.url),'utf8');
+  assert.match(publish,/renderEditorialPost\(post\)/);
+  assert.match(publish,/E_EDITORIAL_PUBLIC_CONTRACT/);
+  assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);
+  assert.match(publish,/E_REPRESENTATIVE_UNVERIFIED/);
+  assert.match(validate,/renderEditorialPost\(post\)/);
 });
