@@ -202,6 +202,13 @@ try {
           const p=t.parentElement;
           return p && /overflow-x:\s*auto/.test(p.getAttribute('style')||'');
         });
+        const images=[...root.querySelectorAll('img')];
+        const responsiveImages=images.filter(img => {
+          const s=img.getAttribute('style')||'';
+          return /width:\s*100%/.test(s) && /max-width:\s*720px/.test(s);
+        });
+        const priorityImages=images.filter(img => img.getAttribute('loading')==='eager' && img.getAttribute('fetchpriority')==='high');
+        const quickCards=[...root.querySelectorAll('p')].filter(p => /이것만 먼저 보세요$/.test(p.textContent.trim()) && /background:\s*#f7f9fc/.test(p.parentElement?.getAttribute('style')||''));
         const qs=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='Q.');
         const as=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='A.');
         const latest=[...root.querySelectorAll('aside')].filter(x => /최신 근거\s*·?\s*\d{4}/.test(x.textContent));
@@ -216,6 +223,10 @@ try {
           accents:accents.length,
           tables:tables.length,
           tableWraps:tableWraps.length,
+          images:images.length,
+          responsiveImages:responsiveImages.length,
+          priorityImages:priorityImages.length,
+          quickCards:quickCards.length,
           faqQ:qs.length,
           faqA:as.length,
           latest:latest.length,
@@ -232,11 +243,15 @@ try {
         editorialSnapshot.h3Styled !== editorialExpected.h3 ||
         editorialSnapshot.tables !== editorialExpected.tables ||
         editorialSnapshot.tableWraps !== editorialExpected.tables ||
+        editorialSnapshot.images !== editorialExpected.images ||
+        editorialSnapshot.responsiveImages !== editorialExpected.images ||
+        (editorialExpected.images > 0 && editorialSnapshot.priorityImages < 1) ||
+        editorialSnapshot.quickCards !== editorialExpected.quick ||
         editorialSnapshot.faqQ !== editorialExpected.faq ||
         editorialSnapshot.faqA !== editorialExpected.faq ||
         editorialSnapshot.latest !== editorialExpected.latest ||
         (editorialExpected.summary && !editorialSnapshot.summaryBox) ||
-        (editorialExpected.related && editorialSnapshot.relatedCards < 1) ||
+        (editorialExpected.related && editorialSnapshot.relatedCards !== editorialExpected.relatedLinks) ||
         (editorialExpected.sources && !editorialSnapshot.sourcesStyled)
       ) throw new Error('E_EDITORIAL_PUBLIC_CONTRACT');
       const state = await ledger.read(post.id);
