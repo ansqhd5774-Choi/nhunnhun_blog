@@ -38,11 +38,22 @@ try{
 
   const htmlBtn=page.getByText('html 편집',{exact:true});
   if(await htmlBtn.count()){
-    await htmlBtn.first().click();
-    await page.waitForTimeout(2500);
+    const el=htmlBtn.first();
+    console.log('HTML_BTN_OUTER '+JSON.stringify(await el.evaluate(e=>e.outerHTML)));
+    const before=context.pages().length;
+    await el.click();
+    await page.waitForTimeout(1800);
+    const pages=context.pages();
+    console.log('PAGE_COUNT '+before+'->'+pages.length);
+    for(let i=0;i<pages.length;i++){
+      const p=pages[i];
+      console.log('PAGE_'+i+' '+p.url());
+      try{
+        const info=await p.evaluate(()=>({title:document.title,body:(document.body?.innerText||'').slice(0,5000),cms:document.querySelectorAll('.CodeMirror').length,textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name}))}));
+        console.log('PAGE_INFO_'+i+' '+JSON.stringify(info));
+      }catch{}
+    }
     await snap('AFTER_HTML_EDIT');
-    await page.waitForTimeout(1200);
-    await snap('AFTER_HTML_EDIT_SETTLED');
   } else {
     console.log('NO_HTML_EDIT_BUTTON');
   }
