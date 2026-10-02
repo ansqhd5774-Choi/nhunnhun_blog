@@ -53,6 +53,15 @@ try{
         console.log('PAGE_INFO_'+i+' '+JSON.stringify(info));
       }catch{}
     }
+    const editorProbe=await page.evaluate(()=>({
+      codeMirror:document.querySelectorAll('.CodeMirror').length,
+      ace:document.querySelectorAll('.ace_editor').length,
+      monaco:document.querySelectorAll('.monaco-editor').length,
+      textareas:[...document.querySelectorAll('textarea')].map(x=>({id:x.id,cls:x.className,name:x.name,display:getComputedStyle(x).display,vis:getComputedStyle(x).visibility})),
+      editables:[...document.querySelectorAll('[contenteditable="true"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id,txt:(x.textContent||'').slice(0,200)})).slice(0,20),
+      suspects:[...document.querySelectorAll('[class*="html"],[class*="css"],[class*="code"],[class*="editor"],[class*="edit"]')].map(x=>({tag:x.tagName,cls:x.className,id:x.id,display:getComputedStyle(x).display,txt:(x.innerText||'').slice(0,120)})).slice(0,100)
+    }));
+    console.log('EDITOR_PROBE '+JSON.stringify(editorProbe));
     await snap('AFTER_HTML_EDIT');
   } else {
     console.log('NO_HTML_EDIT_BUTTON');
