@@ -1,49 +1,32 @@
 import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
-import { writeFile } from 'node:fs/promises';
 
 const BLOG='https://nhunnhun.tistory.com', POST_ID='356';
 const IMAGES=[
   {
-    key:'pairing',
-    src:'https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg',
-    path:'/tmp/apple-sliced.jpg',
     alt:'먹기 좋게 자른 사과',
     marker:'2. 요즘 많이 묻는',
+    src:'https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg',
     source:'https://commons.wikimedia.org/wiki/File:Sliced_apple.jpg',
     credit:'Wikimedia Commons · Public Domain'
   },
   {
-    key:'juice',
-    src:'https://upload.wikimedia.org/wikipedia/commons/0/00/Apple_juice_glass.jpg',
-    path:'/tmp/apple-juice.jpg',
     alt:'사과주스가 담긴 유리잔',
     marker:'3. 통사과 vs 사과주스',
+    src:'https://upload.wikimedia.org/wikipedia/commons/0/00/Apple_juice_glass.jpg',
     source:'https://commons.wikimedia.org/wiki/File:Apple_juice_glass.jpg',
     credit:'Wikimedia Commons · CC BY 4.0 · JeanBono'
   },
   {
-    key:'wash',
-    src:'https://upload.wikimedia.org/wikipedia/commons/9/9d/Washing_apples_with_water_in_a_sink_%2815042552883%29.jpg',
-    path:'/tmp/apple-wash.jpg',
     alt:'흐르는 물에 사과를 씻는 모습',
     marker:'7. 사과는 어떻게 씻으면',
+    src:'https://upload.wikimedia.org/wikipedia/commons/9/9d/Washing_apples_with_water_in_a_sink_%2815042552883%29.jpg',
     source:'https://commons.wikimedia.org/wiki/File:Washing_apples_with_water_in_a_sink_(15042552883).jpg',
     credit:'Wikimedia Commons · CC BY 2.0 · Personal Creations'
   }
 ];
 
 for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
-
-async function download(url,path){
-  const r=await fetch(url,{redirect:'follow',headers:{'User-Agent':'Mozilla/5.0','Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'}});
-  if(!r.ok) throw new Error('E_DOWNLOAD_'+r.status+'_'+url);
-  const type=(r.headers.get('content-type')||'').toLowerCase();
-  if(!type.startsWith('image/')) throw new Error('E_DOWNLOAD_TYPE_'+type);
-  await writeFile(path,Buffer.from(await r.arrayBuffer()));
-}
-for(const im of IMAGES) await download(im.src,im.path);
-
 const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
 const session=await client.sessions.create({
   projectId:process.env.BROWSERBASE_PROJECT_ID,
@@ -52,15 +35,11 @@ const session=await client.sessions.create({
 });
 let browser, originalHtml='', changed=false;
 
-async function uploadOne(page,path){
-  await page.evaluate(()=>document.querySelectorAll('#attach-layer-btn')[0]?.click());
-  const responsePromise=page.waitForResponse(res=>res.url().includes('/manage/post/attach.json')&&res.request().method()==='POST'&&res.status()===200,{timeout:30000});
-  await page.locator('#attach-image').setInputFiles(path);
-  const data=await (await responsePromise).json();
-  if(!data?.url||!data.url.includes('kakaocdn.net')) throw new Error('E_UPLOAD_'+JSON.stringify(data));
-  return data.url;
-}
-async function switchHtml(page){
+async function openHtml(page){
+  await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
+  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+  await page.locator('#post-title-inp').waitFor({state:'visible'});
+  if(!(await page.locator('#post-title-inp').inputValue()).includes('사과')) throw new Error('E_WRONG_POST');
   await page.locator('#editor-mode-layer-btn-open').click();
   await page.locator('#editor-mode-html').click();
   const cm=page.locator('.CodeMirror:visible');
@@ -78,9 +57,9 @@ function insertAfterHeading(html,marker,fragment){
   }
   throw new Error('E_HEADING_'+marker);
 }
-function figure(im,url){
+function figure(im){
   return '<figure class="apple-support-image" style="margin:22px auto 26px;max-width:720px;text-align:center;">'
-    +'<img src="'+url+'" alt="'+im.alt+'" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;border-radius:8px;">'
+    +'<img src="'+im.src+'" alt="'+im.alt+'" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;border-radius:8px;">'
     +'<figcaption style="margin-top:7px;font-size:12px;line-height:1.5;color:#777;">사진: <a href="'+im.source+'" target="_blank" rel="noopener noreferrer">'+im.credit+'</a></figcaption>'
     +'</figure>';
 }
@@ -109,13 +88,11 @@ async function verify(context,w,h){
     return await p.evaluate(()=>{
       const c=document.querySelector('.contents_style');
       const imgs=[...c.querySelectorAll('img')].map(x=>({alt:x.alt,src:x.src}));
-      const figs=[...c.querySelectorAll('figure.apple-support-image')];
       return {
-        imgCount:imgs.length,
-        supportCount:figs.length,
-        sliced:imgs.some(x=>x.alt==='먹기 좋게 자른 사과'&&x.src.includes('kakaocdn.net')),
-        juice:imgs.some(x=>x.alt==='사과주스가 담긴 유리잔'&&x.src.includes('kakaocdn.net')),
-        wash:imgs.some(x=>x.alt==='흐르는 물에 사과를 씻는 모습'&&x.src.includes('kakaocdn.net')),
+        supportCount:c.querySelectorAll('figure.apple-support-image').length,
+        sliced:imgs.some(x=>x.alt==='먹기 좋게 자른 사과'&&x.src.includes('wikimedia.org')),
+        juice:imgs.some(x=>x.alt==='사과주스가 담긴 유리잔'&&x.src.includes('wikimedia.org')),
+        wash:imgs.some(x=>x.alt==='흐르는 물에 사과를 씻는 모습'&&x.src.includes('wikimedia.org')),
         hasQuick:(c.innerText||'').includes('사과, 이것만 먼저 보세요'),
         hasBlood:(c.innerText||'').includes('혈당 스파이크'),
         hasCompare:(c.innerText||'').includes('통사과 vs 사과주스'),
@@ -130,19 +107,9 @@ try{
   const context=browser.contexts()[0], page=await context.newPage();
   page.setDefaultTimeout(30000);
   page.on('dialog',async d=>{try{await d.accept();}catch{}});
-  await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
-  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
-  await page.locator('#post-title-inp').waitFor({state:'visible'});
-  if(!(await page.locator('#post-title-inp').inputValue()).includes('사과')) throw new Error('E_WRONG_POST');
-
-  const urls={};
-  for(const im of IMAGES) urls[im.key]=await uploadOne(page,im.path);
-
-  originalHtml=await switchHtml(page);
-  let html=originalHtml;
-  // Idempotent: remove only our prior support figures if this workflow is rerun.
-  html=html.replace(/<figure class="apple-support-image"[\s\S]*?<\/figure>/gi,'');
-  for(const im of IMAGES) html=insertAfterHeading(html,im.marker,figure(im,urls[im.key]));
+  originalHtml=await openHtml(page);
+  let html=originalHtml.replace(/<figure class="apple-support-image"[\s\S]*?<\/figure>/gi,'');
+  for(const im of IMAGES) html=insertAfterHeading(html,im.marker,figure(im));
   if(html===originalHtml) throw new Error('E_NO_CHANGE');
   await save(page,html);
   changed=true;
@@ -161,10 +128,7 @@ try{
       const context=browser.contexts()[0], p=await context.newPage();
       p.setDefaultTimeout(30000);
       p.on('dialog',async d=>{try{await d.accept();}catch{}});
-      await p.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
-      await p.locator('#editor-mode-layer-btn-open').click();
-      await p.locator('#editor-mode-html').click();
-      await p.locator('.CodeMirror:visible').waitFor({state:'visible'});
+      await openHtml(p);
       await save(p,originalHtml);
       console.error('ROLLBACK_APPLE_SUPPORT_IMAGES_OK');
     }catch(e){console.error('ROLLBACK_APPLE_SUPPORT_IMAGES_FAIL '+(e?.stack||e));}
