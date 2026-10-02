@@ -86,7 +86,7 @@ async function verify(context,w,h){
         h2:c.querySelectorAll('h2').length,
         h3:c.querySelectorAll('h3').length,
         latest:text.includes('최신 근거 · 2026'),
-        faq:text.includes('Q. 바나나는 하루에 몇 개가 적당한가요?')&&text.includes('A. 정해진 의학적 권장 개수는 없습니다.'),
+        faq:text.includes('바나나는 하루에 몇 개가 적당한가요?')&&text.includes('정해진 의학적 권장 개수는 없습니다.'),
         summary:text.includes('핵심 정리')&&text.includes('기존 간식을 바나나로 대체'),
         related:text.includes('바나나 효능 전반 정리')&&text.includes('사과 효능·영양성분·부작용 총정리'),
         tables:c.querySelectorAll('table').length,
