@@ -2,7 +2,7 @@ import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
-import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
+import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 
@@ -180,10 +180,20 @@ try {
       const content = publicPage.locator('.contents_style');
       if (await content.count() !== 1) throw new Error('E_BODY_UNVERIFIED');
       const actual = (await content.innerText()).replace(/\s+/g,' ').trim();
-      const expected = plainText(bodyHtml);
-      // Compare against the final editorial HTML inserted into Tistory, not the raw authoring source.
-      const expectedText = await publicPage.evaluate(html => { const doc = new DOMParser().parseFromString(html,'text/html'); return doc.body.textContent.replace(/\s+/g,' ').trim(); }, textHtml(bodyHtml));
-      if (!expected || !actual.includes(expectedText)) throw new Error('E_BODY_UNVERIFIED');
+      // Materialize the final editorial HTML in the browser and compare rendered innerText.
+      // textContent collapses table cells and block boundaries differently from the live page,
+      // which can create false E_BODY_UNVERIFIED failures even when the public article is complete.
+      const expectedText = await publicPage.evaluate(html => {
+        const host=document.createElement('div');
+        host.setAttribute('aria-hidden','true');
+        host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;visibility:hidden;';
+        host.innerHTML=html;
+        document.body.appendChild(host);
+        const text=(host.innerText||host.textContent||'').replace(/\s+/g,' ').trim();
+        host.remove();
+        return text;
+      }, bodyHtml);
+      if (!expectedText || actual !== expectedText) throw new Error('E_BODY_UNVERIFIED');
       if (sources.length) {
         const publicImages = await content.locator('img').evaluateAll(imgs => imgs.map(img => img.src));
         if (publicImages.length < sources.length || publicImages.slice(0, sources.length).some(src => !src.includes('kakaocdn.net'))) throw new Error('E_IMAGE_UNVERIFIED');
