@@ -45,22 +45,17 @@ async function switchHtml(page){
   await page.locator('.CodeMirror:visible').waitFor({state:'visible'});
 }
 async function uploadOne(page,path){
-  const body=page.frameLocator('#editor-tistory_ifr').locator('body');
-  await body.waitFor({state:'visible'});
-  await body.click();
-  await page.waitForTimeout(150);
-  const frame=page.frames().find(f=>f!==page.mainFrame());
-  const before=frame?await frame.locator('img').evaluateAll(es=>es.map(x=>x.src)):[];
   await page.evaluate(()=>document.querySelectorAll('#attach-layer-btn')[0]?.click());
+  const responsePromise=page.waitForResponse(res=>
+    res.url().includes('/manage/post/attach.json') &&
+    res.request().method()==='POST' &&
+    res.status()===200
+  ,{timeout:30000});
   await page.locator('#attach-image').setInputFiles(path);
-  await page.waitForTimeout(6500);
-  const f=page.frames().find(x=>x!==page.mainFrame());
-  if(!f) throw new Error('E_FRAME');
-  const after=await f.locator('img').evaluateAll(es=>es.map(x=>x.src).filter(Boolean));
-  const added=after.filter(x=>!before.includes(x));
-  const src=added.at(-1)||after.at(-1);
-  if(!src||!src.includes('kakaocdn.net')) throw new Error('E_UPLOAD_SRC_'+JSON.stringify({before,after}));
-  return src;
+  const response=await responsePromise;
+  const data=await response.json();
+  if(!data?.url||!data.url.includes('kakaocdn.net')) throw new Error('E_UPLOAD_RESPONSE_'+JSON.stringify(data));
+  return data.url;
 }
 function makeNativeBody(hero,sliced){
   let h=post.bodyHtml;
