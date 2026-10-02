@@ -92,3 +92,34 @@ LIVE APPLY 상태:
 - PC/태블릿/모바일 주요 페이지 회귀검증: PASS.
 - Evidence/상태 기록: PASS.
 - GSC 색인/검색성과 검증만 BLOCKED_BY_GSC_ACCESS.
+
+
+## 2026-10-03 / FINAL SEO CONTENT PASS
+
+완료:
+- 실제 티스토리 스킨 SEO/A11Y R2 delta 적용 PASS.
+- 최종 live 회귀검증 Run `37047067542` PASS.
+- /195 제목·본문을 "사과 품종·고르는 법·보관법·활용법 총정리"로 재구성하여 /356과 검색의도 분리.
+- /195 → /356 내부링크 적용.
+- /195 기존 건강효능 중복 본문 및 오래된 외부 상업 링크 제거 확인.
+- /352 템플릿 잔여문구 미검출.
+- /356 canonical 정상.
+- /356 robots: `index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1`.
+- /356 대표 OG 이미지가 기본 placeholder가 아닌 실제 대표 이미지로 확인.
+- robots.txt HTTP 200.
+- sitemap.xml HTTP 200 및 /195, /352, /356 포함 확인.
+- 모바일 검색 버튼 48x48 확인.
+- 홈/본문의 legacy footer 및 crawler ligature 노이즈 미검출.
+- 일회성 deploy/verify workflow 정리 완료.
+
+의도적으로 미변경:
+- 카테고리 `약약`: URL 구조 변경 가능성이 있어 프로젝트 URL 보존 원칙에 따라 자동 rename하지 않음.
+
+외부 확인 제한:
+- GSC Wizard 구독 종료로 실제 Google Search Console 색인/노출/CTR 데이터 검증은 미실행.
+- 공개 site 검색에서 /356 exact 결과는 감사 시점에 아직 확인되지 않음. 이 항목은 색인 결과가 아니라 공개 검색 관측치로만 취급.
+
+Evidence:
+- `evidence/blog-source-r2-20261003.json`
+- `evidence/post-195-rewrite-20261003.json`
+- `evidence/final-blog-seo-20261003.json`
