@@ -45,11 +45,15 @@ async function switchHtml(page){
   await page.locator('.CodeMirror:visible').waitFor({state:'visible'});
 }
 async function uploadOne(page,path){
+  const body=page.frameLocator('#editor-tistory_ifr').locator('body');
+  await body.waitFor({state:'visible'});
+  await body.click();
+  await page.waitForTimeout(150);
   const frame=page.frames().find(f=>f!==page.mainFrame());
   const before=frame?await frame.locator('img').evaluateAll(es=>es.map(x=>x.src)):[];
   await page.evaluate(()=>document.querySelectorAll('#attach-layer-btn')[0]?.click());
   await page.locator('#attach-image').setInputFiles(path);
-  await page.waitForTimeout(5500);
+  await page.waitForTimeout(6500);
   const f=page.frames().find(x=>x!==page.mainFrame());
   if(!f) throw new Error('E_FRAME');
   const after=await f.locator('img').evaluateAll(es=>es.map(x=>x.src).filter(Boolean));
