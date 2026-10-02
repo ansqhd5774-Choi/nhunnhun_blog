@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-03",
+  "target": "https://nhunnhun.tistory.com/195",
+  "workflow_run": 37046545133,
+  "conclusion": "success",
+  "live_changed": true,
+  "new_title": "사과 품종·고르는 법·보관법·활용법 총정리",
+  "intent": "사과 품종·고르는 법·보관법·활용법",
+  "internal_link_to_356": true,
+  "old_health_heading_removed": true,
+  "old_commercial_link_removed": true,
+  "desktop_verify": "PASS",
+  "mobile_verify": "PASS",
+  "category_preserved": true,
+  "tags_preserved": true,
+  "url_preserved": true,
+  "source_file": "changes/20261003-195-rewrite.json"
+}
