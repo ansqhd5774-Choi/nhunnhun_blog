@@ -37,11 +37,58 @@
     "live_existing_post_edit": false
   },
   "blockers": {
-    "tinyfish": "quota exhausted",
+    "tinyfish": "quota exhausted, bypassed for this deployment using GitHub Actions + existing Browserbase persisted context",
     "remote_desktop_commander": "device offline and remote calls left 0%",
     "firecrawl": "insufficient credits",
     "gsc_wizard": "trial/subscription inactive"
   },
-  "live_apply": false,
-  "paid_upgrade": false
+  "live_apply": true,
+  "paid_upgrade": false,
+  "live_apply_run": {
+    "workflow": "Apply Tistory SEO A11Y R2",
+    "run_id": 37045048765,
+    "conclusion": "success",
+    "changed_on_first_success_run": true,
+    "idempotent_second_run": true
+  },
+  "live_verification": {
+    "pc_home": {
+      "search_input_height": 50,
+      "search_button": "48x50",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "pc_article": {
+      "search_input_height": 50,
+      "search_button": "48x50",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "mobile_article": {
+      "search_button": "48x48",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "tablet_article": {
+      "search_input_height": 50,
+      "search_button": "48x50",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "mobile_category": {
+      "search_button": "48x48",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "mobile_search": {
+      "search_button": "48x48",
+      "old_footer": false,
+      "crawler_noise": false
+    },
+    "mobile_tag": {
+      "search_button": "48x48",
+      "old_footer": false,
+      "crawler_noise": false
+    }
+  }
 }
