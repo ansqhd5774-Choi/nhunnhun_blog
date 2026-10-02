@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { BLOG, loadPosts, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 
-let browser, client, session;
+let browser, client, session, editorPage;
 let stage = 'configuration';
 try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
@@ -30,6 +30,7 @@ try {
       stage = 'editor-open';
       const context = browser.contexts()[0];
       const page = await context.newPage();
+      editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
       page.on('dialog', async dialog => {
@@ -41,8 +42,11 @@ try {
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       stage = 'editor-content';
       await page.locator('#post-title-inp').fill(post.title);
+      stage = 'mode-menu';
       await page.locator('#editor-mode-layer-btn-open').click();
+      stage = 'html-mode';
       await page.locator('#editor-mode-html').click();
+      stage = 'html-body';
       await page.locator('.CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(post.bodyHtml);
@@ -93,6 +97,14 @@ try {
 } catch (error) {
   const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
+  if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
+    console.log('EDITOR_CONTROLS: '+JSON.stringify(await editorPage.evaluate(()=>({
+      codeMirror:document.querySelectorAll('.CodeMirror').length,
+      codeMirrorCode:document.querySelectorAll('.CodeMirror-code').length,
+      inputs:Array.from(document.querySelectorAll('textarea')).map(e=>({id:e.id,class:e.className})),
+      modeText:document.querySelector('#editor-mode-layer-btn-open')?.textContent,
+    }))));
+  } catch {}
   // Provider exceptions can carry credentials/connect URLs: never log raw exceptions.
   console.error('STOP: 클라우드 설정·로그인·에디터·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
   process.exitCode = 1;
