@@ -96,3 +96,12 @@ jobs:
 # pr-trigger-performance-images-r1-thumb-fix
 
 # pr-trigger-performance-images-r1-keyboard-fix
+
+      - name: Apply performance fallback R1C
+        run: node maintenance/performance-fallback-r1c.mjs
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
+          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
+
+# performance-fallback-r1c
