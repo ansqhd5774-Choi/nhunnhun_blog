@@ -12,12 +12,17 @@ try{
   await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
   if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
   await page.locator('#post-title-inp').waitFor({state:'visible'});
+  const attach=page.locator('#attach-layer-btn:visible').first();
+  await attach.click();
+  await page.waitForTimeout(500);
   const data=await page.evaluate(()=>({
-    buttons:[...document.querySelectorAll('button')].slice(0,120).map((e,i)=>({i,id:e.id,cls:String(e.className||'').slice(0,160),text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,120),title:e.title,aria:e.getAttribute('aria-label'),data:Object.fromEntries([...e.attributes].filter(a=>a.name.startsWith('data-')).map(a=>[a.name,a.value]))})),
-    inputs:[...document.querySelectorAll('input')].slice(0,80).map((e,i)=>({i,id:e.id,cls:String(e.className||'').slice(0,120),type:e.type,name:e.name,accept:e.accept,hidden:e.hidden,display:getComputedStyle(e).display})),
-    iframes:[...document.querySelectorAll('iframe')].map((e,i)=>({i,id:e.id,cls:e.className,src:e.src,title:e.title}))
+    visibleText:[...document.querySelectorAll('body *')].filter(e=>{
+      const cs=getComputedStyle(e),r=e.getBoundingClientRect();
+      return cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>0&&r.height>0&&/사진|이미지|파일|첨부|카메라|photo|image|file/i.test((e.innerText||e.textContent||'').trim());
+    }).slice(0,80).map((e,i)=>({i,tag:e.tagName,id:e.id,cls:String(e.className||'').slice(0,150),text:(e.innerText||e.textContent||'').trim().replace(/\s+/g,' ').slice(0,220),outer:e.outerHTML.slice(0,500)})),
+    inputs:[...document.querySelectorAll('input')].map((e,i)=>({i,id:e.id,cls:String(e.className||'').slice(0,120),type:e.type,name:e.name,accept:e.accept,hidden:e.hidden,display:getComputedStyle(e).display,outer:e.outerHTML.slice(0,500)}))
   }));
-  console.log('EDITOR_UI '+JSON.stringify(data));
+  console.log('ATTACH_MENU '+JSON.stringify(data));
 }finally{
   try{await browser?.close();}catch{}
   try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
