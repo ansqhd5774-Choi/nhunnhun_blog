@@ -42,7 +42,11 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.deepEqual(workflow.permissions, {contents:'read'});
   assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
   assert.equal(workflow.jobs.publish.needs, 'validate');
+  assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm test'));
+  assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm validate'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm run publish'));
+  assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
+  assert.equal(workflow.jobs.publish.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
 });
 
 test('editorial template gives new posts the shared visual hierarchy', () => {
@@ -103,5 +107,7 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/E_EDITORIAL_PUBLIC_CONTRACT/);
   assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);
   assert.match(publish,/E_REPRESENTATIVE_UNVERIFIED/);
+  assert.match(publish,/E_SOURCE_DRIFT/);
+  assert.match(publish,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
   assert.match(validate,/renderEditorialPost\(post\)/);
 });
