@@ -34,7 +34,7 @@ try {
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
       page.on('dialog', async dialog => {
-        if (dialog.type() === 'confirm' && dialog.message().includes('작성 모드를 변경')) await dialog.accept();
+        if (dialog.type() === 'confirm' && /모드.*변경|변경.*모드/.test(dialog.message())) await dialog.accept();
         else await dialog.dismiss();
       });
       await page.goto(`${BLOG}/manage/post`, { waitUntil:'domcontentloaded' });
@@ -47,7 +47,7 @@ try {
       stage = 'html-mode';
       await page.locator('#editor-mode-html').click();
       stage = 'html-body';
-      await page.locator('.CodeMirror-code').click();
+      await page.locator('.CodeMirror:visible .CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(post.bodyHtml);
       stage = 'category-tags';
