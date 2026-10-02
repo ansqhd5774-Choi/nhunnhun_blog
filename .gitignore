@@ -1,0 +1,8 @@
+# 원본 백업과 원자료는 로컬 보관. 공개 저장소에 올리지 않는다.
+backup/**
+evidence/public/**
+skin/current/**
+css/current/**
+js/current/**
+.env*
+*.log
