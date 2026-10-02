@@ -22,34 +22,48 @@ NON_BLOCKING 후속 후보: 중복 description, /352 목록 잔여 문구, 외�
 NEXT: 사용자가 지정하는 SEO·광고·카테고리·게시글 작업 중 하나를 독립 변경 기록으로 시작한다. 적용 전 최신 관리자 원본을 다시 확보한다.
 
 
-## 2026-10-03 / SOURCE IMPROVEMENT READY — LIVE APPLY PENDING
+## 2026-10-03 / PROPOSAL READY — LIVE APPLY PENDING
 
-기준 main SHA: `b3bd09ab434a5d803b1faf73f8aa588c55c63fa5` 이후 연속 개선 반영.
+기준 운영 전 점검 시작 SHA: `39e22c09e1674f052f4bd73b1893984d90f63180`.
 
-완료된 GitHub 기준 소스 정리:
-- `<head>` 구조 정상화, `dns-prefetch` 오타 수정.
+GitHub 구조 정정:
+- `skin/reference/skin.html`, `css/reference/style.css`는 README 규칙대로 2026-10-02 검토 원본으로 복원.
+- 개선본은 별도 proposal로 분리:
+  - `skin/proposals/20261003-seo-a11y-r2.html`
+  - `css/proposals/20261003-seo-a11y-r2.css`
+- proposal HTML은 인증/광고 식별자가 REDACTED 된 검토 사본이므로 전체 파일 배포 금지.
+- 실제 적용 시 최신 티스토리 관리자 원본에 proposal delta만 적용해야 함.
+
+Proposal 개선 범위:
+- `<head>` 구조 정상화, charset 단일화, `dns-prefetch` 오타 수정.
 - 중복 generic `meta title/description` 제거.
-- `robots=index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1` 반영.
+- `robots=index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1` 후보 반영.
 - Material Icons CSS를 render-blocking preload 없이 비차단 로딩 + noscript fallback으로 정리.
-- 미사용 mainFont Google Fonts 요청 제거, 시스템 폰트 안정화 규칙 동기화.
-- 공개 목록의 Material Icons ligature 문자열을 SVG로 교체해 크롤링 노이즈 제거.
+- 미사용 mainFont Google Fonts 요청 제거.
+- 공개 목록/페이지 이동의 Material Icons ligature 문자열을 SVG로 교체.
 - 목록 summary `p.post_text` 닫는 태그 보정, 잘못된 `<ui>`를 `<ul>`로 수정.
 - 검색 입력 `aria-label`, 48px 터치영역, 포커스 표시 추가.
 - 검색/메뉴 버튼에 명시적 button semantics 및 한국어 접근성 이름 부여.
 - 댓글 Namecard 설명 텍스트 대비 강화.
-- 댓글/Namecard 비동기 삽입 CLS 안정화 규칙(R3) 및 이미지/본문 안정화 R1B를 GitHub 기준 CSS에 동기화.
-- 광고 슬롯 구조는 변경하지 않고 기존 운영 CLS 공간예약 CSS만 source-of-truth에 동기화.
-- 이전 스킨 제작자 외부 푸터 브랜딩 제거, 현재 블로그 제목 기반 푸터로 변경.
-- 완료된 목록/페이지 이동 아이콘을 텍스트 ligature 대신 SVG로 변경.
+- 운영에서 검증된 R1B/R2/R3 안정화 CSS를 proposal에 동기화.
+- 기존 광고 슬롯/수익화 구조는 변경하지 않음.
+- 이전 스킨 제작자 외부 푸터 브랜딩 제거, 현재 블로그 제목 기반 푸터 후보로 변경.
 - 사과 글 GitHub 원본에 실제 이미지/alt/srcset 상태 동기화.
 
-검색엔진 공개 조회에서 확인한 사항:
-- 기존 글 다수는 검색엔진에서 크롤링/검색 결과 노출 확인.
-- 신규 `/356`은 exact site 검색에서 아직 확인되지 않음.
-- 기존 `/195`에 사과 효능·영양 가치 글이 이미 색인되어 있어 `/356`과 검색의도 중복(카니벌라이제이션) 가능성 확인. 기존 글 삭제/병합/리라이트는 사용자 승인 없이 실행하지 않음.
+정적 QA:
+- `maintenance/validate-blog-source.mjs`는 proposal HTML/CSS를 검증.
+- GitHub Actions `Validate blog source` run `37044258639`: PASS.
+- 주요 Gate: head 1/1, UTF-8 charset 1, generic meta 중복 0, crawler ligature 0, legacy footer 0, search aria 1, 필수 CSS marker 전부 존재.
+
+검색/콘텐츠 감사:
+- 기존 게시글 다수는 공개 검색엔진에서 크롤링/검색 결과 노출 확인.
+- 신규 `/356` exact site 검색 결과는 감사 시점에 아직 미확인.
+- 기존 `/195` 사과 글이 이미 색인되어 `/356`과 검색의도 중복 가능성 확인.
+- 카니벌라이제이션 대응안은 `changes/20261003-apple-cannibalization.md`에 기록.
+- /195 삭제/병합/리라이트는 사용자 승인 없는 실제 기존글 변경이므로 미실행.
 
 LIVE APPLY 상태:
-- 위 GitHub 신규 스킨 변경분은 아직 실제 티스토리 관리자에 미반영.
+- proposal 신규 변경분은 실제 티스토리 관리자에 아직 미반영.
 - TinyFish: 할당량 소진.
 - Remote Desktop Commander: device offline + remote calls left 0%.
 - Firecrawl: credits 부족.
@@ -57,8 +71,8 @@ LIVE APPLY 상태:
 - 추가 과금 없이 진행 원칙에 따라 유료 충전/가입은 실행하지 않음.
 
 현재 완료 가능한 범위:
-- GitHub source-of-truth 정리: 완료.
-- 변경 Evidence/commit 보존: 완료.
-- 실제 티스토리 스킨 적용 및 PC/태블릿/모바일 최종 회귀검증: BLOCKED_BY_BROWSER_CONTROL.
+- GitHub proposal 작성/검증: PASS.
+- reference 원본 보존: PASS.
+- Evidence/상태 기록: PASS.
+- 실제 티스토리 스킨 delta 적용 및 PC/태블릿/모바일 회귀검증: BLOCKED_BY_BROWSER_CONTROL.
 - GSC 색인/검색성과 검증: BLOCKED_BY_GSC_ACCESS.
-
