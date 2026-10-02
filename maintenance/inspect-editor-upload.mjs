@@ -12,8 +12,7 @@ try{
   await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
   if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
   await page.locator('#post-title-inp').waitFor({state:'visible'});
-  const attach=page.locator('#attach-layer-btn:visible').first();
-  await attach.click();
+  await page.evaluate(()=>{const e=document.querySelector('#attach-layer-btn'); if(!e) throw new Error('E_ATTACH_BTN'); e.click();});
   await page.waitForTimeout(500);
   const data=await page.evaluate(()=>({
     visibleText:[...document.querySelectorAll('body *')].filter(e=>{
