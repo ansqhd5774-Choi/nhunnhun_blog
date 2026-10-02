@@ -39,7 +39,7 @@ async function inspect(context,url,w,h){
     await p.waitForTimeout(1200);
     return await p.evaluate(()=>({
       title:document.title,
-      input:(()=>{const e=document.querySelector('#search-input'); if(!e)return null; const r=e.getBoundingClientRect(); return {h:Math.round(r.height),aria:e.getAttribute('aria-label')}})(),
+      input:(()=>{const e=document.querySelector('#search-input'); if(!e)return null; const r=e.getBoundingClientRect(),s=getComputedStyle(e); return {h:Math.round(r.height),aria:e.getAttribute('aria-label'),display:s.display}})(),
       btn:(()=>{const e=document.querySelector('button.search-icon'); if(!e)return null; const r=e.getBoundingClientRect(); return {w:Math.round(r.width),h:Math.round(r.height),aria:e.getAttribute('aria-label')}})(),
       oldFooter:document.body.innerText.includes('쭈미로운 생활')||document.body.innerText.includes('Designed by'),
       crawlerNoise:['format_list_bulleted','textsms','navigate_before','navigate_next'].some(x=>document.body.innerText.includes(x))
@@ -108,7 +108,7 @@ try{
   ];
   for(const x of checks){
     if(!x.title) throw new Error('E_TITLE');
-    if(x.input && x.input.h<48) throw new Error('E_INPUT_HEIGHT');
+    if(x.input && x.input.display!=='none' && x.input.h<48) throw new Error('E_INPUT_HEIGHT');
     if(x.btn && (x.btn.w<48||x.btn.h<48)) throw new Error('E_BTN_SIZE');
     if(x.oldFooter||x.crawlerNoise) throw new Error('E_PUBLIC_NOISE');
   }
