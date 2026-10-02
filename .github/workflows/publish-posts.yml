@@ -109,3 +109,12 @@ jobs:
 # pr-trigger-performance-fallback-r1c
 
 # pr-trigger-images-attrs-fallback-r1
+
+      - name: Apply CLS reserve R1
+        run: node maintenance/performance-cls-r1.mjs
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
+          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
+
+# performance-cls-r1
