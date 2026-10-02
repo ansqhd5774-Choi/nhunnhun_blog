@@ -6,7 +6,7 @@ const BLOG='https://nhunnhun.tistory.com', POST_ID='356';
 const IMAGES=[
   {
     key:'pairing',
-    src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Sliced_apple.jpg',
+    src:'https://upload.wikimedia.org/wikipedia/commons/9/92/Sliced_apple.jpg',
     path:'/tmp/apple-sliced.jpg',
     alt:'먹기 좋게 자른 사과',
     marker:'2. 요즘 많이 묻는',
@@ -15,7 +15,7 @@ const IMAGES=[
   },
   {
     key:'juice',
-    src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Apple_juice_glass.jpg',
+    src:'https://upload.wikimedia.org/wikipedia/commons/0/00/Apple_juice_glass.jpg',
     path:'/tmp/apple-juice.jpg',
     alt:'사과주스가 담긴 유리잔',
     marker:'3. 통사과 vs 사과주스',
@@ -24,7 +24,7 @@ const IMAGES=[
   },
   {
     key:'wash',
-    src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Washing_apples_with_water_in_a_sink_(15042552883).jpg',
+    src:'https://upload.wikimedia.org/wikipedia/commons/9/9d/Washing_apples_with_water_in_a_sink_%2815042552883%29.jpg',
     path:'/tmp/apple-wash.jpg',
     alt:'흐르는 물에 사과를 씻는 모습',
     marker:'7. 사과는 어떻게 씻으면',
