@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
-import { applyEditorialTemplate } from './editorial.mjs';
+import { renderEditorialPost, editorialExpectations, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 
 
 function imageSources(html) {
@@ -106,7 +106,8 @@ try {
       stage = 'editor-content';
       await page.locator('#post-title-inp').fill(post.title);
       stage = 'image-upload';
-      const editorialHtml = applyEditorialTemplate(post.bodyHtml);
+      const editorialHtml = renderEditorialPost(post);
+      const editorialExpected = editorialExpectations(post.bodyHtml);
       const sources = [...new Set(imageSources(editorialHtml))];
       const representativeSource = post.representativeImageUrl || sources[0] || null;
       const uploadOrder = representativeSource ? [representativeSource, ...sources.filter(src => src !== representativeSource)] : sources;
@@ -143,8 +144,15 @@ try {
           const input = thumb.locator('input[type="file"]');
           if (await input.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
           await input.setInputFiles(repPath);
-          await page.waitForTimeout(1500);
+          await page.waitForFunction(() => {
+            const box=document.querySelector('.publish_editor .box_thumb');
+            if (!box) return false;
+            const text=(box.textContent||'').trim();
+            return !text.includes('대표이미지 추가') || !!box.querySelector('img,[style*="background-image"]');
+          }, {timeout:10000});
         }
+        const thumbText=(await thumb.innerText().catch(()=>''))||'';
+        if (thumbText.includes('대표이미지 추가') && await thumb.locator('img,[style*="background-image"]').count()===0) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
       }
       await page.getByLabel('공개', {exact:true}).check();
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
@@ -152,7 +160,7 @@ try {
       if (await page.locator('#post-title-inp').inputValue() !== post.title) throw new Error('E_TITLE_MISMATCH');
       // Durable checkpoint BEFORE the irreversible final click. A timeout must never resubmit blindly.
       const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
-      await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, timestamp:new Date().toISOString()});
+      await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()});
       stage = 'final-submit';
       await publishButton.click();
       await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname));
@@ -178,11 +186,60 @@ try {
       }
       if (representativeSource) {
         const og = await publicPage.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
-        if (!og || og.includes('opengraph.png')) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+        if (!og || og.includes('opengraph.png') || !og.includes('kakaocdn.net')) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
       }
+      const editorialSnapshot = await content.evaluate(root => {
+        const h2=[...root.querySelectorAll('h2')];
+        const h3=[...root.querySelectorAll('h3')];
+        const accents=[...root.querySelectorAll('div[aria-hidden="true"]')].filter(x => {
+          const s=x.getAttribute('style')||'';
+          return /width:\s*34px/.test(s) && /height:\s*4px/.test(s);
+        });
+        const tables=[...root.querySelectorAll('table')];
+        const tableWraps=tables.filter(t => {
+          const p=t.parentElement;
+          return p && /overflow-x:\s*auto/.test(p.getAttribute('style')||'');
+        });
+        const qs=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='Q.');
+        const as=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='A.');
+        const latest=[...root.querySelectorAll('aside')].filter(x => /최신 근거\s*·?\s*\d{4}/.test(x.textContent));
+        const summary=[...h2].find(x=>x.textContent.trim()==='핵심 정리');
+        const related=[...h2].find(x=>x.textContent.trim()==='함께 보면 좋은 글');
+        const sources=[...h2].find(x=>x.textContent.trim()==='자료 출처');
+        return {
+          h2:h2.length,
+          h2Styled:h2.filter(x=>/font-size:\s*26px/.test(x.getAttribute('style')||'')&&/font-weight:\s*800/.test(x.getAttribute('style')||'')).length,
+          h3:h3.length,
+          h3Styled:h3.filter(x=>/font-size:\s*20px/.test(x.getAttribute('style')||'')&&/font-weight:\s*800/.test(x.getAttribute('style')||'')).length,
+          accents:accents.length,
+          tables:tables.length,
+          tableWraps:tableWraps.length,
+          faqQ:qs.length,
+          faqA:as.length,
+          latest:latest.length,
+          summaryBox:!!(summary?.nextElementSibling && /background:\s*#f8fafc/.test(summary.nextElementSibling.getAttribute('style')||'')),
+          relatedCards:related ? (()=>{ let n=0,e=related.nextElementSibling; while(e&&e.tagName!=='H2'){ if(e.querySelector?.('a[style*="text-decoration:none"]')) n++; e=e.nextElementSibling; } return n; })() : 0,
+          sourcesStyled:!!(sources?.nextElementSibling && sources.nextElementSibling.tagName==='UL' && /font-size:\s*14px/.test(sources.nextElementSibling.getAttribute('style')||''))
+        };
+      });
+      if (
+        editorialSnapshot.h2 !== editorialExpected.h2 ||
+        editorialSnapshot.h2Styled !== editorialExpected.h2 ||
+        editorialSnapshot.accents !== editorialExpected.h2 ||
+        editorialSnapshot.h3 !== editorialExpected.h3 ||
+        editorialSnapshot.h3Styled !== editorialExpected.h3 ||
+        editorialSnapshot.tables !== editorialExpected.tables ||
+        editorialSnapshot.tableWraps !== editorialExpected.tables ||
+        editorialSnapshot.faqQ !== editorialExpected.faq ||
+        editorialSnapshot.faqA !== editorialExpected.faq ||
+        editorialSnapshot.latest !== editorialExpected.latest ||
+        (editorialExpected.summary && !editorialSnapshot.summaryBox) ||
+        (editorialExpected.related && editorialSnapshot.relatedCards < 1) ||
+        (editorialExpected.sources && !editorialSnapshot.sourcesStyled)
+      ) throw new Error('E_EDITORIAL_PUBLIC_CONTRACT');
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
-      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,timestamp:new Date().toISOString()}, state.sha);
+      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()}, state.sha);
       console.log(`PUBLISHED: ${post.id} ${url}`);
     } else console.log('NO_PENDING_POSTS');
   }
