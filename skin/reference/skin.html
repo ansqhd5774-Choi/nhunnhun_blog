@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="preconnect" href="https://t1.daumcdn.net/" crossorigin>
 <link rel="preconnect" href="https://tistory1.daumcdn.net/" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="dns-preferch" href="https://t1.daumcdn.net/" crossorigin>
+<link rel="dns-prefetch" href="https://t1.daumcdn.net/" crossorigin>
 <link rel="dns-prefetch" href="https://tistory1.daumcdn.net/" crossorigin>
 <link rel="dns-prefetch" href="https://img1.daumcdn.net/" crossorigin>
 <script>
@@ -14,7 +15,6 @@
 	(a.textContent.includes("gtag")&&blockedScriptContents.push(a.cloneNode(!0)),a.parentNode.removeChild(a)):c&&LAZY_POST_SCRIPTS.some(function(b){return c.includes(b)})&&(blockedScripts.push(a.cloneNode(!0)),a.parentNode.removeChild(a))}else"LINK"===a.tagName&&"stylesheet"===a.rel&&a.href&&(LAZY_POST_STYLESHEETS.some(function(b){return a.href.includes(b)})?(blockedStylesheets.push(a.cloneNode(!0)),a.parentNode.removeChild(a)):UNWANTED_STYLESHEETS.some(function(b){return a.href.includes(b)})&&a.parentNode.removeChild(a))})});
 	mutationObserver.observe(document.documentElement,{childList:!0,subtree:!0});
 </script>
-<head>
 <!--메타태그 -->
 <meta name="msvalidate.01" content="AFDF7C316680F021B7AF4DCBA4C89062" />
 <!-- REDACTED: site verification retained only in local original -->
@@ -86,14 +86,14 @@
 						<a href="[##_blog_link_##]">[##_title_##]</a>
 					</div>
 					<div id="search-bar">
-						<button class="search-icon" aria-label="search icon" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
+						<button class="search-icon" aria-label="검색" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
 							<svg width="20" height="20" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg" data-svg="search-icon">
 								<circle fill="none" stroke="#666" stroke-width="1.5" cx="11" cy="11" r="8"></circle>
 								<path fill="none" stroke="#4682B4" stroke-width="1.8" d="M23,23 L20,20 L19.2,19.2"></path>
 							</svg>
 						</button>
-						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
-					<button class="search-close-icon" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
+						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
+					<button class="search-close-icon" aria-label="검색 닫기" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
 					</div>
 					<div id="header-ico">
 						<button class="btn_topMenu" id="btn_topbtn" aria-label="topMenu">					
@@ -182,12 +182,12 @@
 												</a>
 												<ul class="post_list">
 													<li class="post_category">
-														<span class="material-icons-outlined" style="padding-bottom: 1px;">format_list_bulleted</span>
+														<svg class="meta-svg" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 6h2v2H4V6Zm4 0h12v2H8V6ZM4 11h2v2H4v-2Zm4 0h12v2H8v-2ZM4 16h2v2H4v-2Zm4 0h12v2H8v-2Z"/></svg>
 														<span class="post_category_name"> [##_article_rep_category_##]</span>
 													</li>
 													<li class="post_date">&middot; [##_article_rep_simple_date_##]</li>
 													<li class="post_comment">
-														<span class="material-icons-outlined">textsms</span>
+														<svg class="meta-svg" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16v12H7l-3 3V4Zm2 2v8.17L6.17 14H18V6H6Z"/></svg>
 														<s_rp_count>[##_article_rep_rp_cnt_##]</s_rp_count>
 													</li>
 												</ul>
@@ -443,7 +443,7 @@
 														<p class="post_text"> 보호되어 있는 글입니다. </p>
 														<ul class="post_list">
 															<li class="post_category">
-																<span class="material-icons-outlined">format_list_bulleted</span>
+																<svg class="meta-svg" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 6h2v2H4V6Zm4 0h12v2H8V6ZM4 11h2v2H4v-2Zm4 0h12v2H8v-2ZM4 16h2v2H4v-2Zm4 0h12v2H8v-2Z"/></svg>
 																<span class="post_category_name"> [##_article_rep_category_##]</span>
 															</li>
 															<li class="post_date">&middot; [##_article_rep_simple_date_##]</li>
@@ -518,7 +518,7 @@
 								<ul class="pagination">
 									<li class="prevpage">
 										<a [##_prev_page_##] class="[##_no_more_prev_##]" aria-label="prevPage" id="prevPage" rel="prev">
-											<span class="material-icons-outlined page-icon">navigate_before</span>
+											<svg class="page-icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="m14.5 5-7 7 7 7 1.5-1.5L10.5 12 16 6.5 14.5 5Z"/></svg>
 										</a>
 									</li>
 									<s_paging_rep>
@@ -528,7 +528,7 @@
 									</s_paging_rep>
 									<li class="nextpage">
 										<a [##_next_page_##] class="[##_no_more_next_##]" aria-label="nextPage" id="nextPage" rel="next">
-											<span class="material-icons-outlined page-icon">navigate_next</span>
+											<svg class="page-icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="m9.5 5 7 7-7 7L8 17.5l5.5-5.5L8 6.5 9.5 5Z"/></svg>
 										</a>
 									</li>
 								</ul>
@@ -749,8 +749,7 @@
 			</div>
 			<div class="footer-wrap">
 				<footer id="footer">
-					<div class="ft-al">Copyright © <a href="https://toyou101.tistory.com">쭈미로운 생활</a> All rights reserved.</div>
-					<div class="ft-ac">Designed by <a href="https://toyou101.tistory.com">JJuum</a></div>
+					<div class="ft-al">Copyright © [##_title_##] All rights reserved.</div>
 				</footer>
 			</div>
 		</div>
