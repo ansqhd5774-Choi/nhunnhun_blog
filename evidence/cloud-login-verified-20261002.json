@@ -1,0 +1,11 @@
+{
+  "loginRun": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/36990326271",
+  "loginResult": "LOGIN_SAVED",
+  "freshSessionRun": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/36989414594/attempts/2",
+  "freshSessionJob": 110786065809,
+  "cloudConnection": "PASS",
+  "tistoryLoginPersistence": "PASS",
+  "publication": "NOT_ATTEMPTED",
+  "publishEnabled": false,
+  "next": "User chose to provide public article title and body; content pending"
+}
