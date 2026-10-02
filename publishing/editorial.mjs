@@ -54,6 +54,7 @@ export function editorialExpectations(sourceHtml){
     quick:/<blockquote><strong>핵심만 먼저:<\/strong>/g.test(sourceHtml) ? 1 : 0,
     summary:/<h2>핵심 정리<\/h2>/.test(sourceHtml) ? 1 : 0,
     related:/<h2>함께 보면 좋은 글<\/h2>/.test(sourceHtml) ? 1 : 0,
+    relatedLinks:(sourceHtml.match(/<p><a href="https:\/\/nhunnhun\.tistory\.com\/[^"]+"><strong>[^<]+<\/strong><\/a><\/p>/g)||[]).length,
     sources:/<h2>자료 출처<\/h2>/.test(sourceHtml) ? 1 : 0,
   };
 }
