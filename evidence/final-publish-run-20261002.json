@@ -1,0 +1,10 @@
+{
+  "run": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/36991616116",
+  "validate": "SUCCESS",
+  "publish": "SUCCESS",
+  "log": "NO_PENDING_POSTS",
+  "logTimestamp": "2026-10-02T09:45:51.6261604Z",
+  "publishedArticle": "https://nhunnhun.tistory.com/355",
+  "duplicatePublication": "SKIPPED",
+  "sourceCommit": "7f03398f64f870d1432eb5894d20d68b20c03ce4"
+}
