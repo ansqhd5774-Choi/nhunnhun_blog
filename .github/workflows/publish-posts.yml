@@ -1,0 +1,47 @@
+name: Validate and publish Tistory posts
+on:
+  push:
+    branches: [main]
+    paths: ['posts/**', 'publishing/**', 'tests/publishing.test.mjs', 'package.json', 'pnpm-lock.yaml', '.github/workflows/publish-posts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-tistory-publish
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm test
+      - run: pnpm validate
+  publish:
+    needs: validate
+    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm run publish
+        # The checked-out main commit may be newer than the push that triggered this run.
+        env:
+          PUBLISH_ENABLED: 'true'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
+          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}

@@ -1,0 +1,18 @@
+{
+  "name": "nhunnhun-blog-publisher",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/publishing.test.mjs",
+    "validate": "node publishing/validate.mjs",
+    "publish": "node publishing/publish.mjs"
+  },
+  "dependencies": {
+    "@browserbasehq/sdk": "2.21.0",
+    "playwright-core": "1.63.0",
+    "sanitize-html": "2.18.0"
+  },
+  "devDependencies": {
+    "yaml": "2.9.1"
+  }
+}

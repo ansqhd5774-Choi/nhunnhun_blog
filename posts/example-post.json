@@ -1,0 +1,9 @@
+{
+  "id": "example-post",
+  "title": "자동 발행 형식 예시 — 발행 금지",
+  "category": "음식",
+  "tags": ["작성예시"],
+  "bodyHtml": "<h2>작성 안내</h2><p>이 파일은 형식 예시입니다. 실제 글로 바꾸고 검토한 뒤 발행을 지정하세요.</p>",
+  "status": "draft",
+  "approved": false
+}
