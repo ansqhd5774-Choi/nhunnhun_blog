@@ -2401,3 +2401,21 @@ pre > code.hljs {
 .post-reply .tt_box_namecard {
   color: #333;
 }
+
+
+/* BLOG CRAWL UI R1 */
+.meta-svg,
+.page-icon {
+  display: inline-block;
+  vertical-align: middle;
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+.post_list .meta-svg {
+  margin-right: 3px;
+}
+#search-bar .search-icon,
+#search-bar .search-close-icon {
+  min-width: 48px;
+  min-height: 48px;
+}
