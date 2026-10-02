@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "target": "https://nhunnhun.tistory.com/356",
+  "workflow_run": 37048508287,
+  "conclusion": "success",
+  "changed": true,
+  "title": "사과 효능·영양성분·부작용 총정리",
+  "improvements": [
+    "100g 및 큰 사과 1개 영양성분 표",
+    "혈당·포만감·단백질/건강한 지방 조합 최신 관심사 반영",
+    "통사과 vs 사과주스 비교",
+    "정보 카드형 디자인",
+    "본문 중복 축약",
+    "장식용 두 번째 사과 이미지 제거",
+    "사과 품종/보관 글 /195 역방향 내부링크",
+    "FDA/USDA/Harvard/Cleveland Clinic/Monash 출처 보강"
+  ],
+  "verify": {
+    "desktop": "PASS",
+    "mobile": "PASS",
+    "quick_summary": true,
+    "nutrition_100g": true,
+    "trend_section": true,
+    "pairing_section": true,
+    "whole_vs_juice": true,
+    "internal_link_195": true,
+    "hero_image_priority": true,
+    "decorative_second_image_removed": true,
+    "table_count": 2,
+    "h2_count": 11
+  }
+}
