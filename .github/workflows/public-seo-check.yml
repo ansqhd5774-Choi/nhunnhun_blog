@@ -1,0 +1,18 @@
+name: Public SEO check
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/public-seo-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: node maintenance/public-seo-check.mjs
