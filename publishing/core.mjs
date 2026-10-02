@@ -26,8 +26,11 @@ export function checkPost(post, filename) {
     try { url = new URL(match[3]); } catch { throw new Error('E_CONTENT_URL'); }
     if (url.protocol !== 'https:' || url.username || url.password || /[?&](key|token|access_token|api_key)=/i.test(url.search)) throw new Error('E_CONTENT_URL');
   }
-  // The sanitizer is a validator here: transformations must be reviewed, never silently published.
-  // HTML void elements may be serialized as <img ...> or <img ... /> with identical semantics.
+  return post;
+}
+export function checkPublishHtml(post) {
+  // Strict publishing HTML is checked only for a post that can create a NEW public article.
+  // Already-published source may retain richer archival markup without becoming eligible for republishing.
   const clean = sanitizeHtml(post.bodyHtml, {
     allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span'],
     allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'] },
@@ -56,8 +59,8 @@ export async function loadPosts(directory = 'posts') {
 export function eligible(post, state) {
   if (post.status !== 'ready' || !post.approved) return false;
   if (!state) return true;
-  if (state.phase === 'published' && state.fingerprint === fingerprint(post)) return false;
-  // An uncertain submission or editing an already-published item never creates another post.
+  if (state.phase === 'published') return false;
+  // An uncertain submission never retries automatically.
   throw new Error('E_EXISTING_PUBLICATION_REQUIRES_REVIEW');
 }
 export function assertArticleUrl(value) {
