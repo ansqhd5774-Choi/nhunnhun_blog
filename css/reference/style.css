@@ -2388,3 +2388,16 @@ pre > code.hljs {
 .hljs-ln td.hljs-ln-code {
 	padding-left: 10px;
 }
+
+/* BLOG A11Y R1 */
+#search-bar .input-text {
+  min-height: 48px;
+  line-height: 48px;
+}
+.post-reply .tt_box_namecard .tt_desc,
+.post-reply .tt_box_namecard a.tt_desc {
+  color: #333 !important;
+}
+.post-reply .tt_box_namecard {
+  color: #333;
+}
