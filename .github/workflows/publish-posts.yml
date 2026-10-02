@@ -65,7 +65,19 @@ jobs:
 # pr-trigger-performance-cls-r1-final
 
       - name: Apply CLS reserve R2
-        run: node maintenance/performance-cls-r2.mjs
+        shell: bash
+        run: |
+          set +e
+          mkdir -p evidence/admin
+          node maintenance/performance-cls-r2.mjs > evidence/admin/performance-cls-r2.log 2>&1
+          code=$?
+          printf "\nEXIT_CODE=%s\n" "$code" >> evidence/admin/performance-cls-r2.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evidence/admin/performance-cls-r2.log
+          git commit -m "evidence: CLS R2 실행 로그" || true
+          git push origin HEAD:main || true
+          exit "$code"
         env:
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
           BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
@@ -74,3 +86,5 @@ jobs:
 # performance-cls-r2
 
 # pr-trigger-performance-cls-r2
+
+# cls-r2-evidence-trigger
