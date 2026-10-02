@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const html=fs.readFileSync('skin/reference/skin.html','utf8');
-const css=fs.readFileSync('css/reference/style.css','utf8');
+const html=fs.readFileSync('skin/proposals/20261003-seo-a11y-r2.html','utf8');
+const css=fs.readFileSync('css/proposals/20261003-seo-a11y-r2.css','utf8');
 
 function count(re,s){return (s.match(re)||[]).length}
 function assert(cond,msg){if(!cond) throw new Error(msg)}
