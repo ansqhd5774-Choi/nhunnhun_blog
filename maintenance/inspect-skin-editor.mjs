@@ -10,27 +10,21 @@ try{
  const context=browser.contexts()[0];
  const page=await context.newPage();
  page.setDefaultTimeout(25000);
+ const events=[];
+ page.on('request',req=>{ if(/skin|design|editor|html|style|css/i.test(req.url())) events.push({type:'request',method:req.method(),url:req.url()}); });
+ page.on('response',res=>{ if(/skin|design|editor|html|style|css/i.test(res.url())) events.push({type:'response',status:res.status(),url:res.url()}); });
  await page.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
  if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
- const before=context.pages().map((p,i)=>({i,url:p.url(),title:null}));
- let popup=null;
- const popupPromise=context.waitForEvent('page',{timeout:4000}).catch(()=>null);
+ events.length=0;
  await page.locator('button.btn-edit-html').click({force:true});
- popup=await popupPromise;
- await page.waitForTimeout(1500);
- const pages=context.pages();
- const pageInfo=[];
- for(let i=0;i<pages.length;i++){
-   const p=pages[i];
-   pageInfo.push({i,url:p.url(),title:await p.title().catch(()=>''),frames:p.frames().map((fr,j)=>({j,url:fr.url(),name:fr.name()}))});
- }
- const dom=await page.evaluate(()=>({
-   bodyClass:document.body.className,
-   iframes:[...document.querySelectorAll('iframe')].map((e,i)=>({i,id:e.id,cls:e.className,src:e.src,title:e.title})),
-   editors:[...document.querySelectorAll('[class*="editor"],[id*="editor"],[class*="code"],[id*="code"],[class*="html"],[id*="html"]')].slice(0,100).map((e,i)=>({i,tag:e.tagName,id:e.id,cls:e.className,text:(e.innerText||'').slice(0,100)})),
-   btn:document.querySelector('button.btn-edit-html')?.outerHTML
+ await page.waitForTimeout(2500);
+ console.log('SKIN_EDIT_NETWORK '+JSON.stringify(events));
+ console.log('SKIN_EDIT_STATE '+JSON.stringify({
+   url:page.url(),
+   bodyText:(await page.locator('body').innerText()).slice(0,12000),
+   localStorage:await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),
+   sessionStorage:await page.evaluate(()=>Object.fromEntries(Object.entries(sessionStorage)))
  }));
- console.log('SKIN_EDITOR_ROUTE '+JSON.stringify({before,pageInfo,dom,popup:!!popup}));
 } finally {
  try{await browser?.close();}catch{}
  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
