@@ -48,9 +48,3 @@ jobs:
           BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
           BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
           BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
-      - name: Patch apple post 356 images
-        run: node maintenance/patch-apple356-images.mjs
-        env:
-          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
-          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
-          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
