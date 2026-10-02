@@ -12,7 +12,7 @@ try{
   await page.goto(BLOG+'/manage/post/'+POST_ID,{waitUntil:'domcontentloaded'});
   if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
   await page.locator('#post-title-inp').waitFor({state:'visible'});
-  const btn=page.locator('#attach-layer-btn').last();
+  const btn=page.locator('#attach-layer-btn:visible').first();
   await btn.click();
   await page.waitForTimeout(400);
   const data=await page.evaluate(()=>({
