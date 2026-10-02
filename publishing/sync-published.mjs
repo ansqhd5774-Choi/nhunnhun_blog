@@ -2,8 +2,9 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
-import { renderEditorialPost } from './editorial.mjs';
+import { renderEditorialPost, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 import { fingerprint } from './core.mjs';
+import { Ledger } from './ledger.mjs';
 
 const BLOG='https://nhunnhun.tistory.com';
 const request=JSON.parse(fs.readFileSync('publishing/sync-request.json','utf8'));
@@ -11,15 +12,22 @@ if(!request?.id || !/^[a-z0-9][a-z0-9-]{2,79}$/.test(request.id)) throw new Erro
 const post=JSON.parse(fs.readFileSync('posts/'+request.id+'.json','utf8'));
 const state=JSON.parse(fs.readFileSync('publishing/state/'+request.id+'.json','utf8'));
 if(state.phase!=='published' || !/^https:\/\/nhunnhun\.tistory\.com\/\d+$/.test(state.url||'')) throw new Error('E_SYNC_STATE');
-if(state.fingerprint!==fingerprint(post)) throw new Error('E_SYNC_SOURCE_CHANGED');
+const previousFingerprint=state.fingerprint;
+const nextFingerprint=fingerprint(post);
+if(previousFingerprint!==nextFingerprint){
+  if(request.mode!=='content-update' || request.expectedPublishedFingerprint!==previousFingerprint) throw new Error('E_SYNC_SOURCE_CHANGED');
+}
 const articleId=new URL(state.url).pathname.slice(1);
 const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const remoteMain=execFileSync('git',['ls-remote','origin','refs/heads/main'],{encoding:'utf8'}).trim().split(/\s+/)[0]||'';
 if(!remoteMain || remoteMain!==sourceCommit) throw new Error('E_SOURCE_DRIFT');
 
-for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) {
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID','GITHUB_TOKEN']) {
   if(!process.env[k]) throw new Error('E_CONFIG_'+k);
 }
+const ledger=new Ledger();
+const liveState=await ledger.read(post.id);
+if(!liveState || liveState.phase!=='published' || liveState.url!==state.url || liveState.fingerprint!==previousFingerprint) throw new Error('E_SYNC_STATE_DRIFT');
 
 function imageMapByAlt(html){
   const map=new Map();
@@ -158,7 +166,12 @@ try{
   }
   const desktop=await verifyDesktop(browser,target);
   const mobile=await verifyMobile(browser,target);
-  console.log('PASS_SYNC_PUBLISHED '+JSON.stringify({id:post.id,url:state.url,changed,desktop,mobile}));
+  const remoteMainAfter=execFileSync('git',['ls-remote','origin','refs/heads/main'],{encoding:'utf8'}).trim().split(/\s+/)[0]||'';
+  if(!remoteMainAfter || remoteMainAfter!==sourceCommit) throw new Error('E_SOURCE_DRIFT');
+  if(nextFingerprint!==previousFingerprint){
+    await ledger.write(post.id,{phase:'published',fingerprint:nextFingerprint,url:state.url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()},liveState.sha);
+  }
+  console.log('PASS_SYNC_PUBLISHED '+JSON.stringify({id:post.id,url:state.url,changed,contentUpdated:nextFingerprint!==previousFingerprint,desktop,mobile}));
 }catch(err){
   console.error('SYNC_PUBLISHED_FAIL '+(err?.stack||err));
   if(changed&&browser&&originalHtml){
