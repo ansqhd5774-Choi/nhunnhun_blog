@@ -92,7 +92,7 @@
 								<path fill="none" stroke="#4682B4" stroke-width="1.8" d="M23,23 L20,20 L19.2,19.2"></path>
 							</svg>
 						</button>
-						<input class="input-text" type="text" name="search" value="" id="search-input" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
+						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
 					<button class="search-close-icon" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
 					</div>
 					<div id="header-ico">
