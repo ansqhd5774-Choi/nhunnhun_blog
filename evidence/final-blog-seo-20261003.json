@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-03",
+  "final_live_verify_run": 37047067542,
+  "conclusion": "success",
+  "checks": {
+    "home": true,
+    "post195_title": "사과 품종·고르는 법·보관법·활용법 총정리",
+    "post195_internal_link_356": true,
+    "post195_old_commercial_link": false,
+    "post352_template_artifact": false,
+    "post356_title": "사과 효능·영양성분·부작용 총정리",
+    "post356_canonical": "https://nhunnhun.tistory.com/356",
+    "post356_robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+    "post356_og_image": "non-default representative image",
+    "mobile_search_button": "48x48",
+    "robots_http": 200,
+    "sitemap_http": 200,
+    "sitemap_contains": [
+      "/195",
+      "/352",
+      "/356"
+    ]
+  },
+  "gsc_verified": false,
+  "gsc_reason": "GSC Wizard subscription inactive",
+  "category_label_current": "약약",
+  "category_rename_performed": false,
+  "category_rename_reason": "URL structure preservation"
+}
