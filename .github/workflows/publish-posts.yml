@@ -21,6 +21,9 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test
       - run: pnpm validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
   publish:
     concurrency:
       group: nhunnhun-tistory-publish
