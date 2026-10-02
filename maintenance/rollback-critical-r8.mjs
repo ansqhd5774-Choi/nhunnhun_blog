@@ -20,14 +20,17 @@ try{
  const original=await fetchSkin(admin);
  let html=original.html;
  html=html.replace(/<!-- ZG critical css R8 -->\s*<style>[\s\S]*?<\/style>\s*/i,'');
- html=html.replace(/<link([^>]*href=["'][^"']*style\.css[^"']*["'][^>]*)media=["']print["'][^>]*onload=["'][^"']*["']([^>]*)rel=["']stylesheet["']([^>]*)>/i,'<link$1$2rel="stylesheet"$3>');
- html=html.replace(/<link([^>]*href=["'][^"']*style\.css[^"']*["'][^>]*)rel=["']stylesheet["']([^>]*)media=["']print["'][^>]*onload=["'][^"']*["']([^>]*)>/i,'<link$1rel="stylesheet"$2$3>');
- html=html.replace(/<noscript>\s*<link[^>]*href=["'][^"']*style\.css[^"']*["'][^>]*>\s*<\/noscript>/i,'');
+ html=html.replace(/<link\b[^>]*href=["']\.\/style\.css["'][^>]*>/gi, m => {
+   if(!/rel=["']stylesheet["']/i.test(m)) return m;
+   return '<link rel="stylesheet" href="./style.css" >';
+ });
+ html=html.replace(/<noscript>\s*<link\b[^>]*href=["']\.\/style\.css["'][^>]*>\s*<\/noscript>/gi,'');
  const s=await saveSkin(admin,html,original.css);
  if(!s.ok) throw new Error('E_SAVE_'+s.status);
  const now=await fetchSkin(admin);
  if(now.html.includes(MARK)) throw new Error('E_MARK_REMAINS');
- if(/style\.css[^>]*media=["']print["']/i.test(now.html)||/media=["']print["'][^>]*style\.css/i.test(now.html)) throw new Error('E_NONBLOCK_REMAINS');
+ const skinLink=(now.html.match(/<link\b[^>]*href=["']\.\/style\.css["'][^>]*>/gi)||[]).find(x=>/rel=["']stylesheet["']/i.test(x))||'';
+ if(!skinLink || /media=["']print["']/i.test(skinLink) || /onload=/i.test(skinLink)) throw new Error('E_NONBLOCK_REMAINS_'+skinLink);
  console.log('PASS_ROLLBACK_R8');
 }finally{
  try{await browser?.close();}catch{}
