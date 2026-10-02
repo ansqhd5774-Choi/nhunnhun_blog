@@ -2,7 +2,7 @@ import Browserbase from '@browserbasehq/sdk';
 import { chromium } from 'playwright-core';
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
-import { BLOG, loadPosts, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
+import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 
 
@@ -74,7 +74,10 @@ try {
     }
     const ledger = new Ledger();
     const queue = [];
-    for (const post of await loadPosts()) if (eligible(post, await ledger.read(post.id))) queue.push(post);
+    for (const post of await loadPosts()) {
+      const state = await ledger.read(post.id);
+      if (eligible(post, state)) queue.push(checkPublishHtml(post));
+    }
     if (queue.length > 1) throw new Error('E_ONE_POST_PER_RUN');
     if (queue.length) {
       const post = queue[0];
