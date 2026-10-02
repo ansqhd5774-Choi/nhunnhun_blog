@@ -11,6 +11,20 @@ const file='/tmp/apple-hero.jpg'; await writeFile(file,Buffer.from(await resp.ar
 const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
 const session=await client.sessions.create({projectId:process.env.BROWSERBASE_PROJECT_ID,browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},timeout:300});
 let browser;
+async function clickVisible(page, selector){
+  const ok=await page.evaluate(sel=>{
+    const els=[...document.querySelectorAll(sel)];
+    const e=els.find(x=>{
+      const r=x.getBoundingClientRect(),s=getComputedStyle(x);
+      return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';
+    })||els[0];
+    if(!e) return false;
+    e.click();
+    return true;
+  },selector);
+  if(!ok) throw new Error('E_VISIBLE_CLICK_'+selector);
+}
+
 try{
   browser=await chromium.connectOverCDP(session.connectUrl);
   const context=browser.contexts()[0], page=await context.newPage();
@@ -21,17 +35,19 @@ try{
   await page.locator('#post-title-inp').waitFor({state:'visible'});
 
   // Capture current body in HTML mode.
-  await page.locator('#editor-mode-layer-btn-open').click();
-  await page.locator('#editor-mode-html').click();
+  await clickVisible(page,'#editor-mode-layer-btn-open');
+  await page.waitForTimeout(150);
+  await clickVisible(page,'#editor-mode-html');
   const cm=page.locator('.CodeMirror:visible');
   await cm.waitFor({state:'visible'});
   const original=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
   if(original.length<500) throw new Error('E_ORIGINAL_TOO_SHORT');
 
   // Return to basic mode.
-  await page.locator('#editor-mode-layer-btn-open').click();
-  const basic=page.getByText('기본모드',{exact:true});
-  if(await basic.count()) await basic.last().click();
+  await clickVisible(page,'#editor-mode-layer-btn-open');
+  await page.waitForTimeout(150);
+  const switched=await page.evaluate(()=>{const els=[...document.querySelectorAll('*')].filter(e=>(e.textContent||'').trim()==='기본모드');const e=els.find(x=>{const r=x.getBoundingClientRect(),s=getComputedStyle(x);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';});if(e){e.click();return true;}return false;});
+  if(!switched) throw new Error('E_BASIC_MODE');
   await page.waitForTimeout(600);
 
   // Upload; this creates a Tistory/Kakao attachment and provisional representative thumbnail.
@@ -49,8 +65,9 @@ try{
   await page.waitForTimeout(300);
 
   // Restore exact body; representative attachment should survive independently.
-  await page.locator('#editor-mode-layer-btn-open').click();
-  await page.locator('#editor-mode-html').click();
+  await clickVisible(page,'#editor-mode-layer-btn-open');
+  await page.waitForTimeout(150);
+  await clickVisible(page,'#editor-mode-html');
   const code=page.locator('.CodeMirror:visible .CodeMirror-code');
   await code.waitFor({state:'visible'}); await code.click();
   await page.keyboard.press('ControlOrMeta+A'); await page.keyboard.insertText(original);
