@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText, textHtml } from './core.mjs';
 import { Ledger } from './ledger.mjs';
-import { renderEditorialPost, editorialExpectations, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
+import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 
 
 function imageSources(html) {
@@ -122,6 +122,8 @@ try {
       await page.locator('.CodeMirror:visible .CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(bodyHtml);
+      const stagedHtml = await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+      assertEditorialContract(stagedHtml, post.bodyHtml);
       stage = 'category-tags';
       await page.locator('#category-btn').click();
       await page.locator('#category-list').waitFor({state:'visible'});
