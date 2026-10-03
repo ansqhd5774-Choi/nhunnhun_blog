@@ -275,6 +275,15 @@ try {
 } catch (error) {
   const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
+  if (stage === 'cloud-connect') {
+    const safe = {
+      name: String(error?.name || '').slice(0,80),
+      status: Number(error?.status || error?.statusCode || error?.response?.status || 0) || null,
+      code: String(error?.code || error?.cause?.code || '').replace(/[^A-Za-z0-9_.-]/g,'').slice(0,80) || null,
+      type: String(error?.type || '').replace(/[^A-Za-z0-9_.-]/g,'').slice(0,80) || null
+    };
+    console.error('CLOUD_CONNECT_SAFE_DIAG '+JSON.stringify(safe));
+  }
   if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
     console.log('EDITOR_CONTROLS: '+JSON.stringify(await editorPage.evaluate(()=>({
       codeMirror:document.querySelectorAll('.CodeMirror').length,
