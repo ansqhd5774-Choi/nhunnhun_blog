@@ -1,7 +1,8 @@
-import Browserbase from '@browserbasehq/sdk';
-import { chromium } from 'playwright-core';
+import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
-import { writeFile } from 'node:fs/promises';
+import { writeFile, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
@@ -34,7 +35,7 @@ async function downloadImage(url, path) {
   throw new Error('E_IMAGE_DOWNLOAD_' + last);
 }
 async function uploadImage(page, sourceUrl, index) {
-  const path = `/tmp/tistory-image-${index}.bin`;
+  const path = join(imageTempDir, `tistory-image-${index}.bin`);
   await downloadImage(sourceUrl, path);
   await page.evaluate(() => document.querySelectorAll('#attach-layer-btn')[0]?.click());
   const responsePromise = page.waitForResponse(res =>
@@ -64,15 +65,13 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
-let browser, client, session, editorPage;
+let editorContext, publicBrowser, editorPage, imageTempDir;
 let stage = 'configuration';
 try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
-    console.log('DISABLED: 클라우드 연결과 운영 검증 전에는 발행하지 않습니다.');
+    console.log('DISABLED: 발행 활성화 전에는 게시하지 않습니다.');
   } else {
-    for (const name of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) {
-      if (!process.env[name]) throw new Error('E_CLOUD_CONFIGURATION');
-    }
+    assertLocalGit();
     const ledger = new Ledger();
     const queue = [];
     for (const post of await loadPosts()) {
@@ -82,17 +81,12 @@ try {
     if (queue.length > 1) throw new Error('E_ONE_POST_PER_RUN');
     if (queue.length) {
       const post = queue[0];
-      stage = 'cloud-connect';
-      client = new Browserbase({ apiKey:process.env.BROWSERBASE_API_KEY });
-      session = await client.sessions.create({
-        projectId:process.env.BROWSERBASE_PROJECT_ID,
-        browserSettings: { context:{ id:process.env.BROWSERBASE_CONTEXT_ID, persist:true }, recordSession:false, logSession:false, solveCaptchas:false },
-        timeout:300,
-      });
-      browser = await chromium.connectOverCDP(session.connectUrl);
+      stage = 'local-browser';
+      const browserConfig = await localBrowserConfig();
+      editorContext = await openEditorContext(browserConfig);
+      imageTempDir = await mkdtemp(join(tmpdir(), 'tistory-images-'));
       stage = 'editor-open';
-      const context = browser.contexts()[0];
-      const page = await context.newPage();
+      const page = await editorContext.newPage();
       editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
@@ -141,7 +135,7 @@ try {
         if (await thumb.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
         const text = (await thumb.innerText().catch(()=>'')) || '';
         if (text.includes('대표이미지 추가')) {
-          const repPath = '/tmp/tistory-representative.bin';
+          const repPath = join(imageTempDir, 'tistory-representative.bin');
           await downloadImage(representativeSource, repPath);
           const input = thumb.locator('input[type="file"]');
           if (await input.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
@@ -173,7 +167,8 @@ try {
       const url = assertArticleUrl(new URL(await articleLink.getAttribute('href'), BLOG).href);
       stage = 'public-verification';
       // Verify anonymously, so an owner-only/private page cannot count as published.
-      const publicContext = await browser.newContext();
+      publicBrowser = await openPublicBrowser(browserConfig);
+      const publicContext = await publicBrowser.newContext();
       const publicPage = await publicContext.newPage();
       await publicPage.goto(url, {waitUntil:'domcontentloaded'});
       if (!(await publicPage.locator('body').innerText()).includes(post.title)) throw new Error('E_PUBLICATION_UNCERTAIN');
@@ -275,15 +270,7 @@ try {
 } catch (error) {
   const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
-  if (stage === 'cloud-connect') {
-    const safe = {
-      name: String(error?.name || '').slice(0,80),
-      status: Number(error?.status || error?.statusCode || error?.response?.status || 0) || null,
-      code: String(error?.code || error?.cause?.code || '').replace(/[^A-Za-z0-9_.-]/g,'').slice(0,80) || null,
-      type: String(error?.type || '').replace(/[^A-Za-z0-9_.-]/g,'').slice(0,80) || null
-    };
-    console.error('CLOUD_CONNECT_SAFE_DIAG '+JSON.stringify(safe));
-  }
+  if (stage === 'local-browser') console.error('LOCAL_BROWSER_SAFE_DIAG '+JSON.stringify({code}));
   if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
     console.log('EDITOR_CONTROLS: '+JSON.stringify(await editorPage.evaluate(()=>({
       codeMirror:document.querySelectorAll('.CodeMirror').length,
@@ -293,12 +280,13 @@ try {
     }))));
   } catch {}
   // Provider exceptions can carry credentials/connect URLs: never log raw exceptions.
-  console.error('STOP: 클라우드 설정·로그인·에디터·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
+  console.error('STOP: 로컬 Chrome·전용 프로필·로그인·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
   process.exitCode = 1;
 } finally {
-  try { await browser?.close(); } catch {}
-  if (session && client) {
-    try { await client.sessions.update(session.id, {projectId:process.env.BROWSERBASE_PROJECT_ID, status:'REQUEST_RELEASE'}); }
-    catch { console.error('STOP: 클라우드 세션 종료 상태 확인 필요.'); process.exitCode = 1; }
+  for (const resource of [publicBrowser, editorContext]) {
+    try { await resource?.close(); }
+    catch { console.error('E_LOCAL_BROWSER_CLOSE'); process.exitCode = 1; }
   }
+  if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
+  catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; }
 }

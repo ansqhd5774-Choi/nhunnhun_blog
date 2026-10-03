@@ -11,3 +11,9 @@ node_modules/
 .pnpm-store/
 playwright-report/
 test-results/
+# Local authentication is never source, cache or artifact.
+profile/
+profiles/
+User Data/
+actions-runner/
+work/

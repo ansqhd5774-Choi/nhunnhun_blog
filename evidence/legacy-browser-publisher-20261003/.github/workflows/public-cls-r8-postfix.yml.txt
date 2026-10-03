@@ -1,0 +1,25 @@
+name: One-time Public CLS R8 post-fix
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/public-cls-r8-postfix.yml']
+permissions:
+  contents: read
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Measure public CLS after TOC R8
+        run: node maintenance/diagnose-cls-public-r7.mjs
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}

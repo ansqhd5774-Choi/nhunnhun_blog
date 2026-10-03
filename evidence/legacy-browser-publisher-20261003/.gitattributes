@@ -1,0 +1,2 @@
+# Preserve historical bytes and hashes across Linux/Windows checkouts.
+*.txt -text -diff

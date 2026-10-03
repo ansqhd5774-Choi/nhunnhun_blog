@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { localBrowserConfig, assertDedicatedProfile, assertLocalGit, openEditorContext, openPublicBrowser } from '../publishing/local-browser.mjs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
 import { applyEditorialTemplate, renderEditorialPost, assertEditorialSource, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from '../publishing/editorial.mjs';
@@ -117,4 +122,82 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/E_SOURCE_DRIFT/);
   assert.match(publish,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
   assert.match(validate,/renderEditorialPost\(post\)/);
+});
+
+test('validation remains hosted; public publisher is Windows CMD only', () => {
+  const w=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
+  assert.equal(w.jobs.validate['runs-on'],'ubuntu-latest');
+  assert.deepEqual(w.jobs.publish['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
+  assert.deepEqual(w.jobs.publish.defaults,{run:{shell:'cmd'}});
+  assert.equal(w.jobs.publish['timeout-minutes'],12);
+  assert.equal(w.jobs.publish.permissions.contents,'write');
+  assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
+});
+
+test('active browser sources contain no cloud session or Linux-only temp dependency', () => {
+  for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
+    const s=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
+    assert.doesNotMatch(s,/@browserbasehq\/sdk|Browserbase|connectOverCDP|BROWSERBASE_|\/tmp\//);
+  }
+  const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(p,/tmpdir\(\)/);
+  assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
+  assert.match(p,/publicBrowser\.newContext\(\)/);
+  assert.match(p,/\[publicBrowser, editorContext\]/);
+  assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click()'));
+  assert.ok(p.indexOf("E_SOURCE_DRIFT")<p.indexOf("phase:'submitting'"));
+});
+
+test('configuration rejects missing executables, missing profiles and ordinary Chrome profiles', async () => {
+  const temp=await mkdtemp(join(tmpdir(),'tistory-config-test-'));
+  try {
+    const exe=join(temp,'chrome.exe'); await writeFile(exe,'fixture');
+    await assert.rejects(localBrowserConfig({}),/E_LOCAL_CHROME_REQUIRED/);
+    await assert.rejects(localBrowserConfig({TISTORY_CHROME_PATH:join(temp,'missing.exe')}),/E_LOCAL_CHROME_REQUIRED/);
+    await assert.rejects(localBrowserConfig({TISTORY_CHROME_PATH:exe}),/E_LOCAL_PROFILE_REQUIRED/);
+    for(const value of ['C:/Users/example/AppData/Local/Google/Chrome/User Data/Default',join(temp,'Google','Chrome','User Data')]){
+      assert.throws(()=>assertDedicatedProfile(value),/E_LOCAL_PROFILE_REQUIRED/);
+    }
+    const profile=join(temp,'dedicated');
+    assert.equal((await localBrowserConfig({TISTORY_CHROME_PATH:exe,TISTORY_PROFILE_DIR:profile})).profileDir,profile);
+    await assert.rejects(localBrowserConfig({TISTORY_CHROME_PATH:exe,TISTORY_PROFILE_DIR:exe}),/E_LOCAL_PROFILE_ACCESS/);
+  } finally {await rm(temp,{recursive:true,force:true});}
+});
+
+test('missing Git fails closed before browser or publication', () => {
+  assert.throws(()=>assertLocalGit(()=>{throw Error('fixture');}),/E_LOCAL_GIT_REQUIRED/);
+});
+
+test('authenticated profile and anonymous browser have separate launch contracts', async () => {
+  const calls=[], config={chromePath:'fixture-chrome',profileDir:'fixture-profile'};
+  const engine={
+    launchPersistentContext:async(...args)=>{calls.push(['editor',...args]);return {kind:'editor'};},
+    launch:async(...args)=>{calls.push(['public',...args]);return {kind:'public'};}
+  };
+  assert.equal((await openEditorContext(config,{engine,headless:false})).kind,'editor');
+  assert.equal((await openPublicBrowser(config,engine)).kind,'public');
+  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome'}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
+  await assert.rejects(openEditorContext(config,{engine:{launchPersistentContext:async()=>{throw Error('private path');}}}),/^Error: E_LOCAL_BROWSER_LAUNCH$/);
+});
+
+test('login bootstrap confirms administrator page and never submits posts', () => {
+  const s=readFileSync(new URL('../publishing/login.mjs',import.meta.url),'utf8');
+  assert.match(s,/headless:false/);
+  assert.match(s,/url\.origin === BLOG && url\.pathname === '\/manage\/posts'/);
+  assert.match(s,/name:'글쓰기', exact:true/);
+  assert.match(s,/LOGIN_SAVED/);
+  assert.doesNotMatch(s,/publishButton|ledger\.write|공개 발행/);
+});
+
+test('retired execution records remain byte-identical and outside active workflows', () => {
+  const records=JSON.parse(readFileSync(new URL('../evidence/legacy-browser-publisher-20261003/manifest.json',import.meta.url),'utf8'));
+  assert.equal(records.length,95);
+  for(const record of records){
+    const bytes=readFileSync(new URL('../'+record.archive,import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'),record.sha256,record.source);
+  }
+  for(const name of readdirSync(new URL('../.github/workflows/',import.meta.url))){
+    assert.doesNotMatch(readFileSync(new URL('../.github/workflows/'+name,import.meta.url),'utf8'),/BROWSERBASE_|pwsh|powershell/i);
+  }
+  assert.doesNotMatch(readFileSync(new URL('../pnpm-lock.yaml',import.meta.url),'utf8'),/@browserbasehq/);
 });

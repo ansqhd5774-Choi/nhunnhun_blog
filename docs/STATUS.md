@@ -1,3 +1,9 @@
+# 2026-10-03 현재 상태
+
+Windows self-hosted 전환 구현·테스트 준비. Browserbase 운영 경로 제거, 기존 운영 기록 보존. runner 미등록/최초 전용 로그인 미완료로 실제 발행은 대기 중이다. 기존 전복 1개만 대상이며 새 글·스킨·광고는 수정하지 않았다. 상세: WINDOWS_PUBLISHER_MIGRATION.md / WINDOWS_TISTORY_PUBLISHER.md.
+
+아래는 전환 전 역사 기록이며 현재 브라우저 연결 상태를 의미하지 않는다.
+
 # 현재 상태
 
 자동 게시: 활성화 완료. Browserbase 무료 계정 연결·GitHub Secrets 등록·새 세션 로그인 유지 검증 완료. GitHub Actions에서 /355를 실제 공개 발행했고 제목·전체 본문·음식 카테고리·블로그소식 태그를 공개 브라우저로 확인했다. 본문 검증 selector 불일치를 수정하고 submitting 기록을 published로 복구했다. 재발행은 하지 않았다. 로그인 만료 또는 무료 이용량 소진 시 중단될 수 있다. docs/AUTO_PUBLISH.md 참조.
