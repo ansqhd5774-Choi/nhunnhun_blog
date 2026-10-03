@@ -1,0 +1,179 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+
+const BLOG='https://nhunnhun.tistory.com';
+const MARK_HTML='<!-- ZG perf fallback R1C -->';
+const MARK_CSS='/* ZG perf fallback R1C */';
+const HERO='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
+
+const HEAD_PATCH=`
+${MARK_HTML}
+<script>
+(function(){
+  if(location.pathname!='/356') return;
+  try{
+    var pc=document.createElement('link');
+    pc.rel='preconnect';
+    pc.href='https://thumb.wikimedia.org';
+    pc.crossOrigin='';
+    document.head.appendChild(pc);
+
+    var p=document.createElement('link');
+    p.rel='preload';
+    p.as='image';
+    p.href='${HERO}';
+    p.fetchPriority='high';
+    document.head.appendChild(p);
+
+    function tune(root){
+      var list=[];
+      if(root && root.nodeType===1){
+        if(root.tagName==='IMG') list.push(root);
+        if(root.querySelectorAll) list.push.apply(list,root.querySelectorAll('img'));
+      }
+      list.forEach(function(img){
+        if(img.alt==='붉은 사과 두 개'){
+          img.setAttribute('width','960');
+          img.setAttribute('height','605');
+          img.setAttribute('loading','eager');
+          img.setAttribute('fetchpriority','high');
+          img.setAttribute('decoding','async');
+        } else if(img.alt==='반으로 자른 사과'){
+          img.setAttribute('width','960');
+          img.setAttribute('height','640');
+          img.setAttribute('loading','lazy');
+          img.setAttribute('decoding','async');
+        }
+      });
+    }
+
+    var mo=new MutationObserver(function(records){
+      records.forEach(function(r){r.addedNodes.forEach(tune);});
+    });
+    mo.observe(document.documentElement,{childList:true,subtree:true});
+    document.addEventListener('DOMContentLoaded',function(){
+      tune(document.body);
+      setTimeout(function(){mo.disconnect();},3000);
+    },{once:true});
+  }catch(e){}
+})();
+</script>
+`;
+
+const CSS_PATCH=`
+${MARK_CSS}
+#tt-body-page .contents_style img[alt="붉은 사과 두 개"]{
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 605;
+}
+#tt-body-page .contents_style img[alt="반으로 자른 사과"]{
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 640;
+}
+`;
+
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser,original,changed=false;
+
+async function fetchSkin(page){
+  return page.evaluate(async()=>{
+    const r=await fetch('/manage/design/skin/html.json',{credentials:'include'});
+    if(!r.ok) throw new Error('E_GET_SKIN_'+r.status);
+    return r.json();
+  });
+}
+async function saveSkin(page,html,css){
+  return page.evaluate(async({html,css})=>{
+    const r=await fetch('/manage/design/skin/html.json',{
+      method:'POST',credentials:'include',headers:{'content-type':'application/json'},
+      body:JSON.stringify({html,css,isPreview:false})
+    });
+    return {ok:r.ok,status:r.status,text:(await r.text()).slice(0,300)};
+  },{html,css});
+}
+async function verify(context,w,h){
+  const p=await context.newPage();
+  try{
+    await p.setViewportSize({width:w,height:h});
+    await p.goto(BLOG+'/356',{waitUntil:'domcontentloaded'});
+    await p.locator('.contents_style img[alt="붉은 사과 두 개"]').waitFor({state:'visible'});
+    await p.waitForTimeout(800);
+    return await p.evaluate(()=>{
+      const hero=document.querySelector('.contents_style img[alt="붉은 사과 두 개"]');
+      const sliced=document.querySelector('.contents_style img[alt="반으로 자른 사과"]');
+      const preloads=[...document.querySelectorAll('link[rel="preload"][as="image"]')].map(x=>x.href);
+      const pack=x=>x?{
+        width:x.getAttribute('width'),
+        height:x.getAttribute('height'),
+        loading:x.getAttribute('loading'),
+        fetchpriority:x.getAttribute('fetchpriority'),
+        decoding:x.getAttribute('decoding'),
+        renderedWidth:Math.round(x.getBoundingClientRect().width),
+        renderedHeight:Math.round(x.getBoundingClientRect().height),
+        aspectRatio:getComputedStyle(x).aspectRatio
+      }:null;
+      return {hero:pack(hero),sliced:pack(sliced),preloads};
+    });
+  } finally {await p.close();}
+}
+
+try{
+  browser=await chromium.connectOverCDP(session.connectUrl);
+  const context=browser.contexts()[0];
+  const admin=await context.newPage();
+  admin.setDefaultTimeout(25000);
+  await admin.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+  if(new URL(admin.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+  original=await fetchSkin(admin);
+
+  let html=original.html;
+  let css=original.css;
+  if(!html.includes(MARK_HTML)){
+    if(!html.includes('</head>')) throw new Error('E_NO_HEAD');
+    html=html.replace('</head>',HEAD_PATCH+'\n</head>');
+  }
+  if(!css.includes(MARK_CSS)) css+='\n\n'+CSS_PATCH+'\n';
+
+  if(html!==original.html||css!==original.css){
+    const s=await saveSkin(admin,html,css);
+    if(!s.ok) throw new Error('E_SAVE_'+s.status);
+    changed=true;
+  }
+
+  const now=await fetchSkin(admin);
+  if(!now.html.includes(MARK_HTML)||!now.css.includes(MARK_CSS)) throw new Error('E_NOT_PERSISTED');
+
+  const desktop=await verify(context,1440,1000);
+  const mobile=await verify(context,390,844);
+  for(const v of [desktop,mobile]){
+    if(!v.hero||!v.sliced) throw new Error('E_IMG_VERIFY');
+    if(v.hero.width!=='960'||v.hero.height!=='605'||v.hero.fetchpriority!=='high'||v.hero.loading!=='eager') throw new Error('E_HERO_ATTRS');
+    if(v.sliced.width!=='960'||v.sliced.height!=='640'||v.sliced.loading!=='lazy') throw new Error('E_SLICED_ATTRS');
+    if(!v.preloads.some(x=>x.includes('Red_apple_fruits.jpg'))) throw new Error('E_PRELOAD');
+  }
+  console.log('PASS_PERF_FALLBACK_R1C '+JSON.stringify({changed,desktop,mobile}));
+}catch(err){
+  console.error('PERF_FALLBACK_R1C_FAIL '+(err?.stack||err));
+  if(changed&&original&&browser){
+    try{
+      const context=browser.contexts()[0];
+      const a=context.pages().find(p=>p.url().includes('/manage/design/skin/edit'))||await context.newPage();
+      if(!a.url().includes('/manage/design/skin/edit')) await a.goto(BLOG+'/manage/design/skin/edit',{waitUntil:'domcontentloaded'});
+      console.error('ROLLBACK '+JSON.stringify(await saveSkin(a,original.html,original.css)));
+    }catch(e){console.error('ROLLBACK_FAIL '+(e?.stack||e));}
+  }
+  throw err;
+}finally{
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}

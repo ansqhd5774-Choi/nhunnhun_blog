@@ -1,0 +1,29 @@
+name: One-time Desktop Grid R4 fix
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/desktop-grid-r4.yml']
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-desktop-grid-r4
+  cancel-in-progress: false
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Apply Desktop Grid R4
+        run: node maintenance/performance-desktop-grid-r4.mjs
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
+          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}

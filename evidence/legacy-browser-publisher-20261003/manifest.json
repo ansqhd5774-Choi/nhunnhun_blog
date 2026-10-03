@@ -1,0 +1,477 @@
+[
+  {
+    "source": "maintenance/add-apple-support-images-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/add-apple-support-images-r1.mjs.txt",
+    "sha256": "cc78ff0926e8db15aef3cf5b5c1996691a2f355f543b9d6ece7a4ad6698358e9"
+  },
+  {
+    "source": "maintenance/apply-highlights-356-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/apply-highlights-356-r1.mjs.txt",
+    "sha256": "f6131aa825d143b362efb137d83ca27b60e265e041d1ad9625d728957301c46a"
+  },
+  {
+    "source": "maintenance/apply-live-delta-r2.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/apply-live-delta-r2.mjs.txt",
+    "sha256": "5d793bb6691160f74cc11d7bc9d5ce2bf74bd04000d7723f3cf0f22ef7c00807"
+  },
+  {
+    "source": "maintenance/apply-source-356-final.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/apply-source-356-final.mjs.txt",
+    "sha256": "0b537fa0143dda121e2912e977ed7d62a3c31c639b69e327e7156897c157d459"
+  },
+  {
+    "source": "maintenance/critical-css-r8.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/critical-css-r8.mjs.txt",
+    "sha256": "8c56a24d04c8754488c0b869dd12e5310c11bf66058db085b098da9e8908bec2"
+  },
+  {
+    "source": "maintenance/diagnose-cls-public-r7.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/diagnose-cls-public-r7.mjs.txt",
+    "sha256": "a7ecbb81859fc7ff38b3fa6a2927c90026a672dccc78ba282cd25651feed4d7e"
+  },
+  {
+    "source": "maintenance/diagnose-cls-r3.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/diagnose-cls-r3.mjs.txt",
+    "sha256": "d2bc3c283d04f1fdb769adef8bbb8ad93a27b641d70a3c9641be75edecf6d6b5"
+  },
+  {
+    "source": "maintenance/diagnose-desktop-r6.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/diagnose-desktop-r6.mjs.txt",
+    "sha256": "f36025d42d21fad2bbad8e8c2c59fd2d19b7b5171e41698a95c116ffcb3412f5"
+  },
+  {
+    "source": "maintenance/diagnose-dom-r4.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/diagnose-dom-r4.mjs.txt",
+    "sha256": "42db50e81f9fdba19c10fb03edaa71ec5c3adcd00ff4f6a1be385880c7c9e641"
+  },
+  {
+    "source": "maintenance/finalize-post-356-r2.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/finalize-post-356-r2.mjs.txt",
+    "sha256": "01bc2436e70c3b95c25b2ed3ee0b259b5e2ca8770fb6c15f14bd2da4e71851d9"
+  },
+  {
+    "source": "maintenance/fix-apple-native-images.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/fix-apple-native-images.mjs.txt",
+    "sha256": "3ebb85c2fed630b1abea8ae4517977573d47bf5e1dd000186241a14161d71feb"
+  },
+  {
+    "source": "maintenance/fix-apple-representative.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/fix-apple-representative.mjs.txt",
+    "sha256": "566c7463a6fd4c29c939b74ac31c1c446c99e2a869dfa16894c5c275eefce51b"
+  },
+  {
+    "source": "maintenance/inspect-attach-layer.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-attach-layer.mjs.txt",
+    "sha256": "23a8a13ebc26dfe07b19c5bfd94e10e62268415e485acd3e0c8bc2bf045ad60d"
+  },
+  {
+    "source": "maintenance/inspect-editor-toolbar.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-editor-toolbar.mjs.txt",
+    "sha256": "f2aabd9685b8ce964e3f20b369a2d62c57ded4cbfd863d5ec24626bdcd1947aa"
+  },
+  {
+    "source": "maintenance/inspect-editor-upload.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-editor-upload.mjs.txt",
+    "sha256": "89b08e28a7e4e0b0adee2f205030e8007b493cecb6bcb75841d3461197338fb1"
+  },
+  {
+    "source": "maintenance/inspect-publish-after-upload.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-publish-after-upload.mjs.txt",
+    "sha256": "43112573b97dbe2403611164c87e3bb8e055bbeb3b34a2f5da0f50330423e3bc"
+  },
+  {
+    "source": "maintenance/inspect-publish-representative.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-publish-representative.mjs.txt",
+    "sha256": "3e331e13541609598874426d591697e0efcf5b765d80d0a339502653328deeaf"
+  },
+  {
+    "source": "maintenance/inspect-skin-editor.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-skin-editor.mjs.txt",
+    "sha256": "acbbc013341e76341a811a9d7a88e93902e56fc1d3feb5cac67b5d8ca4410a47"
+  },
+  {
+    "source": "maintenance/inspect-upload-after.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-upload-after.mjs.txt",
+    "sha256": "878e76fe7d6c51a12d21521bb255e03eab43c2d27200ec488ee93744499782ec"
+  },
+  {
+    "source": "maintenance/inspect-upload-fragment.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-upload-fragment.mjs.txt",
+    "sha256": "43761bbbee0d206b72a2d8ebe60560b2fc8185f876f1d15adabd5f8d72e3ee61"
+  },
+  {
+    "source": "maintenance/inspect-upload-network.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-upload-network.mjs.txt",
+    "sha256": "33a331eea9b7a43d481111be830e14a61dd7787929374289a300e21cd3c7414e"
+  },
+  {
+    "source": "maintenance/inspect-upload-selection.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/inspect-upload-selection.mjs.txt",
+    "sha256": "a779c924775a52ec8a119fa74c5d83a2d29972de382fe70a5a5ba911a511e8e6"
+  },
+  {
+    "source": "maintenance/lcp-native-r9.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/lcp-native-r9.mjs.txt",
+    "sha256": "4b83650b82fe667ca6e43970934e727f2e22a61a67338c90addbbc66fa8ee853"
+  },
+  {
+    "source": "maintenance/lcp-resize-r10.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/lcp-resize-r10.mjs.txt",
+    "sha256": "938268b841bb6df1c8900918094d5ecc00a64bfa0f0bec92ff0e258c05b1c88c"
+  },
+  {
+    "source": "maintenance/og-image-r7.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/og-image-r7.mjs.txt",
+    "sha256": "354ea8bccde4055cb80d348984b9fb064a12e1de5dc00140d927ee00e3408856"
+  },
+  {
+    "source": "maintenance/patch-all-h2-356-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/patch-all-h2-356-r1.mjs.txt",
+    "sha256": "43fbe895e46da6ab8c50bd5186fad02b3b4b91575dc510fcf85d2545ef96a1bb"
+  },
+  {
+    "source": "maintenance/patch-editorial-headings-356-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/patch-editorial-headings-356-r1.mjs.txt",
+    "sha256": "96855cc93a9581ffc8d44b24d34811a8f0e5ad3c1d387aabcd0e6792181c9c15"
+  },
+  {
+    "source": "maintenance/patch-h2-copy-356-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/patch-h2-copy-356-r1.mjs.txt",
+    "sha256": "24395512e66df62febc6b2646d9f2a81905c8f789ebdf4626a58aa0bec3fbd20"
+  },
+  {
+    "source": "maintenance/patch-h3-copy-356-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/patch-h3-copy-356-r1.mjs.txt",
+    "sha256": "5e5c3c35d42e9ef95634ef940852f17debf56cf1addc0f029d1d7de9e0c2ddaf"
+  },
+  {
+    "source": "maintenance/performance-cls-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-cls-r1.mjs.txt",
+    "sha256": "4f06fb520182475b255a96b13714eb677d125430878146ad7eab391f7923b86d"
+  },
+  {
+    "source": "maintenance/performance-cls-r2.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-cls-r2.mjs.txt",
+    "sha256": "bb7ed92cd6a0e377a6762118fa11f55399006859c1eb192870744b59ef646017"
+  },
+  {
+    "source": "maintenance/performance-cls-r3.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-cls-r3.mjs.txt",
+    "sha256": "20d7a5837d96cbf7275e023d4c09df6c3e01d57c10975cab74849cd55529d067"
+  },
+  {
+    "source": "maintenance/performance-desktop-grid-r4.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-desktop-grid-r4.mjs.txt",
+    "sha256": "9a9a28a1a5d37183d1649058f96350d87c36916d85fa4004a29597cdddbac2ea"
+  },
+  {
+    "source": "maintenance/performance-desktop-stability-r5.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-desktop-stability-r5.mjs.txt",
+    "sha256": "0193f89443c64ac8ef85167d886e01fa40af7fa3ab601f397963dea775bf3fab"
+  },
+  {
+    "source": "maintenance/performance-fallback-r1c.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-fallback-r1c.mjs.txt",
+    "sha256": "6f6cf283dbb5e02338f6f8e89dacdcd85bc5182ec782ed99067663b194005e92"
+  },
+  {
+    "source": "maintenance/performance-images-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-images-r1.mjs.txt",
+    "sha256": "43e3a4b3fe0e23b73f34a71a49b91fc55bc275490b586b50b94127fe05c65ae9"
+  },
+  {
+    "source": "maintenance/performance-layout-r3.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-layout-r3.mjs.txt",
+    "sha256": "0957b51e04e34ce2964322b2744a16973c8a8c6c85be8cd33ff48aa09d8033f2"
+  },
+  {
+    "source": "maintenance/performance-r1.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r1.mjs.txt",
+    "sha256": "7cec7a831de9a830098e21693acfa796513863ee97a772edc092c0330724ed87"
+  },
+  {
+    "source": "maintenance/performance-r4.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r4.mjs.txt",
+    "sha256": "d8f85a634cd68bfea9b469478671e33e55833c8a3167099dcb87c74d02d5f71a"
+  },
+  {
+    "source": "maintenance/performance-r5.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r5.mjs.txt",
+    "sha256": "72a23b09d1ac5c1cf8637a20e53f448d410f6d33f719d710554440fad0836ff4"
+  },
+  {
+    "source": "maintenance/performance-r7-inline-css.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r7-inline-css.mjs.txt",
+    "sha256": "5e2ecbb677ba34fa166a12b93aa5a872a5ca83cf9dc75d87e6a66d091c349ffa"
+  },
+  {
+    "source": "maintenance/performance-r8-critical-css.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r8-critical-css.mjs.txt",
+    "sha256": "253521cbb7d7c3a3a59687cfc8edbfbf646aa38de3994d34146425d13c62c4ed"
+  },
+  {
+    "source": "maintenance/performance-r9-restore-css.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-r9-restore-css.mjs.txt",
+    "sha256": "be97e245348a1c2c4a98874fa2251acc749f7efd24cf241fb111c5f371197664"
+  },
+  {
+    "source": "maintenance/performance-toc-r8.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/performance-toc-r8.mjs.txt",
+    "sha256": "32f4cc582c34de9cb7b93ec53cded2d88b3837968ff6df9a82b13efb8f5ee036"
+  },
+  {
+    "source": "maintenance/rewrite-post-195.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/rewrite-post-195.mjs.txt",
+    "sha256": "0605bf4fc23bc051a1b7f08ef899a3e630dda472af0453c9560991ac8617e26c"
+  },
+  {
+    "source": "maintenance/rewrite-post-356-r2.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/rewrite-post-356-r2.mjs.txt",
+    "sha256": "2206728528eeecf1beb44e4d1cd6bcc99394752acce49cfc0ffc2293e2f932b4"
+  },
+  {
+    "source": "maintenance/rollback-critical-r8.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/rollback-critical-r8.mjs.txt",
+    "sha256": "1a5107cb033cff05f73dfcab39a0694756bbca666fc6044c29dd25b145a7ce2e"
+  },
+  {
+    "source": "maintenance/seo-performance-r6.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/seo-performance-r6.mjs.txt",
+    "sha256": "43a3b48f42ecb47c915f74eba76e58f80dc4fd4e4b8bb2dacea19630db136710"
+  },
+  {
+    "source": "maintenance/sync-apple-body-seo.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/sync-apple-body-seo.mjs.txt",
+    "sha256": "03ea7b2afeb6bc2d9fb710e0c6d89434a8d48952dfef2674e88c59876e366f1e"
+  },
+  {
+    "source": "maintenance/test-representative-restore.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/test-representative-restore.mjs.txt",
+    "sha256": "b13c1c95705eb0e9443f2633e9d3fc1a5668abafc7bf808badf6811d1d592e78"
+  },
+  {
+    "source": "maintenance/verify-live-final.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/maintenance/verify-live-final.mjs.txt",
+    "sha256": "5aca19c21ef6690bf350adfcdb6ad302d53b344643dfdd320857d56b300d266f"
+  },
+  {
+    "source": "publishing/sync-published.mjs",
+    "archive": "evidence/legacy-browser-publisher-20261003/publishing/sync-published.mjs.txt",
+    "sha256": "f5e7ed59a43da56d505988c34be02f487a0fe5c5ca9f5f22f5580df1a41e86b1"
+  },
+  {
+    "source": ".github/workflows/apple-body-seo-sync.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apple-body-seo-sync.yml.txt",
+    "sha256": "26c047fd0b39ef49bf3706a736e37b58c23dbfdc1a722c656ee96cd0c80423f6"
+  },
+  {
+    "source": ".github/workflows/apple-native-images.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apple-native-images.yml.txt",
+    "sha256": "fcb38a462cd8757631c70c5efc02e20145a2f5d4c9c349845f26146b0b292386"
+  },
+  {
+    "source": ".github/workflows/apple-representative.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apple-representative.yml.txt",
+    "sha256": "90f064ea4bfbeb76b7843f1e17ad21a7cbae5f66f57e5ffca8a668dc28a32396"
+  },
+  {
+    "source": ".github/workflows/apple-support-images-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apple-support-images-r1.yml.txt",
+    "sha256": "d14a331e3e779589c9541be505037c97ae3f69fd191dfc6506f5d86a469b4bdc"
+  },
+  {
+    "source": ".github/workflows/apply-highlights-356-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apply-highlights-356-r1.yml.txt",
+    "sha256": "988e4681bc232d81a504435387723d0cf99e5687612c4975e60f4d219cf83853"
+  },
+  {
+    "source": ".github/workflows/apply-source-356-final.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/apply-source-356-final.yml.txt",
+    "sha256": "d7ebef74dbca1cfab5e5752f4bad4924e2bbd74222c224d2a4c3b968897b50e4"
+  },
+  {
+    "source": ".github/workflows/cls-r3-diag.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cls-r3-diag.yml.txt",
+    "sha256": "d1b21e6ffc537a08bd43009e3d718c008bdca458558897ac5a93094ce793886a"
+  },
+  {
+    "source": ".github/workflows/cls-r3-postfix.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cls-r3-postfix.yml.txt",
+    "sha256": "7a887da4c7e1192ec864d88adbec651931bb67c7b4672511e2f6e25207d4ce53"
+  },
+  {
+    "source": ".github/workflows/cls-r4-postfix.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cls-r4-postfix.yml.txt",
+    "sha256": "aff02ca8fb3554a7eb844a0403e2cae859d494752f027c0ccec3799b58665b1c"
+  },
+  {
+    "source": ".github/workflows/cls-r5-postfix.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cls-r5-postfix.yml.txt",
+    "sha256": "2727f6097b06f16c8452b375f2c581b99d1adcb3b80a6d7d04c4941d4dc635ce"
+  },
+  {
+    "source": ".github/workflows/desktop-grid-r4.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/desktop-grid-r4.yml.txt",
+    "sha256": "5715c14df6312453d05a42aac7d3fca796bff6c173651573dc653ed42a92b141"
+  },
+  {
+    "source": ".github/workflows/desktop-r6-diag.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/desktop-r6-diag.yml.txt",
+    "sha256": "9f911f7704b7fd159caede5b907ce467a95fee9e0f89146372437c1ae7f9053c"
+  },
+  {
+    "source": ".github/workflows/desktop-stability-r5.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/desktop-stability-r5.yml.txt",
+    "sha256": "5853a66ea18f3c0590d9cb6727f8500174c622171d9bd2f47b5f4e2c3fee095e"
+  },
+  {
+    "source": ".github/workflows/dom-r4-diag.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/dom-r4-diag.yml.txt",
+    "sha256": "917b66c57993ef9bf22ad94a6965ded6b2a61e58e3347fcf0154846c74ae30fa"
+  },
+  {
+    "source": ".github/workflows/finalize-post-356-r2.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/finalize-post-356-r2.yml.txt",
+    "sha256": "d662bdc8b39d4dcb739d4789877889c76c0de96e4f5e24d456ba2cd474947ed4"
+  },
+  {
+    "source": ".github/workflows/inspect-attach-layer.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-attach-layer.yml.txt",
+    "sha256": "6e74004e7fd69874bae7cd7ea26b2cb17c4346ce03661bb1e346474e28db234a"
+  },
+  {
+    "source": ".github/workflows/inspect-editor-toolbar.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-editor-toolbar.yml.txt",
+    "sha256": "a2f2aa8fc3958b07966c30c37f7c11c9978d50359cb42b3e19af658ab3995226"
+  },
+  {
+    "source": ".github/workflows/inspect-editor-ui.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-editor-ui.yml.txt",
+    "sha256": "082d43aa307510b157d1d11fa306e8fcf9f13f275473ea4a85b469e27c84a2dc"
+  },
+  {
+    "source": ".github/workflows/inspect-publish-after-upload.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-publish-after-upload.yml.txt",
+    "sha256": "43bec0bf87eb1540a33c63158fca825b860156d45e949342e32f27e2965d032b"
+  },
+  {
+    "source": ".github/workflows/inspect-publish-representative.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-publish-representative.yml.txt",
+    "sha256": "e6134872dee566bc6535ce78949ed98d00af3b470fae38725d95de0676124c8e"
+  },
+  {
+    "source": ".github/workflows/inspect-upload-after.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-upload-after.yml.txt",
+    "sha256": "79380c7e007f3d291943c013ecfaaaed77f895382bfbdcb5ccf99c8f3fb5916b"
+  },
+  {
+    "source": ".github/workflows/inspect-upload-fragment.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-upload-fragment.yml.txt",
+    "sha256": "1c89cd4242257db3096972ab0612725903528b34f28a7d4903df5f5ab6a37fae"
+  },
+  {
+    "source": ".github/workflows/inspect-upload-network.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-upload-network.yml.txt",
+    "sha256": "2610234ff097f152eda6d5540c98b2e85c66162b7a0c36b2ea48b39f28fb24c2"
+  },
+  {
+    "source": ".github/workflows/inspect-upload-selection.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/inspect-upload-selection.yml.txt",
+    "sha256": "8521cd9ce4421105a19f0a75d44cc5dee79d0f79adc68552d40e1c8858c79734"
+  },
+  {
+    "source": ".github/workflows/layout-r3-only.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/layout-r3-only.yml.txt",
+    "sha256": "edb37f1d2c20ac00c42a44d8d17061fe14218406dcb6ec9bfe8339c2b6804edc"
+  },
+  {
+    "source": ".github/workflows/patch-all-h2-356-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/patch-all-h2-356-r1.yml.txt",
+    "sha256": "172999c7c9e268b480032c94a0c0eb3c59523d3b45f18b6ba899afd74820ee77"
+  },
+  {
+    "source": ".github/workflows/patch-editorial-headings-356-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/patch-editorial-headings-356-r1.yml.txt",
+    "sha256": "00a2aaffc7436635c5d8112db5e281ae04d4436264f9965dc95ba369f7559c29"
+  },
+  {
+    "source": ".github/workflows/patch-h2-copy-356-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/patch-h2-copy-356-r1.yml.txt",
+    "sha256": "c9395ef2b2507dde8d9dd9da0a455dcd6a8012130fef69dee77093418e76dab6"
+  },
+  {
+    "source": ".github/workflows/patch-h3-copy-356-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/patch-h3-copy-356-r1.yml.txt",
+    "sha256": "d92a760fb73ef999b5a54ca7c4c5ce497bf67ceece21d98b43b5719145664c85"
+  },
+  {
+    "source": ".github/workflows/performance-r1.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/performance-r1.yml.txt",
+    "sha256": "5a4c936d3e9c3fd01e30dc4bb17a191774b4b2a434299ad759eb55bdab5d54eb"
+  },
+  {
+    "source": ".github/workflows/performance-r7-inline-css.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/performance-r7-inline-css.yml.txt",
+    "sha256": "ffd5b385eb7cd3e8f7b1147a0862f588f78139a7952f6a49f3e6901ca129d49f"
+  },
+  {
+    "source": ".github/workflows/performance-r8-critical-css.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/performance-r8-critical-css.yml.txt",
+    "sha256": "9573dc99d4767a59060a61434e8dbeeae1913fd385c5c4b6d9aa18b0e2b77690"
+  },
+  {
+    "source": ".github/workflows/performance-r9-restore-css.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/performance-r9-restore-css.yml.txt",
+    "sha256": "2ee7459bd7e144d9ae2afa0a7f2e24b749a3f4c3e79727f7b5e2b9fdf6936e53"
+  },
+  {
+    "source": ".github/workflows/public-cls-r7.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/public-cls-r7.yml.txt",
+    "sha256": "bf46332e3144ffab58572ba018204063daa873715fd2759079f794e2a83528fe"
+  },
+  {
+    "source": ".github/workflows/public-cls-r8-postfix.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/public-cls-r8-postfix.yml.txt",
+    "sha256": "f22fcf5c347cdbfc38e501725758d26167fe1f4e3d38962de99521b4c90ffda8"
+  },
+  {
+    "source": ".github/workflows/rewrite-post-356-r7.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/rewrite-post-356-r7.yml.txt",
+    "sha256": "087b72330ba176aa6e63dda44d2ded17625bac3c0f7f4b08ad51c013ff2177cd"
+  },
+  {
+    "source": ".github/workflows/seo-performance-r6.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/seo-performance-r6.yml.txt",
+    "sha256": "af622193c7f7dd1cb53b609538f20a532e00efd2126dccac6e6e26c04ff2ee36"
+  },
+  {
+    "source": ".github/workflows/sync-published-post.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/sync-published-post.yml.txt",
+    "sha256": "efeaa404916287990848eaee434e4b43fd8fb26344f88fe9ae82d1e41f96249b"
+  },
+  {
+    "source": ".github/workflows/test-representative-restore.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/test-representative-restore.yml.txt",
+    "sha256": "b1dc6ddc9e904eed2ad19270ee285483f6516d643f2db902f2591a458143e60f"
+  },
+  {
+    "source": ".github/workflows/toc-r8-only.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/toc-r8-only.yml.txt",
+    "sha256": "3db9e4197c4cc68586f33f094421e39bd5e4e7f2b7488713e31697f9722d0205"
+  },
+  {
+    "source": ".github/workflows/cloud-login.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cloud-login.yml.txt",
+    "sha256": "5e0c475966d993ac1eac0af8ab7600150b6defd5902e7767814da6ef428c68a2"
+  },
+  {
+    "source": ".github/workflows/cloud-smoke.yml",
+    "archive": "evidence/legacy-browser-publisher-20261003/.github/workflows/cloud-smoke.yml.txt",
+    "sha256": "75248da447769641b1f42c8766e7361afae1bb77a0c23f10fa5774376e468b81"
+  },
+  {
+    "source": "docs/AUTO_PUBLISH.md",
+    "archive": "evidence/legacy-browser-publisher-20261003/docs/AUTO_PUBLISH.md.txt",
+    "sha256": "31241ae8c64b47ca46d5e201637cd4bb1acd9fae8a941f1f85c733a6493f10e7"
+  }
+]

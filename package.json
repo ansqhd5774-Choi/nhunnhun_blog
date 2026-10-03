@@ -8,7 +8,6 @@
     "publish": "node publishing/publish.mjs"
   },
   "dependencies": {
-    "@browserbasehq/sdk": "2.21.0",
     "playwright-core": "1.63.0",
     "sanitize-html": "2.18.0"
   },

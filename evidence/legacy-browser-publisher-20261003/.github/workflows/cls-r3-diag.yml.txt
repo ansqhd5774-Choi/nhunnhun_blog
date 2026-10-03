@@ -1,0 +1,43 @@
+name: One-time CLS R3 diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/cls-r3-diag.yml']
+permissions:
+  contents: write
+concurrency:
+  group: nhunnhun-cls-r3-diag
+  cancel-in-progress: false
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Run browser CLS diagnostic
+        shell: bash
+        run: |
+          set +e
+          mkdir -p evidence/admin
+          node maintenance/diagnose-cls-r3.mjs 2>&1 | tee evidence/admin/cls-r3-diag.log
+          code=${PIPESTATUS[0]}
+          printf "\nEXIT_CODE=%s\n" "$code" | tee -a evidence/admin/cls-r3-diag.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f evidence/admin/cls-r3-diag.log
+          git commit -m "evidence: CLS R3 browser diagnostic" || true
+          git push origin HEAD:main || true
+          exit "$code"
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
+          BROWSERBASE_CONTEXT_ID: ${{ secrets.BROWSERBASE_CONTEXT_ID }}
+
+# pr-trigger-live-log

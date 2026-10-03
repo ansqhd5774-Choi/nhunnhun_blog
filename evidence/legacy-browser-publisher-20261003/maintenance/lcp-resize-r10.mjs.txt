@@ -1,0 +1,111 @@
+import Browserbase from '@browserbasehq/sdk';
+import { chromium } from 'playwright-core';
+import { readFile } from 'node:fs/promises';
+
+const BLOG='https://nhunnhun.tistory.com';
+const POST_ID='356';
+const TARGET_W=720,TARGET_H=454,QUALITY=0.78;
+for(const k of ['BROWSERBASE_API_KEY','BROWSERBASE_PROJECT_ID','BROWSERBASE_CONTEXT_ID']) if(!process.env[k]) throw new Error('E_CONFIG_'+k);
+
+const src=JSON.parse(await readFile('posts/apple-benefits-20261002.json','utf8'));
+const client=new Browserbase({apiKey:process.env.BROWSERBASE_API_KEY});
+const session=await client.sessions.create({
+  projectId:process.env.BROWSERBASE_PROJECT_ID,
+  browserSettings:{context:{id:process.env.BROWSERBASE_CONTEXT_ID,persist:true},recordSession:false,logSession:false,solveCaptchas:false},
+  timeout:300
+});
+let browser;
+
+async function jfetch(page,url,opts={}){
+  return page.evaluate(async({url,opts})=>{
+    const r=await fetch(url,{credentials:'include',...opts});
+    const text=await r.text();
+    let json=null; try{json=JSON.parse(text)}catch{}
+    return {ok:r.ok,status:r.status,text,json,url:r.url};
+  },{url,opts});
+}
+function esc(s){return s.replaceAll('&','&amp;').replaceAll('"','&quot;');}
+
+try{
+  browser=await chromium.connectOverCDP(session.connectUrl);
+  const context=browser.contexts()[0];
+  const pub=await context.newPage();
+  await pub.goto(BLOG+'/'+POST_ID,{waitUntil:'domcontentloaded'});
+  const current=await pub.evaluate(()=>{
+    const hero=document.querySelector('.contents_style img');
+    return {hero:hero?.src||'',og:document.querySelector('meta[property="og:image"]')?.content||''};
+  });
+  if(!current.hero.includes('blog.kakaocdn.net/dna/')) throw new Error('E_NATIVE_HERO');
+
+  const raw=await fetch(current.hero);
+  if(!raw.ok) throw new Error('E_FETCH_'+raw.status);
+  const input=new Uint8Array(await raw.arrayBuffer());
+
+  const admin=await context.newPage();
+  admin.setDefaultTimeout(30000);
+  await admin.goto(BLOG+'/manage/posts',{waitUntil:'domcontentloaded'});
+  if(new URL(admin.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+
+  const resized=await admin.evaluate(async({arr,w,h,q})=>{
+    const blob=new Blob([new Uint8Array(arr)],{type:'image/jpeg'});
+    const bmp=await createImageBitmap(blob);
+    const canvas=new OffscreenCanvas(w,h);
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.drawImage(bmp,0,0,w,h);
+    const out=await canvas.convertToBlob({type:'image/jpeg',quality:q});
+    return Array.from(new Uint8Array(await out.arrayBuffer()));
+  },{arr:Array.from(input),w:TARGET_W,h:TARGET_H,q:QUALITY});
+
+  const upload=await admin.evaluate(async({arr})=>{
+    const fd=new FormData();
+    fd.append('file',new Blob([new Uint8Array(arr)],{type:'image/jpeg'}),'apple-hero-720.jpg');
+    const r=await fetch('/manage/post/attach.json',{method:'POST',credentials:'include',headers:{accept:'application/json'},body:fd});
+    return {ok:r.ok,status:r.status,text:await r.text()};
+  },{arr:resized});
+  if(!upload.ok) throw new Error('E_UPLOAD_'+upload.status);
+  const up=JSON.parse(upload.text);
+  if(!up.url||!up.key||!up.filename) throw new Error('E_UPLOAD_SHAPE');
+
+  const u=new URL(up.url);
+  const query=u.search.slice(1).replaceAll('&','&amp;');
+  const kageRef='kage@'+up.key+'/'+up.filename+(query?'?'+query:'');
+  const thumbnail='kage@'+up.key+'/'+up.filename;
+
+  const heroHtml='<p><img src="'+esc(up.url)+'" alt="붉은 사과 두 개" width="'+TARGET_W+'" height="'+TARGET_H+'" loading="eager" fetchpriority="high" decoding="async" style="width:100%;max-width:720px;height:auto;display:block;margin:16px auto;"></p>';
+  const body=heroHtml+src.bodyHtml;
+
+  const posts=await jfetch(admin,'/manage/posts.json?category=-3&page=1&searchKeyword=&searchType=title&visibility=all');
+  const items=posts.json?.items||posts.json?.data?.items||posts.json?.posts||[];
+  const meta=items.find(x=>String(x.id)===POST_ID);
+  if(!meta) throw new Error('E_META');
+  const payload={
+    id:POST_ID,title:src.title,content:body,slogan:meta.slogan||'',visibility:20,
+    category:Number(meta.categoryId||0),tag:(src.tags||[]).join(','),published:1,
+    password:meta.postPassword||'',uselessMarginForEntry:1,cclCommercial:0,cclDerive:0,
+    type:'post',attachments:[kageRef],thumbnail,recaptchaValue:'',draftSequence:null,totalWritingTimeMs:0
+  };
+  const put=await jfetch(admin,'/manage/post/'+POST_ID+'.json',{
+    method:'PUT',headers:{'content-type':'application/json',accept:'application/json'},body:JSON.stringify(payload)
+  });
+  if(!put.ok) throw new Error('E_PUT_'+put.status+'_'+put.text.slice(0,200));
+  await admin.waitForTimeout(2500);
+
+  const verify=await context.newPage();
+  await verify.goto(BLOG+'/'+POST_ID,{waitUntil:'domcontentloaded'});
+  const out=await verify.evaluate(()=>{
+    const hero=document.querySelector('.contents_style img');
+    return {
+      src:hero?.src||'',loading:hero?.getAttribute('loading')||'',fetchpriority:hero?.getAttribute('fetchpriority')||'',
+      width:hero?.getAttribute('width')||'',height:hero?.getAttribute('height')||'',
+      naturalWidth:hero?.naturalWidth||0,naturalHeight:hero?.naturalHeight||0,
+      og:document.querySelector('meta[property="og:image"]')?.content||''
+    };
+  });
+  if(out.og.includes('opengraph.png')) throw new Error('E_OG');
+  if(out.loading!=='eager'||out.fetchpriority!=='high') throw new Error('E_PRIORITY');
+  if(Number(out.naturalWidth)>TARGET_W) throw new Error('E_RESIZE_NOT_EFFECTIVE_'+out.naturalWidth);
+  console.log('R10_RESULT '+JSON.stringify({inputBytes:input.length,outputBytes:resized.length,uploadBytes:up.size||null,...out}));
+}finally{
+  try{await browser?.close();}catch{}
+  try{await client.sessions.update(session.id,{projectId:process.env.BROWSERBASE_PROJECT_ID,status:'REQUEST_RELEASE'});}catch{}
+}

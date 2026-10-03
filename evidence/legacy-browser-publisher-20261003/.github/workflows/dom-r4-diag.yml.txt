@@ -1,0 +1,29 @@
+name: One-time DOM R4 diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/dom-r4-diag.yml']
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-dom-r4-diag
+  cancel-in-progress: false
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Run DOM R4 trace
+        shell: bash
+        run: node maintenance/diagnose-dom-r4.mjs
+        env:
+          BROWSERBASE_API_KEY: ${{ secrets.BROWSERBASE_API_KEY }}
+          BROWSERBASE_PROJECT_ID: ${{ secrets.BROWSERBASE_PROJECT_ID }}
