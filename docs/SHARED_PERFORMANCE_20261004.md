@@ -11,7 +11,7 @@
 
 ## 검증
 
-원본 대비 body 및 기존 script 보존(명시한 jQuery bridge 제외), idempotence, 이미지 원본 src/fallback, 폰트 정책 및 초기 아이콘 예약 검사를 통과했습니다. 전체 테스트: main 50/50, nutriments 31/31. 게시물 발행/runner workflow는 변경하지 않았습니다. 로컬 발행 validate는 GitHub ledger 환경이 없어 E_GITHUB_CONFIGURATION이므로 PASS로 표시하지 않습니다.
+원본 대비 body 및 기존 script 보존(명시한 jQuery bridge 제외), idempotence, 이미지 원본 src/fallback, 폰트 정책 및 초기 아이콘 예약 검사를 통과했습니다. 전체 테스트: main 51/51 (최신 main 통합 후), nutriments 31/31. 게시물 발행/runner workflow는 변경하지 않았습니다. 로컬 발행 validate는 GitHub ledger 환경이 없어 E_GITHUB_CONFIGURATION이므로 PASS로 표시하지 않습니다.
 
 공개 /366 및 /6에서 시스템 글꼴, 정상 본문, 모바일 390 폭의 가로 넘침 0, jQuery 오류 0을 확인했습니다. 상세 실험 결과는 아래 측정표에 별도 기록합니다.
 
