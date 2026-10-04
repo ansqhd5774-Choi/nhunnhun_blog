@@ -249,7 +249,22 @@ try{
         try{decoded=decodeURIComponent(raw);}catch{}
         return {hasVisual:!!(img||styleNode),isEmpty:text.includes('대표이미지 추가'),matches:decoded.includes(pathname)};
       },repPathname);
-      if(!thumbState.hasVisual || thumbState.isEmpty || !thumbState.matches) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      if(!thumbState.hasVisual || thumbState.isEmpty || !thumbState.matches){
+        const diag=await thumb.evaluate(box=>({
+          text:(box.textContent||'').trim().slice(0,160),
+          children:[...box.querySelectorAll('button,input,label,a,img')].map(x=>({
+            tag:x.tagName,
+            cls:String(x.className||'').slice(0,120),
+            type:x.getAttribute('type'),
+            aria:x.getAttribute('aria-label'),
+            title:x.getAttribute('title'),
+            text:(x.textContent||'').trim().slice(0,80),
+            hasSrc:x.tagName==='IMG'
+          })).slice(0,30)
+        }));
+        console.log('REP_THUMB_DIAG '+JSON.stringify(diag));
+        throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      }
 
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
