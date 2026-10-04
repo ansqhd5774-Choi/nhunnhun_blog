@@ -17,6 +17,12 @@ test('unapproved ready posts are rejected', () => assert.throws(() => checkPost(
 test('approved ready post accepted', () => assert.equal(eligible(checkPublishHtml(checkPost({...base,status:'ready',approved:true},'first-post.json')),null),true));
 test('same publication is skipped', () => assert.equal(eligible({...base,status:'ready',approved:true},{phase:'published',fingerprint:fingerprint(base)}),false));
 test('uncertain final click never retries', () => assert.throws(() => eligible({...base,status:'ready',approved:true},{phase:'submitting',fingerprint:fingerprint(base)})));
+test('evidence-backed failed publication may retry only after confirmed no public mutation', () => {
+  const post={...base,status:'ready',approved:true};
+  assert.equal(eligible(post,{phase:'failed',fingerprint:fingerprint(post),publicMutationConfirmed:false}),true);
+  assert.throws(()=>eligible(post,{phase:'failed',fingerprint:fingerprint(post),publicMutationConfirmed:true}));
+  assert.throws(()=>eligible(post,{phase:'failed',fingerprint:'different',publicMutationConfirmed:false}));
+});
 test('changed published content never creates another article', () => assert.equal(eligible({...base,status:'ready',approved:true,bodyHtml:'<p>변경</p>'},{phase:'published',fingerprint:fingerprint(base)}),false));
 test('arbitrary fields and path injection are rejected', () => {
   assert.throws(() => checkPost({...base,id:'../bad'},'../bad.json'));
@@ -148,6 +154,8 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);
   assert.match(publish,/E_REPRESENTATIVE_UNVERIFIED/);
   assert.match(publish,/E_SOURCE_DRIFT/);
+  assert.match(publish,/previousStateSha/);
+  assert.match(publish,/stage === 'final-submit'/);
   assert.match(publish,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
   assert.match(validate,/renderEditorialPost\(post\)/);
 });

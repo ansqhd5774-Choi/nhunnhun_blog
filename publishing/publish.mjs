@@ -109,12 +109,12 @@ try {
       if (eligible(post, state)) {
         checkPublishHtml(post);
         assertImageReview(post);
-        queue.push(post);
+        queue.push({post, previousStateSha: state?.phase === 'failed' ? state.sha : undefined});
       }
     }
     if (queue.length > 1) throw new Error('E_ONE_POST_PER_RUN');
     if (queue.length) {
-      const post = queue[0];
+      const {post, previousStateSha} = queue[0];
       stage = 'local-browser';
       const browserConfig = await localBrowserConfig();
       editorContext = await openEditorContext(browserConfig);
@@ -125,7 +125,10 @@ try {
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
       page.on('dialog', async dialog => {
-        if (dialog.type() === 'confirm' && /모드.*변경|변경.*모드/.test(dialog.message())) await dialog.accept();
+        const type = dialog.type();
+        const message = dialog.message();
+        if (type === 'confirm' && (/모드.*변경|변경.*모드/.test(message) || stage === 'final-submit')) await dialog.accept();
+        else if (type === 'alert') await dialog.accept();
         else await dialog.dismiss();
       });
       await page.goto(`${BLOG}/manage/post`, { waitUntil:'domcontentloaded' });
@@ -193,7 +196,7 @@ try {
       const remoteMain = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], {encoding:'utf8'}).trim().split(/\s+/)[0] || '';
       if (!remoteMain || remoteMain !== sourceCommit) throw new Error('E_SOURCE_DRIFT');
       assertCurrentSource();
-      await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()});
+      await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()}, previousStateSha);
       stage = 'final-submit';
       await publishButton.click();
       await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname));
