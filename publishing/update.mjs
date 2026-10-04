@@ -1,3 +1,4 @@
+import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -241,6 +242,7 @@ try{
     console.log('UPDATE_DISABLED');
   }else{
     assertLocalGit();
+    assertCurrentSource();
     const ledger=new UpdateLedger();
     const queue=[];
     for(const update of await loadUpdates()){
@@ -342,9 +344,7 @@ try{
       }
       if(!submit) throw new Error('E_UPDATE_SUBMIT_CONTROL');
 
-      const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-      const remoteMain=execFileSync('git',['ls-remote','origin','refs/heads/main'],{encoding:'utf8'}).trim().split(/\s+/)[0]||'';
-      if(!remoteMain||remoteMain!==sourceCommit) throw new Error('E_SOURCE_DRIFT');
+      const sourceCommit = assertCurrentSource();
 
       await ledger.write(update.id,{
         phase:'submitting',fingerprint,url:update.targetUrl,articleId:update.articleId,
@@ -373,7 +373,7 @@ try{
     }
   }
 }catch(error){
-  const code=/^E_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
+  const code=/^(?:E_[A-Z0-9_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
   console.error('UPDATE_DIAGNOSTIC: '+stage+' '+code);
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;

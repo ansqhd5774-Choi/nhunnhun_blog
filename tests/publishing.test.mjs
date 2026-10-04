@@ -51,8 +51,9 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm test'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm validate'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm run publish'));
-  assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
-  assert.equal(workflow.jobs.publish.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
+  assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'${{ github.sha }}');
+  assert.equal(workflow.jobs.publish.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'${{ github.sha }}');
+  assert.ok(workflow.jobs.publish.steps.findIndex(step => step.run === 'node publishing/runner-gate.mjs') < workflow.jobs.publish.steps.findIndex(step => step.run === 'pnpm install --frozen-lockfile --ignore-scripts'));
   const watched=workflow.on?.push?.paths ?? workflow['on']?.push?.paths ?? [];
   assert.ok(!watched.includes('publishing/**'));
   assert.ok(!watched.includes('publishing/update.mjs'));

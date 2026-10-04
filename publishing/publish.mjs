@@ -1,3 +1,4 @@
+import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
@@ -72,6 +73,7 @@ try {
     console.log('DISABLED: 발행 활성화 전에는 게시하지 않습니다.');
   } else {
     assertLocalGit();
+    assertCurrentSource();
     const ledger = new Ledger();
     const queue = [];
     for (const post of await loadPosts()) {
@@ -158,6 +160,7 @@ try {
       const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
       const remoteMain = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], {encoding:'utf8'}).trim().split(/\s+/)[0] || '';
       if (!remoteMain || remoteMain !== sourceCommit) throw new Error('E_SOURCE_DRIFT');
+      assertCurrentSource();
       await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()});
       stage = 'final-submit';
       await publishButton.click();
@@ -278,7 +281,7 @@ try {
     } else console.log('NO_PENDING_POSTS');
   }
 } catch (error) {
-  const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
+  const code = /^(?:E_[A-Z_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
   if (stage === 'local-browser') console.error('LOCAL_BROWSER_SAFE_DIAG '+JSON.stringify({code}));
   if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
