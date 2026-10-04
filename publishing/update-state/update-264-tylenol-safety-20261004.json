@@ -1,0 +1,36 @@
+{
+  "phase": "updated",
+  "fingerprint": "2a2a816792f1b18caf77586697c16c4e7aa6c3547b5abac80f5964f11c861c48",
+  "url": "https://nhunnhun.tistory.com/264",
+  "articleId": "264",
+  "previousTitle": "타이레놀(Tylenol)의 효능과 사용 방법에 대한 모든 것",
+  "title": "타이레놀(아세트아미노펜) 복용법·용량·부작용｜간 손상·중복복용 주의",
+  "sourceCommit": "37e16883e9dc5f5facdf9a8872a246617e777610",
+  "editorialTemplateVersion": "R3",
+  "timestamp": "2026-10-04T11:10:57.195Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 10,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
+}
