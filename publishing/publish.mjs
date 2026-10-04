@@ -39,15 +39,41 @@ async function downloadImage(url, path) {
 async function uploadImage(page, sourceUrl, index) {
   const path = join(imageTempDir, `tistory-image-${index}.bin`);
   await downloadImage(sourceUrl, path);
-  await page.evaluate(() => document.querySelectorAll('#attach-layer-btn')[0]?.click());
+  const input = page.locator('#attach-image');
+  if (await input.count() === 0) {
+    const opened = await page.evaluate(() => {
+      const button = document.querySelectorAll('#attach-layer-btn')[0];
+      if (!button) return false;
+      button.click();
+      return true;
+    });
+    if (!opened) throw new Error('E_IMAGE_ATTACH_BUTTON');
+    await input.waitFor({state:'attached', timeout:10000});
+  }
   const responsePromise = page.waitForResponse(res =>
     res.url().includes('/manage/post/attach.json') &&
-    res.request().method() === 'POST' &&
-    res.status() === 200
+    res.request().method() === 'POST'
   , {timeout:30000});
-  await page.locator('#attach-image').setInputFiles(path);
-  const data = await (await responsePromise).json();
+  try {
+    await input.setInputFiles(path);
+  } catch {
+    throw new Error('E_IMAGE_INPUT');
+  }
+  let uploadResponse;
+  try {
+    uploadResponse = await responsePromise;
+  } catch {
+    throw new Error('E_IMAGE_RESPONSE_TIMEOUT');
+  }
+  if (uploadResponse.status() !== 200) throw new Error('E_IMAGE_UPLOAD_HTTP');
+  let data;
+  try {
+    data = await uploadResponse.json();
+  } catch {
+    throw new Error('E_IMAGE_UPLOAD_RESPONSE');
+  }
   if (!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_IMAGE_UPLOAD');
+  await page.waitForTimeout(400);
   return data.url;
 }
 function replaceImageSources(html, mapping, representativeSource) {
