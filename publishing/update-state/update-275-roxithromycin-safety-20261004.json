@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "09d05c6de364ebee1916754bcf98bb956c02fceeb9ed773333363b76428458f0",
   "url": "https://nhunnhun.tistory.com/275",
   "articleId": "275",
+  "previousTitle": "록시마이신(Roximycin) 호흡기 치료제의 반전!!",
+  "title": "록시마이신(록시트로마이신) 복용법·부작용｜항생제 상호작용·주의사항",
   "sourceCommit": "de4d9369d84c3cd3250878ddf38f61d28b1a044c",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T06:57:25.688Z"
+  "timestamp": "2026-10-04T06:57:35.806Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
