@@ -255,17 +255,10 @@ try{
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
-      stage='fresh-basic-editor';
-      await page.close();
-      page=await editorContext.newPage();
-      editorPage=page;
-      page.setDefaultTimeout(25000);
-      page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
-      await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
-      await page.locator('#post-title-inp').waitFor({state:'visible'});
-      if((await page.locator('#post-title-inp').inputValue()).trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
-      stage='ensure-basic-editor';
-      await ensureBasicEditor(page);
+      stage='restore-basic-editor';
+      await page.locator('#editor-mode-layer-btn-open').click();
+      await page.locator('#editor-mode-basic').click();
+      await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:10000});
 
       stage='render-update';
       const rendered=renderEditorialPost(update);
