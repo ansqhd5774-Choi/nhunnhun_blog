@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "be3486b1e0e65e3693bd686e5f094f04e09f94ff432ebfb870a61a5029978663",
   "url": "https://nhunnhun.tistory.com/345",
   "articleId": "345",
+  "previousTitle": "소나무 껍질 추출물 효능과 부작용｜피크노제놀 근거·복용 주의사항",
+  "title": "소나무 껍질 추출물 효능과 부작용｜피크노제놀 근거·복용 주의사항",
   "sourceCommit": "8781eb45995355297165ab406b3844fd73dd99ee",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T08:41:16.728Z"
+  "timestamp": "2026-10-04T08:41:40.574Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 10,
+    "h2Styled": 10,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 10,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
