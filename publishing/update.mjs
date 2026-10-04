@@ -180,7 +180,7 @@ try{
       const browserConfig=await localBrowserConfig();
       editorContext=await openEditorContext(browserConfig);
       tempDir=await mkdtemp(join(tmpdir(),'tistory-update-'));
-      const page=await editorContext.newPage();
+      let page=await editorContext.newPage();
       editorPage=page;
       page.setDefaultTimeout(25000);
       page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
@@ -200,7 +200,12 @@ try{
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
-      stage='reload-basic';
+      stage='fresh-basic-editor';
+      await page.close();
+      page=await editorContext.newPage();
+      editorPage=page;
+      page.setDefaultTimeout(25000);
+      page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
       await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       if((await page.locator('#post-title-inp').inputValue()).trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
