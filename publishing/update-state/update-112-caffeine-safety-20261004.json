@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "0b6afc6478b16e2f3268f2d0db21c58f4bdf053c611c8655a6b7803396aba1ba",
   "url": "https://nhunnhun.tistory.com/112",
   "articleId": "112",
+  "previousTitle": "카페인(Caffeine)의 놀라운 효과와 그것을 이용한 생활 노하우!",
+  "title": "카페인 작용·부작용·금단 증상과 줄이는 방법",
   "sourceCommit": "263301d5e5ecae4cd72265cf95011f7ea17a5aa1",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T05:31:11.494Z"
+  "timestamp": "2026-10-04T05:31:22.097Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 10,
+    "h2Styled": 10,
+    "h3": 3,
+    "h3Styled": 3,
+    "accents": 10,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
