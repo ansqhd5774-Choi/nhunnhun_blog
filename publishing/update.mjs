@@ -11,13 +11,29 @@ import { UpdateLedger } from './update-ledger.mjs';
 function imageSources(html){
   return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
 }
+function imageRetryDelayMs(response,attempt){
+  const retryAfter=(response.headers.get('retry-after')||'').trim();
+  if(retryAfter){
+    const seconds=Number(retryAfter);
+    const ms=Number.isFinite(seconds)
+      ? Math.max(0,seconds*1000)
+      : Math.max(0,Date.parse(retryAfter)-Date.now());
+    if(ms>120000) throw new Error('E_UPDATE_IMAGE_RATE_LIMIT_LONG');
+    if(ms>0) return ms;
+  }
+  if(response.status===429||response.status===503) return Math.min(30000,5000*(2**attempt));
+  return 500;
+}
 async function downloadImage(url,path){
   let last='';
   for(let attempt=0;attempt<4;attempt++){
     let response;
     try{
       response=await fetch(url,{
-        headers:{'User-Agent':'Mozilla/5.0','Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'},
+        headers:{
+          'User-Agent':'NHUNNHUN-Tistory-Publisher/1.0 (https://nhunnhun.tistory.com/)',
+          'Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+        },
         signal:AbortSignal.timeout(20000)
       });
     }catch(error){
@@ -33,7 +49,7 @@ async function downloadImage(url,path){
       return;
     }
     last=String(response.status);
-    await new Promise(r=>setTimeout(r,500));
+    await new Promise(r=>setTimeout(r,imageRetryDelayMs(response,attempt)));
   }
   throw new Error('E_UPDATE_IMAGE_DOWNLOAD_'+last);
 }
