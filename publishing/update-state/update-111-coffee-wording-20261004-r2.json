@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "832e768e5d9227b55ee153553b42ffe619871cf60c8947db5dce1b223f3bdd90",
   "url": "https://nhunnhun.tistory.com/111",
   "articleId": "111",
+  "previousTitle": "커피의 역사와 원두 종류 총정리｜아라비카·로부스타·로스팅·추출법",
+  "title": "커피의 역사와 원두 종류 총정리｜아라비카·로부스타·로스팅·추출법",
   "sourceCommit": "2773ceebbeda5b6f844fcd26d81e6ce15857fc90",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T06:18:40.398Z"
+  "timestamp": "2026-10-04T06:18:50.459Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 11,
+    "h2Styled": 11,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 11,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 4,
+    "responsiveImages": 4,
+    "nativeImages": 4,
+    "highlights": 10,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
