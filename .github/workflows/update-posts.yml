@@ -8,10 +8,18 @@ on:
       - 'publishing/update-core.mjs'
       - 'publishing/update-ledger.mjs'
       - 'publishing/validate-update.mjs'
+      - 'publishing/verify-updated-public.mjs'
       - 'tests/publishing.test.mjs'
+      - 'tests/public-verification.test.mjs'
       - 'package.json'
       - '.github/workflows/update-posts.yml'
   workflow_dispatch:
+    inputs:
+      public_verify_article_ids:
+        description: 'Optional comma-separated numeric article IDs for read-only public verification; empty verifies all update records.'
+        required: false
+        default: ''
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -30,6 +38,7 @@ jobs:
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test
+      - run: node --test tests/public-verification.test.mjs
       - run: pnpm run validate:update
   update:
     concurrency:
@@ -54,9 +63,16 @@ jobs:
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test
+      - run: node --test tests/public-verification.test.mjs
       - run: pnpm run validate:update
       - run: pnpm run update
         env:
           UPDATE_ENABLED: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+      - name: Verify anonymous public quality
+        run: node publishing/verify-updated-public.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+          PUBLIC_VERIFY_ARTICLE_IDS: ${{ inputs.public_verify_article_ids || '' }}
