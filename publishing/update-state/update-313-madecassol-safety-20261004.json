@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "e8269e217c6384ea5633080369f0659edaabc7297fdb48de65ab00bc9064ff58",
   "url": "https://nhunnhun.tistory.com/313",
   "articleId": "313",
+  "previousTitle": "마데카솔(madecassol)로 피부 재생!! 빠른 회복을 위한 비밀 무기!!",
+  "title": "마데카솔 종류·사용법·부작용｜상처에 맞는 제품과 주의사항",
   "sourceCommit": "3fbaa9a63f9caa03bc68cdfebc6c975c9d7b88df",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T10:11:38.073Z"
+  "timestamp": "2026-10-04T10:12:11.528Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 8,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
