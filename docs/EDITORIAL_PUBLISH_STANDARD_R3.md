@@ -94,3 +94,29 @@ published 글은 source가 바뀌어도 신규 글로 다시 만들지 않는다
 8. published ledger 기록
 
 GitHub 저장만으로 발행 완료라고 보고하지 않는다.
+
+
+## 9. Image Selection Review Gate — ACTIVE
+이미지 개수만 충족하면 PASS로 보지 않는다. 신규 글과 앞으로 작성하는 전체 최신화 source는 `imageReview`를 포함해야 하며 실제 mutation 전에 자동 검증한다.
+
+- 대표 이미지는 글의 핵심 식품·성분·제품을 **가까이서 명확하게 보여주는 사진**이어야 한다.
+- 음식 글에서 과수원·나무·밭·포장·도표 같은 맥락 이미지를 대표 이미지로 사용하지 않는다. 이런 이미지는 본문 보조 이미지로만 사용한다.
+- 파일명이나 검색 결과 제목만 보고 선택하지 않는다. 원본 이미지 자체와 원출처 설명을 확인한 뒤 `visualChecked=true`로 기록한다.
+- `alt`는 의도한 설명이 아니라 **실제 사진에 보이는 장면**을 작성한다.
+- 각 이미지마다 원본 URL, Commons 원출처 페이지, 저작자, 라이선스, 역할, 구도를 기록한다.
+- 첫 이미지는 `role=hero`, `composition=closeup`이어야 하며 `representativeImageUrl`과 정확히 일치해야 한다.
+- 본문 이미지는 대표 이미지와 중복하지 않고 단면·조리·재배 맥락 등 서로 다른 정보 역할을 갖는다.
+- 모든 Commons 원출처 페이지는 자료 출처에 실제 링크로 표시한다.
+- 원본과 출처 페이지가 다른 파일을 가리키거나 저작자·라이선스를 확인할 수 없으면 FAIL이다.
+
+자동 Gate:
+- 이미지와 `imageReview` 1:1
+- source URL / alt / review manifest 정확히 일치
+- 대표 이미지 = 첫 이미지 = hero
+- hero composition = closeup
+- Commons File 원출처 링크 필수
+- 저작자·허용 라이선스 필수
+- 동일 이미지·동일 원출처 중복 금지
+- `visualChecked=true` 필수
+
+이 Gate는 시각 검토를 대체하는 장치가 아니라, 실제 시각 검토가 수행됐다는 증거를 source에 남기고 누락을 fail-closed 하는 장치다.

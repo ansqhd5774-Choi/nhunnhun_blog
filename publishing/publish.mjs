@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
+import { assertImageReview } from './image-review.mjs';
 
 
 function imageSources(html) {
@@ -105,7 +106,11 @@ try {
     const queue = [];
     for (const post of await loadPosts()) {
       const state = await ledger.read(post.id);
-      if (eligible(post, state)) queue.push(checkPublishHtml(post));
+      if (eligible(post, state)) {
+        checkPublishHtml(post);
+        assertImageReview(post);
+        queue.push(post);
+      }
     }
     if (queue.length > 1) throw new Error('E_ONE_POST_PER_RUN');
     if (queue.length) {

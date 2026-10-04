@@ -3,6 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import { loadPosts, checkPublishHtml, eligible } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
+import { assertImageReview } from './image-review.mjs';
 
 function diagnoseHtml(html) {
   const clean = sanitizeHtml(html, {
@@ -28,6 +29,7 @@ try {
     const state = await ledger.read(post.id);
     if (eligible(post, state)) {
       checkPublishHtml(post);
+      assertImageReview(post);
       renderEditorialPost(post);
       pending++;
     }

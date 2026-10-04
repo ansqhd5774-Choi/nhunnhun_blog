@@ -9,6 +9,7 @@ import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowse
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
+import { assertImageReview } from './image-review.mjs';
 
 function imageSources(html){
   return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
@@ -248,7 +249,10 @@ try{
     const queue=[];
     for(const update of await loadUpdates()){
       const state=await ledger.read(update.id);
-      if(eligibleUpdate(update,state)) queue.push(update);
+      if(eligibleUpdate(update,state)) {
+        assertImageReview(update);
+        queue.push(update);
+      }
     }
     if(queue.length>1) throw new Error('E_ONE_UPDATE_PER_RUN');
     if(!queue.length){

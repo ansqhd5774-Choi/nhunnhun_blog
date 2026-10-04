@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
 
-const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','bodyHtml','status','approved'];
+const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved'];
 
 export function checkUpdateSource(update, filename){
   if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');

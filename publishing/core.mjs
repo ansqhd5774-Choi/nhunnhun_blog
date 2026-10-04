@@ -4,7 +4,7 @@ import sanitizeHtml from 'sanitize-html';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
-  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'status', 'approved'];
+  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'status', 'approved'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
   if (typeof post.title !== 'string' || !post.title.trim() || post.title.length > 150 || /[\r\n]/.test(post.title)) throw new Error('E_TITLE');

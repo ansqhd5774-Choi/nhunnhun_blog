@@ -10,6 +10,7 @@ import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
 import { checkUpdateSource, eligibleUpdate, updateFingerprint } from '../publishing/update-core.mjs';
 import { applyEditorialTemplate, renderEditorialPost, assertEditorialSource, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from '../publishing/editorial.mjs';
+import { assertImageReview } from '../publishing/image-review.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
@@ -264,4 +265,18 @@ test('existing-post update workflow is separated from new publication', () => {
   assert.match(all,/pnpm run validate:update/);
   assert.doesNotMatch(all,/pnpm run publish|publishing\/publish\.mjs/);
   assert.equal(w.jobs.update.if,"vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
+});
+
+test('image review gate requires visually checked close-up hero and exact attribution', () => {
+  const body='<p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_A.jpg?width=960" alt="잘라 놓은 과일 단면과 통과일"></p><p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_B.jpg?width=960" alt="과일 내부 구조를 보여주는 단면"></p><p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_C.jpg?width=960" alt="과수원에서 자라는 과일나무"></p><h2>자료 출처</h2><ul><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_A.jpg">A</a></li><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_B.jpg">B</a></li><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_C.jpg">C</a></li></ul>';
+  const review=[
+    {src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_A.jpg?width=960',alt:'잘라 놓은 과일 단면과 통과일',role:'hero',composition:'closeup',sourcePage:'https://commons.wikimedia.org/wiki/File:Fruit_A.jpg',author:'A',license:'CC BY-SA 4.0',visualChecked:true},
+    {src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_B.jpg?width=960',alt:'과일 내부 구조를 보여주는 단면',role:'detail',composition:'cross-section',sourcePage:'https://commons.wikimedia.org/wiki/File:Fruit_B.jpg',author:'B',license:'CC BY-SA 4.0',visualChecked:true},
+    {src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_C.jpg?width=960',alt:'과수원에서 자라는 과일나무',role:'context',composition:'context',sourcePage:'https://commons.wikimedia.org/wiki/File:Fruit_C.jpg',author:'C',license:'CC0',visualChecked:true}
+  ];
+  const item={representativeImageUrl:review[0].src,bodyHtml:body,imageReview:review};
+  assert.doesNotThrow(()=>assertImageReview(item));
+  assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,composition:'context'})}),/E_IMAGE_HERO_REVIEW/);
+  assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,alt:'실제와 다른 설명'})}),/E_IMAGE_REVIEW_MISMATCH/);
+  assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:false})}),/E_IMAGE_REVIEW_REQUIRED/);
 });
