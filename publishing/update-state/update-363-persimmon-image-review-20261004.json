@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "9e0a2a03b0968c3ca8c262770725ab88fad3623e5549b4253fbcb0ae8235d649",
   "url": "https://nhunnhun.tistory.com/363",
   "articleId": "363",
+  "previousTitle": "단감 효능·칼로리 총정리｜영양성분·하루 몇 개·보관법·부작용",
+  "title": "단감 효능·칼로리 총정리｜영양성분·하루 몇 개·보관법·부작용",
   "sourceCommit": "2d8ff42302b53b25a173db7f6118fc243eb423ee",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T12:19:13.468Z"
+  "timestamp": "2026-10-04T12:19:27.566Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 3,
+    "h3Styled": 3,
+    "accents": 13,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
