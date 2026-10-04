@@ -9,7 +9,8 @@ const HIGHLIGHT_COLORS=['#fff1a8','#d9f99d','#bfdbfe','#fbcfe8'];
 function count(html,re){ return [...html.matchAll(re)].length; }
 function topicFromTitle(title=''){
   const first=String(title).trim().split(/[\s·:—-]+/)[0];
-  return first || '';
+  if(!first) return '';
+  return first.length>1 && first.endsWith('의') ? first.slice(0,-1) : first;
 }
 function imageTags(html){ return [...html.matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]); }
 function imageSources(html){

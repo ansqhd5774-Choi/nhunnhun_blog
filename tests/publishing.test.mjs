@@ -82,6 +82,22 @@ test('editorial template gives new posts the shared visual hierarchy', () => {
   assert.doesNotThrow(()=>assertEditorialContract(rendered,post.bodyHtml));
 });
 
+test('editorial quick-summary topic removes Korean genitive particle', () => {
+  const post={
+    id:'coffee-topic-test',
+    title:'커피의 역사와 원두 종류 총정리',
+    category:'음식',
+    tags:['커피'],
+    representativeImageUrl:'https://example.org/a.jpg',
+    status:'ready',
+    approved:true,
+    bodyHtml:'<p><img src="https://example.org/a.jpg" alt="a"></p><p>도입 <u>강조 하나</u></p><p><img src="https://example.org/b.jpg" alt="b"></p><blockquote><strong>핵심만 먼저:</strong> <u>강조 둘</u> 요약</blockquote><p><img src="https://example.org/c.jpg" alt="c"></p><h2>1</h2><p><a href="https://example.org/a">A</a></p><h2>2</h2><p><a href="https://example.net/b">B</a></p><h2>3</h2><p>본문</p><h2>4</h2><p>본문</p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
+  };
+  const rendered=renderEditorialPost(post);
+  assert.match(rendered,/커피, 이것만 먼저 보세요/);
+  assert.doesNotMatch(rendered,/커피의, 이것만 먼저 보세요/);
+});
+
 test('new public article requires complete editorial source structure', () => {
   const valid={
     id:'editorial-post',

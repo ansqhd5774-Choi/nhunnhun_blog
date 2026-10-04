@@ -11,3 +11,5 @@
 - `submitting` 상태에서 결과가 불명확하면 자동 재수정하지 않는다.
 - 수정 후 같은 URL의 익명 공개 페이지에서 제목·본문·Editorial R3·대표 이미지·PC/모바일을 검증한 뒤에만 `updated`로 기록한다.
 - 기존 글을 수정한다는 이유로 새 숫자 URL을 만들지 않는다.
+
+- 같은 articleId를 다시 최신화해야 할 경우 기존 완료 source를 `updates/archive/`로 보존하고, 현재 공개 제목을 `expectedCurrentTitle`로 둔 새 revision source 1개만 root에 둔다. 과거 update revision과 ledger는 삭제하지 않는다.
