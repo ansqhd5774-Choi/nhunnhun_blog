@@ -1,7 +1,24 @@
 {
-  "phase": "submitting",
+  "phase": "failed",
   "fingerprint": "0e02f328fe51a5fb0cdb647c397b3bf444888ca432d27a1c9d5b23cad5c7bc00",
   "sourceCommit": "5cb27011462710cab623e864ed703ae1eabb7b02",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T13:55:53.164Z"
+  "submittingTimestamp": "2026-10-04T13:55:53.164Z",
+  "timestamp": "2026-10-04T13:57:00.000Z",
+  "failureStage": "final-submit",
+  "failureCode": "E_RUNTIME",
+  "publicMutationConfirmed": false,
+  "checkedPublicUrls": [
+    "https://nhunnhun.tistory.com/371",
+    "https://nhunnhun.tistory.com/372",
+    "https://nhunnhun.tistory.com/373",
+    "https://nhunnhun.tistory.com/374",
+    "https://nhunnhun.tistory.com/375",
+    "https://nhunnhun.tistory.com/376",
+    "https://nhunnhun.tistory.com/377",
+    "https://nhunnhun.tistory.com/378",
+    "https://nhunnhun.tistory.com/379",
+    "https://nhunnhun.tistory.com/380"
+  ],
+  "verification": "anonymous_public_404_371_380_after_failed_final_submit"
 }
