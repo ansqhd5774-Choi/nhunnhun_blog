@@ -1,3 +1,4 @@
+import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -197,7 +198,7 @@ function assertSnapshot(snapshot,expected){
   if(expected.sources&&!snapshot.sourcesStyled) throw new Error('E_UPDATE_PUBLIC_SOURCES');
 }
 async function verifyDesktop(browser,update,targetHtml,expected){
-  const context=await browser.newContext({viewport:{width:1440,height:1000}});
+  const context=await verificationContext(browser, {viewport:{width:1440,height:1000}});
   try{
     const page=await context.newPage();
     await page.goto(update.targetUrl,{waitUntil:'domcontentloaded'});
@@ -217,7 +218,7 @@ async function verifyDesktop(browser,update,targetHtml,expected){
   }finally{await context.close();}
 }
 async function verifyMobile(browser,update){
-  const context=await browser.newContext({
+  const context=await verificationContext(browser, {
     viewport:{width:390,height:844},
     userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
   });
