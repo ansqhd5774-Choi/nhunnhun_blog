@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "3be26ebed526932688a5f0b19e2dc079a8a20aa53a769dc0b601bae3254a1025",
   "url": "https://nhunnhun.tistory.com/305",
   "articleId": "305",
+  "previousTitle": "브로멜라인(Bromelain)으로 다이어트 효과 극대화!! 지방을 태우는 비밀!!",
+  "title": "브로멜라인 효능·부작용 총정리｜체중감량 근거·복용 주의사항",
   "sourceCommit": "f4a1b21c214820f9d9073907ad6d0487feacaa2c",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T09:06:27.753Z"
+  "timestamp": "2026-10-04T09:06:38.940Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
