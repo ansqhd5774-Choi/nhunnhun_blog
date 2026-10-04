@@ -237,19 +237,19 @@ try{
       await page.locator('#publish-layer-btn').click();
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
-      const repPath=join(tempDir,'update-representative.bin');
-      await downloadImage(update.representativeImageUrl,repPath);
-      const repInput=thumb.locator('input[type="file"]');
-      if(await repInput.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
-      await repInput.setInputFiles(repPath);
-      await page.waitForFunction(()=>{
-        const box=document.querySelector('.publish_editor .box_thumb');
-        if(!box) return false;
+      const repUploaded=imageMap.get(update.representativeImageUrl);
+      if(!repUploaded) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      const repPathname=new URL(repUploaded).pathname;
+      const thumbState=await thumb.evaluate((box,pathname)=>{
         const text=(box.textContent||'').trim();
-        return !text.includes('대표이미지 추가') || !!box.querySelector('img,[style*="background-image"]');
-      },{timeout:10000});
-      const thumbText=(await thumb.innerText().catch(()=>''))||'';
-      if(thumbText.includes('대표이미지 추가') && await thumb.locator('img,[style*="background-image"]').count()===0) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+        const img=box.querySelector('img');
+        const styleNode=box.querySelector('[style*="background-image"]');
+        const raw=[img?.getAttribute('src')||'',styleNode?.getAttribute('style')||''].join(' ');
+        let decoded=raw;
+        try{decoded=decodeURIComponent(raw);}catch{}
+        return {hasVisual:!!(img||styleNode),isEmpty:text.includes('대표이미지 추가'),matches:decoded.includes(pathname)};
+      },repPathname);
+      if(!thumbState.hasVisual || thumbState.isEmpty || !thumbState.matches) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
 
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
