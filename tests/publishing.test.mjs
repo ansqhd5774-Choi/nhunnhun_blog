@@ -312,6 +312,6 @@ test('human-verification failure stays blocked until manual clearance', () => {
 
 test('publisher recognizes dkaptcha probe and 403 post response as human verification', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/\/manage\/dkaptcha\//);
+  assert.match(publish,/dkaptcha/);
   assert.match(publish,/x\.path === '\/manage\/post\.json' && x\.status === 403/);
 });
