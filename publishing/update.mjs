@@ -255,10 +255,16 @@ try{
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
-      stage='restore-basic-editor';
-      await page.locator('#editor-mode-layer-btn-open').click();
-      await page.locator('#editor-mode-kakao').click();
-      await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:10000});
+      stage='restore-basic-open';
+      const modeOpen=page.locator('#editor-mode-layer-btn-open');
+      if(await modeOpen.count()!==1) throw new Error('E_UPDATE_EDITOR_MODE_CONTROL');
+      await modeOpen.evaluate(el=>el.click());
+      stage='restore-basic-select';
+      const basicMode=page.locator('#editor-mode-kakao');
+      await basicMode.waitFor({state:'attached',timeout:10000});
+      await basicMode.evaluate(el=>el.click());
+      stage='restore-basic-ready';
+      await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:15000});
 
       stage='render-update';
       const rendered=renderEditorialPost(update);
