@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { localBrowserConfig, assertDedicatedProfile, assertLocalGit, openEditorContext, openPublicBrowser } from '../publishing/local-browser.mjs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
+import { checkUpdateSource, eligibleUpdate, updateFingerprint } from '../publishing/update-core.mjs';
 import { applyEditorialTemplate, renderEditorialPost, assertEditorialSource, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from '../publishing/editorial.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
@@ -206,4 +207,38 @@ test('retired execution records remain byte-identical and outside active workflo
     assert.doesNotMatch(readFileSync(new URL('../.github/workflows/'+name,import.meta.url),'utf8'),/BROWSERBASE_|pwsh|powershell/i);
   }
   assert.doesNotMatch(readFileSync(new URL('../pnpm-lock.yaml',import.meta.url),'utf8'),/@browserbasehq/);
+});
+
+
+test('existing-post update source is locked to one numeric public URL', () => {
+  const update={
+    id:'update-111-coffee-history-20261004',
+    articleId:'111',
+    targetUrl:'https://nhunnhun.tistory.com/111',
+    expectedCurrentTitle:'기존 제목',
+    title:'새 제목',
+    representativeImageUrl:'https://example.org/a.jpg',
+    bodyHtml:'<p><img src="https://example.org/a.jpg" alt="a"></p><p>도입</p><p><img src="https://example.org/b.jpg" alt="b"></p><blockquote><strong>핵심만 먼저:</strong> 요약</blockquote><p><img src="https://example.org/c.jpg" alt="c"></p><h2>1</h2><p>내용</p><h2>2</h2><p>내용</p><h2>3</h2><p>내용</p><h2>4</h2><p>내용</p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/1">1</a></li><li><a href="https://example.net/2">2</a></li></ul>',
+    status:'ready',
+    approved:true
+  };
+  assert.equal(checkUpdateSource(update,update.id+'.json').articleId,'111');
+  assert.equal(eligibleUpdate(update,null),true);
+  const state={phase:'updated',fingerprint:updateFingerprint(update),url:update.targetUrl};
+  assert.equal(eligibleUpdate(update,state),false);
+  assert.throws(()=>checkUpdateSource({...update,targetUrl:'https://nhunnhun.tistory.com/112'},update.id+'.json'),/E_UPDATE_URL/);
+  assert.throws(()=>eligibleUpdate(update,{phase:'submitting',fingerprint:updateFingerprint(update),url:update.targetUrl}),/E_UPDATE_EXISTING_STATE_REQUIRES_REVIEW/);
+});
+
+test('existing-post update workflow is separated from new publication', () => {
+  const w=parse(readFileSync(new URL('../.github/workflows/update-posts.yml',import.meta.url),'utf8'));
+  assert.equal(w.jobs['validate-update']['runs-on'],'ubuntu-latest');
+  assert.deepEqual(w.jobs.update['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
+  assert.deepEqual(w.jobs.update.defaults,{run:{shell:'cmd'}});
+  assert.equal(w.jobs.update.needs,'validate-update');
+  const all=JSON.stringify(w);
+  assert.match(all,/pnpm run update/);
+  assert.match(all,/pnpm run validate:update/);
+  assert.doesNotMatch(all,/pnpm run publish|publishing\/publish\.mjs/);
+  assert.equal(w.jobs.update.if,"vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
 });

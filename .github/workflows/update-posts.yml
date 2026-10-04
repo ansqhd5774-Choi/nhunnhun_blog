@@ -1,0 +1,62 @@
+name: Validate and update Tistory posts
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'updates/**'
+      - 'publishing/update.mjs'
+      - 'publishing/update-core.mjs'
+      - 'publishing/update-ledger.mjs'
+      - 'publishing/validate-update.mjs'
+      - 'tests/publishing.test.mjs'
+      - 'package.json'
+      - '.github/workflows/update-posts.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-tistory-update
+  cancel-in-progress: false
+jobs:
+  validate-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm test
+      - run: pnpm run validate:update
+  update:
+    concurrency:
+      group: nhunnhun-tistory-update-runtime
+      cancel-in-progress: false
+    needs: validate-update
+    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm test
+      - run: pnpm run validate:update
+      - run: pnpm run update
+        env:
+          UPDATE_ENABLED: 'true'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog

@@ -5,7 +5,9 @@
   "scripts": {
     "test": "node --test tests/publishing.test.mjs",
     "validate": "node publishing/validate.mjs",
-    "publish": "node publishing/publish.mjs"
+    "publish": "node publishing/publish.mjs",
+    "validate:update": "node publishing/validate-update.mjs",
+    "update": "node publishing/update.mjs"
   },
   "dependencies": {
     "playwright-core": "1.63.0",
