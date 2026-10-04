@@ -19,6 +19,25 @@ try {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   if (!authenticated) throw new Error('E_LOGIN_REQUIRED');
+  // Let the login redirect settle, then verify a fresh server request before closing Chrome.
+  await page.waitForTimeout(10000);
+  await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
+  try {
+    await page.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
+  } catch { throw new Error('E_LOGIN_SESSION_UNSTABLE'); }
+  const settledUrl = new URL(page.url());
+  if (settledUrl.origin !== BLOG || settledUrl.pathname !== '/manage/posts') throw new Error('E_LOGIN_SESSION_UNSTABLE');
+  console.log('LOGIN_CURRENT_SESSION_PASS');
+  await context.close();
+  context = null;
+  context = await openEditorContext(await localBrowserConfig());
+  const verification = await context.newPage();
+  await verification.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
+  try {
+    await verification.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
+  } catch { throw new Error('E_LOGIN_NOT_PERSISTED'); }
+  const verifiedUrl = new URL(verification.url());
+  if (verifiedUrl.origin !== BLOG || verifiedUrl.pathname !== '/manage/posts') throw new Error('E_LOGIN_NOT_PERSISTED');
   await context.close();
   context = null;
   console.log('LOGIN_SAVED');

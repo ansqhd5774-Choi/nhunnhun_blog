@@ -34,7 +34,7 @@ export function assertLocalGit(run = execFileSync) {
 }
 export async function openEditorContext(config, { headless = true, engine = chromium } = {}) {
   try {
-    return await engine.launchPersistentContext(config.profileDir, {headless, executablePath:config.chromePath});
+    return await engine.launchPersistentContext(config.profileDir, {headless, executablePath:config.chromePath, args:['--restore-last-session']});
   } catch { throw new Error('E_LOCAL_BROWSER_LAUNCH'); }
 }
 export async function openPublicBrowser(config, engine = chromium) {
