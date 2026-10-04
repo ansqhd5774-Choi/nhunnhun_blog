@@ -190,6 +190,7 @@ try {
       await page.getByLabel('공개', {exact:true}).check();
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
       await publishButton.waitFor({state:'visible'});
+      if (!(await publishButton.isEnabled())) throw new Error('E_PUBLISH_BUTTON_DISABLED');
       if (await page.locator('#post-title-inp').inputValue() !== post.title) throw new Error('E_TITLE_MISMATCH');
       // Durable checkpoint BEFORE the irreversible final click. A timeout must never resubmit blindly.
       const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
@@ -198,9 +199,37 @@ try {
       assertCurrentSource();
       await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()}, previousStateSha);
       stage = 'final-submit';
-      await publishButton.click();
-      await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname));
-      await page.locator('a').filter({hasText:post.title}).first().waitFor({state:'visible'});
+      const submitResponses = [];
+      const recordSubmitResponse = response => {
+        try {
+          if (response.request().method() !== 'POST') return;
+          const u = new URL(response.url());
+          submitResponses.push({host:u.host,path:u.pathname,status:response.status()});
+        } catch {}
+      };
+      page.on('response', recordSubmitResponse);
+      try {
+        await publishButton.click({timeout:10000});
+        try {
+          await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname), {timeout:8000});
+        } catch {
+          // Tistory may change its post-submit redirect without changing the write result.
+          // Navigate read-only to the canonical post list and verify the exact title instead of clicking twice.
+          await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
+        }
+      } catch (error) {
+        const notices = await page.locator('[role="alert"],.toast,.alert,.notice').evaluateAll(nodes => nodes
+          .map(n => (n.textContent || '').replace(/\s+/g,' ').trim())
+          .filter(Boolean).slice(0,5)).catch(()=>[]);
+        console.log('FINAL_SUBMIT_RESPONSES '+JSON.stringify(submitResponses.slice(-12)));
+        console.log('FINAL_SUBMIT_NOTICES '+JSON.stringify(notices));
+        if (submitResponses.some(x => x.status === 429)) throw new Error('E_PUBLISH_RATE_LIMIT');
+        if (submitResponses.some(x => x.status >= 400)) throw new Error('E_PUBLISH_HTTP');
+        throw new Error('E_FINAL_SUBMIT_INTERACTION');
+      } finally {
+        page.off('response', recordSubmitResponse);
+      }
+      await page.locator('a').filter({hasText:post.title}).first().waitFor({state:'visible',timeout:10000});
       const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
         .filter(a => (a.textContent || '').trim() === title)
         .map(a => a.href)
