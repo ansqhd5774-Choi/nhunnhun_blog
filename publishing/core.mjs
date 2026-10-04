@@ -60,7 +60,10 @@ export function eligible(post, state) {
   if (post.status !== 'ready' || !post.approved) return false;
   if (!state) return true;
   if (state.phase === 'published') return false;
-  if (state.phase === 'failed' && state.publicMutationConfirmed === false && state.fingerprint === fingerprint(post)) return true;
+  if (state.phase === 'failed' && state.publicMutationConfirmed === false && state.fingerprint === fingerprint(post)) {
+    if (state.failureCode === 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED') return false;
+    return true;
+  }
   // An uncertain submission never retries automatically. A retry is allowed only after
   // an evidence-backed recovery explicitly records phase=failed and no public mutation.
   throw new Error('E_EXISTING_PUBLICATION_REQUIRES_REVIEW');
