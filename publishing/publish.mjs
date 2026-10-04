@@ -95,6 +95,7 @@ function replaceImageSources(html, mapping, representativeSource) {
 }
 
 let editorContext, publicBrowser, editorPage, imageTempDir;
+let finalSubmitDialogs = [];
 let stage = 'configuration';
 try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
@@ -199,6 +200,7 @@ try {
       assertCurrentSource();
       await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()}, previousStateSha);
       stage = 'final-submit';
+      finalSubmitDialogs = [];
       const submitResponses = [];
       const recordSubmitResponse = response => {
         try {
@@ -207,29 +209,60 @@ try {
           submitResponses.push({host:u.host,path:u.pathname,status:response.status()});
         } catch {}
       };
+      const readSubmitSignals = async () => {
+        const notices = await page.locator('[role="alert"],.toast,.alert,.notice').evaluateAll(nodes => nodes
+          .map(n => (n.textContent || '').replace(/\s+/g,' ').trim())
+          .filter(Boolean).slice(0,8)).catch(()=>[]);
+        const layerText = ((await page.locator('.publish_editor').innerText().catch(()=>'')) || '').replace(/\s+/g,' ').trim().slice(0,800);
+        return {notices,layerText,dialogs:finalSubmitDialogs.slice(-8)};
+      };
+      const classifySubmitSignals = signals => {
+        const text=[...(signals.notices||[]),...(signals.dialogs||[]).map(x=>x.message),signals.layerText||''].join(' ');
+        if (/하루.{0,30}(?:공개|새롭게).{0,30}발행|최대\s*(?:15|30)개|공개\s*발행.{0,30}제한/.test(text)) return 'E_TISTORY_DAILY_PUBLISH_LIMIT';
+        if (/자동입력|보안문자|captcha|recaptcha|사람인지|로봇/i.test(text)) return 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED';
+        return null;
+      };
       page.on('response', recordSubmitResponse);
+      let navigatedToPostList = false;
       try {
         await publishButton.click({timeout:10000});
+        await page.waitForTimeout(1200);
+        const immediateSignals = await readSubmitSignals();
+        console.log('FINAL_SUBMIT_RESPONSES '+JSON.stringify(submitResponses.slice(-12)));
+        console.log('FINAL_SUBMIT_SIGNALS '+JSON.stringify(immediateSignals));
+        const immediateCode=classifySubmitSignals(immediateSignals);
+        if(immediateCode) throw new Error(immediateCode);
         try {
           await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname), {timeout:8000});
+          navigatedToPostList = true;
         } catch {
           // Tistory may change its post-submit redirect without changing the write result.
           // Navigate read-only to the canonical post list and verify the exact title instead of clicking twice.
           await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
+          navigatedToPostList = true;
         }
       } catch (error) {
-        const notices = await page.locator('[role="alert"],.toast,.alert,.notice').evaluateAll(nodes => nodes
-          .map(n => (n.textContent || '').replace(/\s+/g,' ').trim())
-          .filter(Boolean).slice(0,5)).catch(()=>[]);
+        const signals = await readSubmitSignals();
         console.log('FINAL_SUBMIT_RESPONSES '+JSON.stringify(submitResponses.slice(-12)));
-        console.log('FINAL_SUBMIT_NOTICES '+JSON.stringify(notices));
+        console.log('FINAL_SUBMIT_SIGNALS '+JSON.stringify(signals));
+        const signalCode=classifySubmitSignals(signals);
+        if(signalCode) throw new Error(signalCode);
+        if (/^E_[A-Z_]+$/.test(error?.message ?? '')) throw error;
         if (submitResponses.some(x => x.status === 429)) throw new Error('E_PUBLISH_RATE_LIMIT');
         if (submitResponses.some(x => x.status >= 400)) throw new Error('E_PUBLISH_HTTP');
         throw new Error('E_FINAL_SUBMIT_INTERACTION');
       } finally {
         page.off('response', recordSubmitResponse);
       }
-      await page.locator('a').filter({hasText:post.title}).first().waitFor({state:'visible',timeout:10000});
+      if (!navigatedToPostList) throw new Error('E_PUBLICATION_UNCERTAIN');
+      const titleLink = page.locator('a').filter({hasText:post.title}).first();
+      if (!(await titleLink.isVisible().catch(()=>false))) {
+        const signals = await readSubmitSignals();
+        console.log('FINAL_SUBMIT_POSTLIST '+JSON.stringify({urlPath:new URL(page.url()).pathname,signals}));
+        const signalCode=classifySubmitSignals(signals);
+        if(signalCode) throw new Error(signalCode);
+        throw new Error('E_PUBLICATION_NOT_FOUND_AFTER_CLICK');
+      }
       const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
         .filter(a => (a.textContent || '').trim() === title)
         .map(a => a.href)
