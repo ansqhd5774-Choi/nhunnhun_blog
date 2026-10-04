@@ -357,7 +357,7 @@ try{
     }
   }
 }catch(error){
-  const code=/^E_[A-Z_]+$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
+  const code=/^E_[A-Z0-9_]+$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
   console.error('UPDATE_DIAGNOSTIC: '+stage+' '+code);
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;
