@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "deee162bf5ed5c98df857b5800a81a497916b3e012198d502162fd17eb03f871",
   "url": "https://nhunnhun.tistory.com/354",
   "articleId": "354",
+  "previousTitle": "꽃게 효능·영양성분·부작용 총정리",
+  "title": "꽃게 효능·영양성분 총정리｜칼로리·콜레스테롤·게장 주의사항",
   "sourceCommit": "bda9af32ad718fa559413c16a2e6ece22a1988ba",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T06:07:25.995Z"
+  "timestamp": "2026-10-04T06:07:37.647Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 12,
+    "h2Styled": 12,
+    "h3": 2,
+    "h3Styled": 2,
+    "accents": 12,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
