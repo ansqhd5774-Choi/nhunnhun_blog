@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "e7d2077aabb7a9bd7fbda5ecad5e85c7b8d6dbc53ce5e70144ea9768e08f5fba",
   "url": "https://nhunnhun.tistory.com/199",
   "articleId": "199",
+  "previousTitle": "베이크드 빈스(Baked Beans) 단백질과 식이섬유가 풍부한 건강한 선택!!",
+  "title": "베이크드 빈스 칼로리·영양성분｜다이어트, 먹는 법과 보관",
   "sourceCommit": "8610811ead23b0515fb92ef8cb25f83863fd5894",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T11:43:55.492Z"
+  "timestamp": "2026-10-04T11:44:14.211Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 9,
+    "h2Styled": 9,
+    "h3": 2,
+    "h3Styled": 2,
+    "accents": 9,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 4,
+    "highlightColors": 4,
+    "faqQ": 4,
+    "faqA": 4,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
