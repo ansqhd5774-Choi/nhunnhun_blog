@@ -41,10 +41,34 @@ export function assertImagePayload(contentType,b) {
   if(!jpeg&&!png&&!gif&&!webp) throw new Error('E_QA_IMAGE_SIGNATURE');
   return b;
 }
+function qaRetryDelayMs(response,attempt) {
+  const retryAfter=String(response.headers()['retry-after']||'').trim();
+  if(retryAfter) {
+    const seconds=Number(retryAfter);
+    const ms=Number.isFinite(seconds)
+      ? Math.max(0,seconds*1000)
+      : Math.max(0,Date.parse(retryAfter)-Date.now());
+    if(ms>120000) throw new Error('E_QA_RATE_LIMIT_LONG');
+    if(ms>0) return ms;
+  }
+  return Math.min(30000,5000*(2**attempt));
+}
 async function bytes(request,url,role) {
-  const response=await request.get(url,{timeout:30000,headers:{'User-Agent':'Mozilla/5.0','Accept':'image/*'}});
-  console.log('PUBLIC_QA_ASSET '+JSON.stringify({role,host:new URL(url).hostname,status:response.status(),mime:String(response.headers()['content-type']||'').replace(/[^a-z0-9/;= ._-]/gi,'').slice(0,100)}));
-  if(!response.ok()) throw new Error('E_QA_IMAGE_FETCH');
+  let response;
+  for(let attempt=0;attempt<4;attempt++) {
+    response=await request.get(url,{
+      timeout:30000,
+      headers:{
+        'User-Agent':'NHUNNHUN-Tistory-Publisher/1.0 (https://nhunnhun.tistory.com/)',
+        'Accept':'image/*'
+      }
+    });
+    console.log('PUBLIC_QA_ASSET '+JSON.stringify({role,host:new URL(url).hostname,status:response.status(),mime:String(response.headers()['content-type']||'').replace(/[^a-z0-9/;= ._-]/gi,'').slice(0,100)}));
+    if(response.ok()) break;
+    if(![429,503].includes(response.status())) throw new Error('E_QA_IMAGE_FETCH');
+    await new Promise(r=>setTimeout(r,qaRetryDelayMs(response,attempt)));
+  }
+  if(!response?.ok()) throw new Error('E_QA_IMAGE_FETCH');
   // Tistory .bin assets are served as octet-stream. Validate signatures, then
   // require exact SHA256 equality to the independently fetched image source.
   return assertImagePayload(response.headers()['content-type'],await response.body());
