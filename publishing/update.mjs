@@ -200,17 +200,20 @@ try{
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
-      stage='prepare-images';
-      await page.locator('#editor-mode-layer-btn-open').click();
-      const basic=page.getByText('기본모드',{exact:true});
-      if(await basic.count()) await basic.last().click();
-      await page.waitForTimeout(500);
+      stage='reload-basic';
+      await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
+      await page.locator('#post-title-inp').waitFor({state:'visible'});
+      if((await page.locator('#post-title-inp').inputValue()).trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
 
+      stage='render-update';
       const rendered=renderEditorialPost(update);
       const expected=editorialExpectations(update.bodyHtml);
       const sources=[...new Set(imageSources(rendered))];
       const imageMap=new Map();
-      for(let i=0;i<sources.length;i++) imageMap.set(sources[i],await uploadImage(page,sources[i],i,tempDir));
+      for(let i=0;i<sources.length;i++){
+        stage=`image-upload-${i+1}`;
+        imageMap.set(sources[i],await uploadImage(page,sources[i],i,tempDir));
+      }
       const targetHtml=replaceImageSources(rendered,imageMap,update.representativeImageUrl);
 
       stage='stage-content';
