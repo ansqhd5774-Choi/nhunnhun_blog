@@ -2388,3 +2388,290 @@ pre > code.hljs {
 .hljs-ln td.hljs-ln-code {
 	padding-left: 10px;
 }
+
+
+/* NHUNNHUN_SKIN_R1_FOUNDATION_20261002 */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline: 2px solid #0052B3 !important;
+  outline-offset: 2px !important;
+}
+#content { opacity: 1; }
+
+.post-content img,
+.contents_style img,
+.post-content figure,
+.contents_style figure {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.post-content img,
+.contents_style img { height: auto !important; }
+.post-content p > img,
+.contents_style p > img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.post-content ul,
+.contents_style ul { list-style: disc outside !important; }
+.post-content ol,
+.contents_style ol { list-style: decimal outside !important; }
+.post-content ul,
+.post-content ol,
+.contents_style ul,
+.contents_style ol { padding-left: 1.4rem; }
+.post-content ul li,
+.post-content ol li,
+.contents_style ul li,
+.contents_style ol li { margin-left: .5rem; }
+
+.post-content a,
+.contents_style a {
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}
+.post-content a:hover,
+.contents_style a:hover {
+  font-weight: inherit !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.post-content,
+.contents_style { overflow-wrap: anywhere; }
+.post-content table,
+.contents_style table {
+  max-width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+}
+@media only screen and (max-width: 600px) {
+  .post-content table,
+  .contents_style table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .post-content th,
+  .post-content td,
+  .contents_style th,
+  .contents_style td { min-width: 8rem; }
+}
+/* /NHUNNHUN_SKIN_R1_FOUNDATION_20261002 */
+
+
+
+
+/* ZG article media responsive R1 */
+#tt-body-page .post-content img,
+#tt-body-page .contents_style img {
+  max-width: 100% !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+#tt-body-page .post-content figure,
+#tt-body-page .contents_style figure {
+  max-width: 100%;
+}
+
+
+
+
+/* ZG performance stability R1 */
+html,body,button,input,select,textarea {
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif !important;
+}
+#content,
+#content.show {
+  opacity: 1 !important;
+  transition: none !important;
+}
+#tt-body-page .post-content img,
+#tt-body-page .contents_style img {
+  max-width: 100% !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+
+
+
+
+/* ZG performance stability R1B */
+html,body,button,input,select,textarea {
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif !important;
+}
+#content,
+#content.show {
+  opacity: 1 !important;
+  transition: none !important;
+}
+#tt-body-page .post-content img,
+#tt-body-page .contents_style img {
+  max-width: 100% !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+
+
+
+
+/* ZG apple image perf R1 */
+#tt-body-page .contents_style img[alt="붉은 사과 두 개"] {
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 605;
+}
+#tt-body-page .contents_style img[alt="반으로 자른 사과"] {
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 640;
+}
+
+
+
+
+/* ZG perf fallback R1C */
+#tt-body-page .contents_style img[alt="붉은 사과 두 개"]{
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 605;
+}
+#tt-body-page .contents_style img[alt="반으로 자른 사과"]{
+  width:100% !important;
+  max-width:720px !important;
+  height:auto !important;
+  aspect-ratio:960 / 640;
+}
+
+
+
+
+/* ZG CLS reserve R1 */
+#tt-body-page .contents_style img[alt="붉은 사과 두 개"]{
+  aspect-ratio:960 / 605;
+}
+#tt-body-page .contents_style img[alt="반으로 자른 사과"]{
+  aspect-ratio:960 / 640;
+}
+#tt-body-page .h-entry ins.adsbygoogle,
+#tt-body-page .post-content ins.adsbygoogle,
+#tt-body-page .ads-wrap{
+  min-height:100px !important;
+  contain-intrinsic-size:auto 100px;
+}
+
+
+
+
+/* ZG CLS reserve R2 */
+#tt-body-page .contents_style img[alt="붉은 사과 두 개"]{
+  aspect-ratio:960 / 605 !important;
+}
+#tt-body-page .contents_style img[alt="반으로 자른 사과"]{
+  aspect-ratio:960 / 640 !important;
+}
+
+/* Default reservation for any unclassified responsive ad. */
+#tt-body-page ins.adsbygoogle{
+  min-height:100px !important;
+  contain-intrinsic-size:auto 100px;
+}
+
+/* Slot-specific reservation from current rendered ad sizes. */
+#tt-body-page ins.adsbygoogle[data-ad-slot="5613406766"],
+#tt-body-page ins.adsbygoogle[data-ad-slot="5411757567"]{
+  min-height:90px !important;
+  contain-intrinsic-size:auto 90px;
+}
+#tt-body-page ins.adsbygoogle[data-ad-slot="8167725887"],
+#tt-body-page ins.adsbygoogle[data-ad-slot="2242689565"]{
+  min-height:100px !important;
+  contain-intrinsic-size:auto 100px;
+}
+#tt-body-page ins.adsbygoogle[data-ad-slot="4164841163"]{
+  min-height:250px !important;
+  contain-intrinsic-size:auto 250px;
+}
+
+/* Do not animate the fixed header height on article pages during initial render. */
+#tt-body-page #header_wrap,
+#tt-body-page #header_wrap.shrink{
+  transition:none !important;
+}
+
+
+
+
+/* ZG performance layout R3 */
+/* The large inline auto-TOC is inserted after parsing and caused ~0.535 mobile CLS.
+   Keep the floating TOC behavior, but remove the layout-affecting inline TOC on small screens. */
+@media only screen and (max-width:600px){
+  #tt-body-page .e-content.post-content > .toc-space{
+    display:none !important;
+  }
+}
+
+
+
+
+/* ZG inline TOC no-layout-shift R8 */
+/* Auto TOC is injected after initial paint and caused ~0.20 desktop / ~0.53 mobile CLS.
+   Hide the layout-affecting inline TOC at every viewport. Floating TOC remains independent. */
+#tt-body-page .e-content.post-content > .toc-space{
+  display:none !important;
+}
+
+
+
+
+/* ZG CLS async widgets R3 */
+/* Tistory injects Namecard and Comment React apps after first paint.
+   Reserve stable off-screen space and isolate their layout. */
+#tt-body-page .post-reply{
+  content-visibility:auto;
+  contain:layout paint;
+  contain-intrinsic-size:auto 360px;
+  min-height:72px;
+}
+#tt-body-page [data-tistory-react-app="Namecard"]{
+  min-height:80px;
+  contain:layout paint;
+}
+#tt-body-page [data-tistory-react-app="Comment"],
+#tt-body-page [id^="entry"][id$="Comment"]{
+  min-height:280px;
+  content-visibility:auto;
+  contain:layout paint;
+  contain-intrinsic-size:auto 280px;
+}
+
+
+
+
+/* ZG nonblocking material icons R4 */
+.material-icons-outlined,
+.material-icons-round,
+.material-icon,
+.toc-icon,
+.floating-toc-icon{
+  display:inline-block;
+  min-width:1em;
+  width:1em;
+  line-height:1;
+}
+
+
+
+/* BLOG A11Y R1 LIVE */
+#search-bar .input-text{min-height:48px;line-height:48px}
+#search-bar .search-icon,#search-bar .search-close-icon{min-width:48px;min-height:48px}
+.post-reply .tt_box_namecard .tt_desc,.post-reply .tt_box_namecard a.tt_desc{color:#333!important}
+
+/* BLOG CRAWL UI R1 LIVE */
+.meta-svg,.page-icon{display:inline-block;vertical-align:middle;fill:currentColor;flex:0 0 auto}
+.post_list .meta-svg{margin-right:3px}
+#footer{justify-content:center}
