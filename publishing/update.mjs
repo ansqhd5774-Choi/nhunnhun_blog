@@ -39,58 +39,66 @@ async function downloadImage(url,path){
 }
 async function uploadImage(page,sourceUrl,index,tempDir){
   const path=join(tempDir,`update-image-${index}.bin`);
-  await downloadImage(sourceUrl,path);
-  const input=page.locator('#attach-image');
-  if(await input.count()===0){
-    await page.locator('#attach-layer-btn').first().click();
-    await input.waitFor({state:'attached',timeout:10000});
-  }
-  const responsePromise=page.waitForResponse(res=>
-    res.url().includes('/manage/post/attach.json') &&
-    res.request().method()==='POST'
-  ,{timeout:30000});
+  let step='download';
   try{
-    await input.setInputFiles(path);
-  }catch{
-    throw new Error('E_UPDATE_IMAGE_INPUT');
-  }
-  let uploadResponse;
-  try{
-    uploadResponse=await responsePromise;
-  }catch{
-    throw new Error('E_UPDATE_IMAGE_RESPONSE_TIMEOUT');
-  }
-  if(uploadResponse.status()!==200) throw new Error('E_UPDATE_IMAGE_UPLOAD_HTTP');
-  let data;
-  try{
-    data=await uploadResponse.json();
-  }catch{
-    throw new Error('E_UPDATE_IMAGE_UPLOAD_RESPONSE');
-  }
-  if(!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_UPDATE_IMAGE_UPLOAD');
-  await page.waitForTimeout(400);
-  return data.url;
-}
-async function ensureBasicEditor(page){
-  if(await page.locator('#attach-image, #attach-layer-btn').count()) return;
-  const open=page.locator('#editor-mode-layer-btn-open');
-  if(await open.count()!==1) throw new Error('E_UPDATE_EDITOR_MODE_CONTROL');
-  await open.click();
-  const candidates=[
-    page.locator('#editor-mode-basic'),
-    page.getByText('기본모드',{exact:true}),
-    page.getByText('기본 모드',{exact:true})
-  ];
-  let switched=false;
-  for(const candidate of candidates){
-    if(await candidate.count()){
-      await candidate.last().click();
-      switched=true;
-      break;
+    await downloadImage(sourceUrl,path);
+    step='input-probe';
+    const input=page.locator('#attach-image');
+    const inputCount=await input.count();
+    if(inputCount===0){
+      step='attach-button';
+      const button=page.locator('#attach-layer-btn').first();
+      await button.click();
+      step='input-attach-wait';
+      await input.waitFor({state:'attached',timeout:10000});
     }
+    step='response-arm';
+    const responsePromise=page.waitForResponse(res=>
+      res.url().includes('/manage/post/attach.json') &&
+      res.request().method()==='POST'
+    ,{timeout:30000});
+    step='set-input';
+    try{
+      await input.setInputFiles(path);
+    }catch{
+      throw new Error('E_UPDATE_IMAGE_INPUT');
+    }
+    step='response-wait';
+    let uploadResponse;
+    try{
+      uploadResponse=await responsePromise;
+    }catch{
+      throw new Error('E_UPDATE_IMAGE_RESPONSE_TIMEOUT');
+    }
+    step='response-status';
+    if(uploadResponse.status()!==200) throw new Error('E_UPDATE_IMAGE_UPLOAD_HTTP');
+    step='response-json';
+    let data;
+    try{
+      data=await uploadResponse.json();
+    }catch{
+      throw new Error('E_UPDATE_IMAGE_UPLOAD_RESPONSE');
+    }
+    step='response-url';
+    if(!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_UPDATE_IMAGE_UPLOAD');
+    await page.waitForTimeout(400);
+    return data.url;
+  }catch(error){
+    if(/^E_UPDATE_IMAGE_/.test(String(error?.message||''))) throw error;
+    const code={
+      download:'E_UPDATE_IMAGE_DOWNLOAD_UNEXPECTED',
+      'input-probe':'E_UPDATE_IMAGE_INPUT_PROBE',
+      'attach-button':'E_UPDATE_IMAGE_ATTACH_BUTTON',
+      'input-attach-wait':'E_UPDATE_IMAGE_INPUT_ATTACH_WAIT',
+      'response-arm':'E_UPDATE_IMAGE_RESPONSE_ARM',
+      'set-input':'E_UPDATE_IMAGE_INPUT',
+      'response-wait':'E_UPDATE_IMAGE_RESPONSE_TIMEOUT',
+      'response-status':'E_UPDATE_IMAGE_UPLOAD_HTTP',
+      'response-json':'E_UPDATE_IMAGE_UPLOAD_RESPONSE',
+      'response-url':'E_UPDATE_IMAGE_UPLOAD'
+    }[step]||'E_UPDATE_IMAGE_UNKNOWN';
+    throw new Error(code);
   }
-  if(!switched) throw new Error('E_UPDATE_EDITOR_BASIC_CONTROL');
-  await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:10000});
 }
 function replaceImageSources(html,mapping,representativeSource){
   let first=true;
