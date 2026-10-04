@@ -30,8 +30,9 @@ export function checkMeasurements(m,e) {
   if(m.faqQ!==e.faq || m.faqA!==e.faq || !m.heroPriority || m.badLazyImages) throw new Error('E_QA_STRUCTURE');
   return true;
 }
-async function bytes(request,url) {
+async function bytes(request,url,role) {
   const response=await request.get(url,{timeout:30000,headers:{'User-Agent':'Mozilla/5.0','Accept':'image/*'}});
+  console.log('PUBLIC_QA_ASSET '+JSON.stringify({role,host:new URL(url).hostname,status:response.status(),mime:String(response.headers()['content-type']||'').replace(/[^a-z0-9/;= ._-]/gi,'').slice(0,100)}));
   if(!response.ok() || !/^image\//i.test(response.headers()['content-type']||'')) throw new Error('E_QA_IMAGE_FETCH');
   const b=await response.body();
   if(!b.length || b.length>12*1024*1024) throw new Error('E_QA_IMAGE_SIZE');
@@ -83,11 +84,14 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
         faqA:[...el.querySelectorAll('span')].filter(n=>n.textContent.trim()==='A.').length
       };
     });
+    console.log('PUBLIC_QA_METRICS '+JSON.stringify({articleId:update.articleId,width,...metrics}));
     checkMeasurements(metrics,expected);
     if(assetChecks) {
       const og=ogAsset(await page.locator('meta[property="og:image"]').getAttribute('content'));
       const hero=await images.first().getAttribute('src');
-      const [a,b,c]=await Promise.all([bytes(context.request,hero),bytes(context.request,og),bytes(context.request,update.representativeImageUrl)]);
+      const assets=await Promise.allSettled([bytes(context.request,hero,'hero'),bytes(context.request,og,'og'),bytes(context.request,update.representativeImageUrl,'source')]);
+      if(assets.some(a=>a.status!=='fulfilled')) throw new Error('E_QA_IMAGE_FETCH');
+      const [a,b,c]=assets.map(x=>x.value);
       if(hash(a)!==hash(b)||hash(a)!==hash(c)) throw new Error('E_QA_REPRESENTATIVE_CONTENT');
       metrics.representativeSourceMatch=true;
       metrics.ogNative=true;
@@ -113,14 +117,21 @@ async function main() {
   let browser;
   try {
     browser=await openPublicBrowser(await localBrowserConfig());
+    let failures=0;
     for(const update of targets) {
-      const state=await ledger.read(update.id);
-      if(state?.phase!=='updated'||state.url!==update.targetUrl||state.fingerprint!==updateFingerprint(update)) throw new Error('E_QA_LEDGER');
-      const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml);
-      const desktop=await verify(browser,update,1440,expected,rendered,true);
-      const mobile=await verify(browser,update,390,expected,rendered,false);
-      console.log('PUBLIC_QA_PASS '+JSON.stringify({articleId:update.articleId,url:update.targetUrl,title:update.title,desktop,mobile}));
+      try {
+        const state=await ledger.read(update.id);
+        if(state?.phase!=='updated'||state.url!==update.targetUrl||state.fingerprint!==updateFingerprint(update)) throw new Error('E_QA_LEDGER');
+        const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml);
+        const desktop=await verify(browser,update,1440,expected,rendered,true);
+        const mobile=await verify(browser,update,390,expected,rendered,false);
+        console.log('PUBLIC_QA_PASS '+JSON.stringify({articleId:update.articleId,url:update.targetUrl,title:update.title,desktop,mobile}));
+      } catch(error) {
+        failures++;
+        console.log('PUBLIC_QA_FAIL '+JSON.stringify({articleId:update.articleId,code:/^E_QA_[A-Z_]+$/.test(error?.message||'')?error.message:'E_QA_RUNTIME'}));
+      }
     }
+    if(failures) throw new Error('E_QA_INCOMPLETE');
     console.log('PUBLIC_QA_COMPLETE '+targets.length);
   } finally {await browser?.close();}
 }
