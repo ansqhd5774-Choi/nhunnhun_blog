@@ -14,10 +14,16 @@ function imageSources(html){
 async function downloadImage(url,path){
   let last='';
   for(let attempt=0;attempt<4;attempt++){
-    const response=await fetch(url,{
-      headers:{'User-Agent':'Mozilla/5.0','Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'},
-      signal:AbortSignal.timeout(20000)
-    });
+    let response;
+    try{
+      response=await fetch(url,{
+        headers:{'User-Agent':'Mozilla/5.0','Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'},
+        signal:AbortSignal.timeout(20000)
+      });
+    }catch(error){
+      if(error?.name==='TimeoutError'||error?.name==='AbortError') throw new Error('E_UPDATE_IMAGE_DOWNLOAD_TIMEOUT');
+      throw new Error('E_UPDATE_IMAGE_DOWNLOAD_NETWORK');
+    }
     if(response.ok){
       const type=response.headers.get('content-type')??'';
       if(!type.toLowerCase().startsWith('image/')) throw new Error('E_UPDATE_IMAGE_CONTENT_TYPE');
@@ -41,11 +47,26 @@ async function uploadImage(page,sourceUrl,index,tempDir){
   }
   const responsePromise=page.waitForResponse(res=>
     res.url().includes('/manage/post/attach.json') &&
-    res.request().method()==='POST' &&
-    res.status()===200
+    res.request().method()==='POST'
   ,{timeout:30000});
-  await input.setInputFiles(path);
-  const data=await (await responsePromise).json();
+  try{
+    await input.setInputFiles(path);
+  }catch{
+    throw new Error('E_UPDATE_IMAGE_INPUT');
+  }
+  let uploadResponse;
+  try{
+    uploadResponse=await responsePromise;
+  }catch{
+    throw new Error('E_UPDATE_IMAGE_RESPONSE_TIMEOUT');
+  }
+  if(uploadResponse.status()!==200) throw new Error('E_UPDATE_IMAGE_UPLOAD_HTTP');
+  let data;
+  try{
+    data=await uploadResponse.json();
+  }catch{
+    throw new Error('E_UPDATE_IMAGE_UPLOAD_RESPONSE');
+  }
   if(!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_UPDATE_IMAGE_UPLOAD');
   await page.waitForTimeout(400);
   return data.url;
