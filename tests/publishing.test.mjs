@@ -292,3 +292,14 @@ test('image review gate requires visually checked close-up hero and exact attrib
   assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,alt:'실제와 다른 설명'})}),/E_IMAGE_REVIEW_MISMATCH/);
   assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:false})}),/E_IMAGE_REVIEW_REQUIRED/);
 });
+
+
+test('publisher diagnoses Tistory daily limit and human verification without a second click', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/E_TISTORY_DAILY_PUBLISH_LIMIT/);
+  assert.match(publish,/E_TISTORY_HUMAN_VERIFICATION_REQUIRED/);
+  assert.match(publish,/E_PUBLICATION_NOT_FOUND_AFTER_CLICK/);
+  assert.match(publish,/FINAL_SUBMIT_SIGNALS/);
+  const finalBlock=publish.slice(publish.indexOf("stage = 'final-submit'"),publish.indexOf("stage = 'public-verification'"));
+  assert.equal((finalBlock.match(/publishButton\.click\(/g)||[]).length,1);
+});
