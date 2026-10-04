@@ -94,7 +94,7 @@ test('new public article requires complete editorial source structure', () => {
   assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('alt="사과 설명 1"','alt=""')}),/E_EDITORIAL_IMAGE_ALT_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:undefined}),/E_REPRESENTATIVE_IMAGE_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:'https://example.org/other.jpg'}),/E_REPRESENTATIVE_IMAGE_NOT_IN_BODY/);
-  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<blockquote><strong>핵심만 먼저:</strong> 요약</blockquote>','')}),/E_EDITORIAL_QUICK_REQUIRED/);
+  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<blockquote><strong>핵심만 먼저:</strong> <u>강조 둘</u> 요약</blockquote>','')}),/E_EDITORIAL_QUICK_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<h2>핵심 정리</h2>','')}),/E_EDITORIAL_SUMMARY_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<h2>자료 출처</h2>','')}),/E_EDITORIAL_SOURCES_REQUIRED/);
 });
