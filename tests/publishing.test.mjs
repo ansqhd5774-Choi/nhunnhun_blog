@@ -156,6 +156,10 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/E_SOURCE_DRIFT/);
   assert.match(publish,/previousStateSha/);
   assert.match(publish,/stage === 'final-submit'/);
+  assert.match(publish,/E_PUBLISH_BUTTON_DISABLED/);
+  assert.match(publish,/FINAL_SUBMIT_RESPONSES/);
+  assert.match(publish,/page\.goto\(\`\$\{BLOG\}\/manage\/posts\`/);
+  assert.equal((publish.match(/publishButton\.click/g)||[]).length,1);
   assert.match(publish,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
   assert.match(validate,/renderEditorialPost\(post\)/);
 });
