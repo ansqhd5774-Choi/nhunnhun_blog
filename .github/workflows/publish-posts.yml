@@ -5,6 +5,8 @@ on:
     paths:
       - 'posts/**'
       - 'publishing/publish.mjs'
+      - 'publishing/runner-gate.mjs'
+      - 'tests/runner-gate.test.mjs'
       - 'publishing/validate.mjs'
       - 'publishing/core.mjs'
       - 'publishing/editorial.mjs'
@@ -26,12 +28,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Diagnose self-hosted allocation
+        run: node publishing/runner-gate.mjs --queue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: pnpm test
       - run: pnpm validate
         env:
@@ -53,10 +59,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
+      - name: Runner evidence and source drift Gate A
+        run: node publishing/runner-gate.mjs
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test

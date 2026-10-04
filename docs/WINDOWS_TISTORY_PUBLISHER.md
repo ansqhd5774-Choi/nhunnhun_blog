@@ -1,5 +1,23 @@
 # Windows 전용 티스토리 자동화 Runner — 최초 설정
 
+## 2026-10-04 자동 운영 및 Queue 보호
+
+현재 PC는 `NHUNNHUN-Tistory-Runner` 작업 스케줄러로 동일 프로필 소유자의 **Windows 로그인 30초 후** 자동 시작한다. `InteractiveToken` / 최소 권한 / 중복 실행 IgnoreNew / 실행시간 제한 없음으로 구성한다. 로그인하지 않은 부팅 직후에는 실행되지 않는다. 비밀번호 없는 S4U는 네트워크 접근 제약이 있어 사용하지 않는다. Windows 자동 로그인을 활성화하지 않는다.
+
+장애 복구는 작업 실패 후 1분 간격 3회 재시작과 2분 간격 listener 확인으로 구성한다. 이미 실행 중인 listener는 중복 시작하거나 종료하지 않는다. 유지보수 때 `C:\actions-runner\maintenance.stop`을 먼저 생성하고 작업을 중지한다. 재개할 때 해당 marker만 제거한 뒤 작업을 1회 실행한다. 공식 runner의 CMD helper를 사용하며 `run.cmd`의 PowerShell Unblock-File 단계는 사용하지 않는다. listener 정상 종료와 session conflict는 CMD helper의 정상 종료 규칙을 유지한다. 반복 복구를 중지하려면 marker를 유지한다.
+
+서비스가 필요한 경우 GitHub 공식 절차에 따라 기존 runner를 재등록하고 **동일 Windows 사용자**의 서비스 계정을 사용한다. 관리자 CMD와 해당 계정 비밀번호 입력은 사용자가 로컬에서 수행한다. LocalSystem 변경, profile 복사, 비밀번호 인수/로그/채팅 저장은 금지한다. 서비스 복구 정책은 `sc failure <service-name> reset= 86400 actions= restart/60000/restart/120000/restart/300000`으로 적용한다. 서비스와 위 예약 작업은 동시에 사용하지 않는다.
+
+현재 전원 연결 AC 절전 및 최대절전 타이머는 모두 0(사용 안 함)이다. 불필요한 전원 설정 변경은 하지 않았다. NIC 절전 설정은 미검증이며 네트워크가 정상일 때 장애 원인으로 단정하지 않는다.
+
+상태 확인: GitHub Settings → Actions → Runners에서 Online/Idle 또는 Active를 확인한다. Offline은 listener/서비스/작업/PC 상태부터 확인한다. 읽기 전용 `maintenance\check-windows-runner.cmd`는 값이나 프로필 내용 없이 존재 여부를 출력한다. GitHub API 조회 권한이 없는 hosted 진단은 RUNNER_UNREACHABLE로 기록하며 Offline으로 단정하지 않는다.
+
+Queue 확인 순서: 다른 job 사용 여부 → Online → self-hosted/windows/x64/tistory-publisher 네 label → 예약 작업 또는 서비스 실행 여부 → 절전 → 네트워크 → source drift. queued mutation job은 matching self-hosted runner가 아직 배정되지 않았다는 뜻이다. 권한을 추가하거나 PAT를 생성하지 않는다.
+
+모든 checkout은 workflow의 `github.sha`에 고정한다. Windows job의 Gate A는 workflow SHA = checkout SHA = 최신 remote main을 검사하고 불일치하면 BLOCKED_SOURCE_DRIFT로 브라우저 전에 차단한다. 최종 클릭 전 Gate B도 동일 검사한다. Queue 나이 자체로 차단하지 않고 SHA 일치를 기준으로 한다. 기존 테스트/validate와 submitting/published/updated 보호를 유지한다.
+
+재부팅 자체는 작업 중 자동 실행하지 않는다. 로그인 후 자동 실행 설정과 재시작 실측을 구분하고, 실제 재부팅 검증 전에는 reboot PASS로 보고하지 않는다.
+
 목적: 상시 가동 Windows PC의 전용 Chrome 로그인으로 GitHub main의 승인된 신규 글 발행과 기존 글 수정을 수행한다. PC가 꺼져 있거나 runner가 Offline이면 실제 Tistory mutation을 수행하지 못한다. 유료 cloud browser는 표준 경로에서 사용하지 않는다.
 
 소스·테스트 준비 후 실제 runner 등록과 최초 Kakao 로그인은 사용자가 아래 순서로 한 번만 한다. 설정 중 TISTORY_PUBLISH_ENABLED는 false로 유지한다. 등록·로그인 성공을 알려주면 Codex가 runner Online과 표준 workflow를 확인하고 활성화한다.
