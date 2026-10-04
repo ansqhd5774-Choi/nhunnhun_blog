@@ -257,7 +257,7 @@ try{
 
       stage='restore-basic-editor';
       await page.locator('#editor-mode-layer-btn-open').click();
-      await page.locator('#editor-mode-basic').click();
+      await page.locator('#editor-mode-kakao').click();
       await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:10000});
 
       stage='render-update';
