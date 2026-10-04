@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "2bd7a78ab25dd14430763c8b67e47d541f1e12bdd1d09b32d29d6a577af1472f",
   "url": "https://nhunnhun.tistory.com/290",
   "articleId": "290",
+  "previousTitle": "알로에(Aloe)!! 당신의 피부를 젊게 만드는 놀라운 비밀!!",
+  "title": "알로에 효능·부작용 총정리｜젤·라텍스 차이와 먹을 때 주의사항",
   "sourceCommit": "401e33f59d3e3831646720702ae8a62f1ab8392c",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T10:49:30.013Z"
+  "timestamp": "2026-10-04T10:49:47.455Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 8,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
