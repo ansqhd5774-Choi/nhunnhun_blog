@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "29a7a14fb451f187fd1b562b00d53f589cd835b69643444726620ac46fd5e65c",
   "url": "https://nhunnhun.tistory.com/183",
   "articleId": "183",
+  "previousTitle": "단호박(Sweet Pumpkin)의 영양 가치와 건강 효과!! 베타카로틴, 비타민, 식이 섬유 함유",
+  "title": "단호박 효능·칼로리 총정리｜영양성분·다이어트·보관법·먹는 법",
   "sourceCommit": "4af0d4a060225835098bc7a2ff44f2b772ae8862",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T11:55:54.323Z"
+  "timestamp": "2026-10-04T11:56:05.321Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 12,
+    "h2Styled": 12,
+    "h3": 4,
+    "h3Styled": 4,
+    "accents": 12,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
