@@ -53,6 +53,9 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm run publish'));
   assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
   assert.equal(workflow.jobs.publish.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'main');
+  const watched=workflow.on?.push?.paths ?? workflow['on']?.push?.paths ?? [];
+  assert.ok(!watched.includes('publishing/**'));
+  assert.ok(!watched.includes('publishing/update.mjs'));
 });
 
 test('editorial template gives new posts the shared visual hierarchy', () => {

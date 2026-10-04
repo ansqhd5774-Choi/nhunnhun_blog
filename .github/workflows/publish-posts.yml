@@ -2,7 +2,18 @@ name: Validate and publish Tistory posts
 on:
   push:
     branches: [main]
-    paths: ['posts/**', 'publishing/**', 'tests/publishing.test.mjs', 'package.json', 'pnpm-lock.yaml', '.github/workflows/publish-posts.yml']
+    paths:
+      - 'posts/**'
+      - 'publishing/publish.mjs'
+      - 'publishing/validate.mjs'
+      - 'publishing/core.mjs'
+      - 'publishing/editorial.mjs'
+      - 'publishing/ledger.mjs'
+      - 'publishing/local-browser.mjs'
+      - 'tests/publishing.test.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/publish-posts.yml'
   workflow_dispatch:
 permissions:
   contents: read

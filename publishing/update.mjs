@@ -237,34 +237,26 @@ try{
       await page.locator('#publish-layer-btn').click();
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
-      const repUploaded=imageMap.get(update.representativeImageUrl);
-      if(!repUploaded) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
-      const repPathname=new URL(repUploaded).pathname;
-      const thumbState=await thumb.evaluate((box,pathname)=>{
-        const text=(box.textContent||'').trim();
-        const img=box.querySelector('img');
-        const styleNode=box.querySelector('[style*="background-image"]');
-        const raw=[img?.getAttribute('src')||'',styleNode?.getAttribute('style')||''].join(' ');
-        let decoded=raw;
-        try{decoded=decodeURIComponent(raw);}catch{}
-        return {hasVisual:!!(img||styleNode),isEmpty:text.includes('대표이미지 추가'),matches:decoded.includes(pathname)};
-      },repPathname);
-      if(!thumbState.hasVisual || thumbState.isEmpty || !thumbState.matches){
-        const diag=await thumb.evaluate(box=>({
-          text:(box.textContent||'').trim().slice(0,160),
-          children:[...box.querySelectorAll('button,input,label,a,img')].map(x=>({
-            tag:x.tagName,
-            cls:String(x.className||'').slice(0,120),
-            type:x.getAttribute('type'),
-            aria:x.getAttribute('aria-label'),
-            title:x.getAttribute('title'),
-            text:(x.textContent||'').trim().slice(0,80),
-            hasSrc:x.tagName==='IMG'
-          })).slice(0,30)
-        }));
-        console.log('REP_THUMB_DIAG '+JSON.stringify(diag));
-        throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      const deleteRepresentative=thumb.locator('button.ico_delete, button.mce-ico.ico_delete');
+      if(await deleteRepresentative.count()){
+        await deleteRepresentative.first().click();
+        await page.waitForFunction(()=>{
+          const box=document.querySelector('.publish_editor .box_thumb');
+          return !!box && ((box.textContent||'').includes('대표이미지 추가') || !!box.querySelector('input[type="file"]'));
+        },{timeout:10000});
       }
+      const repPath=join(tempDir,'update-representative.bin');
+      await downloadImage(update.representativeImageUrl,repPath);
+      const repInput=thumb.locator('input[type="file"]');
+      if(await repInput.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      await repInput.setInputFiles(repPath);
+      await page.waitForFunction(()=>{
+        const box=document.querySelector('.publish_editor .box_thumb');
+        if(!box) return false;
+        const text=(box.textContent||'').trim();
+        return !text.includes('대표이미지 추가');
+      },{timeout:10000});
+      if((await thumb.innerText().catch(()=>''))?.includes('대표이미지 추가')) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
 
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
