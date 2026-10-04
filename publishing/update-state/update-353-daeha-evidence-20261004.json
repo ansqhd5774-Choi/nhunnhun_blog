@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "f584897bc1773977c9a115baf0540d1f124ec67f1f4fa9be751422455d027106",
   "url": "https://nhunnhun.tistory.com/353",
   "articleId": "353",
+  "previousTitle": "대하 효능 완전정복 - 칼로리, 콜레스테롤, 손질·보관·조리법",
+  "title": "대하 효능·영양성분 총정리｜흰다리새우 차이·칼로리·콜레스테롤",
   "sourceCommit": "dd769fcef91f363e8fd14d92bf73e2bf62594c7d",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T06:14:18.889Z"
+  "timestamp": "2026-10-04T06:14:30.267Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 2,
+    "h3Styled": 2,
+    "accents": 13,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 11,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
