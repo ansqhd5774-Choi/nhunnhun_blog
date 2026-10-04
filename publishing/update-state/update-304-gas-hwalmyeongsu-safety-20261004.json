@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "cd752b70bb54ca9874253bd53830656853666a5cf2192c5e436e2f8190d12049",
   "url": "https://nhunnhun.tistory.com/304",
   "articleId": "304",
+  "previousTitle": "까스활명수(Gas Hwalmyeongsu) 속쓰림과 소화불량을 즉시 해결!!",
+  "title": "까스활명수 효능·복용법·부작용｜까스활과 차이·주의사항",
   "sourceCommit": "dfd15a9667c58363ee45a3f78a8b8e03b1e0510a",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T08:48:39.478Z"
+  "timestamp": "2026-10-04T08:48:50.406Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 12,
+    "h2Styled": 12,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 12,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
