@@ -34,15 +34,20 @@ async function downloadImage(url,path){
 async function uploadImage(page,sourceUrl,index,tempDir){
   const path=join(tempDir,`update-image-${index}.bin`);
   await downloadImage(sourceUrl,path);
-  await page.evaluate(()=>document.querySelectorAll('#attach-layer-btn')[0]?.click());
+  const input=page.locator('#attach-image');
+  if(await input.count()===0){
+    await page.locator('#attach-layer-btn').first().click();
+    await input.waitFor({state:'attached',timeout:10000});
+  }
   const responsePromise=page.waitForResponse(res=>
     res.url().includes('/manage/post/attach.json') &&
     res.request().method()==='POST' &&
     res.status()===200
   ,{timeout:30000});
-  await page.locator('#attach-image').setInputFiles(path);
+  await input.setInputFiles(path);
   const data=await (await responsePromise).json();
   if(!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_UPDATE_IMAGE_UPLOAD');
+  await page.waitForTimeout(400);
   return data.url;
 }
 function replaceImageSources(html,mapping,representativeSource){
