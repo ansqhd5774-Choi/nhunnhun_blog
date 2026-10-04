@@ -47,8 +47,13 @@ async function uploadImage(page,sourceUrl,index,tempDir){
     const inputCount=await input.count();
     if(inputCount===0){
       step='attach-button';
-      const button=page.locator('#attach-layer-btn').first();
-      await button.click();
+      const opened=await page.evaluate(()=>{
+        const button=document.querySelectorAll('#attach-layer-btn')[0];
+        if(!button) return false;
+        button.click();
+        return true;
+      });
+      if(!opened) throw new Error('E_UPDATE_IMAGE_ATTACH_BUTTON');
       step='input-attach-wait';
       await input.waitFor({state:'attached',timeout:10000});
     }
