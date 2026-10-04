@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "03540282549b050903480f6b7438e34fb10e47a084470338eada755c3a0f3da5",
   "url": "https://nhunnhun.tistory.com/345",
   "articleId": "345",
+  "previousTitle": "소나무 껍질 추출물(pine bark extract)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "title": "소나무 껍질 추출물 효능과 부작용｜피크노제놀 근거·복용 주의사항",
   "sourceCommit": "5cca75afe683b548f839b63a3a57ad4e4869e6c8",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T08:28:46.951Z"
+  "timestamp": "2026-10-04T08:28:57.049Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 10,
+    "h2Styled": 10,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 10,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
