@@ -186,7 +186,7 @@ try{
       page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
 
       stage='editor-open';
-      await page.goto(`${BLOG}/manage/post/${update.articleId}`,{waitUntil:'domcontentloaded'});
+      await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
       if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       const currentTitle=(await page.locator('#post-title-inp').inputValue()).trim();
@@ -198,8 +198,7 @@ try{
       const cm=page.locator('.CodeMirror:visible');
       await cm.waitFor({state:'visible'});
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
-      const originalFirst=imageSources(originalHtml)[0]||null;
-      if(!originalFirst||!originalFirst.includes('kakaocdn.net')) throw new Error('E_UPDATE_EXISTING_REPRESENTATIVE');
+      if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
       stage='prepare-images';
       await page.locator('#editor-mode-layer-btn-open').click();
@@ -210,9 +209,8 @@ try{
       const rendered=renderEditorialPost(update);
       const expected=editorialExpectations(update.bodyHtml);
       const sources=[...new Set(imageSources(rendered))];
-      const imageMap=new Map([[update.representativeImageUrl,originalFirst]]);
-      const toUpload=sources.filter(src=>!imageMap.has(src));
-      for(let i=0;i<toUpload.length;i++) imageMap.set(toUpload[i],await uploadImage(page,toUpload[i],i,tempDir));
+      const imageMap=new Map();
+      for(let i=0;i<sources.length;i++) imageMap.set(sources[i],await uploadImage(page,sources[i],i,tempDir));
       const targetHtml=replaceImageSources(rendered,imageMap,update.representativeImageUrl);
 
       stage='stage-content';
@@ -231,8 +229,19 @@ try{
       await page.locator('#publish-layer-btn').click();
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      const repPath=join(tempDir,'update-representative.bin');
+      await downloadImage(update.representativeImageUrl,repPath);
+      const repInput=thumb.locator('input[type="file"]');
+      if(await repInput.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      await repInput.setInputFiles(repPath);
+      await page.waitForFunction(()=>{
+        const box=document.querySelector('.publish_editor .box_thumb');
+        if(!box) return false;
+        const text=(box.textContent||'').trim();
+        return !text.includes('대표이미지 추가') || !!box.querySelector('img,[style*="background-image"]');
+      },{timeout:10000});
       const thumbText=(await thumb.innerText().catch(()=>''))||'';
-      if(thumbText.includes('대표이미지 추가')) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
+      if(thumbText.includes('대표이미지 추가') && await thumb.locator('img,[style*="background-image"]').count()===0) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
 
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
