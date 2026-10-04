@@ -6,6 +6,8 @@ GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
 
 이 프로젝트는 작업 파일과 증거를 관리한다. GitHub 연결을 사용할 수 있는 ChatGPT에서는 저장소의 문서를 읽어 작업을 이어간다. 저장/수정/PR 기능은 해당 대화의 실제 도구와 권한을 별도로 확인한다. 로컬 프로젝트 생성과 GitHub 연결은 ChatGPT 클라우드 실행 환경 생성이나 티스토리 로그인 공유를 의미하지 않는다.
 
+신규 글 작성·발행 기준은 `docs/EDITORIAL_PUBLISH_STANDARD_R3.md`를 ACTIVE 기준으로 사용한다. 신규 글은 서로 다른 본문 이미지 최소 3개와 제한적 다색 형광펜 강조 계약을 통과해야 한다.
+
 자동 발행은 Windows self-hosted runner로 전환했다. PC·runner가 켜져 있어야 한다. 신규 공개 발행은 publish-posts.yml 한 경로만 사용하며 ready/approved 신규 글 1개를 검증한다. 초기 runner 등록·전용 프로필 로그인은 docs/WINDOWS_TISTORY_PUBLISHER.md를 따른다. 전환 준비 중에는 발행을 비활성화한다. 과거 클라우드 기록은 evidence/legacy-browser-publisher-20261003/에 보존했다.
 
 ChatGPT 인수인계: [docs/CHATGPT_HANDOFF.md](docs/CHATGPT_HANDOFF.md). GitHub에 올린 skin/reference/skin.html은 인증·광고 식별자를 제거한 검토용 소스다. 실제 적용 파일로 사용하지 않는다. 원본 백업과 수집 원자료는 로컬에만 보존한다.

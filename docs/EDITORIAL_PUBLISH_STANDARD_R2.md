@@ -1,6 +1,6 @@
 # Tistory Editorial Publish Standard R2
 
-Status: ACTIVE
+Status: SUPERSEDED — 신규 글은 R3 사용
 Target: 신규 티스토리 공개 글
 
 ## 1. 단일 발행 경로

@@ -63,16 +63,18 @@ test('editorial template gives new posts the shared visual hierarchy', () => {
     representativeImageUrl:'https://example.org/a.jpg',
     status:'ready',
     approved:true,
-    bodyHtml:'<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입 문장입니다.</p><blockquote><strong>핵심만 먼저:</strong> 핵심 요약입니다.</blockquote><h2>1. 첫 항목</h2><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><p>설명 <a href="https://example.org/source-a">출처 A</a></p><h2>2. 두 번째</h2><p>설명 <a href="https://example.net/source-b">출처 B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/source-a">출처 A</a></li><li><a href="https://example.net/source-b">출처 B</a></li></ul>'
+    bodyHtml:'<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입 <u>핵심 하나</u> 문장입니다.</p><p><img src="https://example.org/b.jpg" alt="설명 이미지 1"></p><blockquote><strong>핵심만 먼저:</strong> <u>핵심 둘</u> 요약입니다.</blockquote><h2>1. 첫 항목</h2><p><img src="https://example.org/c.jpg" alt="설명 이미지 2"></p><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><p>설명 <a href="https://example.org/source-a">출처 A</a></p><h2>2. 두 번째</h2><p>설명 <a href="https://example.net/source-b">출처 B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/source-a">출처 A</a></li><li><a href="https://example.net/source-b">출처 B</a></li></ul>'
   };
   const rendered=renderEditorialPost(post);
-  assert.equal(EDITORIAL_TEMPLATE_VERSION,'R2');
+  assert.equal(EDITORIAL_TEMPLATE_VERSION,'R3');
   assert.match(rendered,/바나나, 이것만 먼저 보세요/);
   assert.match(rendered,/width:34px;height:4px/);
   assert.match(rendered,/font-size:26px/);
   assert.match(rendered,/font-size:20px/);
   assert.match(rendered,/overflow-x:auto/);
   assert.match(rendered,/background:#f8fafc/);
+  assert.match(rendered,/linear-gradient\(transparent 45%,#fff1a8 45%\)/);
+  assert.match(rendered,/linear-gradient\(transparent 45%,#d9f99d 45%\)/);
   assert.doesNotThrow(()=>assertEditorialContract(rendered,post.bodyHtml));
 });
 
@@ -85,9 +87,11 @@ test('new public article requires complete editorial source structure', () => {
     representativeImageUrl:'https://example.org/apple.jpg',
     status:'ready',
     approved:true,
-    bodyHtml:'<p><img src="https://example.org/apple.jpg" alt="사과"></p><p>도입</p><blockquote><strong>핵심만 먼저:</strong> 요약</blockquote><h2>1. 하나</h2><p><a href="https://example.org/a">A</a></p><h2>2. 둘</h2><p><a href="https://example.net/b">B</a></p><h2>3. 셋</h2><p>본문</p><h2>4. 넷</h2><p>본문</p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
+    bodyHtml:'<p><img src="https://example.org/apple.jpg" alt="사과"></p><p>도입 <u>강조 하나</u></p><p><img src="https://example.org/apple-2.jpg" alt="사과 설명 1"></p><blockquote><strong>핵심만 먼저:</strong> <u>강조 둘</u> 요약</blockquote><p><img src="https://example.org/apple-3.jpg" alt="사과 설명 2"></p><h2>1. 하나</h2><p><a href="https://example.org/a">A</a></p><h2>2. 둘</h2><p><a href="https://example.net/b">B</a></p><h2>3. 셋</h2><p>본문</p><h2>4. 넷</h2><p>본문</p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/a">A</a></li><li><a href="https://example.net/b">B</a></li></ul>'
   };
   assert.doesNotThrow(()=>assertEditorialSource(valid));
+  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<p><img src="https://example.org/apple-2.jpg" alt="사과 설명 1"></p>','').replace('<p><img src="https://example.org/apple-3.jpg" alt="사과 설명 2"></p>','')}),/E_EDITORIAL_IMAGE_MINIMUM/);
+  assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('alt="사과 설명 1"','alt=""')}),/E_EDITORIAL_IMAGE_ALT_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:undefined}),/E_REPRESENTATIVE_IMAGE_REQUIRED/);
   assert.throws(()=>assertEditorialSource({...valid,representativeImageUrl:'https://example.org/other.jpg'}),/E_REPRESENTATIVE_IMAGE_NOT_IN_BODY/);
   assert.throws(()=>assertEditorialSource({...valid,bodyHtml:valid.bodyHtml.replace('<blockquote><strong>핵심만 먼저:</strong> 요약</blockquote>','')}),/E_EDITORIAL_QUICK_REQUIRED/);
@@ -115,6 +119,8 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/host\.innerText\|\|host\.textContent/);
   assert.doesNotMatch(publish,/DOMParser\(\)\.parseFromString/);
   assert.match(publish,/editorialSnapshot\.responsiveImages/);
+  assert.match(publish,/editorialSnapshot\.highlights/);
+  assert.match(publish,/editorialSnapshot\.highlightColors/);
   assert.match(publish,/editorialSnapshot\.quickCards/);
   assert.match(publish,/editorialSnapshot\.relatedCards/);
   assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);

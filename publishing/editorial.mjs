@@ -1,21 +1,30 @@
-export const EDITORIAL_TEMPLATE_VERSION='R2';
+export const EDITORIAL_TEMPLATE_VERSION='R3';
 
 const ACCENT='<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;border-radius:999px;margin:48px 0 10px;"></div>';
 const H2='<h2 style="margin:0 0 18px;padding:0;font-size:26px;line-height:1.4;font-weight:800;letter-spacing:-0.02em;color:#111827;border:0;background:none;">';
 const H3='<h3 style="margin:30px 0 10px;padding:0;font-size:20px;line-height:1.45;font-weight:800;letter-spacing:-0.01em;color:#1f2937;border:0;background:none;">';
 const SOURCE='margin:8px 0 24px;padding-top:8px;border-top:1px solid #eef1f4;font-size:12px;line-height:1.6;color:#6b7280;';
+const HIGHLIGHT_COLORS=['#fff1a8','#d9f99d','#bfdbfe','#fbcfe8'];
 
 function count(html,re){ return [...html.matchAll(re)].length; }
 function topicFromTitle(title=''){
   const first=String(title).trim().split(/[\s·:—-]+/)[0];
   return first || '';
 }
+function imageTags(html){ return [...html.matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]); }
 function imageSources(html){
   return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
 }
 function externalLinks(html){
   return [...html.matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/[^"']+)\1[^>]*>/gi)]
     .map(m=>m[2]).filter(url=>!url.startsWith('https://nhunnhun.tistory.com/'));
+}
+function applyHighlights(html){
+  let index=0;
+  return html.replace(/<u>([\s\S]*?)<\/u>/g,(_m,inner)=>{
+    const color=HIGHLIGHT_COLORS[index++ % HIGHLIGHT_COLORS.length];
+    return `<span style="background:linear-gradient(transparent 45%,${color} 45%);padding:0 .06em;">${inner}</span>`;
+  });
 }
 function styleTable(inner){
   let t=inner;
@@ -29,10 +38,12 @@ export function assertEditorialSource(post){
   const html=post.bodyHtml;
   const h2=count(html,/<h2>/g);
   const images=imageSources(html);
+  const tags=imageTags(html);
   if(h2<4) throw new Error('E_EDITORIAL_SOURCE_TOO_THIN');
   if(!/<h2>핵심 정리<\/h2>/.test(html)) throw new Error('E_EDITORIAL_SUMMARY_REQUIRED');
   if(!/<h2>자료 출처<\/h2>/.test(html)) throw new Error('E_EDITORIAL_SOURCES_REQUIRED');
-  if(images.length<1) throw new Error('E_EDITORIAL_IMAGE_REQUIRED');
+  if(images.length<3 || new Set(images).size<3) throw new Error('E_EDITORIAL_IMAGE_MINIMUM');
+  if(tags.some(tag=>{ const alt=tag.match(/\balt=(["'])(.*?)\1/i); return !alt || !alt[2].trim(); })) throw new Error('E_EDITORIAL_IMAGE_ALT_REQUIRED');
   const firstImage=html.search(/<img\b/i);
   const firstH2=html.indexOf('<h2>');
   if(firstImage<0 || firstH2<0 || firstImage>firstH2) throw new Error('E_EDITORIAL_HERO_REQUIRED');
@@ -53,6 +64,7 @@ export function editorialExpectations(sourceHtml){
     h3:count(sourceHtml,/<h3>/g),
     tables:count(sourceHtml,/<table>/g),
     images:count(sourceHtml,/<img\b/g),
+    highlights:count(sourceHtml,/<u>/g),
     faq:count(sourceHtml,/<p><strong>Q\.\s*[^<]+<\/strong><br\/?/g),
     latest,
     quick:/<blockquote><strong>핵심만 먼저:<\/strong>/g.test(sourceHtml) ? 1 : 0,
@@ -66,6 +78,9 @@ export function editorialExpectations(sourceHtml){
 export function applyEditorialTemplate(html,{title=''}={}){
   let out=html;
   const topic=topicFromTitle(title);
+
+  // Restrained multi-color highlighter: source <u> marks only short key phrases.
+  out=applyHighlights(out);
 
   // Hero and lead.
   out=out.replace(
@@ -143,12 +158,16 @@ export function assertEditorialContract(renderedHtml,sourceHtml){
   const tableWraps=count(renderedHtml,/<div style="overflow-x:auto;[^"]*"><table\b/g);
   const images=count(renderedHtml,/<img\b/g);
   const responsiveImages=count(renderedHtml,/<img\b[^>]*style="[^"]*width:100%;[^"]*max-width:720px;[^"]*"/g);
+  const highlights=count(renderedHtml,/<span style="background:linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\);padding:0 \.06em;">/gi);
+  const highlightColors=new Set([...renderedHtml.matchAll(/background:linear-gradient\(transparent 45%,(#[0-9a-f]{6}) 45%\)/gi)].map(m=>m[1].toLowerCase()));
   const q=count(renderedHtml,/>Q\.<\/span>/g);
   const a=count(renderedHtml,/>A\.<\/span>/g);
   if(h2!==e.h2 || h2Styled!==e.h2 || accents!==e.h2) throw new Error('E_EDITORIAL_H2_CONTRACT');
   if(h3!==e.h3 || h3Styled!==e.h3) throw new Error('E_EDITORIAL_H3_CONTRACT');
   if(tables!==e.tables || tableWraps!==e.tables) throw new Error('E_EDITORIAL_TABLE_CONTRACT');
   if(images!==e.images || responsiveImages!==e.images) throw new Error('E_EDITORIAL_IMAGE_CONTRACT');
+  if(highlights!==e.highlights) throw new Error('E_EDITORIAL_HIGHLIGHT_CONTRACT');
+  if(e.highlights>=2 && highlightColors.size<2) throw new Error('E_EDITORIAL_HIGHLIGHT_COLOR_CONTRACT');
   if(q!==e.faq || a!==e.faq) throw new Error('E_EDITORIAL_FAQ_CONTRACT');
   if(e.latest && count(renderedHtml,/<div\b[^>]*background:#fbfcfe;[^>]*>[\s\S]*?최신 근거\s*·?\s*\d{4}[\s\S]*?<\/div>/g)!==e.latest) throw new Error('E_EDITORIAL_LATEST_CONTRACT');
   if(e.quick && !/이것만 먼저 보세요<\/p>/.test(renderedHtml)) throw new Error('E_EDITORIAL_QUICK_CONTRACT');

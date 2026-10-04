@@ -219,6 +219,8 @@ try {
           return /width:\s*100%/.test(s) && /max-width:\s*720px/.test(s);
         });
         const priorityImages=images.filter(img => img.getAttribute('loading')==='eager' && img.getAttribute('fetchpriority')==='high');
+        const highlights=[...root.querySelectorAll('span')].filter(x => /background:\s*linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\)/i.test(x.getAttribute('style')||''));
+        const highlightColors=new Set(highlights.map(x => ((x.getAttribute('style')||'').match(/linear-gradient\(transparent 45%,(#[0-9a-f]{6}) 45%\)/i)||[])[1]).filter(Boolean).map(x=>x.toLowerCase()));
         const quickCards=[...root.querySelectorAll('p')].filter(p => /이것만 먼저 보세요$/.test(p.textContent.trim()) && /background:\s*#f7f9fc/.test(p.parentElement?.getAttribute('style')||''));
         const qs=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='Q.');
         const as=[...root.querySelectorAll('span')].filter(x => x.textContent.trim()==='A.');
@@ -237,6 +239,8 @@ try {
           images:images.length,
           responsiveImages:responsiveImages.length,
           priorityImages:priorityImages.length,
+          highlights:highlights.length,
+          highlightColors:highlightColors.size,
           quickCards:quickCards.length,
           faqQ:qs.length,
           faqA:as.length,
@@ -257,6 +261,8 @@ try {
         editorialSnapshot.images !== editorialExpected.images ||
         editorialSnapshot.responsiveImages !== editorialExpected.images ||
         (editorialExpected.images > 0 && editorialSnapshot.priorityImages < 1) ||
+        editorialSnapshot.highlights !== editorialExpected.highlights ||
+        (editorialExpected.highlights >= 2 && editorialSnapshot.highlightColors < 2) ||
         editorialSnapshot.quickCards !== editorialExpected.quick ||
         editorialSnapshot.faqQ !== editorialExpected.faq ||
         editorialSnapshot.faqA !== editorialExpected.faq ||
