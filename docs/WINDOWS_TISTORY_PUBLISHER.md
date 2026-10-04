@@ -18,6 +18,8 @@ Queue 확인 순서: 다른 job 사용 여부 → Online → self-hosted/windows
 
 재부팅 자체는 작업 중 자동 실행하지 않는다. 로그인 후 자동 실행 설정과 재시작 실측을 구분하고, 실제 재부팅 검증 전에는 reboot PASS로 보고하지 않는다.
 
+실제 운영 검증: PR #18 main 반영, runner idle 재시작 후 Online 및 네 label 확인. 로그인 smoke PASS. Run `37194435494`의 hosted validate/Windows Gate A/테스트/수정/익명 공개 품질 단계 모두 성공. `/313`은 기존 숫자 URL에서 수정됐고 ledger `updated`이다. PC/full-body/Editorial/mobile 검증은 ledger에 기록했다. TISTORY_PUBLISH_ENABLED는 true로 복구했다. 상세 증거: `evidence/windows-runner-queue-20261004.json`.
+
 목적: 상시 가동 Windows PC의 전용 Chrome 로그인으로 GitHub main의 승인된 신규 글 발행과 기존 글 수정을 수행한다. PC가 꺼져 있거나 runner가 Offline이면 실제 Tistory mutation을 수행하지 못한다. 유료 cloud browser는 표준 경로에서 사용하지 않는다.
 
 소스·테스트 준비 후 실제 runner 등록과 최초 Kakao 로그인은 사용자가 아래 순서로 한 번만 한다. 설정 중 TISTORY_PUBLISH_ENABLED는 false로 유지한다. 등록·로그인 성공을 알려주면 Codex가 runner Online과 표준 workflow를 확인하고 활성화한다.

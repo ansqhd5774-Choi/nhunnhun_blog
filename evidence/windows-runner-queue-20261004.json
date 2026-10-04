@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-04",
+  "timezone": "Asia/Seoul",
+  "startMainSha": "f8b663dae77a6bca53e4a090b7ec461f6b2820e4",
+  "implementationMergeSha": "3fbaa9a63f9caa03bc68cdfebc6c975c9d7b88df",
+  "postUpdateMainSha": "43e44ed1a131341f959e13e73606c33c854df766",
+  "pullRequest": 18,
+  "runner": {
+    "name": "c06-tistory-publisher",
+    "labels": ["self-hosted", "Windows", "X64", "tistory-publisher"],
+    "before": "offline",
+    "after": "online",
+    "startup": "Task Scheduler NHUNNHUN-Tistory-Runner; same profile-owning user; InteractiveToken; logon +30 seconds",
+    "service": "NOT_INSTALLED",
+    "recovery": "restart on task failure after 60 seconds, count 3; periodic check every 2 minutes; IgnoreNew",
+    "restartObserved": "PASS",
+    "rebootObserved": "NOT_EXECUTED",
+    "beforeWindowsLogon": "NOT_SUPPORTED_BY_CURRENT_INTERACTIVE_TASK",
+    "cmdOnly": true,
+    "power": {"acSleepSecondsBefore": 0, "acHibernateSecondsBefore": 0, "changed": false, "networkAdapterPowerSetting": "NOT_VERIFIED"},
+    "oldListenerEvidence": "Socket/IO/cancelled broker GET requests; process present while GitHub reported Offline; idle restart restored Online"
+  },
+  "validation": {"unitTests": "31/31", "publicVerificationFixtures": "11/11", "newPostValidate": "8 posts; pending 0", "updateValidate": "11 updates", "syntax": "PASS", "sourceDriftFixture": "PASS", "updatedDuplicateProtectionFixture": "PASS", "loginSmoke": "LOCAL_BROWSER_PASS / TISTORY_LOGIN_PASS / PUBLICATION_NOT_ATTEMPTED"},
+  "workflow": {"cancelledOldRun": 37192057649, "successfulUpdateRun": 37194435494, "validate": "success", "update": "success", "runnerAssignment": "matching self-hosted Windows runner", "startSourceGate": "success", "anonymousQualityStep": "success"},
+  "article313": {"stateBefore": "ABSENT", "publicBefore": "expected original title confirmed", "mutationPerformed": true, "url": "https://nhunnhun.tistory.com/313", "publicTitle": "마데카솔 종류·사용법·부작용｜상처에 맞는 제품과 주의사항", "stateAfter": "updated", "verification": "anonymous full body + editorial + PC/mobile", "responsiveImages": 3, "faqPairs": 5, "mobileOverflow": false},
+  "publishVariableFinal": "true",
+  "limitations": ["No actual reboot performed", "Interactive startup requires the same Windows user to log on", "No service or saved Windows credential added", "Hosted API permission refusal is RUNNER_UNREACHABLE, not proof of Offline"]
+}
