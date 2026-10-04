@@ -187,7 +187,7 @@ test('active browser sources contain no cloud session or Linux-only temp depende
   assert.match(verification,/context\.route\('\*\*\/\*'/);
   assert.match(verification,/serviceWorkers: 'block'/);
   assert.match(p,/\[publicBrowser, editorContext\]/);
-  assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click()'));
+  assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click'));
   assert.ok(p.indexOf("E_SOURCE_DRIFT")<p.indexOf("phase:'submitting'"));
 });
 
