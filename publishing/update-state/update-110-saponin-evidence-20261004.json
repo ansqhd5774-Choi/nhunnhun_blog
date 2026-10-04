@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "564bb566e60e968b4749475f7c7334475d3fd9284c8d4076e76aa896416ae5c9",
   "url": "https://nhunnhun.tistory.com/110",
   "articleId": "110",
+  "previousTitle": "사포닌(saponin)으로 면역력 UP! 건강을 지키는 비밀 레시피!",
+  "title": "사포닌 효능·부작용과 함유 식품｜권장량·홍삼과의 차이",
   "sourceCommit": "6913a9f61889e42d2f79dbe205099f73aae2d212",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T05:35:10.704Z"
+  "timestamp": "2026-10-04T05:35:21.385Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 9,
+    "h2Styled": 9,
+    "h3": 3,
+    "h3Styled": 3,
+    "accents": 9,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 8,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 1,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
