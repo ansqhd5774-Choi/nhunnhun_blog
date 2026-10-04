@@ -176,7 +176,7 @@ test('authenticated profile and anonymous browser have separate launch contracts
   };
   assert.equal((await openEditorContext(config,{engine,headless:false})).kind,'editor');
   assert.equal((await openPublicBrowser(config,engine)).kind,'public');
-  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome'}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
+  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--restore-last-session']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
   await assert.rejects(openEditorContext(config,{engine:{launchPersistentContext:async()=>{throw Error('private path');}}}),/^Error: E_LOCAL_BROWSER_LAUNCH$/);
 });
 

@@ -6,6 +6,9 @@ try {
   context = await openEditorContext(await localBrowserConfig());
   const page = await context.newPage();
   await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded', timeout:45000});
+  try {
+    await page.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
+  } catch { throw new Error('E_LOGIN_REQUIRED'); }
   const url = new URL(page.url());
   if (url.origin !== BLOG || url.pathname !== '/manage/posts'
     || await page.getByRole('link', {name:'글쓰기', exact:true}).count() < 1) throw new Error('E_LOGIN_REQUIRED');
