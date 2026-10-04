@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="preconnect" href="https://t1.daumcdn.net/" crossorigin>
-<link rel="preconnect" href="https://tistory1.daumcdn.net/" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="dns-preferch" href="https://t1.daumcdn.net/" crossorigin>
+<!-- SHARED PERFORMANCE R1 20261004 -->
+<link rel="preconnect" href="https://t1.daumcdn.net" crossorigin>
+<link rel="preconnect" href="https://tistory1.daumcdn.net" crossorigin>
+<link rel="preconnect" href="https://edge.daumcdn.net" crossorigin>
+<link rel="preconnect" href="https://t1.kakaocdn.net" crossorigin>
+<link rel="preconnect" href="https://blog.kakaocdn.net" crossorigin>
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preload" as="style" href="./style.css">
+
+<link rel="dns-prefetch" href="https://t1.daumcdn.net/" crossorigin>
 <link rel="dns-prefetch" href="https://tistory1.daumcdn.net/" crossorigin>
 <link rel="dns-prefetch" href="https://img1.daumcdn.net/" crossorigin>
 <script>
@@ -14,16 +20,51 @@
 	(a.textContent.includes("gtag")&&blockedScriptContents.push(a.cloneNode(!0)),a.parentNode.removeChild(a)):c&&LAZY_POST_SCRIPTS.some(function(b){return c.includes(b)})&&(blockedScripts.push(a.cloneNode(!0)),a.parentNode.removeChild(a))}else"LINK"===a.tagName&&"stylesheet"===a.rel&&a.href&&(LAZY_POST_STYLESHEETS.some(function(b){return a.href.includes(b)})?(blockedStylesheets.push(a.cloneNode(!0)),a.parentNode.removeChild(a)):UNWANTED_STYLESHEETS.some(function(b){return a.href.includes(b)})&&a.parentNode.removeChild(a))})});
 	mutationObserver.observe(document.documentElement,{childList:!0,subtree:!0});
 </script>
+<script id="shared-performance-images-20261004">
+(function(){
+  if(location.pathname!=='/6')return;
+  var seen=new WeakSet();
+  // Live original-image dimensions verified on 2026-10-04; unknown images are untouched.
+  var dimensions={bW7T4l:[640,480],bkYrKJ:[960,638],c9UbsI:[960,708],dAiJab:[637,615],kOURe:[2710,1802],p1OWZ:[800,432]};
+  function optimize(img){
+    if(seen.has(img)||!img.closest('.contents_style')||!img.getAttribute('style')?.includes('max-width:720px'))return;
+    var original=img.getAttribute('src');
+    if(!original||!original.startsWith('https://blog.kakaocdn.net/'))return;
+    var key=original.split('/')[4],size=dimensions[key];
+    if(!size)return;
+    seen.add(img);
+    if(!img.hasAttribute('width'))img.setAttribute('width',size[0]);
+    if(!img.hasAttribute('height'))img.setAttribute('height',size[1]);
+    img.addEventListener('error',function(){img.removeAttribute('srcset');img.removeAttribute('sizes');},{once:true});
+    // src and OG identity remain the native original, preserving publisher verification.
+    img.setAttribute('sizes','(max-width:760px) calc(100vw - 40px), 720px');
+    img.setAttribute('srcset','https://img1.daumcdn.net/thumb/R960x0.fwebp.q85/?fname='+encodeURIComponent(original)+' '+Math.min(size[0],960)+'w');
+  }
+  function scan(node){
+    if(node.nodeType!==1)return;
+    if(node.tagName==='IMG')optimize(node);
+    node.querySelectorAll('img').forEach(optimize);
+  }
+  var observer=new MutationObserver(function(records){records.forEach(function(record){record.addedNodes.forEach(scan);});});
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.contents_style img').forEach(optimize);observer.disconnect();},{once:true});
+})();
+</script>
 <head>
+
+<!-- ZG SEO PERF R6 -->
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="dns-prefetch" href="//t1.daumcdn.net">
+<link rel="dns-prefetch" href="//edge.daumcdn.net">
+<link rel="dns-prefetch" href="//tistory1.daumcdn.net">
+
 <!--메타태그 -->
-<meta name="msvalidate.01" content="AFDF7C316680F021B7AF4DCBA4C89062" />
-<!-- REDACTED: site verification retained only in local original -->
-<!-- REDACTED: site verification retained only in local original -->
+<meta name="msvalidate.01" content="REDACTED" />
+<meta name="naver-site-verification" content="REDACTED" />
+<meta name="google-site-verification" content="REDACTED" />
 <!--메타태그 -->
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="title" content="[##_page_title_##]" />
-	<meta name="description" content="[##_desc_##]" />
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1.0, maximum-scale=5.0" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
 	<meta content='#0052B3' name='theme-color'/>
@@ -31,14 +72,100 @@
 	<title>[##_page_title_##]</title>
 	<link rel="alternate" type="application/rss+xml" title="[##_title_##]" href="[##_rss_url_##]" />
 	<link rel="shortcut icon" href="[##_blog_link_##]favicon.ico" />
-	<link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined&display=swap" >
-	<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=[##_var_mainFont_##]:wght@400&display=swap">
-	<link rel="preload" as="style" href="./style.css" >
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined&display=swap">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=[##_var_mainFont_##]:wght@400&display=swap" >
-  <link rel="stylesheet" href="./style.css" >
-	<script async>
-		window.jQuery = tjQuery;
+<!-- ZG critical desktop stability R5 -->
+<style id="zg-critical-desktop-stability-r5">
+@media only screen and (min-width:1023px){
+  html{
+    overflow-y:scroll;
+    scrollbar-gutter:stable;
+  }
+  #wrap,
+  #wrap #container{
+    min-height:100vh;
+  }
+}
+</style>
+
+<!-- ZG critical desktop grid R4 -->
+<style id="zg-critical-desktop-grid-r4">
+@media only screen and (min-width:1023px){
+  #main.sidebarPosition.left{
+    display:grid !important;
+    grid-template-columns:302px minmax(0,1fr);
+    column-gap:45px;
+    margin:20px;
+    padding-left:0;
+  }
+  #main.sidebarPosition.left > #content{
+    grid-column:2;
+    grid-row:1;
+    min-width:0;
+  }
+  #main.sidebarPosition.left > #sidebar{
+    grid-column:1;
+    grid-row:1;
+    min-width:302px;
+    max-width:302px;
+    margin:0 !important;
+  }
+
+  #main.sidebarPosition.right{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 302px;
+    column-gap:45px;
+    margin:20px;
+    padding-left:10px;
+  }
+  #main.sidebarPosition.right > #content{
+    grid-column:1;
+    grid-row:1;
+    min-width:0;
+  }
+  #main.sidebarPosition.right > #sidebar{
+    grid-column:2;
+    grid-row:1;
+    min-width:302px;
+    max-width:302px;
+    margin:0 !important;
+  }
+}
+</style>
+
+<!-- ZG critical layout R3 -->
+<style id="zg-critical-layout-r3">
+@media only screen and (min-width:1023px){
+  #wrap #container{width:1200px;margin:0 auto;}
+  #main.sidebarPosition.left{
+    display:flex;
+    flex-direction:row-reverse;
+    margin:20px;
+    padding-left:0;
+  }
+  #main.sidebarPosition.right{
+    display:flex;
+    margin:20px;
+    padding-left:10px;
+  }
+  #container #main #content{
+    flex:2.85;
+    overflow:hidden;
+    position:relative;
+  }
+  #container #main #sidebar{
+    flex:1;
+    max-width:302px;
+    min-width:302px;
+    height:fit-content;
+  }
+  #container #main #sidebar.left{margin-left:0;margin-right:45px;}
+  #container #main #sidebar.right{margin-left:45px;margin-right:0;}
+  .h-entry .content-width{max-width:810px;margin:0 auto;}
+}
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined&display=swap"></noscript>
+<script async>
+		window.jQuery = window.$ = tjQuery;
 		function loadStylesheet(b){return new Promise(function(c,d){var a=document.createElement("link");a.rel="stylesheet";a.href=b;a.addEventListener("load",c);a.addEventListener("error",d);document.head.appendChild(a)})}function loadScript(b){return new Promise(function(c,d){var a=document.createElement("script");a.src=b;a.addEventListener("load",c);a.addEventListener("error",d);document.head.appendChild(a)})};
 	</script>
 	<style>
@@ -66,15 +193,72 @@
 	</style>
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=GT-T5JXFQL"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-REDACTED"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'GT-T5JXFQL');
+  gtag('config', 'G-REDACTED');
 </script>
 	<!------------------------>
+
+<!-- ZG perf fallback R1C -->
+<script>
+(function(){
+  if(location.pathname!='/356') return;
+  try{
+    var pc=document.createElement('link');
+    pc.rel='preconnect';
+    pc.href='https://thumb.wikimedia.org';
+    pc.crossOrigin='';
+    document.head.appendChild(pc);
+
+    var p=document.createElement('link');
+    p.rel='preload';
+    p.as='image';
+    p.href='https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Red_apple_fruits.jpg/960px-Red_apple_fruits.jpg';
+    p.fetchPriority='high';
+    document.head.appendChild(p);
+
+    function tune(root){
+      var list=[];
+      if(root && root.nodeType===1){
+        if(root.tagName==='IMG') list.push(root);
+        if(root.querySelectorAll) list.push.apply(list,root.querySelectorAll('img'));
+      }
+      list.forEach(function(img){
+        if(img.alt==='붉은 사과 두 개'){
+          img.setAttribute('width','960');
+          img.setAttribute('height','605');
+          img.setAttribute('loading','eager');
+          img.setAttribute('fetchpriority','high');
+          img.setAttribute('decoding','async');
+        } else if(img.alt==='반으로 자른 사과'){
+          img.setAttribute('width','960');
+          img.setAttribute('height','640');
+          img.setAttribute('loading','lazy');
+          img.setAttribute('decoding','async');
+        }
+      });
+    }
+
+    var mo=new MutationObserver(function(records){
+      records.forEach(function(r){r.addedNodes.forEach(tune);});
+    });
+    mo.observe(document.documentElement,{childList:true,subtree:true});
+    document.addEventListener('DOMContentLoaded',function(){
+      tune(document.body);
+      setTimeout(function(){mo.disconnect();},3000);
+    },{once:true});
+  }catch(e){}
+})();
+</script>
+
+
+<link rel="stylesheet" href="./style.css">
+
+<style id="shared-performance-system-font">html,body,button,input,select,textarea{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif!important;}.material-icons-outlined{font-family:"Material Icons Outlined";font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;width:1em;max-width:1em;overflow:hidden;-webkit-font-smoothing:antialiased;}</style>
 </head>
 <body id="[##_body_id_##]" class="no-scroll" >
 	<s_t3>
@@ -86,17 +270,17 @@
 						<a href="[##_blog_link_##]">[##_title_##]</a>
 					</div>
 					<div id="search-bar">
-						<button class="search-icon" aria-label="search icon" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
+						<button type="button" class="search-icon" aria-label="검색" onclick="if (window.getComputedStyle(document.getElementById('search-input')).display != 'none') {  window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';} else { document.getElementById('search-bar').classList.add('active'); document.getElementById('search-input').focus();}">
 							<svg width="20" height="20" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg" data-svg="search-icon">
 								<circle fill="none" stroke="#666" stroke-width="1.5" cx="11" cy="11" r="8"></circle>
 								<path fill="none" stroke="#4682B4" stroke-width="1.8" d="M23,23 L20,20 L19.2,19.2"></path>
 							</svg>
 						</button>
-						<input class="input-text" type="text" name="search" value="" id="search-input" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
-					<button class="search-close-icon" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
+						<input class="input-text" type="text" name="search" value="" id="search-input" aria-label="검색어 입력" onkeypress="if (event.keyCode==13) { try {window.location.href = '/search' + '/' + looseURIEncode(document.getElementsByName('search')[0].value);document.getElementsByName('search')[0].value = '';	return false;} catch (e) {} }" placeholder="키워드를 입력하세요.">
+					<button type="button" class="search-close-icon" aria-label="검색 닫기" onclick="document.getElementById('search-bar').classList.remove('active')">x</button>
 					</div>
 					<div id="header-ico">
-						<button class="btn_topMenu" id="btn_topbtn" aria-label="topMenu">					
+						<button type="button" class="btn_topMenu" id="btn_topbtn" aria-label="메뉴 열기">
 							<div class="menu-icon"></div>
 							<div class="menu-icon"></div>
 							<div class="menu-icon"></div>			
@@ -177,17 +361,17 @@
 													</div>
 													<div class="list_detail_wrap">
 														<h2 class="post_title">[##_article_rep_title_##]</h2>
-														<p class="post_text"> [##_article_rep_summary_##]
+														<p class="post_text">[##_article_rep_summary_##]</p>
 													</div>
 												</a>
 												<ul class="post_list">
 													<li class="post_category">
-														<span class="material-icons-outlined" style="padding-bottom: 1px;">format_list_bulleted</span>
+														<svg class="meta-svg" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 6h2v2H4V6Zm4 0h12v2H8V6ZM4 11h2v2H4v-2Zm4 0h12v2H8v-2ZM4 16h2v2H4v-2Zm4 0h12v2H8v-2Z"/></svg>
 														<span class="post_category_name"> [##_article_rep_category_##]</span>
 													</li>
 													<li class="post_date">&middot; [##_article_rep_simple_date_##]</li>
 													<li class="post_comment">
-														<span class="material-icons-outlined">textsms</span>
+														<svg class="meta-svg" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16v12H7l-3 3V4Zm2 2v8.17L6.17 14H18V6H6Z"/></svg>
 														<s_rp_count>[##_article_rep_rp_cnt_##]</s_rp_count>
 													</li>
 												</ul>
@@ -237,7 +421,7 @@
 												</span>
 											</div>
 											<div id="popupContainer" class="popup-container">
-												<ui id="duplicateWordsContainer"></ui>
+												<ul id="duplicateWordsContainer"></ul>
 												<button id="closeButton">닫기</button>
 											</div>
 										</s_ad_div>
@@ -246,12 +430,12 @@
 										</div>
 
 						<!-- 태그 하단 광고고 -->
-						<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=REDACTED_AD_PUBLISHER"
+						<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-REDACTED"
      crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
      style="display:block"
      data-ad-format="autorelaxed"
-     data-ad-client="REDACTED_AD_PUBLISHER"
+     data-ad-client="ca-pub-REDACTED"
      data-ad-slot="8473207186"></ins>
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
@@ -518,7 +702,7 @@
 								<ul class="pagination">
 									<li class="prevpage">
 										<a [##_prev_page_##] class="[##_no_more_prev_##]" aria-label="prevPage" id="prevPage" rel="prev">
-											<span class="material-icons-outlined page-icon">navigate_before</span>
+											<svg class="page-icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="m14.5 5-7 7 7 7 1.5-1.5L10.5 12 16 6.5 14.5 5Z"/></svg>
 										</a>
 									</li>
 									<s_paging_rep>
@@ -528,7 +712,7 @@
 									</s_paging_rep>
 									<li class="nextpage">
 										<a [##_next_page_##] class="[##_no_more_next_##]" aria-label="nextPage" id="nextPage" rel="next">
-											<span class="material-icons-outlined page-icon">navigate_next</span>
+											<svg class="page-icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="m9.5 5 7 7-7 7L8 17.5l5.5-5.5L8 6.5 9.5 5Z"/></svg>
 										</a>
 									</li>
 								</ul>
@@ -749,8 +933,7 @@
 			</div>
 			<div class="footer-wrap">
 				<footer id="footer">
-					<div class="ft-al">Copyright © <a href="https://toyou101.tistory.com">쭈미로운 생활</a> All rights reserved.</div>
-					<div class="ft-ac">Designed by <a href="https://toyou101.tistory.com">JJuum</a></div>
+					<div class="ft-al">Copyright © [##_title_##] All rights reserved.</div>
 				</footer>
 			</div>
 		</div>
@@ -768,7 +951,7 @@
 	<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
 <script type="text/javascript">
 if(!wcs_add) var wcs_add = {};
-wcs_add["wa"] = "19f42486c0a0db0";
+wcs_add["wa"] = "REDACTED";
 if(window.wcs) {
   wcs_do();
 }
