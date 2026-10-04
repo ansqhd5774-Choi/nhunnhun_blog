@@ -71,6 +71,27 @@ async function uploadImage(page,sourceUrl,index,tempDir){
   await page.waitForTimeout(400);
   return data.url;
 }
+async function ensureBasicEditor(page){
+  if(await page.locator('#attach-image, #attach-layer-btn').count()) return;
+  const open=page.locator('#editor-mode-layer-btn-open');
+  if(await open.count()!==1) throw new Error('E_UPDATE_EDITOR_MODE_CONTROL');
+  await open.click();
+  const candidates=[
+    page.locator('#editor-mode-basic'),
+    page.getByText('기본모드',{exact:true}),
+    page.getByText('기본 모드',{exact:true})
+  ];
+  let switched=false;
+  for(const candidate of candidates){
+    if(await candidate.count()){
+      await candidate.last().click();
+      switched=true;
+      break;
+    }
+  }
+  if(!switched) throw new Error('E_UPDATE_EDITOR_BASIC_CONTROL');
+  await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:10000});
+}
 function replaceImageSources(html,mapping,representativeSource){
   let first=true;
   return html.replace(/<img\b[^>]*>/gi,tag=>{
@@ -235,6 +256,8 @@ try{
       await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       if((await page.locator('#post-title-inp').inputValue()).trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
+      stage='ensure-basic-editor';
+      await ensureBasicEditor(page);
 
       stage='render-update';
       const rendered=renderEditorialPost(update);
