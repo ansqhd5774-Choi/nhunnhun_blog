@@ -1,6 +1,6 @@
-# Windows 전용 티스토리 발행기 — 최초 설정
+# Windows 전용 티스토리 자동화 Runner — 최초 설정
 
-목적: 상시 가동 Windows PC의 전용 Chrome 로그인으로 GitHub main의 승인된 신규 글 1개를 발행한다. PC가 꺼져 있거나 runner가 Offline이면 게시하지 못한다. 유료 브라우저는 사용하지 않는다.
+목적: 상시 가동 Windows PC의 전용 Chrome 로그인으로 GitHub main의 승인된 신규 글 발행과 기존 글 수정을 수행한다. PC가 꺼져 있거나 runner가 Offline이면 실제 Tistory mutation을 수행하지 못한다. 유료 cloud browser는 표준 경로에서 사용하지 않는다.
 
 소스·테스트 준비 후 실제 runner 등록과 최초 Kakao 로그인은 사용자가 아래 순서로 한 번만 한다. 설정 중 TISTORY_PUBLISH_ENABLED는 false로 유지한다. 등록·로그인 성공을 알려주면 Codex가 runner Online과 표준 workflow를 확인하고 활성화한다.
 
@@ -87,8 +87,13 @@ GitHub가 제공한 **config.cmd** 등록 명령을 현재 CMD에서 1회 실행
 2. 최초 login 실행의 LOGIN_SAVED 여부.
 3. 실패한 경우 오류 코드만. token/비밀번호/OTP/profile 파일 금지.
 
-정상 기대값: runner Online, LOGIN_SAVED. 이때까지 공개 버튼을 직접 누르거나 새 전복 JSON을 만들거나 workflow를 반복 실행하지 않는다. Codex가 최신 main/ledger를 확인한 다음 **기존 publish-posts.yml**을 1회 실행한다.
+정상 기대값: runner Online, LOGIN_SAVED. 이후 실제 작업은 최신 main과 해당 ledger를 확인한 다음 표준 workflow만 사용한다.
 
-발행 대상은 posts/abalone-nutrition-benefits-20261003.json 1개다. submitting이면 자동 재시도하지 않는다. published이면 재발행하지 않는다. 발행 완료 판정은 익명 공개 URL·전체 제목/본문·카테고리/태그·대표 이미지 및 kakaocdn og:image·R2 편집 계약을 검증한 뒤 ledger published까지 확인했을 때만 한다.
+- 신규 공개 글: `.github/workflows/publish-posts.yml`
+- 기존 숫자 URL 수정: `.github/workflows/update-posts.yml`
+- 신규 글 source: `posts/*.json`
+- 기존 글 수정 source: `updates/*.json`
+
+신규 글이 `submitting`이면 자동 재발행하지 않고, `published`이면 재발행하지 않는다. 기존 글 수정이 `submitting`이면 자동 재수정하지 않고, 공개 URL 상태를 먼저 확인한다. 완료 판정은 익명 공개 URL·전체 제목/본문·이미지·대표 이미지 및 kakaocdn `og:image`·Editorial R3 계약·PC/mobile 검증과 최종 ledger 상태까지 확인했을 때만 한다.
 
 공식 참고: [runner 추가](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners), [Windows 서비스](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/configure-the-application?platform=windows), [runner config 인수](https://github.com/actions/runner/blob/main/src/Runner.Listener/Runner.cs).
