@@ -1,3 +1,4 @@
+import { verificationContext } from './verification-context.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -74,7 +75,7 @@ async function bytes(request,url,role) {
   return assertImagePayload(response.headers()['content-type'],await response.body());
 }
 async function verify(browser,update,width,expected,rendered,assetChecks) {
-  const context=await browser.newContext({viewport:{width,height:width===390?844:1000}});
+  const context=await verificationContext(browser, {viewport:{width,height:width===390?844:1000}});
   try {
     const page=await context.newPage();
     const response=await page.goto(articleUrl(update.targetUrl),{waitUntil:'domcontentloaded',timeout:45000});

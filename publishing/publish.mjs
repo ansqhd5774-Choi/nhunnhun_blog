@@ -1,3 +1,4 @@
+import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
@@ -175,7 +176,7 @@ try {
       stage = 'public-verification';
       // Verify anonymously, so an owner-only/private page cannot count as published.
       publicBrowser = await openPublicBrowser(browserConfig);
-      const publicContext = await publicBrowser.newContext();
+      const publicContext = await verificationContext(publicBrowser);
       const publicPage = await publicContext.newPage();
       await publicPage.goto(url, {waitUntil:'domcontentloaded'});
       if (!(await publicPage.locator('body').innerText()).includes(post.title)) throw new Error('E_PUBLICATION_UNCERTAIN');

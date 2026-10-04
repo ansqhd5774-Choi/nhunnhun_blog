@@ -169,7 +169,10 @@ test('active browser sources contain no cloud session or Linux-only temp depende
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(p,/tmpdir\(\)/);
   assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
-  assert.match(p,/publicBrowser\.newContext\(\)/);
+  assert.match(p,/verificationContext\(publicBrowser\)/);
+  const verification=readFileSync(new URL('../publishing/verification-context.mjs',import.meta.url),'utf8');
+  assert.match(verification,/context\.route\('\*\*\/\*'/);
+  assert.match(verification,/serviceWorkers: 'block'/);
   assert.match(p,/\[publicBrowser, editorContext\]/);
   assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click()'));
   assert.ok(p.indexOf("E_SOURCE_DRIFT")<p.indexOf("phase:'submitting'"));
