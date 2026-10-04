@@ -303,3 +303,15 @@ test('publisher diagnoses Tistory daily limit and human verification without a s
   const finalBlock=publish.slice(publish.indexOf("stage = 'final-submit'"),publish.indexOf("stage = 'public-verification'"));
   assert.equal((finalBlock.match(/publishButton\.click\(/g)||[]).length,1);
 });
+
+test('human-verification failure stays blocked until manual clearance', () => {
+  const post={...base,status:'ready',approved:true};
+  const state={phase:'failed',fingerprint:fingerprint(post),publicMutationConfirmed:false,failureCode:'E_TISTORY_HUMAN_VERIFICATION_REQUIRED'};
+  assert.equal(eligible(post,state),false);
+});
+
+test('publisher recognizes dkaptcha probe and 403 post response as human verification', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/\/manage\/dkaptcha\//);
+  assert.match(publish,/x\.path === '\/manage\/post\.json' && x\.status === 403/);
+});
