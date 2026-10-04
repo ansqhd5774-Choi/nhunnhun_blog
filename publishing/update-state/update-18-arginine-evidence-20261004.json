@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "77d8a440a4ddbda2191926a35bce263c04e45044939a8d2e9f16def876bc0c40",
   "url": "https://nhunnhun.tistory.com/18",
   "articleId": "18",
+  "previousTitle": "아르기닌(Arginine) 숨만쉬어 내가 다 빼줄게!!",
+  "title": "아르기닌 효능·부작용 총정리｜운동·혈압 효과와 복용 주의사항",
   "sourceCommit": "4096b9ebb75aa78f827929549ee284d4121080ed",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T10:34:51.112Z"
+  "timestamp": "2026-10-04T10:35:08.899Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
