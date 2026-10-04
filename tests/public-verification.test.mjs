@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {articleUrl,ogAsset,checkMeasurements} from '../publishing/verify-updated-public.mjs';
+import {articleUrl,ogAsset,checkMeasurements,assertImagePayload} from '../publishing/verify-updated-public.mjs';
 const e={images:3,h2:10,h3:3,tables:2,highlights:7,faq:5};
 const m={overflowPx:0,wideImages:0,images:3,missingAlt:0,brokenImages:0,nonNativeImages:0,h2:10,h3:3,badHeadingStyles:0,tables:2,badTableWraps:0,highlights:7,highlightColors:4,hiddenHighlights:0,faqQ:5,faqA:5,heroPriority:true,badLazyImages:0};
 test('only authorized numeric public article URLs',()=>{
@@ -14,3 +14,12 @@ test('even one pixel document overflow fails',()=>assert.throws(()=>checkMeasure
 test('broken or unlabelled image fails',()=>{for(const key of ['brokenImages','missingAlt','nonNativeImages','badLazyImages'])assert.throws(()=>checkMeasurements({...m,[key]:1},e));});
 test('computed heading and table styles fail closed',()=>{for(const key of ['badHeadingStyles','badTableWraps'])assert.throws(()=>checkMeasurements({...m,[key]:1},e));});
 test('single color and hidden emphasis fail',()=>{assert.throws(()=>checkMeasurements({...m,highlightColors:1},e));assert.throws(()=>checkMeasurements({...m,hiddenHighlights:1},e));});
+test('octet-stream is accepted only for actual supported image signatures',()=>{
+  const jpg=Buffer.from([255,216,255,224,0,16]);
+  assert.equal(assertImagePayload('application/octet-stream',jpg),jpg);
+  assert.equal(assertImagePayload('image/jpeg',jpg),jpg);
+});
+test('invalid bytes fail even with an image MIME type',()=>{
+  for(const mime of ['image/jpeg','application/octet-stream']) assert.throws(()=>assertImagePayload(mime,Buffer.from('<html>not an image</html>')),/E_QA_IMAGE_SIGNATURE/);
+});
+test('HTML response is not allowed even with a copied signature',()=>assert.throws(()=>assertImagePayload('text/html',Buffer.from([255,216,255,224,0,16])),/E_QA_IMAGE_TYPE/));

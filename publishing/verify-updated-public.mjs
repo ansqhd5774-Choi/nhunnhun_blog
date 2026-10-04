@@ -30,13 +30,24 @@ export function checkMeasurements(m,e) {
   if(m.faqQ!==e.faq || m.faqA!==e.faq || !m.heroPriority || m.badLazyImages) throw new Error('E_QA_STRUCTURE');
   return true;
 }
+export function assertImagePayload(contentType,b) {
+  const mime=String(contentType||'').split(';')[0].trim().toLowerCase();
+  if(!/^image\//.test(mime)&&mime!=='application/octet-stream') throw new Error('E_QA_IMAGE_TYPE');
+  if(!Buffer.isBuffer(b)||!b.length||b.length>12*1024*1024) throw new Error('E_QA_IMAGE_SIZE');
+  const jpeg=b.length>3&&b[0]===255&&b[1]===216&&b[2]===255;
+  const png=b.length>=8&&b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  const gif=['GIF87a','GIF89a'].includes(b.subarray(0,6).toString('ascii'));
+  const webp=b.length>=12&&b.subarray(0,4).toString('ascii')==='RIFF'&&b.subarray(8,12).toString('ascii')==='WEBP';
+  if(!jpeg&&!png&&!gif&&!webp) throw new Error('E_QA_IMAGE_SIGNATURE');
+  return b;
+}
 async function bytes(request,url,role) {
   const response=await request.get(url,{timeout:30000,headers:{'User-Agent':'Mozilla/5.0','Accept':'image/*'}});
   console.log('PUBLIC_QA_ASSET '+JSON.stringify({role,host:new URL(url).hostname,status:response.status(),mime:String(response.headers()['content-type']||'').replace(/[^a-z0-9/;= ._-]/gi,'').slice(0,100)}));
-  if(!response.ok() || !/^image\//i.test(response.headers()['content-type']||'')) throw new Error('E_QA_IMAGE_FETCH');
-  const b=await response.body();
-  if(!b.length || b.length>12*1024*1024) throw new Error('E_QA_IMAGE_SIZE');
-  return b;
+  if(!response.ok()) throw new Error('E_QA_IMAGE_FETCH');
+  // Tistory .bin assets are served as octet-stream. Validate signatures, then
+  // require exact SHA256 equality to the independently fetched image source.
+  return assertImagePayload(response.headers()['content-type'],await response.body());
 }
 async function verify(browser,update,width,expected,rendered,assetChecks) {
   const context=await browser.newContext({viewport:{width,height:width===390?844:1000}});
