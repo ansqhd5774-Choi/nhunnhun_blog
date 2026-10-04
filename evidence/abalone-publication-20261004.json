@@ -1,0 +1,68 @@
+{
+  "url": "https://nhunnhun.tistory.com/359",
+  "title": "전복 효능·영양성분·칼로리·콜레스테롤 총정리",
+  "http": 200,
+  "body": "PASS",
+  "editorial": {
+    "h2": 11,
+    "h2Styled": 11,
+    "h3": 4,
+    "h3Styled": 4,
+    "accents": 11,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 1,
+    "responsiveImages": 1,
+    "priorityImages": 1,
+    "quickCards": 1,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "category": "PASS",
+  "tags": "PASS",
+  "expectedTags": [
+    "전복",
+    "전복 효능",
+    "전복 영양성분",
+    "전복 칼로리",
+    "전복 콜레스테롤",
+    "전복 내장",
+    "전복 단백질",
+    "해산물"
+  ],
+  "representative": "PASS",
+  "layouts": [
+    {
+      "width": 1440,
+      "viewport": 1440,
+      "documentWidth": 1432,
+      "bodyWidth": 1432,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "pass": true
+    }
+  ],
+  "runner": {
+    "name": "c06-tistory-publisher",
+    "labels": [
+      "self-hosted",
+      "windows",
+      "x64",
+      "tistory-publisher"
+    ],
+    "observedOnline": true
+  },
+  "workflowRun": 37170921372,
+  "originalJob": "final-submit E_PUBLICATION_UNCERTAIN",
+  "ledger": "published",
+  "resubmission": false
+}

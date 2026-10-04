@@ -162,9 +162,13 @@ try {
       stage = 'final-submit';
       await publishButton.click();
       await page.waitForURL(url => url.origin === BLOG && /\/manage\/posts\/?$/.test(url.pathname));
-      const articleLink = page.getByRole('link', {name:post.title,exact:true});
-      if (await articleLink.count() !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
-      const url = assertArticleUrl(new URL(await articleLink.getAttribute('href'), BLOG).href);
+      await page.locator('a').filter({hasText:post.title}).first().waitFor({state:'visible'});
+      const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
+        .filter(a => (a.textContent || '').trim() === title)
+        .map(a => a.href)
+        .filter(href => /^https:\/\/nhunnhun\.tistory\.com\/\d+$/.test(href)))], post.title);
+      if (publicUrls.length !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
+      const url = assertArticleUrl(publicUrls[0]);
       stage = 'public-verification';
       // Verify anonymously, so an owner-only/private page cannot count as published.
       publicBrowser = await openPublicBrowser(browserConfig);
@@ -181,7 +185,7 @@ try {
       const expectedText = await publicPage.evaluate(html => {
         const host=document.createElement('div');
         host.setAttribute('aria-hidden','true');
-        host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;visibility:hidden;';
+        host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;opacity:0;pointer-events:none;';
         host.innerHTML=html;
         document.body.appendChild(host);
         const text=(host.innerText||host.textContent||'').replace(/\s+/g,' ').trim();
