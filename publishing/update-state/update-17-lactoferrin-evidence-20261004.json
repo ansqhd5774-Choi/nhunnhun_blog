@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "f4b356e9d0e6d24a5aaef3504440c8344e8a332284c5973416ed3addc235c090",
   "url": "https://nhunnhun.tistory.com/17",
   "articleId": "17",
+  "previousTitle": "락토페린(Lactoferrin)으로 건강한 장을 만들어라! 소화 개선의 열쇠!",
+  "title": "락토페린 효능·부작용 총정리｜면역·장 건강·빈혈 근거와 섭취 주의사항",
   "sourceCommit": "3cb8ac4078414ce00d3009d4dc67233045105030",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-04T10:23:10.873Z"
+  "timestamp": "2026-10-04T10:23:52.397Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 0,
+    "tableWraps": 0,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
