@@ -95,7 +95,7 @@ function replaceImageSources(html, mapping, representativeSource) {
 }
 
 async function switchToHtmlEditor(page) {
-  const modeButton = page.locator('#editor-mode-layer-btn-open');
+  const modeButton = page.locator('#editor-mode-layer-btn');
 
   const activeHtmlMirror = async () => {
     const mirrors = page.locator('.cm-s-tistory-html');
@@ -158,9 +158,19 @@ async function switchToHtmlEditor(page) {
     await modeButton.waitFor({state:'visible', timeout:10000})
       .catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
 
+    let menuOpened = false;
     try {
       await modeButton.click({timeout:5000});
+      menuOpened = true;
     } catch {
+      menuOpened = await page.evaluate(() => {
+        const button = document.querySelector('#editor-mode-layer-btn-open');
+        if (!button) return false;
+        button.click();
+        return true;
+      }).catch(() => false);
+    }
+    if (!menuOpened) {
       if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
       continue;
     }
