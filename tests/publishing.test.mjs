@@ -415,12 +415,16 @@ test('CDP disconnect closes transport directly without closing persistent Chrome
 });
 
 
-test('publisher category selector uses actual Tistory button/link structure', () => {
+test('publisher category selector prefers the current Tistory combobox and keeps legacy fallback', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/categoryList\.locator\('button, a'\)/);
+  assert.match(publish,/getByRole\('combobox', \{name:\/카테고리 선택\/\}\)\.first\(\)/);
+  assert.match(publish,/getByRole\('option', \{name:post\.category, exact:true\}\)/);
+  assert.match(publish,/page\.locator\('#category-btn'\)/);
+  assert.match(publish,/categoryList\.locator\('button, a, \[role="option"\], li'\)/);
   assert.match(publish,/CATEGORY_DIAG/);
   assert.match(publish,/E_CATEGORY_CONTROL/);
   assert.match(publish,/E_CATEGORY_LIST/);
   assert.match(publish,/E_CATEGORY_AMBIGUOUS/);
   assert.match(publish,/E_TAG_CONTROL/);
+  assert.doesNotMatch(publish,/matches\[0\]\.click\(\{force:true\}\)/);
 });
