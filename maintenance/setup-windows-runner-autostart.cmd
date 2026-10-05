@@ -46,7 +46,7 @@ if errorlevel 1 (
 
 echo [5/7] Create 2-minute watchdog
 schtasks /Delete /TN "%WATCHDOG_NAME%" /F >nul 2>nul
-schtasks /Create /TN "%WATCHDOG_NAME%" /TR "\"%WATCHDOG_SCRIPT%\"" /SC MINUTE /MO 2 /RL LIMITED /IT /F >nul
+schtasks /Create /TN "%WATCHDOG_NAME%" /TR "cmd.exe /d /c \"\"%WATCHDOG_SCRIPT%\" >nul 2>nul\"" /SC MINUTE /MO 2 /RL LIMITED /F >nul
 if errorlevel 1 (
   echo FAIL: WATCHDOG_TASK_CREATE
   exit /b 21
@@ -64,6 +64,6 @@ schtasks /Query /TN "%TASK_NAME%" >nul 2>nul || (echo FAIL: RUNNER_TASK_QUERY & 
 schtasks /Query /TN "%WATCHDOG_NAME%" >nul 2>nul || (echo FAIL: WATCHDOG_TASK_QUERY & exit /b 24)
 
 echo PASS: NHUNNHUN_RUNNER_AUTOSTART_READY
-echo NOTE: Closing the runner console may make it offline briefly, but the watchdog will restart it within about 2 minutes.
+echo NOTE: Closing the runner console may make it offline briefly, but the hidden watchdog will restart it within about 2 minutes.
 echo NOTE: Tistory login helper is still only needed when the saved login session expires.
 exit /b 0
