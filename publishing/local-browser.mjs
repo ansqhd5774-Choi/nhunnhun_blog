@@ -59,12 +59,60 @@ async function discoverLocalCdpWebSocket(cdpUrl, fetchImpl = fetch) {
     clearTimeout(timer);
   }
 }
-export async function openEditorConnection(config, { engine = chromium, fetchImpl = fetch } = {}) {
+async function activateLocalCdpTargets(wsUrl, WebSocketImpl = WebSocket) {
+  return await new Promise((resolve, reject) => {
+    let settled = false;
+    const socket = new WebSocketImpl(wsUrl);
+    const pending = new Set();
+    const finish = error => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try { socket.close(); } catch {}
+      error ? reject(error) : resolve();
+    };
+    const timer = setTimeout(() => finish(new Error('E_LOCAL_CDP_ACTIVATE')), 8000);
+    socket.addEventListener('error', () => finish(new Error('E_LOCAL_CDP_ACTIVATE')), {once:true});
+    socket.addEventListener('open', () => {
+      pending.add(1);
+      socket.send(JSON.stringify({id:1,method:'Target.getTargets'}));
+    }, {once:true});
+    socket.addEventListener('message', event => {
+      let message;
+      try { message = JSON.parse(typeof event.data === 'string' ? event.data : String(event.data)); }
+      catch { return; }
+      if (!pending.has(message.id)) return;
+      pending.delete(message.id);
+      if (message.id === 1) {
+        const targets = (message.result?.targetInfos || []).filter(target =>
+          target?.targetId && ['page','webview'].includes(target.type));
+        if (!targets.length) return finish();
+        let id = 1;
+        for (const target of targets) {
+          id += 1;
+          pending.add(id);
+          socket.send(JSON.stringify({id,method:'Target.activateTarget',params:{targetId:target.targetId}}));
+        }
+        return;
+      }
+      if (!pending.size) finish();
+    });
+  });
+}
+
+export async function openEditorConnection(config, { engine = chromium, fetchImpl = fetch, recoverTargets = activateLocalCdpTargets } = {}) {
   try {
     let endpoint = config.cdpUrl;
     try { endpoint = await discoverLocalCdpWebSocket(config.cdpUrl, fetchImpl); }
     catch { /* Safe fallback for older Chrome endpoints. */ }
-    const browser = await engine.connectOverCDP(endpoint, { timeout:15000, isLocal:true, noDefaults:true });
+    const connect = () => engine.connectOverCDP(endpoint, { timeout:15000, isLocal:true, noDefaults:true });
+    let browser;
+    try { browser = await connect(); }
+    catch (firstError) {
+      if (!endpoint.startsWith('ws:')) throw firstError;
+      await recoverTargets(endpoint);
+      browser = await connect();
+    }
     const contexts = browser.contexts();
     if (contexts.length !== 1) {
       browser._shouldCloseConnectionOnClose = true;
