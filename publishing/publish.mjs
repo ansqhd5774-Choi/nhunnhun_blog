@@ -132,7 +132,33 @@ async function switchToHtmlEditor(page) {
   }
 
   const htmlOption = page.locator('#editor-mode-html');
+  const htmlOptionDiag = await page.evaluate(() => {
+    const el = document.querySelector('#editor-mode-html');
+    if (!el) return {exists:false};
+    const r = el.getBoundingClientRect();
+    const s = getComputedStyle(el);
+    return {
+      exists:true,
+      outer:el.outerHTML,
+      parent:el.parentElement?.outerHTML || null,
+      rect:{x:r.x,y:r.y,width:r.width,height:r.height},
+      display:s.display,
+      visibility:s.visibility,
+      pointerEvents:s.pointerEvents,
+      active:document.activeElement?.outerHTML || null
+    };
+  }).catch(()=>({probe:'failed'}));
+  console.log('EDITOR_HTML_OPTION_DIAG '+JSON.stringify(htmlOptionDiag));
   await htmlOption.click({force:true}).catch(() => { throw new Error('E_EDITOR_HTML_MODE'); });
+  const postClickDiag = await page.evaluate(() => ({
+    modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
+    htmlExists: !!document.querySelector('#editor-mode-html'),
+    dialogs: [...document.querySelectorAll('[role="dialog"], .layer_popup, .mce-window')].map(el => ({
+      text:(el.textContent || '').trim().slice(0,500),
+      outer:el.outerHTML.slice(0,1500)
+    }))
+  })).catch(()=>({probe:'failed'}));
+  console.log('EDITOR_HTML_POSTCLICK_DIAG '+JSON.stringify(postClickDiag));
 
   const modeSettled = await page.waitForFunction(() => {
     const mode = document.querySelector('#editor-mode-layer-btn-open');
@@ -195,7 +221,11 @@ try {
           try {
             const type = dialog.type();
             const message = dialog.message();
-            if (type === 'confirm' && (stage === 'html-mode' || stage === 'final-submit' || /모드.*변경|변경.*모드/.test(message))) await dialog.accept();
+            console.log('DIALOG_DIAG '+JSON.stringify({stage,type,message}));
+            if (type === 'confirm' && (stage === 'html-mode' || stage === 'final-submit' || /모드.*변경|변경.*모드/.test(message))) {
+              await dialog.accept();
+              console.log('DIALOG_ACTION '+JSON.stringify({stage,type,action:'accept'}));
+            }
             else if (type === 'alert') await dialog.accept();
             else await dialog.dismiss();
           } catch (error) {
