@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "419930437b7ee0853de95fb3abe8406f8d621fef823c0e77adc422ad20f6c8fc",
   "url": "https://nhunnhun.tistory.com/372",
   "articleId": "372",
+  "previousTitle": "홍게 효능·칼로리 총정리｜대게 차이·제철·먹는 법·보관법",
+  "title": "홍게 효능·칼로리 총정리｜대게 차이·제철·먹는 법·보관법",
   "sourceCommit": "85bc693eb5f6b027677a83716f543e7e7da96834",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T15:50:48.295Z"
+  "timestamp": "2026-10-05T15:50:59.658Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
