@@ -277,8 +277,14 @@ try{
       if(currentTitle!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
 
       stage='read-original';
-      await page.locator('#editor-mode-layer-btn-open').click();
-      await page.locator('#editor-mode-html').click();
+      const originalModeButton=page.locator('#editor-mode-layer-btn-open');
+      await originalModeButton.waitFor({state:'attached',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
+      const originalModeOpened=await originalModeButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
+      if(!originalModeOpened) throw new Error('E_UPDATE_EDITOR_MODE_MENU');
+      const originalHtmlButton=page.locator('#editor-mode-html');
+      await originalHtmlButton.waitFor({state:'visible',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
+      const originalHtmlOpened=await originalHtmlButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
+      if(!originalHtmlOpened) throw new Error('E_UPDATE_EDITOR_HTML_MODE');
       const cm=page.locator('.CodeMirror:visible');
       await cm.waitFor({state:'visible'});
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
@@ -308,8 +314,14 @@ try{
 
       stage='stage-content';
       await page.locator('#post-title-inp').fill(update.title);
-      await page.locator('#editor-mode-layer-btn-open').click();
-      await page.locator('#editor-mode-html').click();
+      const stageModeButton=page.locator('#editor-mode-layer-btn-open');
+      await stageModeButton.waitFor({state:'attached',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
+      const stageModeOpened=await stageModeButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
+      if(!stageModeOpened) throw new Error('E_UPDATE_EDITOR_MODE_MENU');
+      const stageHtmlButton=page.locator('#editor-mode-html');
+      await stageHtmlButton.waitFor({state:'visible',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
+      const stageHtmlOpened=await stageHtmlButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
+      if(!stageHtmlOpened) throw new Error('E_UPDATE_EDITOR_HTML_MODE');
       const code=page.locator('.CodeMirror:visible .CodeMirror-code');
       await code.waitFor({state:'visible'});
       await code.click();
