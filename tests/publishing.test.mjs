@@ -16,6 +16,12 @@ test('draft posts never publish', () => assert.equal(eligible(base,null),false))
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
 test('approved ready post accepted', () => assert.equal(eligible(checkPublishHtml(checkPost({...base,status:'ready',approved:true},'first-post.json')),null),true));
 test('same publication is skipped', () => assert.equal(eligible({...base,status:'ready',approved:true},{phase:'published',fingerprint:fingerprint(base)}),false));
+test('scheduled publication is terminal and schedule metadata is validated', () => {
+  const post=checkPost({...base,status:'ready',approved:true,scheduledAt:'2026-10-06T13:00:00+09:00'},'first-post.json');
+  assert.equal(eligible(post,{phase:'scheduled',fingerprint:fingerprint(post)}),false);
+  assert.throws(()=>checkPost({...base,status:'ready',approved:true,scheduledAt:'2026/10/06 13:00'},'first-post.json'),/E_SCHEDULE/);
+  assert.notEqual(fingerprint(post),fingerprint({...post,scheduledAt:'2026-10-06T14:00:00+09:00'}));
+});
 test('uncertain final click never retries', () => assert.throws(() => eligible({...base,status:'ready',approved:true},{phase:'submitting',fingerprint:fingerprint(base)})));
 test('evidence-backed failed publication may retry only after confirmed no public mutation', () => {
   const post={...base,status:'ready',approved:true};
@@ -173,6 +179,9 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/previousStateSha/);
   assert.match(publish,/stage === 'final-submit'/);
   assert.match(publish,/E_PUBLISH_BUTTON_DISABLED/);
+  assert.match(publish,/SCHEDULE_SETTINGS/);
+  assert.match(publish,/E_SCHEDULE_NOT_CONFIRMED/);
+  assert.match(publish,/phase:'scheduled'/);
   assert.match(publish,/FINAL_SUBMIT_RESPONSES/);
   assert.match(publish,/page\.goto\(\`\$\{BLOG\}\/manage\/posts\`/);
   assert.equal((publish.match(/publishButton\.click/g)||[]).length,1);
