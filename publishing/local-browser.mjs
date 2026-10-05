@@ -61,10 +61,19 @@ export async function closeEditorConnection(connection) {
   catch { throw new Error('E_LOCAL_BROWSER_DISCONNECT'); }
 }
 export async function freshEditorPage(context) {
-  for (const page of context.pages()) {
+  const pages = context.pages();
+  let keeper = pages.find(page => {
+    const url = page.url();
+    return url.startsWith('https://nhunnhun.tistory.com/') || url.startsWith('https://www.tistory.com/');
+  }) || pages[0];
+
+  if (!keeper) keeper = await context.newPage();
+
+  for (const page of pages) {
+    if (page === keeper) continue;
     try { await page.close({runBeforeUnload:false}); } catch {}
   }
-  return await context.newPage();
+  return keeper;
 }
 export async function openPublicBrowser(config, engine = chromium) {
   try { return await engine.launch({headless:true, executablePath:config.chromePath}); }
