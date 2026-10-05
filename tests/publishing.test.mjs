@@ -262,16 +262,18 @@ test('authenticated editor attaches to local persistent Chrome and disconnects w
     launch:async(...args)=>{calls.push(['public',...args]);return {kind:'public'};}
   };
   const config={chromePath:'fixture-chrome',profileDir:'fixture-profile',cdpUrl:'http://127.0.0.1:9223'};
-  const connection=await openEditorConnection(config,{engine});
+  const fetchImpl=async()=>({ok:true,json:async()=>({webSocketDebuggerUrl:'ws://127.0.0.1:9223/devtools/browser/fixture'})});
+  const connection=await openEditorConnection(config,{engine,fetchImpl});
   assert.equal(connection.context,context);
   assert.equal((await openPublicBrowser(config,engine)).kind,'public');
   await closeEditorConnection(connection);
   assert.deepEqual(calls,[
-    ['editor','http://127.0.0.1:9223',{timeout:15000,isLocal:true,noDefaults:true}],
+    ['editor','ws://127.0.0.1:9223/devtools/browser/fixture',{timeout:15000,isLocal:true,noDefaults:true}],
     ['public',{headless:true,executablePath:'fixture-chrome'}],
     ['disconnect',true]
   ]);
   await assert.rejects(openEditorConnection(config,{
+    fetchImpl,
     engine:{connectOverCDP:async()=>{throw Error('offline');}}
   }),/^Error: E_LOCAL_BROWSER_CONNECT$/);
 });
