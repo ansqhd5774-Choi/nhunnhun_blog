@@ -13,7 +13,6 @@ on:
       - 'publishing/update-ledger.mjs'
       - 'publishing/validate-update.mjs'
       - 'publishing/verify-updated-public.mjs'
-      - 'tests/publishing.test.mjs'
       - 'tests/public-verification.test.mjs'
       - 'package.json'
       - '.github/workflows/update-posts.yml'
