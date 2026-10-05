@@ -1,9 +1,9 @@
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, openEditorContext } from './local-browser.mjs';
+import { localBrowserConfig, openEditorContext, freshEditorPage } from './local-browser.mjs';
 let context;
 try {
   context = await openEditorContext(await localBrowserConfig(), {headless:false});
-  const page = await context.newPage();
+  const page = await freshEditorPage(context);
   await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
   console.log('WAITING_FOR_USER_LOGIN: 열린 전용 Chrome에서 직접 로그인하세요. 글은 발행하지 않습니다.');
   const deadline = Date.now() + 240000;
@@ -31,7 +31,7 @@ try {
   await context.close();
   context = null;
   context = await openEditorContext(await localBrowserConfig());
-  const verification = await context.newPage();
+  const verification = await freshEditorPage(context);
   await verification.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
   try {
     await verification.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
