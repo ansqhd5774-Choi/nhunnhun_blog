@@ -83,6 +83,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Restore always-on Chrome
         if: always()
-        run: call maintenance\ensure-tistory-chrome.cmd
+        run: |
+          if exist C:\actions-runner\maintenance.stop del /q C:\actions-runner\maintenance.stop
+          call maintenance\ensure-tistory-chrome.cmd
 
 
