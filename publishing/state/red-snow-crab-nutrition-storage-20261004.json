@@ -4,9 +4,9 @@
   "sourceCommit": "bbb8f3dfc8562875e185ca518455c1f8d50d9000",
   "editorialTemplateVersion": "R3",
   "submittingTimestamp": "2026-10-04T14:30:04.564Z",
-  "timestamp": "2026-10-04T14:32:14.103Z",
+  "timestamp": "2026-10-05T04:56:55.065Z",
   "failureStage": "final-submit",
-  "failureCode": "E_TISTORY_HUMAN_VERIFICATION_REQUIRED",
+  "failureCode": "E_TISTORY_HUMAN_VERIFICATION_CLEARED",
   "publicMutationConfirmed": false,
   "checkedPublicUrls": [
     "https://nhunnhun.tistory.com/371",
@@ -20,10 +20,15 @@
     "https://nhunnhun.tistory.com/379",
     "https://nhunnhun.tistory.com/380"
   ],
-  "verification": "tinyfish_anonymous_public_404_371_380_after_dkaptcha_403",
+  "verification": "manual_tistory_ready_completed_by_user_after_dkaptcha",
   "diagnostic": {
     "postStatus": 403,
     "captchaProbeStatus": 200,
     "captchaProbePath": "/manage/dkaptcha/widgetId"
+  },
+  "manualClearance": {
+    "confirmedByUser": true,
+    "method": "TISTORY_ALL_READY_R1",
+    "note": "Shared Tistory login/verification session prepared; retry permitted once because prior publicMutationConfirmed=false."
   }
 }
