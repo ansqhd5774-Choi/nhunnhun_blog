@@ -12,6 +12,7 @@ on:
       - 'publishing/editorial.mjs'
       - 'publishing/ledger.mjs'
       - 'publishing/local-browser.mjs'
+      - 'publishing/mutation-gate.mjs'
       - 'maintenance/ensure-tistory-chrome.cmd'
       - 'maintenance/stop-tistory-chrome.mjs'
       - 'tests/publishing.test.mjs'
@@ -19,6 +20,12 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/publish-posts.yml'
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Actually publish one pending post'
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -27,10 +34,18 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.mutation-gate.outputs.should_mutate }}
     steps:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Mutation gate
+        id: mutation-gate
+        run: node publishing/mutation-gate.mjs posts
+        env:
+          MUTATION_REQUESTED: ${{ inputs.publish }}
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
@@ -50,7 +65,7 @@ jobs:
       group: nhunnhun-tistory-publish
       cancel-in-progress: false
     needs: validate
-    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate.outputs.should_publish == 'true'
     runs-on: [self-hosted, windows, x64, tistory-publisher]
     defaults:
       run:
