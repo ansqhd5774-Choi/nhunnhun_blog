@@ -304,27 +304,55 @@ try {
       if (!stagedHtml.trim()) throw new Error('E_EDITOR_HTML_BODY');
       assertEditorialContract(stagedHtml, post.bodyHtml);
       stage = 'category-tags';
-      const categoryButton = page.locator('#category-btn');
-      await categoryButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
-      await categoryButton.click({force:true}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
-      const categoryList = page.locator('#category-list');
-      await categoryList.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_CATEGORY_LIST'); });
-      const options = categoryList.locator('button, a');
-      const optionCount = await options.count();
-      const matches = [];
-      for (let i = 0; i < optionCount; i++) {
-        const option = options.nth(i);
-        const raw = (await option.innerText().catch(()=>'')) || '';
-        const normalized = raw.trim().replace(/^[-·]\s*/, '').replace(/\s+/g, ' ');
-        if (normalized === post.category) matches.push(option);
+      let categorySelected = false;
+
+      const categoryCombo = page.getByRole('combobox', {name:/카테고리 선택/}).first();
+      if (await categoryCombo.isVisible().catch(() => false)) {
+        try {
+          await categoryCombo.click({timeout:5000});
+          const exactOption = page.getByRole('option', {name:post.category, exact:true});
+          await exactOption.waitFor({state:'visible', timeout:5000});
+          if (await exactOption.count() === 1 && await exactOption.isEnabled().catch(() => false)) {
+            await exactOption.click({timeout:5000});
+            categorySelected = true;
+          }
+        } catch {}
       }
-      if (matches.length !== 1) {
-        const labels = [];
-        for (let i = 0; i < optionCount; i++) labels.push(((await options.nth(i).innerText().catch(()=>''))||'').trim());
-        console.error('CATEGORY_DIAG '+JSON.stringify({target:post.category,count:optionCount,labels}));
+
+      if (!categorySelected) {
+        const categoryButton = page.locator('#category-btn');
+        if (await categoryButton.isVisible().catch(() => false)) {
+          await categoryButton.click({timeout:5000}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
+          const categoryList = page.locator('#category-list');
+          await categoryList.waitFor({state:'visible', timeout:5000}).catch(() => { throw new Error('E_CATEGORY_LIST'); });
+          const options = categoryList.locator('button, a, [role="option"], li');
+          const optionCount = await options.count();
+          const matches = [];
+          for (let i = 0; i < optionCount; i++) {
+            const option = options.nth(i);
+            if (!await option.isVisible().catch(() => false)) continue;
+            const raw = (await option.innerText().catch(()=>'')) || '';
+            const normalized = raw.trim().replace(/^[-·]\s*/, '').replace(/\s+/g, ' ');
+            if (normalized === post.category) matches.push(option);
+          }
+          if (matches.length === 1) {
+            await matches[0].click({timeout:5000});
+            categorySelected = true;
+          }
+        }
+      }
+
+      if (!categorySelected) {
+        const diag = await page.evaluate(target => ({
+          target,
+          comboboxes:[...document.querySelectorAll('[role="combobox"]')].map(el=>({text:(el.textContent||'').trim(),aria:el.getAttribute('aria-label'),outer:el.outerHTML.slice(0,1200)})),
+          options:[...document.querySelectorAll('[role="option"]')].map(el=>({text:(el.textContent||'').trim(),outer:el.outerHTML.slice(0,800)})),
+          categoryButton:document.querySelector('#category-btn')?.outerHTML || null,
+          categoryList:document.querySelector('#category-list')?.outerHTML?.slice(0,4000) || null
+        }), post.category).catch(()=>({target:post.category,probe:'failed'}));
+        console.error('CATEGORY_DIAG '+JSON.stringify(diag));
         throw new Error('E_CATEGORY_AMBIGUOUS');
       }
-      await matches[0].click({force:true});
       const tagInput = page.locator('#tagText');
       await tagInput.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_TAG_CONTROL'); });
       for (const tag of post.tags) { await tagInput.fill(tag); await tagInput.press('Enter'); }
