@@ -57,8 +57,19 @@ export async function openEditorConnection(config, { engine = chromium } = {}) {
   }
 }
 export async function closeEditorConnection(connection) {
-  try { await connection?.browser?.close(); }
-  catch { throw new Error('E_LOCAL_BROWSER_DISCONNECT'); }
+  const browser = connection?.browser;
+  if (!browser) return;
+  try {
+    if (browser._connection?.close) {
+      browser._connection.close();
+      return;
+    }
+    browser._shouldCloseConnectionOnClose = true;
+    await Promise.race([
+      browser.close(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('disconnect-timeout')), 3000))
+    ]);
+  } catch { throw new Error('E_LOCAL_BROWSER_DISCONNECT'); }
 }
 export async function freshEditorPage(context) {
   const pages = context.pages();
