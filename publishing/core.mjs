@@ -4,7 +4,7 @@ import sanitizeHtml from 'sanitize-html';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
-  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'status', 'approved'];
+  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
   if (typeof post.title !== 'string' || !post.title.trim() || post.title.length > 150 || /[\r\n]/.test(post.title)) throw new Error('E_TITLE');
@@ -13,6 +13,11 @@ export function checkPost(post, filename) {
   if (post.status === 'ready' && !post.approved) throw new Error('E_APPROVAL');
   if (!Array.isArray(post.tags) || post.tags.length > 10 || post.tags.some(t => typeof t !== 'string' || !t.trim() || t.length > 40 || /[,#\r\n]/.test(t))) throw new Error('E_TAGS');
   if (typeof post.bodyHtml !== 'string' || post.bodyHtml.length > 200000 || !plainText(post.bodyHtml)) throw new Error('E_BODY');
+  if (post.scheduledAt !== undefined) {
+    if (typeof post.scheduledAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+09:00$/.test(post.scheduledAt)) throw new Error('E_SCHEDULE');
+    const when = new Date(post.scheduledAt);
+    if (!Number.isFinite(when.getTime())) throw new Error('E_SCHEDULE');
+  }
   if (post.representativeImageUrl !== undefined) {
     if (typeof post.representativeImageUrl !== 'string' || !post.representativeImageUrl.trim()) throw new Error('E_REPRESENTATIVE_IMAGE');
     let rep;
@@ -46,6 +51,7 @@ export function fingerprint(post) {
   const parts = [post.id, post.title, post.category, post.tags, post.bodyHtml];
   // Preserve fingerprints of legacy posts that predate representativeImageUrl.
   if (post.representativeImageUrl) parts.push(post.representativeImageUrl);
+  if (post.scheduledAt) parts.push(post.scheduledAt);
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
 }
 export async function loadPosts(directory = 'posts') {
@@ -59,7 +65,7 @@ export async function loadPosts(directory = 'posts') {
 export function eligible(post, state) {
   if (post.status !== 'ready' || !post.approved) return false;
   if (!state) return true;
-  if (state.phase === 'published') return false;
+  if (state.phase === 'published' || state.phase === 'scheduled') return false;
   if (state.phase === 'failed' && state.publicMutationConfirmed === false && state.fingerprint === fingerprint(post)) {
     if (state.failureCode === 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED') return false;
     return true;
