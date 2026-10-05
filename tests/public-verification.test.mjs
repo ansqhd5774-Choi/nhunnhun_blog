@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {articleUrl,ogAsset,checkMeasurements,assertImagePayload} from '../publishing/verify-updated-public.mjs';
+import {articleUrl,ogAsset,checkMeasurements,assertImagePayload,verifyInternalLink} from '../publishing/verify-updated-public.mjs';
 const e={images:3,h2:10,h3:3,tables:2,highlights:7,faq:5};
 const m={overflowPx:0,wideImages:0,images:3,missingAlt:0,brokenImages:0,nonNativeImages:0,h2:10,h3:3,badHeadingStyles:0,tables:2,badTableWraps:0,highlights:7,highlightColors:4,hiddenHighlights:0,faqQ:5,faqA:5,heroPriority:true,badLazyImages:0};
 test('only authorized numeric public article URLs',()=>{
@@ -23,3 +23,16 @@ test('invalid bytes fail even with an image MIME type',()=>{
   for(const mime of ['image/jpeg','application/octet-stream']) assert.throws(()=>assertImagePayload(mime,Buffer.from('<html>not an image</html>')),/E_QA_IMAGE_SIGNATURE/);
 });
 test('HTML response is not allowed even with a copied signature',()=>assert.throws(()=>assertImagePayload('text/html',Buffer.from([255,216,255,224,0,16])),/E_QA_IMAGE_TYPE/));
+
+test('internal-link verifier retries transient 503 and then passes',async()=>{
+  let calls=0;
+  const request={get:async()=>{calls++;return calls===1
+    ? {ok:()=>false,status:()=>503,url:()=> 'https://nhunnhun.tistory.com/374'}
+    : {ok:()=>true,status:()=>200,url:()=> 'https://nhunnhun.tistory.com/374'};}};
+  assert.equal(await verifyInternalLink(request,'https://nhunnhun.tistory.com/374',async()=>{}),true);
+  assert.equal(calls,2);
+});
+test('internal-link verifier still fails permanent 404',async()=>{
+  const request={get:async()=>({ok:()=>false,status:()=>404,url:()=> 'https://nhunnhun.tistory.com/374'})};
+  await assert.rejects(()=>verifyInternalLink(request,'https://nhunnhun.tistory.com/374',async()=>{}),/E_QA_INTERNAL_LINK/);
+});
