@@ -139,6 +139,43 @@ function replaceImageSources(html,mapping,representativeSource){
     return out;
   });
 }
+async function probeManagedPost(page,update){
+  try{
+    const result=await page.evaluate(async ({id,title})=>{
+      const params=new URLSearchParams({
+        category:'-3',page:'1',searchKeyword:title,searchType:'title',visibility:'all'
+      });
+      const response=await fetch('/manage/posts.json?'+params.toString(),{
+        credentials:'include',
+        headers:{Accept:'application/json'}
+      });
+      let data=null;
+      try{data=await response.json();}catch{}
+      const items=Array.isArray(data?.items)?data.items:Array.isArray(data?.data?.items)?data.data.items:[];
+      const item=items.find(x=>String(x?.id)===String(id))||null;
+      return {
+        status:response.status,
+        found:!!item,
+        id:item?String(item.id):null,
+        visibility:item?.visibility||null,
+        title:item?.title||null
+      };
+    },{id:update.articleId,title:update.expectedCurrentTitle});
+    console.log('UPDATE_TARGET_PROBE '+JSON.stringify({
+      articleId:update.articleId,
+      status:result.status,
+      found:result.found,
+      visibility:result.visibility
+    }));
+    if(result.status!==200) throw new Error('E_UPDATE_TARGET_PROBE');
+    if(!result.found) throw new Error('E_UPDATE_TARGET_NOT_FOUND');
+    if((result.title||'').trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
+    return result;
+  }catch(error){
+    if(/^E_UPDATE_/.test(String(error?.message||''))) throw error;
+    throw new Error('E_UPDATE_TARGET_PROBE');
+  }
+}
 async function materializedText(page,html){
   return page.evaluate(markup=>{
     const host=document.createElement('div');
@@ -270,10 +307,20 @@ try{
       page.setDefaultTimeout(25000);
       page.on('dialog',d=>{void (async()=>{try{if(d.type()==='confirm') await d.accept(); else await d.dismiss();}catch(error){const message=String(error?.message||error||'');if(!/No dialog is showing|Target page, context or browser has been closed|Browser has been closed/i.test(message)) console.error('E_UPDATE_DIALOG_HANDLER');}})();});
 
+      stage='target-probe';
+      await probeManagedPost(page,update);
+
       stage='editor-open';
-      await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
+      try{
+        await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
+      }catch{
+        throw new Error('E_UPDATE_EDITOR_OPEN_NAVIGATION');
+      }
       if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
-      await page.locator('#post-title-inp').waitFor({state:'visible'});
+      await page.locator('#post-title-inp').waitFor({state:'visible',timeout:15000}).catch(()=>{
+        console.log('UPDATE_EDITOR_OPEN_STATE '+JSON.stringify({articleId:update.articleId,path:new URL(page.url()).pathname}));
+        throw new Error('E_UPDATE_EDITOR_OPEN_TITLE');
+      });
       const currentTitle=(await page.locator('#post-title-inp').inputValue()).trim();
       if(currentTitle!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
 
