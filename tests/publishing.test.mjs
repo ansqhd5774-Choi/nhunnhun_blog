@@ -271,7 +271,21 @@ test('authenticated editor attaches to local persistent Chrome and disconnects w
     ['public',{headless:true,executablePath:'fixture-chrome'}],
     ['disconnect',true]
   ]);
-  await assert.rejects(openEditorConnection(config,{engine:{connectOverCDP:async()=>{throw Error('offline');}}}),/^Error: E_LOCAL_BROWSER_CONNECT$/);
+  const fallbackCalls=[];
+  const fallbackBrowser={_shouldCloseConnectionOnClose:false,contexts:()=>[context],close:async()=>{}};
+  const fallbackEngine={connectOverCDP:async(endpoint,options)=>{
+    fallbackCalls.push([endpoint,options]);
+    if(fallbackCalls.length===1) throw Error('http-cdp-failed');
+    return fallbackBrowser;
+  }};
+  const fallbackFetch=async()=>({ok:true,json:async()=>({webSocketDebuggerUrl:'ws://127.0.0.1:9223/devtools/browser/test'})});
+  const fallback=await openEditorConnection(config,{engine:fallbackEngine,fetchFn:fallbackFetch});
+  assert.equal(fallback.context,context);
+  assert.equal(fallbackCalls[1][0],'ws://127.0.0.1:9223/devtools/browser/test');
+  await assert.rejects(openEditorConnection(config,{
+    engine:{connectOverCDP:async()=>{throw Error('offline');}},
+    fetchFn:async()=>{throw Error('offline');}
+  }),/^Error: E_LOCAL_BROWSER_CONNECT$/);
 });
 
 test('login bootstrap confirms administrator page and never submits posts', () => {
