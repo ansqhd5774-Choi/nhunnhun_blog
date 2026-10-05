@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "f345f79dcbb4fbad209e3d3955dfe6108a49bc92a9b3720fe4eb9b80a11b496c",
   "url": "https://nhunnhun.tistory.com/369",
   "articleId": "369",
+  "previousTitle": "멜라토닌 효과·복용법 총정리｜수면·용량·부작용·한국에서 주의할 점",
+  "title": "멜라토닌 효과·복용법 총정리｜수면·용량·부작용·한국에서 주의할 점",
   "sourceCommit": "01a6c052ba545ac9b9075e1d472303e57f528a4b",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T16:07:58.114Z"
+  "timestamp": "2026-10-05T16:08:09.459Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 8,
+    "faqA": 8,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
