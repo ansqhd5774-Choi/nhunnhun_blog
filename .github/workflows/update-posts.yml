@@ -6,6 +6,7 @@ on:
       - 'updates/**'
       - 'publishing/update.mjs'
       - 'publishing/local-browser.mjs'
+      - 'publishing/mutation-gate.mjs'
       - 'maintenance/ensure-tistory-chrome.cmd'
       - 'publishing/runner-gate.mjs'
       - 'tests/runner-gate.test.mjs'
@@ -18,6 +19,11 @@ on:
       - '.github/workflows/update-posts.yml'
   workflow_dispatch:
     inputs:
+      update:
+        description: 'Actually update pending existing posts'
+        required: false
+        default: false
+        type: boolean
       public_verify_article_ids:
         description: 'Optional comma-separated numeric article IDs for read-only public verification; empty verifies all update records.'
         required: false
@@ -31,10 +37,18 @@ concurrency:
 jobs:
   validate-update:
     runs-on: ubuntu-latest
+    outputs:
+      should_update: ${{ steps.mutation-gate.outputs.should_mutate }}
     steps:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Mutation gate
+        id: mutation-gate
+        run: node publishing/mutation-gate.mjs updates
+        env:
+          MUTATION_REQUESTED: ${{ inputs.update }}
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
@@ -52,7 +66,7 @@ jobs:
       group: nhunnhun-tistory-update-runtime
       cancel-in-progress: false
     needs: validate-update
-    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate-update.outputs.should_update == 'true'
     runs-on: [self-hosted, windows, x64, tistory-publisher]
     defaults:
       run:
