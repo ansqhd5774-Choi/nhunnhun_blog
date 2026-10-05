@@ -373,24 +373,21 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher closes overlays, opens the mode layer, and writes through HTML CodeMirror', () => {
+test('publisher uses a real visible HTML menu item and active HTML CodeMirror', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(publish,/async function switchToHtmlEditor\(page\)/);
   assert.match(publish,/keyboard\.press\('Escape'\)/);
   assert.match(publish,/editor-mode-layer-btn-open/);
-  assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
-  assert.match(publish,/EDITOR_MODE_DIAG/);
-  assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
-  assert.match(publish,/nativeHtmlClick/);
-  assert.match(publish,/EDITOR_HTML_MODE_DIAG/);
-  assert.match(publish,/EDITOR_HTML_OPTION_DIAG/);
-  assert.match(publish,/EDITOR_HTML_POSTCLICK_DIAG/);
+  assert.match(publish,/getByRole\('menuitem', \{name:\/\^HTML\$\/i\}\)/);
+  assert.match(publish,/page\.locator\('#editor-mode-html'\)/);
+  assert.match(publish,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
+  assert.match(publish,/document\.querySelectorAll\('\.cm-s-tistory-html'\)/);
+  assert.match(publish,/\.CodeMirror-code/);
+  assert.doesNotMatch(publish,/nativeHtmlClick/);
+  assert.doesNotMatch(publish,/htmlOption\.click\(\{force:true\}\)/);
   assert.match(publish,/DIALOG_DIAG/);
   assert.match(publish,/DIALOG_ACTION/);
   assert.match(publish,/stage === 'html-mode'/);
-  assert.match(publish,/document\.querySelector\('\.cm-s-tistory-html'\)/);
-  assert.match(publish,/page\.locator\('\.cm-s-tistory-html:visible'\)\.first\(\)/);
-  assert.match(publish,/htmlMirror\.locator\('\.CodeMirror-code'\)/);
   assert.match(publish,/htmlCode\.click\(\{force:true\}\)/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
   assert.match(publish,/E_EDITOR_MODE_MENU/);
