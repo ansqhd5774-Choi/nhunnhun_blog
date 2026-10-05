@@ -337,3 +337,12 @@ test('publisher recognizes dkaptcha probe and 403 post response as human verific
   assert.match(publish,/dkaptcha/);
   assert.match(publish,/x\.path === '\/manage\/post\.json' && x\.status === 403/);
 });
+
+
+test('persistent Chrome helper binds CDP to loopback only', () => {
+  const helper=readFileSync(new URL('../maintenance/ensure-tistory-chrome.cmd',import.meta.url),'utf8');
+  assert.match(helper,/remote-debugging-address=127\.0\.0\.1/);
+  assert.match(helper,/remote-debugging-port=%TISTORY_CDP_PORT%/);
+  assert.match(helper,/user-data-dir="%TISTORY_PROFILE_DIR%"/);
+  assert.doesNotMatch(helper,/0\.0\.0\.0|powershell|pwsh/i);
+});
