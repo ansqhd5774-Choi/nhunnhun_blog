@@ -17,6 +17,16 @@
       "visualChecked": true
     },
     {
+      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Curingsalmon.jpg?width=960",
+      "alt": "비타민D가 풍부한 식품 예시로 손질 중인 연어",
+      "role": "detail",
+      "composition": "closeup",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Curingsalmon.jpg",
+      "author": "Miia Ranta",
+      "license": "CC BY-SA 2.0",
+      "visualChecked": true
+    },
+    {
       "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Sunlight_and_vitamin_D.jpg?width=960",
       "alt": "야외에서 햇빛을 받으며 비타민D 합성을 설명하는 장면",
       "role": "context",
@@ -24,16 +34,6 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Sunlight_and_vitamin_D.jpg",
       "author": "GiftedLydia",
       "license": "CC BY-SA 4.0",
-      "visualChecked": true
-    },
-    {
-      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Curingsalmon.jpg?width=960",
-      "alt": "비타민D가 풍부한 식품 예시로 손질 중인 연어",
-      "role": "food",
-      "composition": "closeup",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Curingsalmon.jpg",
-      "author": "Miia Ranta",
-      "license": "CC BY-SA 2.0",
       "visualChecked": true
     }
   ],
