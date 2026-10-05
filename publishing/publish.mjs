@@ -210,20 +210,39 @@ try {
       stage = 'html-mode';
       const htmlMirror = await switchToHtmlEditor(page);
       stage = 'html-body';
-      await htmlMirror.evaluate((el, value) => el?.CodeMirror?.setValue?.(value), bodyHtml);
+      const htmlCode = htmlMirror.locator('.CodeMirror-code');
+      await htmlCode.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
+      await htmlCode.click({force:true});
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText(bodyHtml);
       const stagedHtml = await htmlMirror.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if (!stagedHtml.trim()) throw new Error('E_EDITOR_HTML_BODY');
       assertEditorialContract(stagedHtml, post.bodyHtml);
       stage = 'category-tags';
-      await page.locator('#category-btn').click();
-      await page.locator('#category-list').waitFor({state:'visible'});
+      const categoryButton = page.locator('#category-btn');
+      await categoryButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
+      await categoryButton.click({force:true}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
+      const categoryList = page.locator('#category-list');
+      await categoryList.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_CATEGORY_LIST'); });
+      const options = categoryList.locator('button, a');
+      const optionCount = await options.count();
       const matches = [];
-      for (const option of await page.locator('#category-list [role="option"]').all()) {
-        if ((await option.innerText()).trim().replace(/^-\s*/, '') === post.category) matches.push(option);
+      for (let i = 0; i < optionCount; i++) {
+        const option = options.nth(i);
+        const raw = (await option.innerText().catch(()=>'')) || '';
+        const normalized = raw.trim().replace(/^[-·]\s*/, '').replace(/\s+/g, ' ');
+        if (normalized === post.category) matches.push(option);
       }
-      if (matches.length !== 1) throw new Error('E_CATEGORY_AMBIGUOUS');
-      await matches[0].click();
-      for (const tag of post.tags) { await page.locator('#tagText').fill(tag); await page.locator('#tagText').press('Enter'); }
+      if (matches.length !== 1) {
+        const labels = [];
+        for (let i = 0; i < optionCount; i++) labels.push(((await options.nth(i).innerText().catch(()=>''))||'').trim());
+        console.error('CATEGORY_DIAG '+JSON.stringify({target:post.category,count:optionCount,labels}));
+        throw new Error('E_CATEGORY_AMBIGUOUS');
+      }
+      await matches[0].click({force:true});
+      const tagInput = page.locator('#tagText');
+      await tagInput.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_TAG_CONTROL'); });
+      for (const tag of post.tags) { await tagInput.fill(tag); await tagInput.press('Enter'); }
       await page.locator('#publish-layer-btn').click();
       stage = 'publish-dialog';
       if (representativeSource) {
