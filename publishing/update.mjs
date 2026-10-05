@@ -267,7 +267,7 @@ try{
       let page=await freshEditorPage(editorContext);
       editorPage=page;
       page.setDefaultTimeout(25000);
-      page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
+      page.on('dialog',d=>{void (async()=>{try{if(d.type()==='confirm') await d.accept(); else await d.dismiss();}catch(error){const message=String(error?.message||error||'');if(!/No dialog is showing|Target page, context or browser has been closed|Browser has been closed/i.test(message)) console.error('E_UPDATE_DIALOG_HANDLER');}})();});
 
       stage='editor-open';
       await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
