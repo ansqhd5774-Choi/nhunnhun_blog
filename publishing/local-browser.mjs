@@ -73,18 +73,12 @@ export async function closeEditorConnection(connection) {
 }
 export async function freshEditorPage(context) {
   const pages = context.pages();
-  let keeper = pages.find(page => {
-    const url = page.url();
-    return url.startsWith('https://nhunnhun.tistory.com/') || url.startsWith('https://www.tistory.com/');
-  }) || pages[0];
-
-  if (!keeper) keeper = await context.newPage();
-
   for (const page of pages) {
-    if (page === keeper) continue;
+    const url = page.url();
+    if (!/^https:\/\/nhunnhun\.tistory\.com\/manage\/post(?:[/?#]|$)/.test(url)) continue;
     try { await page.close({runBeforeUnload:false}); } catch {}
   }
-  return keeper;
+  return context.newPage();
 }
 export async function openPublicBrowser(config, engine = chromium) {
   try { return await engine.launch({headless:true, executablePath:config.chromePath}); }
