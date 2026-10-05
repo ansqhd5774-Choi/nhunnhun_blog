@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "5730a8802df30ee2b9c2e208e771dd506018507cb323b93601150e0a3b8090f5",
   "url": "https://nhunnhun.tistory.com/377",
   "articleId": "377",
+  "previousTitle": "위고비 vs 마운자로 vs 에페 비교｜감량률·성분·부작용·국내 출시 상태",
+  "title": "위고비 vs 마운자로 vs 에페 비교｜감량률·성분·부작용·국내 출시 상태",
   "sourceCommit": "ff8fbf54da3279ce5c7452ef2471332b1c84605b",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T15:40:36.358Z"
+  "timestamp": "2026-10-05T15:40:46.702Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 12,
+    "h2Styled": 12,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 12,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 0,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
