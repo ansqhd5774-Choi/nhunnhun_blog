@@ -371,3 +371,18 @@ test('dialog handler contains stale-dialog race guard', () => {
   assert.match(publish,/E_DIALOG_HANDLER/);
   assert.match(publish,/void \(async \(\) =>/);
 });
+
+
+test('publisher mode switch uses DOM click fallback and explicit errors', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/modeButton\.evaluate\(el => \{ el\.click\(\); return true; \}\)/);
+  assert.match(publish,/E_EDITOR_MODE_MENU/);
+  assert.match(publish,/E_EDITOR_HTML_MODE/);
+  assert.match(publish,/E_EDITOR_HTML_BODY/);
+});
+
+test('CDP disconnect closes transport directly without closing persistent Chrome', () => {
+  const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
+  assert.match(local,/browser\._connection\?\.close/);
+  assert.match(local,/disconnect-timeout/);
+});
