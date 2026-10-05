@@ -95,10 +95,50 @@ function replaceImageSources(html, mapping, representativeSource) {
 }
 
 async function switchToHtmlEditor(page) {
-  const htmlButton = page.locator('#editor-mode-html');
-  await htmlButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_MODE'); });
-  const switched = await htmlButton.evaluate(el => { el.click(); return true; }).catch(() => false);
+  await page.keyboard.press('Escape').catch(()=>{});
+  await page.locator('#post-title-inp').click({force:true}).catch(()=>{});
+  const modeButton = page.locator('#editor-mode-layer-btn-open');
+  await modeButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+  const opened = await page.evaluate(() => {
+    const button = document.querySelector('#editor-mode-layer-btn-open');
+    if (!button) return false;
+    button.click();
+    return true;
+  }).catch(() => false);
+  if (!opened) throw new Error('E_EDITOR_MODE_MENU');
+
+  const htmlReady = await page.waitForFunction(() => {
+    const el = document.querySelector('#editor-mode-html');
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    const s = getComputedStyle(el);
+    return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+  }, {timeout:10000}).then(()=>true).catch(()=>false);
+  if (!htmlReady) {
+    const diag = await page.evaluate(() => {
+      const mode = document.querySelector('#editor-mode-layer-btn-open');
+      const html = document.querySelector('#editor-mode-html');
+      return {
+        modeText: mode?.textContent || null,
+        modeHtml: mode?.outerHTML || null,
+        htmlExists: !!html,
+        htmlOuter: html?.outerHTML || null,
+        htmlDisplay: html ? getComputedStyle(html).display : null,
+        htmlVisibility: html ? getComputedStyle(html).visibility : null
+      };
+    }).catch(()=>({probe:'failed'}));
+    console.error('EDITOR_MODE_DIAG '+JSON.stringify(diag));
+    throw new Error('E_EDITOR_MODE_MENU');
+  }
+
+  const switched = await page.evaluate(() => {
+    const button = document.querySelector('#editor-mode-html');
+    if (!button) return false;
+    button.click();
+    return true;
+  }).catch(() => false);
   if (!switched) throw new Error('E_EDITOR_HTML_MODE');
+
   const htmlMirror = page.locator('.cm-s-tistory-html').first();
   await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
   return htmlMirror;
@@ -107,6 +147,7 @@ async function switchToHtmlEditor(page) {
 let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
 let finalSubmitDialogs = [];
 let stage = 'configuration';
+let fatalExitCode = 0;
 try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
     console.log('DISABLED: 발행 활성화 전에는 게시하지 않습니다.');
@@ -411,11 +452,13 @@ try {
   // Provider exceptions can carry credentials/connect URLs: never log raw exceptions.
   console.error('STOP: 로컬 Chrome·전용 프로필·로그인·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
   process.exitCode = 1;
+  fatalExitCode = 1;
 } finally {
   try { await publicBrowser?.close(); }
   catch { console.error('E_LOCAL_PUBLIC_BROWSER_CLOSE'); process.exitCode = 1; }
   try { await closeEditorConnection(editorConnection); }
   catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
   if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
-  catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; }
+  catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; fatalExitCode = 1; }
+  if (fatalExitCode) setTimeout(() => process.exit(fatalExitCode), 0);
 }
