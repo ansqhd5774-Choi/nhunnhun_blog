@@ -1,6 +1,7 @@
 import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openPublicBrowser } from './local-browser.mjs';
+import { chromium } from 'playwright-core';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -94,124 +95,7 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
-async function switchToHtmlEditor(page) {
-  const modeButtonCandidates = [
-    page.locator('[role="button"][aria-haspopup="true"]').filter({hasText:/기본\s*모드|HTML/i}).first(),
-    page.locator('#editor-mode-layer-btn')
-  ];
-
-  const visibleModeButton = async () => {
-    for (const candidate of modeButtonCandidates) {
-      if (!await candidate.isVisible().catch(() => false)) continue;
-      const box = await candidate.boundingBox().catch(() => null);
-      if (box && box.width > 0 && box.height > 0) return candidate;
-    }
-    return null;
-  };
-
-  const activeHtmlMirror = async () => {
-    const mirrors = page.locator('.CodeMirror.cm-s-tistory-html');
-    const count = await mirrors.count();
-    for (let i = 0; i < count; i++) {
-      const mirror = mirrors.nth(i);
-      if (!await mirror.isVisible().catch(() => false)) continue;
-      const box = await mirror.boundingBox().catch(() => null);
-      if (box && box.width > 0 && box.height > 0 && await mirror.locator('.CodeMirror-code').count() > 0) return mirror;
-    }
-    return null;
-  };
-
-  const waitForActiveHtmlMirror = async (timeout = 7000) => {
-    const settled = await page.waitForFunction(() => {
-      const htmlActive = [...document.querySelectorAll('.CodeMirror.cm-s-tistory-html')].some(el => {
-        const r = el.getBoundingClientRect();
-        const s = getComputedStyle(el);
-        return r.width > 0 && r.height > 0 &&
-          s.display !== 'none' && s.visibility !== 'hidden' &&
-          !!el.querySelector('.CodeMirror-code');
-      });
-      const markdownActive = [...document.querySelectorAll('.CodeMirror.cm-s-tistory-markdown')].some(el => {
-        const r = el.getBoundingClientRect();
-        const s = getComputedStyle(el);
-        return r.width > 0 && r.height > 0 &&
-          s.display !== 'none' && s.visibility !== 'hidden';
-      });
-      return htmlActive && !markdownActive;
-    }, {timeout}).then(() => true).catch(() => false);
-    return settled ? activeHtmlMirror() : null;
-  };
-
-  const clickVisibleHtmlOption = async () => {
-    const candidates = [
-      page.locator('[role="menuitem"]').filter({hasText:/^\s*HTML\s*$/}),
-      page.locator('#editor-mode-html')
-    ];
-    for (const list of candidates) {
-      const count = await list.count().catch(() => 0);
-      for (let i = 0; i < count; i++) {
-        const option = list.nth(i);
-        if (!await option.isVisible().catch(() => false)) continue;
-        if (!await option.isEnabled().catch(() => false)) continue;
-        try {
-          await option.click({timeout:4000});
-          return true;
-        } catch {}
-      }
-    }
-    return false;
-  };
-
-  const alreadyActive = await activeHtmlMirror();
-  if (alreadyActive) return alreadyActive;
-
-  for (let attempt = 0; attempt < 2; attempt++) {
-    await page.keyboard.press('Escape').catch(() => {});
-
-    const modeButton = await visibleModeButton();
-    if (!modeButton) {
-      if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
-      continue;
-    }
-
-    try {
-      await modeButton.click({timeout:5000});
-    } catch {
-      if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
-      continue;
-    }
-
-    const clicked = await clickVisibleHtmlOption();
-    if (!clicked) {
-      await page.keyboard.press('Escape').catch(() => {});
-      if (attempt === 1) throw new Error('E_EDITOR_HTML_MODE');
-      continue;
-    }
-
-    const htmlMirror = await waitForActiveHtmlMirror(7000);
-    if (htmlMirror) return htmlMirror;
-
-    await page.keyboard.press('Escape').catch(() => {});
-  }
-
-  const diag = await page.evaluate(() => ({
-    modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
-    modeControls:[...document.querySelectorAll('[role="button"][aria-haspopup="true"]')].map(el=>el.outerHTML.slice(0,1200)),
-    menuItems:[...document.querySelectorAll('[role="menuitem"]')].map(el=>({
-      text:(el.textContent||'').trim(),
-      className:el.className,
-      rect:(()=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};})()
-    })),
-    mirrors: [...document.querySelectorAll('.CodeMirror')].map((el,index) => {
-      const r=el.getBoundingClientRect();
-      const s=getComputedStyle(el);
-      return {index,className:el.className,width:r.width,height:r.height,display:s.display,visibility:s.visibility,hasCode:!!el.querySelector('.CodeMirror-code')};
-    })
-  })).catch(() => ({probe:'failed'}));
-  console.error('EDITOR_HTML_MODE_DIAG '+JSON.stringify(diag));
-  throw new Error('E_EDITOR_HTML_MODE');
-}
-
-let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
+let editorContext, publicBrowser, editorPage, imageTempDir;
 let finalSubmitDialogs = [];
 let stage = 'configuration';
 let fatalExitCode = 0;
@@ -236,11 +120,13 @@ try {
       const {post, previousStateSha} = queue[0];
       stage = 'local-browser';
       const browserConfig = await localBrowserConfig();
-      editorConnection = await openEditorConnection(browserConfig);
-      editorContext = editorConnection.context;
+      editorContext = await chromium.launchPersistentContext(browserConfig.profileDir, {
+        headless:true,
+        executablePath:browserConfig.chromePath
+      });
       imageTempDir = await mkdtemp(join(tmpdir(), 'tistory-images-'));
       stage = 'editor-open';
-      const page = await freshEditorPage(editorContext);
+      const page = await editorContext.newPage();
       editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
@@ -278,81 +164,30 @@ try {
       const imageMap = new Map();
       for (let i = 0; i < uploadOrder.length; i++) imageMap.set(uploadOrder[i], await uploadImage(page, uploadOrder[i], i));
       const bodyHtml = sources.length ? replaceImageSources(editorialHtml, imageMap, representativeSource) : editorialHtml;
+      stage = 'mode-menu';
+      await page.locator('#editor-mode-layer-btn-open').click();
       stage = 'html-mode';
-      const htmlMirror = await switchToHtmlEditor(page);
+      await page.locator('#editor-mode-html').click();
       stage = 'html-body';
-      const htmlCode = htmlMirror.locator('.CodeMirror-code');
-      if (await htmlCode.count() < 1) throw new Error('E_EDITOR_HTML_BODY');
-      const mirrorBox = await htmlMirror.boundingBox().catch(() => null);
-      if (!mirrorBox || mirrorBox.width <= 0 || mirrorBox.height <= 0) throw new Error('E_EDITOR_HTML_BODY');
-      await htmlMirror.click({position:{x:Math.min(12, Math.max(1, mirrorBox.width - 1)),y:Math.min(12, Math.max(1, mirrorBox.height - 1))}, timeout:5000});
+      await page.locator('.CodeMirror:visible .CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(bodyHtml);
-      let stagedHtml = await htmlMirror.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
-      if (!stagedHtml.trim()) {
-        const setByCodeMirror = await htmlMirror.evaluate((el, html) => {
-          const cm=el?.CodeMirror;
-          if (!cm?.setValue) return false;
-          cm.setValue(html);
-          cm.save?.();
-          cm.focus?.();
-          return true;
-        }, bodyHtml).catch(() => false);
-        if (!setByCodeMirror) throw new Error('E_EDITOR_HTML_BODY');
-        stagedHtml = await htmlMirror.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
-      }
+      const stagedHtml = await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if (!stagedHtml.trim()) throw new Error('E_EDITOR_HTML_BODY');
       assertEditorialContract(stagedHtml, post.bodyHtml);
       stage = 'category-tags';
-      let categorySelected = false;
-
-      const categoryCombo = page.getByRole('combobox', {name:/카테고리 선택/}).first();
-      if (await categoryCombo.isVisible().catch(() => false)) {
-        try {
-          await categoryCombo.click({timeout:5000});
-          const exactOption = page.getByRole('option', {name:post.category, exact:true});
-          await exactOption.waitFor({state:'visible', timeout:5000});
-          if (await exactOption.count() === 1 && await exactOption.isEnabled().catch(() => false)) {
-            await exactOption.click({timeout:5000});
-            categorySelected = true;
-          }
-        } catch {}
+      await page.locator('#category-btn').click();
+      await page.locator('#category-list').waitFor({state:'visible'});
+      const matches = [];
+      for (const option of await page.locator('#category-list [role="option"]').all()) {
+        if ((await option.innerText()).trim().replace(/^[-·]\s*/, '') === post.category) matches.push(option);
       }
-
-      if (!categorySelected) {
-        const categoryButton = page.locator('#category-btn');
-        if (await categoryButton.isVisible().catch(() => false)) {
-          await categoryButton.click({timeout:5000}).catch(() => { throw new Error('E_CATEGORY_CONTROL'); });
-          const categoryList = page.locator('#category-list');
-          await categoryList.waitFor({state:'visible', timeout:5000}).catch(() => { throw new Error('E_CATEGORY_LIST'); });
-          const options = categoryList.locator('button, a, [role="option"], li');
-          const optionCount = await options.count();
-          const matches = [];
-          for (let i = 0; i < optionCount; i++) {
-            const option = options.nth(i);
-            if (!await option.isVisible().catch(() => false)) continue;
-            const raw = (await option.innerText().catch(()=>'')) || '';
-            const normalized = raw.trim().replace(/^[-·]\s*/, '').replace(/\s+/g, ' ');
-            if (normalized === post.category) matches.push(option);
-          }
-          if (matches.length === 1) {
-            await matches[0].click({timeout:5000});
-            categorySelected = true;
-          }
-        }
-      }
-
-      if (!categorySelected) {
-        const diag = await page.evaluate(target => ({
-          target,
-          comboboxes:[...document.querySelectorAll('[role="combobox"]')].map(el=>({text:(el.textContent||'').trim(),aria:el.getAttribute('aria-label'),outer:el.outerHTML.slice(0,1200)})),
-          options:[...document.querySelectorAll('[role="option"]')].map(el=>({text:(el.textContent||'').trim(),outer:el.outerHTML.slice(0,800)})),
-          categoryButton:document.querySelector('#category-btn')?.outerHTML || null,
-          categoryList:document.querySelector('#category-list')?.outerHTML?.slice(0,4000) || null
-        }), post.category).catch(()=>({target:post.category,probe:'failed'}));
-        console.error('CATEGORY_DIAG '+JSON.stringify(diag));
+      if (matches.length !== 1) {
+        const labels = await page.locator('#category-list [role="option"]').allInnerTexts().catch(()=>[]);
+        console.error('CATEGORY_DIAG '+JSON.stringify({target:post.category,labels}));
         throw new Error('E_CATEGORY_AMBIGUOUS');
       }
+      await matches[0].click();
       const tagInput = page.locator('#tagText');
       await tagInput.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_TAG_CONTROL'); });
       for (const tag of post.tags) { await tagInput.fill(tag); await tagInput.press('Enter'); }
@@ -588,8 +423,8 @@ try {
 } finally {
   try { await publicBrowser?.close(); }
   catch { console.error('E_LOCAL_PUBLIC_BROWSER_CLOSE'); process.exitCode = 1; }
-  try { await closeEditorConnection(editorConnection); }
-  catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
+  try { await editorContext?.close(); }
+  catch { console.error('E_LOCAL_BROWSER_CLOSE'); process.exitCode = 1; }
   if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
   catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; fatalExitCode = 1; }
   if (fatalExitCode) setTimeout(() => process.exit(fatalExitCode), 0);
