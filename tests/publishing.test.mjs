@@ -377,7 +377,8 @@ test('publisher uses a real visible HTML menu item and active HTML CodeMirror', 
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(publish,/async function switchToHtmlEditor\(page\)/);
   assert.match(publish,/keyboard\.press\('Escape'\)/);
-  assert.match(publish,/editor-mode-layer-btn-open/);
+  assert.match(publish,/page\.locator\('#editor-mode-layer-btn'\)/);
+  assert.match(publish,/document\.querySelector\('#editor-mode-layer-btn-open'\)/);
   assert.match(publish,/getByRole\('menuitem', \{name:\/\^HTML\$\/i\}\)/);
   assert.match(publish,/page\.locator\('#editor-mode-html'\)/);
   assert.match(publish,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
