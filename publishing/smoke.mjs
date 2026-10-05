@@ -19,4 +19,6 @@ try {
 } finally {
   try { await closeEditorConnection(connection); }
   catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
+  // A completed check must not retain a CDP client that handles future dialogs.
+  setTimeout(() => process.exit(process.exitCode ?? 0), 0);
 }

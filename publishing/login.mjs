@@ -35,4 +35,6 @@ try {
 } finally {
   try { await closeEditorConnection(connection); }
   catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
+  // Exit after disconnect; keep the dedicated Chrome and its session alive.
+  setTimeout(() => process.exit(process.exitCode ?? 0), 0);
 }
