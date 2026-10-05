@@ -190,7 +190,7 @@ test('validation remains hosted; public publisher is Windows CMD only', () => {
   assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
 });
 
-test('publisher attaches to the saved login Chrome but always creates a fresh editor tab', () => {
+test('publisher attaches to the saved login Chrome and reuses only the authenticated manager tab', () => {
   for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
     const source=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
     assert.doesNotMatch(source,/@browserbasehq\/sdk|Browserbase|BROWSERBASE_|\/tmp\//);
@@ -198,11 +198,15 @@ test('publisher attaches to the saved login Chrome but always creates a fresh ed
   const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
   assert.match(local,/connectOverCDP/);
   assert.match(local,/127\.0\.0\.1/);
-  assert.match(local,/return context\.newPage\(\)/);
+  assert.match(local,/return anchor \|\| context\.newPage\(\)/);
+  assert.match(local,/url\.pathname\.startsWith\('\/manage'\)/);
   assert.match(local,/manage\\\/post/);
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(p,/openEditorConnection\(browserConfig\)/);
   assert.match(p,/freshEditorPage\(editorContext\)/);
+  assert.match(p,/page\.goto\(`\$\{BLOG\}\/manage\/posts`/);
+  assert.match(p,/name:'글쓰기', exact:true/);
+  assert.match(p,/page\.goto\(`\$\{BLOG\}\/manage\/post`/);
   assert.match(p,/closeEditorConnection\(editorConnection\)/);
   assert.doesNotMatch(p,/launchPersistentContext/);
   assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
@@ -376,7 +380,7 @@ test('persistent Chrome helper binds CDP to loopback only', () => {
 });
 
 
-test('persistent editor closes only stale write tabs and creates a fresh page', async () => {
+test('persistent editor keeps the authenticated manager anchor and closes only stale write tabs', async () => {
   const closed=[];
   const list={url:()=> 'https://nhunnhun.tistory.com/manage/posts',close:async()=>closed.push('list')};
   const stale={url:()=> 'https://nhunnhun.tistory.com/manage/post',close:async()=>closed.push('stale')};
@@ -384,7 +388,7 @@ test('persistent editor closes only stale write tabs and creates a fresh page', 
   const created={url:()=> 'about:blank'};
   const context={pages:()=>[list,stale,other],newPage:async()=>created};
   const page=await freshEditorPage(context);
-  assert.equal(page,created);
+  assert.equal(page,list);
   assert.deepEqual(closed,['stale']);
 });
 
