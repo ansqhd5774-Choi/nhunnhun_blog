@@ -1,7 +1,6 @@
 import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
-import { localBrowserConfig, assertLocalGit, openPublicBrowser } from './local-browser.mjs';
-import { chromium } from 'playwright-core';
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -95,7 +94,7 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
-let editorContext, publicBrowser, editorPage, imageTempDir;
+let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
 let finalSubmitDialogs = [];
 let stage = 'configuration';
 let fatalExitCode = 0;
@@ -120,13 +119,11 @@ try {
       const {post, previousStateSha} = queue[0];
       stage = 'local-browser';
       const browserConfig = await localBrowserConfig();
-      editorContext = await chromium.launchPersistentContext(browserConfig.profileDir, {
-        headless:true,
-        executablePath:browserConfig.chromePath
-      });
+      editorConnection = await openEditorConnection(browserConfig);
+      editorContext = editorConnection.context;
       imageTempDir = await mkdtemp(join(tmpdir(), 'tistory-images-'));
       stage = 'editor-open';
-      const page = await editorContext.newPage();
+      const page = await freshEditorPage(editorContext);
       editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
@@ -423,8 +420,8 @@ try {
 } finally {
   try { await publicBrowser?.close(); }
   catch { console.error('E_LOCAL_PUBLIC_BROWSER_CLOSE'); process.exitCode = 1; }
-  try { await editorContext?.close(); }
-  catch { console.error('E_LOCAL_BROWSER_CLOSE'); process.exitCode = 1; }
+  try { await closeEditorConnection(editorConnection); }
+  catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
   if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
   catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; fatalExitCode = 1; }
   if (fatalExitCode) setTimeout(() => process.exit(fatalExitCode), 0);
