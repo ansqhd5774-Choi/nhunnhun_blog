@@ -32,7 +32,7 @@ export function assertLocalGit(run = execFileSync) {
   try { run('git', ['--version'], { encoding:'utf8', stdio:'pipe', windowsHide:true }); }
   catch { throw new Error('E_LOCAL_GIT_REQUIRED'); }
 }
-export async function openEditorContext(config, { headless = true, engine = chromium } = {}) {
+export async function openEditorContext(config, { headless = false, engine = chromium } = {}) {
   try {
     return await engine.launchPersistentContext(config.profileDir, {
       headless,
