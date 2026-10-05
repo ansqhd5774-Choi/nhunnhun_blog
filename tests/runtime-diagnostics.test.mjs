@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { safeRuntimeDiagnostic } from '../publishing/runtime-diagnostics.mjs';
+
+test('publisher entry point parses before any browser or external mutation',()=>{
+  execFileSync(process.execPath,['--check',fileURLToPath(new URL('../publishing/publish.mjs',import.meta.url))]);
+});
 
 test('runtime diagnostics classify click blockers without echoing sensitive exceptions',()=>{
   const error=new Error('Timeout 20000ms exceeded: overlay intercepts pointer events https://example.invalid/?token=private-secret Authorization: private-secret');

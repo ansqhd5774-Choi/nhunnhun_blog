@@ -428,7 +428,7 @@ try {
           hitWithinButton:!!hit&&(hit===button||button.contains(hit)),
           hitTag:hit?.tagName??null};
       })};
-    }))));
+    })));
   } catch { console.log('MODE_MENU_SAFE_DIAG_UNAVAILABLE'); }
   if (stage === 'local-browser') console.error('LOCAL_BROWSER_SAFE_DIAG '+JSON.stringify({code}));
   if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
