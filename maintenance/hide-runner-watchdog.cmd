@@ -22,7 +22,7 @@ if not exist "%WATCHDOG_SCRIPT%" (
 schtasks /End /TN "%TASK_NAME%" >nul 2>nul
 schtasks /Delete /TN "%TASK_NAME%" /F >nul 2>nul
 
-schtasks /Create /TN "%TASK_NAME%" /TR "cmd.exe /d /c \"\"%WATCHDOG_SCRIPT%\" >nul 2>nul\"" /SC MINUTE /MO 2 /RL LIMITED /F >nul
+schtasks /Create /TN "%TASK_NAME%" /TR "\"%WATCHDOG_SCRIPT%\"" /SC MINUTE /MO 2 /RL LIMITED /F >nul
 if errorlevel 1 (
   echo FAIL: WATCHDOG_TASK_CREATE
   pause
