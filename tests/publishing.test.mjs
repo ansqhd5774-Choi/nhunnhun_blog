@@ -437,10 +437,11 @@ test('publisher restores the last proven direct Tistory HTML-mode sequence', () 
   assert.doesNotMatch(publish,/switchToHtmlEditor/);
 });
 
-test('publisher exits promptly after a pre-submit runtime failure', () => {
+test('publisher exits promptly after cleanup on success or failure', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(publish,/fatalExitCode/);
-  assert.match(publish,/setTimeout\(\(\) => process\.exit\(fatalExitCode\), 0\)/);
+  assert.match(publish,/const finalExitCode = fatalExitCode \|\| process\.exitCode \|\| 0/);
+  assert.match(publish,/setTimeout\(\(\) => process\.exit\(finalExitCode\), 0\)/);
 });
 
 test('CDP disconnect closes transport directly without closing persistent Chrome', () => {
