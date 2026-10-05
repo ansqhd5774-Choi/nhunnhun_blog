@@ -373,23 +373,28 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher uses a real visible HTML menu item and active HTML CodeMirror', () => {
+test('publisher uses user-visible mode controls and confirms real HTML mode before body input', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/async function switchToHtmlEditor\(page\)/);
-  assert.match(publish,/keyboard\.press\('Escape'\)/);
-  assert.match(publish,/page\.locator\('#editor-mode-layer-btn'\)/);
-  assert.match(publish,/document\.querySelector\('#editor-mode-layer-btn-open'\)/);
-  assert.match(publish,/getByRole\('menuitem', \{name:\/\^HTML\$\/i\}\)/);
-  assert.match(publish,/page\.locator\('#editor-mode-html'\)/);
-  assert.match(publish,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
-  assert.match(publish,/document\.querySelectorAll\('\.cm-s-tistory-html'\)/);
-  assert.match(publish,/\.CodeMirror-code/);
-  assert.doesNotMatch(publish,/nativeHtmlClick/);
-  assert.doesNotMatch(publish,/htmlOption\.click\(\{force:true\}\)/);
+  const switchBlock=publish.slice(
+    publish.indexOf('async function switchToHtmlEditor(page) {'),
+    publish.indexOf('\nlet editorConnection')
+  );
+  assert.match(switchBlock,/getByRole\('button', \{name:\/기본\\s\*모드\|HTML\/i\}\)\.first\(\)/);
+  assert.match(switchBlock,/getByRole\('menuitem', \{name:\/\^HTML\$\/i\}\)/);
+  assert.match(switchBlock,/getByText\('HTML', \{exact:true\}\)/);
+  assert.match(switchBlock,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
+  assert.match(switchBlock,/document\.querySelector\('#editor-mode-layer-btn-open'\)\?\.textContent/);
+  assert.match(switchBlock,/document\.querySelectorAll\('\.CodeMirror\.cm-s-tistory-html'\)/);
+  assert.match(switchBlock,/\/HTML\/i\.test\(mode\)/);
+  assert.match(switchBlock,/r\.width > 0 && r\.height > 0/);
+  assert.match(switchBlock,/\.CodeMirror-code/);
+  assert.match(switchBlock,/keyboard\.press\('Escape'\)/);
+  assert.doesNotMatch(switchBlock,/force:true/);
+  assert.doesNotMatch(switchBlock,/\.evaluate\([^]*\.click\(\)/);
+  assert.doesNotMatch(switchBlock,/#editor-mode-html/);
   assert.match(publish,/DIALOG_DIAG/);
   assert.match(publish,/DIALOG_ACTION/);
   assert.match(publish,/stage === 'html-mode'/);
-  assert.match(publish,/htmlCode\.click\(\{force:true\}\)/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
   assert.match(publish,/E_EDITOR_MODE_MENU/);
   assert.match(publish,/E_EDITOR_HTML_MODE/);
