@@ -1,0 +1,33 @@
+name: Disable Tistory Chrome auto-open
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disable-tistory-chrome-autostart.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  disable-auto-open:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - name: Remove legacy Chrome auto-start tasks
+        run: |
+          schtasks /End /TN "NHUNNHUN-Tistory-Chrome" >nul 2>nul
+          schtasks /End /TN "NHUNNHUN-Tistory-Chrome-Watchdog" >nul 2>nul
+          schtasks /Delete /TN "NHUNNHUN-Tistory-Chrome" /F >nul 2>nul
+          schtasks /Delete /TN "NHUNNHUN-Tistory-Chrome-Watchdog" /F >nul 2>nul
+          if exist C:\actions-runner\watch-tistory-chrome.cmd del /q C:\actions-runner\watch-tistory-chrome.cmd
+          echo CHROME_AUTO_OPEN_TASKS_REMOVED
+      - name: Verify tasks absent
+        run: |
+          schtasks /Query /TN "NHUNNHUN-Tistory-Chrome" >nul 2>nul && exit /b 21
+          schtasks /Query /TN "NHUNNHUN-Tistory-Chrome-Watchdog" >nul 2>nul && exit /b 22
+          echo CHROME_AUTO_OPEN_DISABLED
