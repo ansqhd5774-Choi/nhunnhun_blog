@@ -1,4 +1,5 @@
 name: Validate and update Tistory posts
+# Chrome is check-only; update never opens it.
 # Existing-post mutation is source-scoped by the hosted mutation gate.
 on:
   push:
