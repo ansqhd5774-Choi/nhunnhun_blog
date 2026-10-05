@@ -142,19 +142,32 @@ function replaceImageSources(html,mapping,representativeSource){
 async function probeManagedPost(page,update){
   try{
     const result=await page.evaluate(async ({id,title})=>{
-      const params=new URLSearchParams({
-        category:'-3',page:'1',searchKeyword:title,searchType:'title',visibility:'all'
-      });
-      const response=await fetch('/manage/posts.json?'+params.toString(),{
-        credentials:'include',
-        headers:{Accept:'application/json'}
-      });
-      let data=null;
-      try{data=await response.json();}catch{}
-      const items=Array.isArray(data?.items)?data.items:Array.isArray(data?.data?.items)?data.data.items:[];
-      const item=items.find(x=>String(x?.id)===String(id))||null;
+      async function getPage(page,searchKeyword=''){
+        const params=new URLSearchParams({
+          category:'-3',page:String(page),searchKeyword,searchType:'title',visibility:'all'
+        });
+        const response=await fetch('/manage/posts.json?'+params.toString(),{
+          credentials:'include',
+          headers:{Accept:'application/json'}
+        });
+        let data=null;
+        try{data=await response.json();}catch{}
+        const items=Array.isArray(data?.items)?data.items:Array.isArray(data?.data?.items)?data.data.items:[];
+        return {status:response.status,items};
+      }
+      let first=await getPage(1,title);
+      let item=first.items.find(x=>String(x?.id)===String(id))||null;
+      let status=first.status;
+      if(!item && status===200){
+        for(let page=1;page<=5 && !item;page++){
+          const scan=await getPage(page,'');
+          status=scan.status;
+          if(status!==200) break;
+          item=scan.items.find(x=>String(x?.id)===String(id))||null;
+        }
+      }
       return {
-        status:response.status,
+        status,
         found:!!item,
         id:item?String(item.id):null,
         visibility:item?.visibility||null,
