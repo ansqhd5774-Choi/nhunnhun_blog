@@ -5,7 +5,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
@@ -263,7 +263,7 @@ try{
       const browserConfig=await localBrowserConfig();
       editorContext=await openEditorContext(browserConfig);
       tempDir=await mkdtemp(join(tmpdir(),'tistory-update-'));
-      let page=await editorContext.newPage();
+      let page=await freshEditorPage(editorContext);
       editorPage=page;
       page.setDefaultTimeout(25000);
       page.on('dialog',async d=>{if(d.type()==='confirm') await d.accept(); else await d.dismiss();});
