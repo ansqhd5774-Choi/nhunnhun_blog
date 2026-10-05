@@ -12,6 +12,7 @@ on:
       - 'publishing/editorial.mjs'
       - 'publishing/ledger.mjs'
       - 'publishing/local-browser.mjs'
+      - 'maintenance/ensure-tistory-chrome.cmd'
       - 'tests/publishing.test.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -72,6 +73,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+      - run: call maintenance\ensure-tistory-chrome.cmd
       - run: pnpm run publish
         # Validate and publish use the same checked-out current main. publish.mjs also rechecks remote main immediately before final submit.
         env:
