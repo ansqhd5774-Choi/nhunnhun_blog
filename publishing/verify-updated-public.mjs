@@ -74,6 +74,23 @@ async function bytes(request,url,role) {
   // require exact SHA256 equality to the independently fetched image source.
   return assertImagePayload(response.headers()['content-type'],await response.body());
 }
+export async function verifyInternalLink(request,url,sleep=(ms)=>new Promise(r=>setTimeout(r,ms))) {
+  const expected=articleUrl(url);
+  for(let attempt=0;attempt<3;attempt++) {
+    try {
+      const response=await request.get(expected,{timeout:30000});
+      const finalUrl=response.url();
+      const same=(()=>{try{return articleUrl(finalUrl)===expected;}catch{return false;}})();
+      if(response.ok()&&same) return true;
+      console.log('PUBLIC_QA_INTERNAL_LINK '+JSON.stringify({url:expected,status:response.status(),finalUrl,attempt:attempt+1}));
+      if(![429,503].includes(response.status())) break;
+    } catch {
+      console.log('PUBLIC_QA_INTERNAL_LINK '+JSON.stringify({url:expected,status:0,finalUrl:'',attempt:attempt+1}));
+    }
+    if(attempt<2) await sleep(1000*(2**attempt));
+  }
+  throw new Error('E_QA_INTERNAL_LINK');
+}
 async function verify(browser,update,width,expected,rendered,assetChecks) {
   const context=await verificationContext(browser, {viewport:{width,height:width===390?844:1000}});
   try {
@@ -132,10 +149,7 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
       metrics.representativeSourceMatch=true;
       metrics.ogNative=true;
       const links=await root.locator('a').evaluateAll(nodes=>[...new Set(nodes.map(a=>a.href).filter(u=>/^https:\/\/nhunnhun\.tistory\.com\/\d+$/.test(u)))]);
-      for(const url of links) {
-        const r=await context.request.get(articleUrl(url),{timeout:30000});
-        if(!r.ok()||articleUrl(r.url())!==url) throw new Error('E_QA_INTERNAL_LINK');
-      }
+      for(const url of links) await verifyInternalLink(context.request,url);
       metrics.internalLinks=links.length;
     }
     return metrics;
