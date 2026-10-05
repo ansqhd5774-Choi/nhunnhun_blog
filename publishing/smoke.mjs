@@ -1,10 +1,10 @@
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorContext, freshEditorPage } from './local-browser.mjs';
 let context;
 try {
   assertLocalGit();
   context = await openEditorContext(await localBrowserConfig());
-  const page = await context.newPage();
+  const page = await freshEditorPage(context);
   await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded', timeout:45000});
   try {
     await page.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
