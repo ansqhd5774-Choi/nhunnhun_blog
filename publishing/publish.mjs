@@ -126,12 +126,21 @@ try {
       editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
-      page.on('dialog', async dialog => {
-        const type = dialog.type();
-        const message = dialog.message();
-        if (type === 'confirm' && (/모드.*변경|변경.*모드/.test(message) || stage === 'final-submit')) await dialog.accept();
-        else if (type === 'alert') await dialog.accept();
-        else await dialog.dismiss();
+      page.on('dialog', dialog => {
+        void (async () => {
+          try {
+            const type = dialog.type();
+            const message = dialog.message();
+            if (type === 'confirm' && (/모드.*변경|변경.*모드/.test(message) || stage === 'final-submit')) await dialog.accept();
+            else if (type === 'alert') await dialog.accept();
+            else await dialog.dismiss();
+          } catch (error) {
+            const message = String(error?.message || error || '');
+            if (!/No dialog is showing|Target page, context or browser has been closed|Browser has been closed/i.test(message)) {
+              console.error('E_DIALOG_HANDLER');
+            }
+          }
+        })();
       });
       await page.goto(`${BLOG}/manage/post`, { waitUntil:'domcontentloaded' });
       if (new URL(page.url()).origin !== BLOG) throw new Error('E_LOGIN_REQUIRED');
