@@ -40,44 +40,9 @@ export function assertLocalGit(run = execFileSync) {
   try { run('git', ['--version'], { encoding:'utf8', stdio:'pipe', windowsHide:true }); }
   catch { throw new Error('E_LOCAL_GIT_REQUIRED'); }
 }
-async function resolveCdpWebSocket(cdpUrl, fetchFn = fetch) {
-  const response = await fetchFn(cdpUrl + '/json/version', { signal:AbortSignal.timeout(3000) });
-  if (!response?.ok) throw new Error('E_LOCAL_CDP_VERSION');
-  const payload = await response.json();
-  const raw = payload?.webSocketDebuggerUrl;
-  let ws;
-  try { ws = new URL(raw); } catch { throw new Error('E_LOCAL_CDP_WEBSOCKET'); }
-  const http = new URL(cdpUrl);
-  if (ws.protocol !== 'ws:' || !['127.0.0.1','localhost'].includes(ws.hostname) || ws.port !== http.port) {
-    throw new Error('E_LOCAL_CDP_WEBSOCKET');
-  }
-  return ws.toString();
-}
-export async function openEditorConnection(config, { engine = chromium, fetchFn = fetch } = {}) {
-  let browser;
+export async function openEditorConnection(config, { engine = chromium } = {}) {
   try {
-    browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
-  } catch (httpError) {
-    const httpMessage=String(httpError?.message||httpError||'').replace(/[\r\n]+/g,' ').slice(0,500);
-    console.error('LOCAL_BROWSER_HTTP_DIAG '+JSON.stringify({name:httpError?.name||'Error',message:httpMessage}));
-    try {
-      const wsEndpoint = await resolveCdpWebSocket(config.cdpUrl, fetchFn);
-      browser = await engine.connectOverCDP(wsEndpoint, { timeout:15000, isLocal:true, noDefaults:true });
-      console.log('LOCAL_BROWSER_CONNECT_FALLBACK=websocket');
-    } catch (wsError) {
-      const wsMessage=String(wsError?.message||wsError||'').replace(/[\r\n]+/g,' ').slice(0,500);
-      console.error('LOCAL_BROWSER_WS_DIAG '+JSON.stringify({name:wsError?.name||'Error',message:wsMessage}));
-      try {
-        browser = await engine.connectOverCDP('chrome', { timeout:15000, isLocal:true, noDefaults:true });
-        console.log('LOCAL_BROWSER_CONNECT_FALLBACK=chrome-channel');
-      } catch (channelError) {
-        const channelMessage=String(channelError?.message||channelError||'').replace(/[\r\n]+/g,' ').slice(0,500);
-        console.error('LOCAL_BROWSER_CHANNEL_DIAG '+JSON.stringify({name:channelError?.name||'Error',message:channelMessage}));
-        throw new Error('E_LOCAL_BROWSER_CONNECT');
-      }
-    }
-  }
-  try {
+    const browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
     const contexts = browser.contexts();
     if (contexts.length !== 1) {
       browser._shouldCloseConnectionOnClose = true;
