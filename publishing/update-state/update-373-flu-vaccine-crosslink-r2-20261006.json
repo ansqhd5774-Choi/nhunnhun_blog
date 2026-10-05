@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "86b502dc32a8d5c9898e6aaf32fc8489e416139e33ea63fb48c468b5ecb21ddc",
   "url": "https://nhunnhun.tistory.com/373",
   "articleId": "373",
+  "previousTitle": "2026 독감 예방접종 총정리｜무료 대상·일정·3가 백신·주의사항",
+  "title": "2026 독감 예방접종 총정리｜무료 대상·일정·3가 백신·주의사항",
   "sourceCommit": "39a6b80f2fe733f3cd2277997040206d501704c0",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T16:47:08.744Z"
+  "timestamp": "2026-10-05T16:47:20.273Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 12,
+    "h2Styled": 12,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 12,
+    "tables": 1,
+    "tableWraps": 1,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 5,
+    "highlightColors": 4,
+    "faqQ": 5,
+    "faqA": 5,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
