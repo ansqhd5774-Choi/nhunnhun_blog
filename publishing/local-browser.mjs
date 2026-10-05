@@ -57,12 +57,16 @@ export async function openEditorConnection(config, { engine = chromium, fetchFn 
   let browser;
   try {
     browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
-  } catch {
+  } catch (httpError) {
+    const httpMessage=String(httpError?.message||httpError||'').replace(/[\r\n]+/g,' ').slice(0,500);
+    console.error('LOCAL_BROWSER_HTTP_DIAG '+JSON.stringify({name:httpError?.name||'Error',message:httpMessage}));
     try {
       const wsEndpoint = await resolveCdpWebSocket(config.cdpUrl, fetchFn);
       browser = await engine.connectOverCDP(wsEndpoint, { timeout:15000, isLocal:true, noDefaults:true });
       console.log('LOCAL_BROWSER_CONNECT_FALLBACK=websocket');
-    } catch {
+    } catch (wsError) {
+      const wsMessage=String(wsError?.message||wsError||'').replace(/[\r\n]+/g,' ').slice(0,500);
+      console.error('LOCAL_BROWSER_WS_DIAG '+JSON.stringify({name:wsError?.name||'Error',message:wsMessage}));
       throw new Error('E_LOCAL_BROWSER_CONNECT');
     }
   }
