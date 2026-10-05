@@ -1,6 +1,6 @@
 import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -94,7 +94,7 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
-let editorContext, publicBrowser, editorPage, imageTempDir;
+let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
 let finalSubmitDialogs = [];
 let stage = 'configuration';
 try {
@@ -118,7 +118,8 @@ try {
       const {post, previousStateSha} = queue[0];
       stage = 'local-browser';
       const browserConfig = await localBrowserConfig();
-      editorContext = await openEditorContext(browserConfig);
+      editorConnection = await openEditorConnection(browserConfig);
+      editorContext = editorConnection.context;
       imageTempDir = await mkdtemp(join(tmpdir(), 'tistory-images-'));
       stage = 'editor-open';
       const page = await freshEditorPage(editorContext);
@@ -395,10 +396,10 @@ try {
   console.error('STOP: 로컬 Chrome·전용 프로필·로그인·발행 증거를 확인해야 합니다. 실패 직후 임의 재발행하지 마세요.');
   process.exitCode = 1;
 } finally {
-  for (const resource of [publicBrowser, editorContext]) {
-    try { await resource?.close(); }
-    catch { console.error('E_LOCAL_BROWSER_CLOSE'); process.exitCode = 1; }
-  }
+  try { await publicBrowser?.close(); }
+  catch { console.error('E_LOCAL_PUBLIC_BROWSER_CLOSE'); process.exitCode = 1; }
+  try { await closeEditorConnection(editorConnection); }
+  catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
   if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
   catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; }
 }
