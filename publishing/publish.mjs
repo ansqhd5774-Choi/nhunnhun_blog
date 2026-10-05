@@ -147,6 +147,16 @@ try {
           }
         })();
       });
+      stage = 'login-check';
+      await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded'});
+      const managerUrl = new URL(page.url());
+      if (managerUrl.origin !== BLOG || managerUrl.pathname !== '/manage/posts') throw new Error('E_LOGIN_REQUIRED');
+      try {
+        await page.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
+      } catch {
+        throw new Error('E_LOGIN_REQUIRED');
+      }
+      stage = 'editor-open';
       await page.goto(`${BLOG}/manage/post`, { waitUntil:'domcontentloaded' });
       if (new URL(page.url()).origin !== BLOG) throw new Error('E_LOGIN_REQUIRED');
       await page.locator('#post-title-inp').waitFor({state:'visible'});
