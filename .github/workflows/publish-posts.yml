@@ -14,7 +14,6 @@ on:
       - 'publishing/local-browser.mjs'
       - 'publishing/mutation-gate.mjs'
       - 'maintenance/ensure-tistory-chrome.cmd'
-      - 'maintenance/stop-tistory-chrome.mjs'
       - 'tests/publishing.test.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -89,17 +88,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
-      - name: Stop always-on Chrome before isolated publisher
-        run: node maintenance/stop-tistory-chrome.mjs
+      - run: call maintenance\ensure-tistory-chrome.cmd
       - run: pnpm run publish
         # Validate and publish use the same checked-out current main. publish.mjs also rechecks remote main immediately before final submit.
         env:
           PUBLISH_ENABLED: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Restore always-on Chrome
-        if: always()
-        run: |
-          if exist C:\actions-runner\maintenance.stop del /q C:\actions-runner\maintenance.stop
-          call maintenance\ensure-tistory-chrome.cmd
 
 
