@@ -174,21 +174,34 @@ test('validation remains hosted; public publisher is Windows CMD only', () => {
   assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
 });
 
-test('active browser sources use only local persistent Chrome and no cloud session', () => {
+test('publisher uses an isolated per-run profile context while login keeps the always-on local Chrome', () => {
   for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
     const source=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
     assert.doesNotMatch(source,/@browserbasehq\/sdk|Browserbase|BROWSERBASE_|\/tmp\//);
-    assert.doesNotMatch(source,/restore-last-session/);
   }
   const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
   assert.match(local,/connectOverCDP/);
   assert.match(local,/127\.0\.0\.1/);
   assert.match(local,/_shouldCloseConnectionOnClose = true/);
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(p,/tmpdir\(\)/);
+  assert.match(p,/chromium\.launchPersistentContext\(browserConfig\.profileDir/);
+  assert.match(p,/headless:true/);
+  assert.match(p,/editorContext\.newPage\(\)/);
+  assert.match(p,/editorContext\?\.close\(\)/);
+  assert.doesNotMatch(p,/openEditorConnection|freshEditorPage|closeEditorConnection/);
   assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
   assert.match(p,/verificationContext\(publicBrowser\)/);
-  assert.match(p,/closeEditorConnection\(editorConnection\)/);
+  const workflow=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
+  const runs=workflow.jobs.publish.steps.map(step=>step.run).filter(Boolean);
+  const stopIndex=runs.indexOf('node maintenance/stop-tistory-chrome.mjs');
+  const publishIndex=runs.indexOf('pnpm run publish');
+  const restoreIndex=runs.indexOf('call maintenance\\ensure-tistory-chrome.cmd');
+  assert.ok(stopIndex>=0 && stopIndex<publishIndex && publishIndex<restoreIndex);
+  const restore=workflow.jobs.publish.steps.find(step=>step.name==='Restore always-on Chrome');
+  assert.equal(restore.if,'always()');
+  const stopper=readFileSync(new URL('../maintenance/stop-tistory-chrome.mjs',import.meta.url),'utf8');
+  assert.match(stopper,/connectOverCDP/);
+  assert.match(stopper,/await browser\.close\(\)/);
   const verification=readFileSync(new URL('../publishing/verification-context.mjs',import.meta.url),'utf8');
   assert.match(verification,/context\.route\('\*\*\/\*'/);
   assert.match(verification,/serviceWorkers: 'block'/);
@@ -373,33 +386,17 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher uses trusted visible mode controls and only writes after the HTML CodeMirror becomes active', () => {
+test('publisher restores the last proven direct Tistory HTML-mode sequence', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  const switchBlock=publish.slice(
-    publish.indexOf('async function switchToHtmlEditor(page) {'),
-    publish.indexOf('\nlet editorConnection')
-  );
-  assert.match(switchBlock,/\[role="button"\]\[aria-haspopup="true"\]/);
-  assert.match(switchBlock,/filter\(\{hasText:\/기본\\s\*모드\|HTML\/i\}\)/);
-  assert.match(switchBlock,/\[role="menuitem"\]/);
-  assert.match(switchBlock,/hasText:\/\^\\s\*HTML\\s\*\$\//);
-  assert.match(switchBlock,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
-  assert.match(switchBlock,/document\.querySelectorAll\('\.CodeMirror\.cm-s-tistory-html'\)/);
-  assert.match(switchBlock,/document\.querySelectorAll\('\.CodeMirror\.cm-s-tistory-markdown'\)/);
-  assert.match(switchBlock,/return htmlActive && !markdownActive/);
-  assert.match(switchBlock,/keyboard\.press\('Escape'\)/);
-  assert.doesNotMatch(switchBlock,/force:true/);
-  assert.doesNotMatch(switchBlock,/\.evaluate\([^]*\.click\(\)/);
-  assert.match(publish,/DIALOG_DIAG/);
-  assert.match(publish,/DIALOG_ACTION/);
-  assert.match(publish,/stage === 'html-mode'/);
-  assert.match(publish,/htmlMirror\.click\(\{position:/);
+  assert.match(publish,/stage = 'mode-menu'/);
+  assert.match(publish,/page\.locator\('#editor-mode-layer-btn-open'\)\.click\(\)/);
+  assert.match(publish,/stage = 'html-mode'/);
+  assert.match(publish,/page\.locator\('#editor-mode-html'\)\.click\(\)/);
+  assert.match(publish,/page\.locator\('\.CodeMirror:visible \.CodeMirror-code'\)\.click\(\)/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
-  assert.match(publish,/cm\.setValue\(html\)/);
-  assert.doesNotMatch(publish,/htmlCode\.click\(\{force:true\}\)/);
-  assert.match(publish,/E_EDITOR_MODE_MENU/);
-  assert.match(publish,/E_EDITOR_HTML_MODE/);
+  assert.match(publish,/page\.locator\('\.CodeMirror:visible'\)\.evaluate/);
   assert.match(publish,/E_EDITOR_HTML_BODY/);
+  assert.doesNotMatch(publish,/switchToHtmlEditor/);
 });
 
 test('publisher exits promptly after a pre-submit runtime failure', () => {
@@ -415,16 +412,14 @@ test('CDP disconnect closes transport directly without closing persistent Chrome
 });
 
 
-test('publisher category selector prefers the current Tistory combobox and keeps legacy fallback', () => {
+test('publisher restores the last proven Tistory category option sequence', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/getByRole\('combobox', \{name:\/카테고리 선택\/\}\)\.first\(\)/);
-  assert.match(publish,/getByRole\('option', \{name:post\.category, exact:true\}\)/);
-  assert.match(publish,/page\.locator\('#category-btn'\)/);
-  assert.match(publish,/categoryList\.locator\('button, a, \[role="option"\], li'\)/);
+  assert.match(publish,/page\.locator\('#category-btn'\)\.click\(\)/);
+  assert.match(publish,/page\.locator\('#category-list'\)\.waitFor/);
+  assert.match(publish,/page\.locator\('#category-list \[role="option"\]'\)\.all\(\)/);
+  assert.match(publish,/matches\[0\]\.click\(\)/);
   assert.match(publish,/CATEGORY_DIAG/);
-  assert.match(publish,/E_CATEGORY_CONTROL/);
-  assert.match(publish,/E_CATEGORY_LIST/);
   assert.match(publish,/E_CATEGORY_AMBIGUOUS/);
   assert.match(publish,/E_TAG_CONTROL/);
-  assert.doesNotMatch(publish,/matches\[0\]\.click\(\{force:true\}\)/);
 });
+
