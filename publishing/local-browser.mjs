@@ -93,6 +93,16 @@ export async function freshEditorPage(context) {
 
   return anchor || context.newPage();
 }
+export async function ensureEditorRendering(context, page) {
+  // noDefaults preserves the user's Chrome settings but skips Playwright's
+  // focus emulation. Hidden tabs can suspend the animation-frame polling
+  // used by locator actions. Restore only this override for the editor tab.
+  try {
+    const session = await context.newCDPSession(page);
+    await session.send('Emulation.setFocusEmulationEnabled', { enabled:true });
+    return session;
+  } catch { throw new Error('E_EDITOR_RENDERING'); }
+}
 export async function openPublicBrowser(config, engine = chromium) {
   try { return await engine.launch({headless:true, executablePath:config.chromePath}); }
   catch { throw new Error('E_LOCAL_PUBLIC_BROWSER_LAUNCH'); }

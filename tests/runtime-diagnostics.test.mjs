@@ -3,6 +3,17 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { safeRuntimeDiagnostic } from '../publishing/runtime-diagnostics.mjs';
+import { ensureEditorRendering } from '../publishing/local-browser.mjs';
+
+test('editor rendering correction targets its own CDP session and fails closed',async()=>{
+  const page={};
+  const calls=[];
+  const session={send:async(...args)=>calls.push(args)};
+  const context={newCDPSession:async target=>{assert.equal(target,page);return session;}};
+  assert.equal(await ensureEditorRendering(context,page),session);
+  assert.deepEqual(calls,[['Emulation.setFocusEmulationEnabled',{enabled:true}]]);
+  await assert.rejects(ensureEditorRendering({newCDPSession:async()=>{throw Error('secret');}},page),/^Error: E_EDITOR_RENDERING$/);
+});
 
 test('publisher entry point parses before any browser or external mutation',()=>{
   execFileSync(process.execPath,['--check',fileURLToPath(new URL('../publishing/publish.mjs',import.meta.url))]);

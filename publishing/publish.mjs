@@ -1,7 +1,7 @@
 import { verificationContext } from './verification-context.mjs';
 import { safeRuntimeDiagnostic } from './runtime-diagnostics.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -126,6 +126,7 @@ try {
       stage = 'editor-open';
       const page = await freshEditorPage(editorContext);
       editorPage = page;
+      await ensureEditorRendering(editorContext, page);
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
       page.on('dialog', dialog => {
