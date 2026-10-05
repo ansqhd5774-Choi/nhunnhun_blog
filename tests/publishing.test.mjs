@@ -363,3 +363,11 @@ test('persistent editor creates one tab only when browser has no pages', async (
   const context={pages:()=>[],newPage:async()=>created};
   assert.equal(await freshEditorPage(context),created);
 });
+
+
+test('dialog handler contains stale-dialog race guard', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/No dialog is showing/);
+  assert.match(publish,/E_DIALOG_HANDLER/);
+  assert.match(publish,/void \(async \(\) =>/);
+});
