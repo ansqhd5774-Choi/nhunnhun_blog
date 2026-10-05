@@ -209,9 +209,10 @@ test('publisher attaches to the saved login Chrome but always creates a fresh ed
   assert.match(p,/verificationContext\(publicBrowser\)/);
   const workflow=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
   const runs=workflow.jobs.publish.steps.map(step=>step.run).filter(Boolean);
-  const ensureIndex=runs.indexOf('call maintenance\\ensure-tistory-chrome.cmd');
+  const checkIndex=runs.indexOf('call maintenance\\check-tistory-chrome.cmd');
   const publishIndex=runs.indexOf('pnpm run publish');
-  assert.ok(ensureIndex>=0 && ensureIndex<publishIndex);
+  assert.ok(checkIndex>=0 && checkIndex<publishIndex);
+  assert.ok(!runs.includes('call maintenance\\ensure-tistory-chrome.cmd'));
   assert.ok(!runs.includes('node maintenance/stop-tistory-chrome.mjs'));
   const verification=readFileSync(new URL('../publishing/verification-context.mjs',import.meta.url),'utf8');
   assert.match(verification,/context\.route\('\*\*\/\*'/);
