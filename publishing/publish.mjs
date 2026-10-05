@@ -298,7 +298,7 @@ try {
         throw new Error('E_PUBLICATION_NOT_FOUND_AFTER_CLICK');
       }
       const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
-        .filter(a => (a.textContent || '').trim() === title)
+        .filter(a => (a.textContent || '').replace(/\\s+/g,' ').trim().includes(title))
         .map(a => a.href)
         .filter(href => /^https:\/\/nhunnhun\.tistory\.com\/\d+$/.test(href)))], post.title);
       if (publicUrls.length !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
