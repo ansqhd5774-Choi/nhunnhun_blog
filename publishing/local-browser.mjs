@@ -67,7 +67,14 @@ export async function openEditorConnection(config, { engine = chromium, fetchFn 
     } catch (wsError) {
       const wsMessage=String(wsError?.message||wsError||'').replace(/[\r\n]+/g,' ').slice(0,500);
       console.error('LOCAL_BROWSER_WS_DIAG '+JSON.stringify({name:wsError?.name||'Error',message:wsMessage}));
-      throw new Error('E_LOCAL_BROWSER_CONNECT');
+      try {
+        browser = await engine.connectOverCDP('chrome', { timeout:15000, isLocal:true, noDefaults:true });
+        console.log('LOCAL_BROWSER_CONNECT_FALLBACK=chrome-channel');
+      } catch (channelError) {
+        const channelMessage=String(channelError?.message||channelError||'').replace(/[\r\n]+/g,' ').slice(0,500);
+        console.error('LOCAL_BROWSER_CHANNEL_DIAG '+JSON.stringify({name:channelError?.name||'Error',message:channelMessage}));
+        throw new Error('E_LOCAL_BROWSER_CONNECT');
+      }
     }
   }
   try {
