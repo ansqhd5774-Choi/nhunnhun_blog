@@ -53,7 +53,10 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-publish');
   assert.equal(workflow.jobs.publish.concurrency['cancel-in-progress'], false);
   assert.deepEqual(workflow.permissions, {contents:'read'});
-  assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
+  assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate.outputs.should_publish == 'true'");
+  assert.equal(workflow.jobs.validate.outputs.should_publish,'${{ steps.mutation-gate.outputs.should_mutate }}');
+  assert.equal(workflow.jobs.validate.steps.find(step => step.id === 'mutation-gate').run,'node publishing/mutation-gate.mjs posts');
+  assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with['fetch-depth'],0);
   assert.equal(workflow.jobs.publish.needs, 'validate');
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm test'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm validate'));
@@ -64,6 +67,19 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   const watched=workflow.on?.push?.paths ?? workflow['on']?.push?.paths ?? [];
   assert.ok(!watched.includes('publishing/**'));
   assert.ok(!watched.includes('publishing/update.mjs'));
+});
+
+test('mutation gate prevents maintenance commits from reaching Tistory', () => {
+  const source=readFileSync(new URL('../publishing/mutation-gate.mjs',import.meta.url),'utf8');
+  assert.match(source,/eventName === 'workflow_dispatch'/);
+  assert.match(source,/MUTATION_REQUESTED/);
+  assert.match(source,/\^posts\\\/\[\^\/\]\+\\\.json\$/);
+  assert.match(source,/\^updates\\\/\[\^\/\]\+\\\.json\$/);
+  assert.match(source,/should_mutate=/);
+  const publish=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
+  const update=parse(readFileSync(new URL('../.github/workflows/update-posts.yml',import.meta.url),'utf8'));
+  assert.equal(publish.on?.workflow_dispatch?.inputs?.publish?.default ?? publish['on'].workflow_dispatch.inputs.publish.default,false);
+  assert.equal(update.on?.workflow_dispatch?.inputs?.update?.default ?? update['on'].workflow_dispatch.inputs.update.default,false);
 });
 
 test('editorial template gives new posts the shared visual hierarchy', () => {
@@ -315,7 +331,10 @@ test('existing-post update workflow is separated from new publication', () => {
   assert.match(all,/pnpm run update/);
   assert.match(all,/pnpm run validate:update/);
   assert.doesNotMatch(all,/pnpm run publish|publishing\/publish\.mjs/);
-  assert.equal(w.jobs.update.if,"vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
+  assert.equal(w.jobs.update.if,"vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate-update.outputs.should_update == 'true'");
+  assert.equal(w.jobs['validate-update'].outputs.should_update,'${{ steps.mutation-gate.outputs.should_mutate }}');
+  assert.equal(w.jobs['validate-update'].steps.find(step => step.id === 'mutation-gate').run,'node publishing/mutation-gate.mjs updates');
+  assert.equal(w.jobs['validate-update'].steps.find(step => step.uses === 'actions/checkout@v5').with['fetch-depth'],0);
 });
 
 test('image review gate requires visually checked close-up hero and exact attribution', () => {
