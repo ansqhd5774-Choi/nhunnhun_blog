@@ -8,6 +8,8 @@ GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
 
 `docs/BLOG_PLUGIN_EXECUTION_RULES_R2.md`를 블로그 도구 선택·실행·완료 판정의 ACTIVE 최상위 운영 기준으로 사용한다. 신규 글 작성·발행 디자인 기준은 `docs/EDITORIAL_PUBLISH_STANDARD_R3.md`를 ACTIVE 기준으로 사용한다. 신규 글은 서로 다른 본문 이미지 최소 3개와 제한적 다색 형광펜 강조 계약을 통과해야 한다.
 
+콘텐츠 운영 범위는 **음식 / 영양소 / 약학 / 질병 4개 카테고리 전체**다. 신규 주제는 카테고리 비율을 기계적으로 맞추지 않고 검색 수요·기존 검색의도 중복·GSC 성과·최신성 필요도를 기준으로 선택한다. 약학·질병 콘텐츠는 음식·영양소보다 높은 근거 수준과 안전성 검증을 적용한다.
+
 실제 Tistory mutation은 Windows self-hosted runner가 표준 실행 환경이다. PC·runner가 켜져 있어야 한다. 신규 공개 발행은 `publish-posts.yml`, 기존 숫자 URL 수정은 `update-posts.yml`만 사용한다. 두 경로 모두 최신 main·테스트·source drift·checkpoint·익명 공개 검증을 요구한다. 초기 runner 등록·전용 프로필 로그인은 `docs/WINDOWS_TISTORY_PUBLISHER.md`를 따른다. Browserbase 등 과거 cloud-browser 발행 경로는 RETIRED이며 기록은 `evidence/legacy-browser-publisher-20261003/`에 보존했다.
 
 ChatGPT 인수인계: [docs/CHATGPT_HANDOFF.md](docs/CHATGPT_HANDOFF.md). GitHub에 올린 skin/reference/skin.html은 인증·광고 식별자를 제거한 검토용 소스다. 실제 적용 파일로 사용하지 않는다. 원본 백업과 수집 원자료는 로컬에만 보존한다.
