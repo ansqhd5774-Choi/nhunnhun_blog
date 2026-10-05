@@ -381,7 +381,8 @@ test('publisher closes overlays, opens the mode layer, and writes through HTML C
   assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
   assert.match(publish,/EDITOR_MODE_DIAG/);
   assert.match(publish,/page\.locator\('\.cm-s-tistory-html'\)/);
-  assert.match(publish,/CodeMirror\?\.setValue/);
+  assert.match(publish,/htmlCode\.click\(\{force:true\}\)/);
+  assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
   assert.match(publish,/E_EDITOR_MODE_MENU/);
   assert.match(publish,/E_EDITOR_HTML_MODE/);
   assert.match(publish,/E_EDITOR_HTML_BODY/);
@@ -397,4 +398,15 @@ test('CDP disconnect closes transport directly without closing persistent Chrome
   const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
   assert.match(local,/browser\._connection\?\.close/);
   assert.match(local,/disconnect-timeout/);
+});
+
+
+test('publisher category selector uses actual Tistory button/link structure', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/categoryList\.locator\('button, a'\)/);
+  assert.match(publish,/CATEGORY_DIAG/);
+  assert.match(publish,/E_CATEGORY_CONTROL/);
+  assert.match(publish,/E_CATEGORY_LIST/);
+  assert.match(publish,/E_CATEGORY_AMBIGUOUS/);
+  assert.match(publish,/E_TAG_CONTROL/);
 });
