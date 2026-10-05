@@ -95,24 +95,25 @@ function replaceImageSources(html, mapping, representativeSource) {
 }
 
 async function switchToHtmlEditor(page) {
-  const modeButton = page.locator('#editor-mode-layer-btn');
+  const modeButton = page.getByRole('button', {name:/기본\s*모드|HTML/i}).first();
 
   const activeHtmlMirror = async () => {
-    const mirrors = page.locator('.cm-s-tistory-html');
+    const mirrors = page.locator('.CodeMirror.cm-s-tistory-html');
     const count = await mirrors.count();
     for (let i = 0; i < count; i++) {
       const mirror = mirrors.nth(i);
-      const visible = await mirror.isVisible().catch(() => false);
-      const box = visible ? await mirror.boundingBox().catch(() => null) : null;
+      if (!await mirror.isVisible().catch(() => false)) continue;
+      const box = await mirror.boundingBox().catch(() => null);
       if (box && box.width > 0 && box.height > 0 && await mirror.locator('.CodeMirror-code').count() > 0) return mirror;
     }
     return null;
   };
 
-  const waitForActiveHtmlMirror = async (timeout = 7000) => {
+  const waitForConfirmedHtmlMode = async (timeout = 5000) => {
     const settled = await page.waitForFunction(() => {
-      const mirrors = [...document.querySelectorAll('.cm-s-tistory-html')];
-      return mirrors.some(el => {
+      const mode = document.querySelector('#editor-mode-layer-btn-open')?.textContent || '';
+      if (!/HTML/i.test(mode)) return false;
+      return [...document.querySelectorAll('.CodeMirror.cm-s-tistory-html')].some(el => {
         const r = el.getBoundingClientRect();
         const s = getComputedStyle(el);
         return r.width > 0 && r.height > 0 &&
@@ -123,71 +124,62 @@ async function switchToHtmlEditor(page) {
     return settled ? activeHtmlMirror() : null;
   };
 
-  const clickVisibleHtmlOption = async () => {
-    const semantic = page.getByRole('menuitem', {name:/^HTML$/i});
-    const semanticCount = await semantic.count().catch(() => 0);
-    for (let i = 0; i < semanticCount; i++) {
-      const option = semantic.nth(i);
-      if (!await option.isVisible().catch(() => false)) continue;
-      try {
-        await option.click({timeout:4000});
-        return true;
-      } catch {}
-    }
-
-    const fallback = page.locator('#editor-mode-html');
-    const fallbackCount = await fallback.count().catch(() => 0);
-    for (let i = 0; i < fallbackCount; i++) {
-      const option = fallback.nth(i);
-      if (!await option.isVisible().catch(() => false)) continue;
-      try {
-        await option.click({timeout:4000});
-        return true;
-      } catch {}
-    }
-    return false;
-  };
-
-  const alreadyActive = await activeHtmlMirror();
-  if (alreadyActive) return alreadyActive;
+  await modeButton.waitFor({state:'visible', timeout:10000})
+    .catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
 
   for (let attempt = 0; attempt < 2; attempt++) {
-    await page.keyboard.press('Escape').catch(() => {});
-    await page.locator('#post-title-inp').click({force:true}).catch(() => {});
+    const current = ((await modeButton.innerText().catch(() => '')) || '').trim();
+    if (!/HTML/i.test(current)) {
+      try {
+        await modeButton.click({timeout:5000});
+      } catch {
+        if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
+        await page.keyboard.press('Escape').catch(() => {});
+        continue;
+      }
 
-    await modeButton.waitFor({state:'visible', timeout:10000})
-      .catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+      const semantic = page.getByRole('menuitem', {name:/^HTML$/i});
+      let clicked = false;
+      const semanticCount = await semantic.count().catch(() => 0);
+      for (let i = 0; i < semanticCount; i++) {
+        const option = semantic.nth(i);
+        if (!await option.isVisible().catch(() => false)) continue;
+        await option.waitFor({state:'visible', timeout:4000});
+        if (!await option.isEnabled().catch(() => false)) continue;
+        await option.click({timeout:4000});
+        clicked = true;
+        break;
+      }
 
-    let menuOpened = false;
-    try {
-      await modeButton.click({timeout:5000});
-      menuOpened = true;
-    } catch {
-      menuOpened = await page.evaluate(() => {
-        const button = document.querySelector('#editor-mode-layer-btn-open');
-        if (!button) return false;
-        button.click();
-        return true;
-      }).catch(() => false);
+      if (!clicked) {
+        const textOption = page.getByText('HTML', {exact:true});
+        const textCount = await textOption.count().catch(() => 0);
+        for (let i = textCount - 1; i >= 0; i--) {
+          const option = textOption.nth(i);
+          if (!await option.isVisible().catch(() => false)) continue;
+          await option.waitFor({state:'visible', timeout:4000});
+          if (!await option.isEnabled().catch(() => false)) continue;
+          await option.click({timeout:4000});
+          clicked = true;
+          break;
+        }
+      }
+
+      if (!clicked) {
+        await page.keyboard.press('Escape').catch(() => {});
+        if (attempt === 1) throw new Error('E_EDITOR_HTML_MODE');
+        continue;
+      }
     }
-    if (!menuOpened) {
-      if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
-      continue;
-    }
 
-    const clicked = await clickVisibleHtmlOption();
-    if (!clicked) {
-      if (attempt === 1) throw new Error('E_EDITOR_HTML_MODE');
-      continue;
-    }
-
-    const htmlMirror = await waitForActiveHtmlMirror(7000);
+    const htmlMirror = await waitForConfirmedHtmlMode(5000);
     if (htmlMirror) return htmlMirror;
+
+    await page.keyboard.press('Escape').catch(() => {});
   }
 
   const diag = await page.evaluate(() => ({
     modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
-    htmlOption: document.querySelector('#editor-mode-html')?.outerHTML || null,
     mirrors: [...document.querySelectorAll('.CodeMirror')].map((el,index) => {
       const r=el.getBoundingClientRect();
       const s=getComputedStyle(el);
