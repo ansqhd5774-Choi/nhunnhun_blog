@@ -219,8 +219,9 @@ test('authenticated profile and anonymous browser have separate launch contracts
     launch:async(...args)=>{calls.push(['public',...args]);return {kind:'public'};}
   };
   assert.equal((await openEditorContext(config,{engine,headless:false})).kind,'editor');
+  assert.equal((await openEditorContext(config,{engine})).kind,'editor');
   assert.equal((await openPublicBrowser(config,engine)).kind,'public');
-  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
+  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
   await assert.rejects(openEditorContext(config,{engine:{launchPersistentContext:async()=>{throw Error('private path');}}}),/^Error: E_LOCAL_BROWSER_LAUNCH$/);
 });
 
