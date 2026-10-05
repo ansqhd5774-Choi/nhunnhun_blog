@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "796f7e62e5cf0499ce63eeda0883dce25baa0e601d8d9d0109088d07d8d46923",
   "url": "https://nhunnhun.tistory.com/264",
   "articleId": "264",
+  "previousTitle": "타이레놀(아세트아미노펜) 복용법·용량·부작용｜간 손상·중복복용 주의",
+  "title": "아세트아미노펜 감기약 중복복용 주의｜타이레놀 같이 먹어도 될까·하루 최대량",
   "sourceCommit": "89b4a28cfe3fa443b75075b9f30d422259fd8c7f",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T17:28:59.496Z"
+  "timestamp": "2026-10-05T17:29:10.237Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 4,
+    "tableWraps": 4,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
