@@ -373,15 +373,24 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher switches directly to Tistory HTML mode and writes through the HTML CodeMirror instance', () => {
+test('publisher closes overlays, opens the mode layer, and writes through HTML CodeMirror', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(publish,/async function switchToHtmlEditor\(page\)/);
-  assert.match(publish,/page\.locator\('#editor-mode-html'\)/);
-  assert.match(publish,/htmlButton\.evaluate\(el => \{ el\.click\(\); return true; \}\)/);
+  assert.match(publish,/keyboard\.press\('Escape'\)/);
+  assert.match(publish,/editor-mode-layer-btn-open/);
+  assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
+  assert.match(publish,/EDITOR_MODE_DIAG/);
   assert.match(publish,/page\.locator\('\.cm-s-tistory-html'\)/);
   assert.match(publish,/CodeMirror\?\.setValue/);
+  assert.match(publish,/E_EDITOR_MODE_MENU/);
   assert.match(publish,/E_EDITOR_HTML_MODE/);
   assert.match(publish,/E_EDITOR_HTML_BODY/);
+});
+
+test('publisher exits promptly after a pre-submit runtime failure', () => {
+  const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
+  assert.match(publish,/fatalExitCode/);
+  assert.match(publish,/setTimeout\(\(\) => process\.exit\(fatalExitCode\), 0\)/);
 });
 
 test('CDP disconnect closes transport directly without closing persistent Chrome', () => {
