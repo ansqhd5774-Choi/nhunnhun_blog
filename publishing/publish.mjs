@@ -94,6 +94,30 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
+async function visibleCodeMirror(page) {
+  const mirrors = page.locator('.CodeMirror');
+  const count = await mirrors.count();
+  for (let i = 0; i < count; i++) {
+    const mirror = mirrors.nth(i);
+    if (await mirror.isVisible().catch(()=>false)) return mirror;
+  }
+  return null;
+}
+async function switchToHtmlEditor(page) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const modeButton = page.locator('#editor-mode-layer-btn-open');
+    await modeButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+    await modeButton.click({force:true}).catch(async()=>{ await modeButton.evaluate(el=>el.click()).catch(()=>{}); });
+    const htmlButton = page.locator('#editor-mode-html');
+    await htmlButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+    await htmlButton.click({force:true}).catch(async()=>{ await htmlButton.evaluate(el=>el.click()).catch(()=>{}); });
+    await page.waitForTimeout(1200);
+    const mirror = await visibleCodeMirror(page);
+    if (mirror) return mirror;
+  }
+  throw new Error('E_EDITOR_HTML_BODY');
+}
+
 let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
 let finalSubmitDialogs = [];
 let stage = 'configuration';
@@ -156,22 +180,12 @@ try {
       const imageMap = new Map();
       for (let i = 0; i < uploadOrder.length; i++) imageMap.set(uploadOrder[i], await uploadImage(page, uploadOrder[i], i));
       const bodyHtml = sources.length ? replaceImageSources(editorialHtml, imageMap, representativeSource) : editorialHtml;
-      stage = 'mode-menu';
-      const modeButton = page.locator('#editor-mode-layer-btn-open');
-      await modeButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-      const modeOpened = await modeButton.evaluate(el => { el.click(); return true; }).catch(() => false);
-      if (!modeOpened) throw new Error('E_EDITOR_MODE_MENU');
-      const htmlModeButton = page.locator('#editor-mode-html');
-      await htmlModeButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
       stage = 'html-mode';
-      const htmlModeOpened = await htmlModeButton.evaluate(el => { el.click(); return true; }).catch(() => false);
-      if (!htmlModeOpened) throw new Error('E_EDITOR_HTML_MODE');
+      const htmlMirror = await switchToHtmlEditor(page);
       stage = 'html-body';
-      await page.locator('.CodeMirror:visible .CodeMirror-code').waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
-      await page.locator('.CodeMirror:visible .CodeMirror-code').click();
-      await page.keyboard.press('ControlOrMeta+A');
-      await page.keyboard.insertText(bodyHtml);
-      const stagedHtml = await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+      await htmlMirror.evaluate((el, value) => el?.CodeMirror?.setValue?.(value), bodyHtml);
+      const stagedHtml = await htmlMirror.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+      if (!stagedHtml.trim()) throw new Error('E_EDITOR_HTML_BODY');
       assertEditorialContract(stagedHtml, post.bodyHtml);
       stage = 'category-tags';
       await page.locator('#category-btn').click();
