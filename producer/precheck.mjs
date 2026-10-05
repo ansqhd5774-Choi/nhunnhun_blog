@@ -1,0 +1,10 @@
+import {access,mkdir} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {DatabaseSync} from 'node:sqlite';
+if(process.versions.node!=='24.19.0')throw new Error('E_NODE_VERSION');
+await import('playwright-core');await import('sanitize-html');
+const runtime=resolve(process.argv[2]??'');if(!process.argv[2]||/[/\\]OneDrive(?:[/\\]|$)/i.test(runtime)||runtime.startsWith('\\\\'))throw new Error('E_RUNTIME_LOCATION');
+await mkdir(runtime,{recursive:true});
+const db=new DatabaseSync(':memory:');db.exec('CREATE TABLE check_runtime(value INTEGER)');db.close();
+await access(new URL('./worker.mjs',import.meta.url));
+console.log('PRECHECK_PASS: NODE24.19.0 SQLITE DEPENDENCIES LOCAL_RUNTIME; AUTO_PUBLIC_NOT_ENABLED');

@@ -1,4 +1,5 @@
 import { verificationContext } from './verification-context.mjs';
+import {readPublicMetadata,publicUpdateAudit} from './public-quality.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -261,6 +262,8 @@ try{
       const update=queue[0];
       const fingerprint=updateFingerprint(update);
       const browserConfig=await localBrowserConfig();
+      stage='read-original-public-metadata';
+      const originalMetadata=await readPublicMetadata(update.targetUrl);
       editorContext=await openEditorContext(browserConfig);
       tempDir=await mkdtemp(join(tmpdir(),'tistory-update-'));
       let page=await freshEditorPage(editorContext);
@@ -271,6 +274,7 @@ try{
       stage='editor-open';
       await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
       if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
+      if(new URL(page.url()).pathname.replace(/\/$/,'')!=='/manage/newpost/'+update.articleId)throw new Error('E_UPDATE_EDITOR_TARGET_MISMATCH');
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       const currentTitle=(await page.locator('#post-title-inp').inputValue()).trim();
       if(currentTitle!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
@@ -361,9 +365,7 @@ try{
       await page.waitForTimeout(4500);
 
       stage='public-verification';
-      publicBrowser=await openPublicBrowser(browserConfig);
-      const desktop=await verifyDesktop(publicBrowser,update,targetHtml,expected);
-      const mobile=await verifyMobile(publicBrowser,update);
+      const {desktop,mobile}=await publicUpdateAudit(update,originalMetadata);
 
       const state=await ledger.read(update.id);
       if(state?.phase!=='submitting'||state.fingerprint!==fingerprint||state.url!==update.targetUrl) throw new Error('E_UPDATE_LEDGER_CONFLICT');

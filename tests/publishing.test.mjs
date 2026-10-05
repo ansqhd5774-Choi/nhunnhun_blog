@@ -50,7 +50,7 @@ test('relative assets and credential-bearing content URLs rejected', () => {
 test('cloud workflow has serial execution and an explicit main-only activation gate', () => {
   const workflow = parse(readFileSync(new URL('../.github/workflows/publish-posts.yml', import.meta.url),'utf8'));
   assert.equal(workflow.concurrency['cancel-in-progress'], false);
-  assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-publish');
+  assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-mutation');
   assert.equal(workflow.jobs.publish.concurrency['cancel-in-progress'], false);
   assert.deepEqual(workflow.permissions, {contents:'read'});
   assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
@@ -316,3 +316,7 @@ test('publisher recognizes dkaptcha probe and 403 post response as human verific
   assert.match(publish,/dkaptcha/);
   assert.match(publish,/x\.path === '\/manage\/post\.json' && x\.status === 403/);
 });
+
+test('NEW and UPDATE share one mutation lock without cancelling a final click',()=>{const publish=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8')),update=parse(readFileSync(new URL('../.github/workflows/update-posts.yml',import.meta.url),'utf8'));assert.equal(publish.jobs.publish.concurrency.group,update.jobs.update.concurrency.group);assert.equal(publish.jobs.publish.concurrency.group,'nhunnhun-tistory-mutation');assert.equal(publish.jobs.publish.concurrency['cancel-in-progress'],false);assert.equal(update.jobs.update.concurrency['cancel-in-progress'],false);});
+
+test('daily-limit and HTTP rate-limit recovery never authorize another automatic final click',()=>{const post={...base,status:'ready',approved:true};for(const failureCode of ['E_TISTORY_DAILY_PUBLISH_LIMIT','E_PUBLISH_RATE_LIMIT'])assert.equal(eligible(post,{phase:'failed',publicMutationConfirmed:false,fingerprint:fingerprint(post),failureCode}),false);});

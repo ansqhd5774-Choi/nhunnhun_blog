@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { publicIPv4,publicUrl,robotsAllows,manifestGate } from './research.mjs';
+test('SSRF excludes private, loopback, link local and documentation IPv4 ranges',()=>{for(const ip of ['127.0.0.1','10.1.1.1','172.16.0.1','192.168.1.1','169.254.169.254','100.64.0.1','192.0.2.1','198.51.100.1','203.0.113.1','224.0.0.1'])assert.equal(publicIPv4(ip),false);assert.equal(publicIPv4('8.8.8.8'),true);});
+test('credentials and deceptive host suffixes cannot enter research URLs',()=>{for(const url of ['http://nodejs.org','https://nodejs.org.evil.test','https://u:p@nodejs.org','https://localhost','https://nodejs.org/?token=fake','https://nhunnhun.tistory.com/manage'])assert.throws(()=>publicUrl(url));assert.equal(publicUrl('https://nodejs.org/docs/').hostname,'nodejs.org');});
+test('robots longest matching path honors allow and wildcard disallow',()=>{const text='User-agent: *\nDisallow: /private\nAllow: /private/public\nDisallow: /*?secret=*';assert.equal(robotsAllows(text,'/private/a'),false);assert.equal(robotsAllows(text,'/private/public/a'),true);assert.equal(robotsAllows(text,'/?secret=x'),false);});
+test('unverified evidence and missing rights are held before network calls',()=>{assert.throws(()=>manifestGate({sources:[]}),/BLOCKED_EVIDENCE/);assert.throws(()=>manifestGate({sources:[{},{}],images:[]}),/BLOCKED_IMAGES/);});

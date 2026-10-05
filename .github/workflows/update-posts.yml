@@ -15,6 +15,9 @@ on:
       - 'tests/public-verification.test.mjs'
       - 'package.json'
       - '.github/workflows/update-posts.yml'
+      - 'publishing/public-quality.mjs'
+      - 'publishing/verification-context.mjs'
+      - 'tests/active-standard.test.mjs'
   workflow_dispatch:
     inputs:
       public_verify_article_ids:
@@ -48,7 +51,7 @@ jobs:
       - run: pnpm run validate:update
   update:
     concurrency:
-      group: nhunnhun-tistory-update-runtime
+      group: nhunnhun-tistory-mutation
       cancel-in-progress: false
     needs: validate-update
     if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'

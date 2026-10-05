@@ -61,7 +61,7 @@ export function eligible(post, state) {
   if (!state) return true;
   if (state.phase === 'published') return false;
   if (state.phase === 'failed' && state.publicMutationConfirmed === false && state.fingerprint === fingerprint(post)) {
-    if (state.failureCode === 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED') return false;
+    if (['E_TISTORY_HUMAN_VERIFICATION_REQUIRED','E_TISTORY_DAILY_PUBLISH_LIMIT','E_PUBLISH_RATE_LIMIT'].includes(state.failureCode)) return false;
     return true;
   }
   // An uncertain submission never retries automatically. A retry is allowed only after

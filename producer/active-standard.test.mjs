@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {highlightPhrase,reviewedNutritionRows} from './active-standard.mjs';
+import {assertSupportedKeyword} from './keyword.mjs';
+test('highlight selects a complete short factual phrase without cutting a sentence',()=>{assert.equal(highlightPhrase('표의 기준량은 126 g이며 다른 크기의 과일에는 적용하지 않는다.'),'126 g');assert.equal(highlightPhrase('자료에 없는 새로운 주장을 만들지 않습니다.'),null);});
+test('nutrition table preserves the shared serving basis and rejects mixed portions',()=>{const evidence={sources:[{claims:[{id:'c-portion',text:'먹을 수 있는 부분 126 g 기준이다.'},{id:'c-calories',text:'기준량 126 g에서 열량은 110 kcal이다.'},{id:'c-fiber',text:'기준량 126 g에서 식이섬유는 3 g이다.'}]}]};assert.equal(reviewedNutritionRows(evidence)[1].value,'110');evidence.sources[0].claims[2].text='기준량 100 g에서 식이섬유는 3 g이다.';assert.throws(()=>reviewedNutritionRows(evidence),/E_ACTIVE_NUTRITION_BASIS/);});
+test('unsupported keyword is rejected before expensive inventory or model work',async()=>{assert.equal(await assertSupportedKeyword('바나나','missing-profile-directory'),'바나나');assert.equal(await assertSupportedKeyword('천도복숭아','missing-profile-directory'),'천도복숭아');await assert.rejects(assertSupportedKeyword('타이어','missing-profile-directory'),/BLOCKED_UNSUPPORTED_KEYWORD/);});
