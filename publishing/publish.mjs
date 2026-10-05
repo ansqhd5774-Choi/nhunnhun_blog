@@ -94,28 +94,14 @@ function replaceImageSources(html, mapping, representativeSource) {
   });
 }
 
-async function visibleCodeMirror(page) {
-  const mirrors = page.locator('.CodeMirror');
-  const count = await mirrors.count();
-  for (let i = 0; i < count; i++) {
-    const mirror = mirrors.nth(i);
-    if (await mirror.isVisible().catch(()=>false)) return mirror;
-  }
-  return null;
-}
 async function switchToHtmlEditor(page) {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const modeButton = page.locator('#editor-mode-layer-btn-open');
-    await modeButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-    await modeButton.click({force:true}).catch(async()=>{ await modeButton.evaluate(el=>el.click()).catch(()=>{}); });
-    const htmlButton = page.locator('#editor-mode-html');
-    await htmlButton.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-    await htmlButton.click({force:true}).catch(async()=>{ await htmlButton.evaluate(el=>el.click()).catch(()=>{}); });
-    await page.waitForTimeout(1200);
-    const mirror = await visibleCodeMirror(page);
-    if (mirror) return mirror;
-  }
-  throw new Error('E_EDITOR_HTML_BODY');
+  const htmlButton = page.locator('#editor-mode-html');
+  await htmlButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_MODE'); });
+  const switched = await htmlButton.evaluate(el => { el.click(); return true; }).catch(() => false);
+  if (!switched) throw new Error('E_EDITOR_HTML_MODE');
+  const htmlMirror = page.locator('.cm-s-tistory-html').first();
+  await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
+  return htmlMirror;
 }
 
 let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
