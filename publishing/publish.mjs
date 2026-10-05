@@ -99,13 +99,7 @@ async function switchToHtmlEditor(page) {
   await page.locator('#post-title-inp').click({force:true}).catch(()=>{});
   const modeButton = page.locator('#editor-mode-layer-btn-open');
   await modeButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-  const opened = await page.evaluate(() => {
-    const button = document.querySelector('#editor-mode-layer-btn-open');
-    if (!button) return false;
-    button.click();
-    return true;
-  }).catch(() => false);
-  if (!opened) throw new Error('E_EDITOR_MODE_MENU');
+  await modeButton.click({force:true}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
 
   const htmlReady = await page.waitForFunction(() => {
     const el = document.querySelector('#editor-mode-html');
@@ -131,26 +125,25 @@ async function switchToHtmlEditor(page) {
     throw new Error('E_EDITOR_MODE_MENU');
   }
 
-  const switched = await page.evaluate(() => {
-    const button = document.querySelector('#editor-mode-html');
-    if (!button) return false;
-    button.click();
-    return true;
-  }).catch(() => false);
-  if (!switched) throw new Error('E_EDITOR_HTML_MODE');
+  const htmlOption = page.locator('#editor-mode-html');
+  await htmlOption.click({force:true}).catch(() => { throw new Error('E_EDITOR_HTML_MODE'); });
 
   const modeSettled = await page.waitForFunction(() => {
     const mode = document.querySelector('#editor-mode-layer-btn-open');
-    const mirrors = [...document.querySelectorAll('.CodeMirror')];
-    const visibleMirror = mirrors.find(el => {
-      const r = el.getBoundingClientRect();
-      const s = getComputedStyle(el);
-      return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden'
-        && !!el.querySelector('.CodeMirror-code');
-    });
-    return /HTML/i.test(mode?.textContent || '') || !!visibleMirror;
+    return /HTML/i.test(mode?.textContent || '');
   }, {timeout:10000}).then(()=>true).catch(()=>false);
-  if (!modeSettled) throw new Error('E_EDITOR_HTML_BODY');
+  if (!modeSettled) {
+    const diag = await page.evaluate(() => ({
+      modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
+      mirrors: [...document.querySelectorAll('.CodeMirror')].map((el, index) => {
+        const r = el.getBoundingClientRect();
+        const s = getComputedStyle(el);
+        return {index,className:el.className,width:r.width,height:r.height,display:s.display,visibility:s.visibility,hasCode:!!el.querySelector('.CodeMirror-code')};
+      })
+    })).catch(()=>({probe:'failed'}));
+    console.error('EDITOR_HTML_MODE_DIAG '+JSON.stringify(diag));
+    throw new Error('E_EDITOR_HTML_MODE');
+  }
 
   const htmlMirror = page.locator('.CodeMirror:visible').last();
   await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
@@ -196,7 +189,7 @@ try {
           try {
             const type = dialog.type();
             const message = dialog.message();
-            if (type === 'confirm' && (/모드.*변경|변경.*모드/.test(message) || stage === 'final-submit')) await dialog.accept();
+            if (type === 'confirm' && (stage === 'html-mode' || stage === 'final-submit' || /모드.*변경|변경.*모드/.test(message))) await dialog.accept();
             else if (type === 'alert') await dialog.accept();
             else await dialog.dismiss();
           } catch (error) {
