@@ -1,34 +1,7 @@
 {
-  "phase": "failed",
+  "phase": "submitting",
   "fingerprint": "0e02f328fe51a5fb0cdb647c397b3bf444888ca432d27a1c9d5b23cad5c7bc00",
-  "sourceCommit": "bbb8f3dfc8562875e185ca518455c1f8d50d9000",
+  "sourceCommit": "35281533f8d165b5776afb0a64fe5c69d8153cb7",
   "editorialTemplateVersion": "R3",
-  "submittingTimestamp": "2026-10-04T14:30:04.564Z",
-  "timestamp": "2026-10-05T06:07:57.064Z",
-  "failureStage": "final-submit",
-  "failureCode": "E_TISTORY_HUMAN_VERIFICATION_CLEARED",
-  "publicMutationConfirmed": false,
-  "checkedPublicUrls": [
-    "https://nhunnhun.tistory.com/371",
-    "https://nhunnhun.tistory.com/372",
-    "https://nhunnhun.tistory.com/373",
-    "https://nhunnhun.tistory.com/374",
-    "https://nhunnhun.tistory.com/375",
-    "https://nhunnhun.tistory.com/376",
-    "https://nhunnhun.tistory.com/377",
-    "https://nhunnhun.tistory.com/378",
-    "https://nhunnhun.tistory.com/379",
-    "https://nhunnhun.tistory.com/380"
-  ],
-  "verification": "persistent_chrome_login_saved_pass",
-  "diagnostic": {
-    "postStatus": 403,
-    "captchaProbeStatus": 200,
-    "captchaProbePath": "/manage/dkaptcha/widgetId"
-  },
-  "manualClearance": {
-    "confirmedByUser": true,
-    "method": "NHUNNHUN_TISTORY_LOGIN.cmd",
-    "note": "Persistent local Chrome login confirmed with LOGIN_CURRENT_SESSION_PASS and LOGIN_SAVED."
-  }
+  "timestamp": "2026-10-05T11:57:31.558Z"
 }
