@@ -5,7 +5,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
@@ -261,7 +261,8 @@ try{
       const update=queue[0];
       const fingerprint=updateFingerprint(update);
       const browserConfig=await localBrowserConfig();
-      editorContext=await openEditorContext(browserConfig);
+      editorConnection=await openEditorConnection(browserConfig);
+      editorContext=editorConnection.context;
       tempDir=await mkdtemp(join(tmpdir(),'tistory-update-'));
       let page=await freshEditorPage(editorContext);
       editorPage=page;
@@ -383,8 +384,7 @@ try{
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;
 }finally{
-  for(const resource of [publicBrowser,editorContext]){
-    try{await resource?.close();}catch{console.error('E_UPDATE_BROWSER_CLOSE');process.exitCode=1;}
-  }
+  try{await publicBrowser?.close();}catch{console.error('E_UPDATE_PUBLIC_BROWSER_CLOSE');process.exitCode=1;}
+  try{await closeEditorConnection(editorConnection);}catch{console.error('E_UPDATE_BROWSER_DISCONNECT');process.exitCode=1;}
   if(tempDir) try{await rm(tempDir,{recursive:true,force:true});}catch{console.error('E_UPDATE_TEMP_CLEANUP');process.exitCode=1;}
 }
