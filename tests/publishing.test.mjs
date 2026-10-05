@@ -190,7 +190,7 @@ test('validation remains hosted; public publisher is Windows CMD only', () => {
   assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
 });
 
-test('publisher uses an isolated per-run profile context while login keeps the always-on local Chrome', () => {
+test('publisher attaches to the saved login Chrome but always creates a fresh editor tab', () => {
   for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
     const source=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
     assert.doesNotMatch(source,/@browserbasehq\/sdk|Browserbase|BROWSERBASE_|\/tmp\//);
@@ -198,30 +198,21 @@ test('publisher uses an isolated per-run profile context while login keeps the a
   const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
   assert.match(local,/connectOverCDP/);
   assert.match(local,/127\.0\.0\.1/);
-  assert.match(local,/_shouldCloseConnectionOnClose = true/);
+  assert.match(local,/return context\.newPage\(\)/);
+  assert.match(local,/manage\\\/post/);
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(p,/chromium\.launchPersistentContext\(browserConfig\.profileDir/);
-  assert.match(p,/headless:true/);
-  assert.match(p,/editorContext\.newPage\(\)/);
-  assert.match(p,/editorContext\?\.close\(\)/);
-  assert.doesNotMatch(p,/openEditorConnection|freshEditorPage|closeEditorConnection/);
+  assert.match(p,/openEditorConnection\(browserConfig\)/);
+  assert.match(p,/freshEditorPage\(editorContext\)/);
+  assert.match(p,/closeEditorConnection\(editorConnection\)/);
+  assert.doesNotMatch(p,/launchPersistentContext/);
   assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
   assert.match(p,/verificationContext\(publicBrowser\)/);
   const workflow=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
-  const steps=workflow.jobs.publish.steps;
-  const stopIndex=steps.findIndex(step=>step.run==='node maintenance/stop-tistory-chrome.mjs');
-  const publishIndex=steps.findIndex(step=>step.run==='pnpm run publish');
-  const restoreIndex=steps.findIndex(step=>step.name==='Restore always-on Chrome');
-  assert.ok(stopIndex>=0 && stopIndex<publishIndex && publishIndex<restoreIndex);
-  const restore=steps[restoreIndex];
-  assert.equal(restore.if,'always()');
-  assert.match(restore.run,/maintenance\.stop/);
-  assert.match(restore.run,/ensure-tistory-chrome\.cmd/);
-  const stopper=readFileSync(new URL('../maintenance/stop-tistory-chrome.mjs',import.meta.url),'utf8');
-  assert.match(stopper,/connectOverCDP/);
-  assert.match(stopper,/maintenance\.stop/);
-  assert.match(stopper,/taskkill/);
-  assert.match(stopper,/PERSISTENT_CHROME_STOPPED/);
+  const runs=workflow.jobs.publish.steps.map(step=>step.run).filter(Boolean);
+  const ensureIndex=runs.indexOf('call maintenance\\ensure-tistory-chrome.cmd');
+  const publishIndex=runs.indexOf('pnpm run publish');
+  assert.ok(ensureIndex>=0 && ensureIndex<publishIndex);
+  assert.ok(!runs.includes('node maintenance/stop-tistory-chrome.mjs'));
   const verification=readFileSync(new URL('../publishing/verification-context.mjs',import.meta.url),'utf8');
   assert.match(verification,/context\.route\('\*\*\/\*'/);
   assert.match(verification,/serviceWorkers: 'block'/);
@@ -384,22 +375,23 @@ test('persistent Chrome helper binds CDP to loopback only', () => {
 });
 
 
-test('persistent editor reuses authenticated Tistory tab and closes extras', async () => {
+test('persistent editor closes only stale write tabs and creates a fresh page', async () => {
   const closed=[];
-  const auth={url:()=> 'https://nhunnhun.tistory.com/manage/posts',close:async()=>closed.push('auth')};
-  const extra={url:()=> 'about:blank',close:async()=>closed.push('extra')};
-  const context={pages:()=>[extra,auth],newPage:async()=>{throw Error('must not create');}};
+  const list={url:()=> 'https://nhunnhun.tistory.com/manage/posts',close:async()=>closed.push('list')};
+  const stale={url:()=> 'https://nhunnhun.tistory.com/manage/post',close:async()=>closed.push('stale')};
+  const other={url:()=> 'about:blank',close:async()=>closed.push('other')};
+  const created={url:()=> 'about:blank'};
+  const context={pages:()=>[list,stale,other],newPage:async()=>created};
   const page=await freshEditorPage(context);
-  assert.equal(page,auth);
-  assert.deepEqual(closed,['extra']);
+  assert.equal(page,created);
+  assert.deepEqual(closed,['stale']);
 });
 
-test('persistent editor creates one tab only when browser has no pages', async () => {
+test('persistent editor creates a new page when no stale write tab exists', async () => {
   const created={url:()=> 'about:blank'};
   const context={pages:()=>[],newPage:async()=>created};
   assert.equal(await freshEditorPage(context),created);
 });
-
 
 test('dialog handler contains stale-dialog race guard', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
