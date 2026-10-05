@@ -4,7 +4,7 @@
   "sourceCommit": "bbb8f3dfc8562875e185ca518455c1f8d50d9000",
   "editorialTemplateVersion": "R3",
   "submittingTimestamp": "2026-10-04T14:30:04.564Z",
-  "timestamp": "2026-10-05T05:28:48.450Z",
+  "timestamp": "2026-10-05T06:07:57.064Z",
   "failureStage": "final-submit",
   "failureCode": "E_TISTORY_HUMAN_VERIFICATION_CLEARED",
   "publicMutationConfirmed": false,
@@ -20,7 +20,7 @@
     "https://nhunnhun.tistory.com/379",
     "https://nhunnhun.tistory.com/380"
   ],
-  "verification": "manual_login_saved_single_tab_pass_after_session_restore_fix",
+  "verification": "persistent_chrome_login_saved_pass",
   "diagnostic": {
     "postStatus": 403,
     "captchaProbeStatus": 200,
@@ -28,7 +28,7 @@
   },
   "manualClearance": {
     "confirmedByUser": true,
-    "method": "publishing/login.mjs",
-    "note": "User confirmed repeated login test keeps one automation window/tab after restore-last-session removal."
+    "method": "NHUNNHUN_TISTORY_LOGIN.cmd",
+    "note": "Persistent local Chrome login confirmed with LOGIN_CURRENT_SESSION_PASS and LOGIN_SAVED."
   }
 }
