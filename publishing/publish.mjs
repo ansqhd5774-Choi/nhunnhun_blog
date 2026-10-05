@@ -99,7 +99,13 @@ async function switchToHtmlEditor(page) {
   await page.locator('#post-title-inp').click({force:true}).catch(()=>{});
   const modeButton = page.locator('#editor-mode-layer-btn-open');
   await modeButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-  await modeButton.click({force:true}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+  const opened = await page.evaluate(() => {
+    const button = document.querySelector('#editor-mode-layer-btn-open');
+    if (!button) return false;
+    button.click();
+    return true;
+  }).catch(() => false);
+  if (!opened) throw new Error('E_EDITOR_MODE_MENU');
 
   const htmlReady = await page.waitForFunction(() => {
     const el = document.querySelector('#editor-mode-html');
