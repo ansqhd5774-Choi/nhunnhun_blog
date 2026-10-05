@@ -373,11 +373,14 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher mode switch uses DOM click fallback and explicit errors', () => {
+test('publisher mode switch retries and writes through the visible CodeMirror instance', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/modeButton\.evaluate\(el => \{ el\.click\(\); return true; \}\)/);
+  assert.match(publish,/async function switchToHtmlEditor\(page\)/);
+  assert.match(publish,/modeButton\.click\(\{force:true\}\)/);
+  assert.match(publish,/htmlButton\.click\(\{force:true\}\)/);
+  assert.match(publish,/visibleCodeMirror\(page\)/);
+  assert.match(publish,/CodeMirror\?\.setValue/);
   assert.match(publish,/E_EDITOR_MODE_MENU/);
-  assert.match(publish,/E_EDITOR_HTML_MODE/);
   assert.match(publish,/E_EDITOR_HTML_BODY/);
 });
 
