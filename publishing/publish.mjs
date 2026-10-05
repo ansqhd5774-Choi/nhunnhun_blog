@@ -222,6 +222,30 @@ try {
         if (thumbText.includes('대표이미지 추가') && await thumb.locator('img,[style*="background-image"]').count()===0) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
       }
       await page.getByLabel('공개', {exact:true}).check();
+      const scheduledAt = post.scheduledAt ? new Date(post.scheduledAt) : null;
+      if (scheduledAt) {
+        stage = 'schedule-settings';
+        if (!(scheduledAt.getTime() > Date.now())) throw new Error('E_SCHEDULE_PAST');
+        const parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit',
+          hour:'2-digit', minute:'2-digit', hourCycle:'h23'
+        }).formatToParts(scheduledAt).reduce((acc,p)=>{ acc[p.type]=p.value; return acc; }, {});
+        const nowParts = new Intl.DateTimeFormat('en-CA', {
+          timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit'
+        }).formatToParts(new Date()).reduce((acc,p)=>{ acc[p.type]=p.value; return acc; }, {});
+        if (parts.year!==nowParts.year || parts.month!==nowParts.month || parts.day!==nowParts.day) throw new Error('E_SCHEDULE_DATE_UNSUPPORTED');
+        const reserve = page.locator('.publish_editor .btn_date').filter({hasText:'예약'});
+        if (await reserve.count() !== 1) throw new Error('E_SCHEDULE_CONTROL');
+        await reserve.click();
+        const timeInputs = page.locator('.publish_editor .box_date input[type="number"]');
+        await timeInputs.first().waitFor({state:'visible',timeout:10000}).catch(()=>{ throw new Error('E_SCHEDULE_TIME_CONTROL'); });
+        if (await timeInputs.count() < 2) throw new Error('E_SCHEDULE_TIME_CONTROL');
+        await timeInputs.nth(0).fill(String(Number(parts.hour)));
+        await timeInputs.nth(1).fill(String(Number(parts.minute)));
+        const values = [await timeInputs.nth(0).inputValue(), await timeInputs.nth(1).inputValue()];
+        if (Number(values[0]) !== Number(parts.hour) || Number(values[1]) !== Number(parts.minute)) throw new Error('E_SCHEDULE_TIME_MISMATCH');
+        console.log('SCHEDULE_SETTINGS '+JSON.stringify({scheduledAt:post.scheduledAt,hour:Number(parts.hour),minute:Number(parts.minute)}));
+      }
       const publishButton = page.getByRole('button', {name:'공개 발행',exact:true});
       await publishButton.waitFor({state:'visible'});
       if (!(await publishButton.isEnabled())) throw new Error('E_PUBLISH_BUTTON_DISABLED');
@@ -296,6 +320,28 @@ try {
         const signalCode=classifySubmitSignals(signals);
         if(signalCode) throw new Error(signalCode);
         throw new Error('E_PUBLICATION_NOT_FOUND_AFTER_CLICK');
+      }
+      if (post.scheduledAt) {
+        const scheduleEvidence = await titleLink.evaluate((link,title) => {
+          let el=link;
+          for(let i=0;i<8&&el;i++,el=el.parentElement){
+            const text=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
+            if(text.includes(title) && /예약/.test(text)) return text.slice(0,500);
+          }
+          return '';
+        }, post.title).catch(()=> '');
+        if (!scheduleEvidence || !/예약/.test(scheduleEvidence)) throw new Error('E_SCHEDULE_NOT_CONFIRMED');
+        const state = await ledger.read(post.id);
+        if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
+        await ledger.write(post.id, {
+          phase:'scheduled',
+          fingerprint:fingerprint(post),
+          scheduledAt:post.scheduledAt,
+          editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,
+          timestamp:new Date().toISOString()
+        }, state.sha);
+        console.log(`SCHEDULED: ${post.id} ${post.scheduledAt}`);
+        return;
       }
       const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
         .filter(a => (a.textContent || '').replace(/\\s+/g,' ').trim().includes(title))
