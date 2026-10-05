@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "f62beadde4c68701ee2d96557c815d32b50987018a590972914bd3b66969a65e",
   "url": "https://nhunnhun.tistory.com/378",
   "articleId": "378",
+  "previousTitle": "2026 코로나19 예방접종 총정리｜무료 대상·일정·XFG 백신·독감 동시접종",
+  "title": "2026 코로나19 예방접종 총정리｜무료 대상·일정·XFG 백신·독감 동시접종",
   "sourceCommit": "fc9a6859a254e9b22c3034a8676beeb5a2c6abaf",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T16:21:05.010Z"
+  "timestamp": "2026-10-05T16:21:16.332Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 7,
+    "faqA": 7,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
