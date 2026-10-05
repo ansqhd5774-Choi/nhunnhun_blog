@@ -282,6 +282,15 @@ test('authenticated editor attaches to local persistent Chrome and disconnects w
   const fallback=await openEditorConnection(config,{engine:fallbackEngine,fetchFn:fallbackFetch});
   assert.equal(fallback.context,context);
   assert.equal(fallbackCalls[1][0],'ws://127.0.0.1:9223/devtools/browser/test');
+  const channelCalls=[];
+  const channelEngine={connectOverCDP:async(endpoint,options)=>{
+    channelCalls.push([endpoint,options]);
+    if(endpoint!=='chrome') throw Error('endpoint-failed');
+    return fallbackBrowser;
+  }};
+  const channel=await openEditorConnection(config,{engine:channelEngine,fetchFn:fallbackFetch});
+  assert.equal(channel.context,context);
+  assert.equal(channelCalls.at(-1)[0],'chrome');
   await assert.rejects(openEditorConnection(config,{
     engine:{connectOverCDP:async()=>{throw Error('offline');}},
     fetchFn:async()=>{throw Error('offline');}
