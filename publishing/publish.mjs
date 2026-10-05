@@ -139,8 +139,22 @@ async function switchToHtmlEditor(page) {
   }).catch(() => false);
   if (!switched) throw new Error('E_EDITOR_HTML_MODE');
 
-  const htmlMirror = page.locator('.cm-s-tistory-html').first();
+  const modeSettled = await page.waitForFunction(() => {
+    const mode = document.querySelector('#editor-mode-layer-btn-open');
+    const mirrors = [...document.querySelectorAll('.CodeMirror')];
+    const visibleMirror = mirrors.find(el => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden'
+        && !!el.querySelector('.CodeMirror-code');
+    });
+    return /HTML/i.test(mode?.textContent || '') || !!visibleMirror;
+  }, {timeout:10000}).then(()=>true).catch(()=>false);
+  if (!modeSettled) throw new Error('E_EDITOR_HTML_BODY');
+
+  const htmlMirror = page.locator('.CodeMirror:visible').last();
   await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
+  if (await htmlMirror.locator('.CodeMirror-code').count() < 1) throw new Error('E_EDITOR_HTML_BODY');
   return htmlMirror;
 }
 
