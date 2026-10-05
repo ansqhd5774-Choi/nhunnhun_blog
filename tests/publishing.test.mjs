@@ -373,29 +373,30 @@ test('dialog handler contains stale-dialog race guard', () => {
 });
 
 
-test('publisher uses user-visible mode controls and confirms real HTML mode before body input', () => {
+test('publisher uses trusted visible mode controls and only writes after the HTML CodeMirror becomes active', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   const switchBlock=publish.slice(
     publish.indexOf('async function switchToHtmlEditor(page) {'),
     publish.indexOf('\nlet editorConnection')
   );
-  assert.match(switchBlock,/getByRole\('button', \{name:\/기본\\s\*모드\|HTML\/i\}\)\.first\(\)/);
-  assert.match(switchBlock,/getByRole\('menuitem', \{name:\/\^HTML\$\/i\}\)/);
-  assert.match(switchBlock,/getByText\('HTML', \{exact:true\}\)/);
+  assert.match(switchBlock,/\[role="button"\]\[aria-haspopup="true"\]/);
+  assert.match(switchBlock,/filter\(\{hasText:\/기본\\s\*모드\|HTML\/i\}\)/);
+  assert.match(switchBlock,/\[role="menuitem"\]/);
+  assert.match(switchBlock,/hasText:\/\^\\s\*HTML\\s\*\$\//);
   assert.match(switchBlock,/for \(let attempt = 0; attempt < 2; attempt\+\+\)/);
-  assert.match(switchBlock,/document\.querySelector\('#editor-mode-layer-btn-open'\)\?\.textContent/);
   assert.match(switchBlock,/document\.querySelectorAll\('\.CodeMirror\.cm-s-tistory-html'\)/);
-  assert.match(switchBlock,/\/HTML\/i\.test\(mode\)/);
-  assert.match(switchBlock,/r\.width > 0 && r\.height > 0/);
-  assert.match(switchBlock,/\.CodeMirror-code/);
+  assert.match(switchBlock,/document\.querySelectorAll\('\.CodeMirror\.cm-s-tistory-markdown'\)/);
+  assert.match(switchBlock,/return htmlActive && !markdownActive/);
   assert.match(switchBlock,/keyboard\.press\('Escape'\)/);
   assert.doesNotMatch(switchBlock,/force:true/);
   assert.doesNotMatch(switchBlock,/\.evaluate\([^]*\.click\(\)/);
-  assert.doesNotMatch(switchBlock,/#editor-mode-html/);
   assert.match(publish,/DIALOG_DIAG/);
   assert.match(publish,/DIALOG_ACTION/);
   assert.match(publish,/stage === 'html-mode'/);
+  assert.match(publish,/htmlMirror\.click\(\{position:/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
+  assert.match(publish,/cm\.setValue\(html\)/);
+  assert.doesNotMatch(publish,/htmlCode\.click\(\{force:true\}\)/);
   assert.match(publish,/E_EDITOR_MODE_MENU/);
   assert.match(publish,/E_EDITOR_HTML_MODE/);
   assert.match(publish,/E_EDITOR_HTML_BODY/);
