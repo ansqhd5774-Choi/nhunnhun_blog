@@ -272,8 +272,19 @@ test('authenticated editor attaches to local persistent Chrome and disconnects w
     ['public',{headless:true,executablePath:'fixture-chrome'}],
     ['disconnect',true]
   ]);
+  let attempts=0,recoveries=0;
+  const recovered=await openEditorConnection(config,{
+    fetchImpl,
+    recoverTargets:async endpoint=>{recoveries++;assert.equal(endpoint,'ws://127.0.0.1:9223/devtools/browser/fixture');},
+    engine:{connectOverCDP:async()=>{attempts++;if(attempts===1)throw Error('discarded-target');return browser;}}
+  });
+  assert.equal(recovered.context,context);
+  assert.equal(attempts,2);
+  assert.equal(recoveries,1);
+  await closeEditorConnection(recovered);
   await assert.rejects(openEditorConnection(config,{
     fetchImpl,
+    recoverTargets:async()=>{throw Error('activation-failed');},
     engine:{connectOverCDP:async()=>{throw Error('offline');}}
   }),/^Error: E_LOCAL_BROWSER_CONNECT$/);
 });
