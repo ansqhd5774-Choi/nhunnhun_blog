@@ -40,9 +40,31 @@ export function assertLocalGit(run = execFileSync) {
   try { run('git', ['--version'], { encoding:'utf8', stdio:'pipe', windowsHide:true }); }
   catch { throw new Error('E_LOCAL_GIT_REQUIRED'); }
 }
-export async function openEditorConnection(config, { engine = chromium } = {}) {
+async function discoverLocalCdpWebSocket(cdpUrl, fetchImpl = fetch) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
+    const response = await fetchImpl(cdpUrl + '/json/version', { signal:controller.signal });
+    if (!response?.ok) throw new Error('E_LOCAL_CDP_DISCOVERY');
+    const data = await response.json();
+    const ws = new URL(data?.webSocketDebuggerUrl || '');
+    if (ws.protocol !== 'ws:') throw new Error('E_LOCAL_CDP_DISCOVERY');
+    const base = new URL(cdpUrl);
+    if (!['127.0.0.1','localhost'].includes(ws.hostname)) ws.hostname = base.hostname;
+    if (!ws.port) ws.port = base.port;
+    return ws.toString();
+  } catch {
+    throw new Error('E_LOCAL_CDP_DISCOVERY');
+  } finally {
+    clearTimeout(timer);
+  }
+}
+export async function openEditorConnection(config, { engine = chromium, fetchImpl = fetch } = {}) {
+  try {
+    let endpoint = config.cdpUrl;
+    try { endpoint = await discoverLocalCdpWebSocket(config.cdpUrl, fetchImpl); }
+    catch { /* Safe fallback for older Chrome endpoints. */ }
+    const browser = await engine.connectOverCDP(endpoint, { timeout:15000, isLocal:true, noDefaults:true });
     const contexts = browser.contexts();
     if (contexts.length !== 1) {
       browser._shouldCloseConnectionOnClose = true;
