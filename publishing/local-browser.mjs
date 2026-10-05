@@ -40,9 +40,33 @@ export function assertLocalGit(run = execFileSync) {
   try { run('git', ['--version'], { encoding:'utf8', stdio:'pipe', windowsHide:true }); }
   catch { throw new Error('E_LOCAL_GIT_REQUIRED'); }
 }
-export async function openEditorConnection(config, { engine = chromium } = {}) {
+async function resolveCdpWebSocket(cdpUrl, fetchFn = fetch) {
+  const response = await fetchFn(cdpUrl + '/json/version', { signal:AbortSignal.timeout(3000) });
+  if (!response?.ok) throw new Error('E_LOCAL_CDP_VERSION');
+  const payload = await response.json();
+  const raw = payload?.webSocketDebuggerUrl;
+  let ws;
+  try { ws = new URL(raw); } catch { throw new Error('E_LOCAL_CDP_WEBSOCKET'); }
+  const http = new URL(cdpUrl);
+  if (ws.protocol !== 'ws:' || !['127.0.0.1','localhost'].includes(ws.hostname) || ws.port !== http.port) {
+    throw new Error('E_LOCAL_CDP_WEBSOCKET');
+  }
+  return ws.toString();
+}
+export async function openEditorConnection(config, { engine = chromium, fetchFn = fetch } = {}) {
+  let browser;
   try {
-    const browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
+    browser = await engine.connectOverCDP(config.cdpUrl, { timeout:15000, isLocal:true, noDefaults:true });
+  } catch {
+    try {
+      const wsEndpoint = await resolveCdpWebSocket(config.cdpUrl, fetchFn);
+      browser = await engine.connectOverCDP(wsEndpoint, { timeout:15000, isLocal:true, noDefaults:true });
+      console.log('LOCAL_BROWSER_CONNECT_FALLBACK=websocket');
+    } catch {
+      throw new Error('E_LOCAL_BROWSER_CONNECT');
+    }
+  }
+  try {
     const contexts = browser.contexts();
     if (contexts.length !== 1) {
       browser._shouldCloseConnectionOnClose = true;
