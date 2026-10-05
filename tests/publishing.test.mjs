@@ -408,10 +408,12 @@ test('dialog handler contains stale-dialog race guard', () => {
 
 test('publisher restores the last proven direct Tistory HTML-mode sequence', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/stage = 'mode-menu'/);
-  assert.match(publish,/page\.locator\('#editor-mode-layer-btn-open'\)\.click\(\)/);
-  assert.match(publish,/stage = 'html-mode'/);
-  assert.match(publish,/page\.locator\('#editor-mode-html'\)\.click\(\)/);
+  const mode=readFileSync(new URL('../publishing/html-mode.mjs',import.meta.url),'utf8');
+  assert.match(publish,/await openHtmlMode\(page/);
+  assert.match(mode,/setStage\('mode-menu'\)/);
+  assert.match(mode,/page\.locator\('#editor-mode-layer-btn-open'\)\.click\(\)/);
+  assert.match(mode,/setStage\('html-mode'\)/);
+  assert.match(mode,/#editor-mode-html/);
   assert.match(publish,/page\.locator\('\.CodeMirror:visible \.CodeMirror-code'\)\.click\(\)/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
   assert.match(publish,/page\.locator\('\.CodeMirror:visible'\)\.evaluate/);

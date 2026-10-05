@@ -1,5 +1,6 @@
 import { verificationContext } from './verification-context.mjs';
 import { safeRuntimeDiagnostic } from './runtime-diagnostics.mjs';
+import { openHtmlMode } from './html-mode.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
@@ -134,7 +135,7 @@ try {
           try {
             const type = dialog.type();
             const message = dialog.message();
-            console.log('DIALOG_DIAG '+JSON.stringify({stage,type,message}));
+            console.log('DIALOG_DIAG '+JSON.stringify({stage,type,modeChange:/모드.*변경|변경.*모드/.test(message)}));
             if (type === 'confirm' && (stage === 'html-mode' || stage === 'final-submit' || /모드.*변경|변경.*모드/.test(message))) {
               await dialog.accept();
               console.log('DIALOG_ACTION '+JSON.stringify({stage,type,action:'accept'}));
@@ -143,6 +144,7 @@ try {
             else await dialog.dismiss();
           } catch (error) {
             const message = String(error?.message || error || '');
+            if (/No dialog is showing/i.test(message)) console.error('DIALOG_ALREADY_HANDLED');
             if (!/No dialog is showing|Target page, context or browser has been closed|Browser has been closed/i.test(message)) {
               console.error('E_DIALOG_HANDLER');
             }
@@ -173,10 +175,7 @@ try {
       const imageMap = new Map();
       for (let i = 0; i < uploadOrder.length; i++) imageMap.set(uploadOrder[i], await uploadImage(page, uploadOrder[i], i));
       const bodyHtml = sources.length ? replaceImageSources(editorialHtml, imageMap, representativeSource) : editorialHtml;
-      stage = 'mode-menu';
-      await page.locator('#editor-mode-layer-btn-open').click();
-      stage = 'html-mode';
-      await page.locator('#editor-mode-html').click();
+      await openHtmlMode(page, value=>{ stage=value; });
       stage = 'html-body';
       await page.locator('.CodeMirror:visible .CodeMirror-code').click();
       await page.keyboard.press('ControlOrMeta+A');
