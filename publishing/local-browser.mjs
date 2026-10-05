@@ -73,12 +73,25 @@ export async function closeEditorConnection(connection) {
 }
 export async function freshEditorPage(context) {
   const pages = context.pages();
+  const anchor = pages.find(page => {
+    try {
+      const url = new URL(page.url());
+      return url.origin === 'https://nhunnhun.tistory.com'
+        && url.pathname.startsWith('/manage')
+        && !/^\/manage\/post(?:[/?#]|$)/.test(url.pathname);
+    } catch {
+      return false;
+    }
+  }) || null;
+
   for (const page of pages) {
+    if (page === anchor) continue;
     const url = page.url();
     if (!/^https:\/\/nhunnhun\.tistory\.com\/manage\/post(?:[/?#]|$)/.test(url)) continue;
     try { await page.close({runBeforeUnload:false}); } catch {}
   }
-  return context.newPage();
+
+  return anchor || context.newPage();
 }
 export async function openPublicBrowser(config, engine = chromium) {
   try { return await engine.launch({headless:true, executablePath:config.chromePath}); }
