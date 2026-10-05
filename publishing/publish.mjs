@@ -95,101 +95,97 @@ function replaceImageSources(html, mapping, representativeSource) {
 }
 
 async function switchToHtmlEditor(page) {
-  await page.keyboard.press('Escape').catch(()=>{});
-  await page.locator('#post-title-inp').click({force:true}).catch(()=>{});
   const modeButton = page.locator('#editor-mode-layer-btn-open');
-  await modeButton.waitFor({state:'attached', timeout:10000}).catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
-  const opened = await page.evaluate(() => {
-    const button = document.querySelector('#editor-mode-layer-btn-open');
-    if (!button) return false;
-    button.click();
-    return true;
-  }).catch(() => false);
-  if (!opened) throw new Error('E_EDITOR_MODE_MENU');
 
-  const htmlReady = await page.waitForFunction(() => {
-    const el = document.querySelector('#editor-mode-html');
-    if (!el) return false;
-    const r = el.getBoundingClientRect();
-    const s = getComputedStyle(el);
-    return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-  }, {timeout:10000}).then(()=>true).catch(()=>false);
-  if (!htmlReady) {
-    const diag = await page.evaluate(() => {
-      const mode = document.querySelector('#editor-mode-layer-btn-open');
-      const html = document.querySelector('#editor-mode-html');
-      return {
-        modeText: mode?.textContent || null,
-        modeHtml: mode?.outerHTML || null,
-        htmlExists: !!html,
-        htmlOuter: html?.outerHTML || null,
-        htmlDisplay: html ? getComputedStyle(html).display : null,
-        htmlVisibility: html ? getComputedStyle(html).visibility : null
-      };
-    }).catch(()=>({probe:'failed'}));
-    console.error('EDITOR_MODE_DIAG '+JSON.stringify(diag));
-    throw new Error('E_EDITOR_MODE_MENU');
-  }
+  const activeHtmlMirror = async () => {
+    const mirrors = page.locator('.cm-s-tistory-html');
+    const count = await mirrors.count();
+    for (let i = 0; i < count; i++) {
+      const mirror = mirrors.nth(i);
+      const visible = await mirror.isVisible().catch(() => false);
+      const box = visible ? await mirror.boundingBox().catch(() => null) : null;
+      if (box && box.width > 0 && box.height > 0 && await mirror.locator('.CodeMirror-code').count() > 0) return mirror;
+    }
+    return null;
+  };
 
-  const htmlOption = page.locator('#editor-mode-html');
-  const htmlOptionDiag = await page.evaluate(() => {
-    const el = document.querySelector('#editor-mode-html');
-    if (!el) return {exists:false};
-    const r = el.getBoundingClientRect();
-    const s = getComputedStyle(el);
-    return {
-      exists:true,
-      outer:el.outerHTML,
-      parent:el.parentElement?.outerHTML || null,
-      rect:{x:r.x,y:r.y,width:r.width,height:r.height},
-      display:s.display,
-      visibility:s.visibility,
-      pointerEvents:s.pointerEvents,
-      active:document.activeElement?.outerHTML || null
-    };
-  }).catch(()=>({probe:'failed'}));
-  console.log('EDITOR_HTML_OPTION_DIAG '+JSON.stringify(htmlOptionDiag));
-  const nativeHtmlClick = await page.evaluate(() => {
-    const el = document.querySelector('#editor-mode-html');
-    if (!el) return false;
-    el.click();
-    return true;
-  }).catch(() => false);
-  if (!nativeHtmlClick) throw new Error('E_EDITOR_HTML_MODE');
-  const postClickDiag = await page.evaluate(() => ({
-    modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
-    htmlExists: !!document.querySelector('#editor-mode-html'),
-    dialogs: [...document.querySelectorAll('[role="dialog"], .layer_popup, .mce-window')].map(el => ({
-      text:(el.textContent || '').trim().slice(0,500),
-      outer:el.outerHTML.slice(0,1500)
-    }))
-  })).catch(()=>({probe:'failed'}));
-  console.log('EDITOR_HTML_POSTCLICK_DIAG '+JSON.stringify(postClickDiag));
-
-  const modeSettled = await page.waitForFunction(() => {
-    const html = document.querySelector('.cm-s-tistory-html');
-    if (!html || !html.querySelector('.CodeMirror-code')) return false;
-    const r = html.getBoundingClientRect();
-    const s = getComputedStyle(html);
-    return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-  }, {timeout:10000}).then(()=>true).catch(()=>false);
-  if (!modeSettled) {
-    const diag = await page.evaluate(() => ({
-      modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
-      mirrors: [...document.querySelectorAll('.CodeMirror')].map((el, index) => {
+  const waitForActiveHtmlMirror = async (timeout = 7000) => {
+    const settled = await page.waitForFunction(() => {
+      const mirrors = [...document.querySelectorAll('.cm-s-tistory-html')];
+      return mirrors.some(el => {
         const r = el.getBoundingClientRect();
         const s = getComputedStyle(el);
-        return {index,className:el.className,width:r.width,height:r.height,display:s.display,visibility:s.visibility,hasCode:!!el.querySelector('.CodeMirror-code')};
-      })
-    })).catch(()=>({probe:'failed'}));
-    console.error('EDITOR_HTML_MODE_DIAG '+JSON.stringify(diag));
-    throw new Error('E_EDITOR_HTML_MODE');
+        return r.width > 0 && r.height > 0 &&
+          s.display !== 'none' && s.visibility !== 'hidden' &&
+          !!el.querySelector('.CodeMirror-code');
+      });
+    }, {timeout}).then(() => true).catch(() => false);
+    return settled ? activeHtmlMirror() : null;
+  };
+
+  const clickVisibleHtmlOption = async () => {
+    const semantic = page.getByRole('menuitem', {name:/^HTML$/i});
+    const semanticCount = await semantic.count().catch(() => 0);
+    for (let i = 0; i < semanticCount; i++) {
+      const option = semantic.nth(i);
+      if (!await option.isVisible().catch(() => false)) continue;
+      try {
+        await option.click({timeout:4000});
+        return true;
+      } catch {}
+    }
+
+    const fallback = page.locator('#editor-mode-html');
+    const fallbackCount = await fallback.count().catch(() => 0);
+    for (let i = 0; i < fallbackCount; i++) {
+      const option = fallback.nth(i);
+      if (!await option.isVisible().catch(() => false)) continue;
+      try {
+        await option.click({timeout:4000});
+        return true;
+      } catch {}
+    }
+    return false;
+  };
+
+  const alreadyActive = await activeHtmlMirror();
+  if (alreadyActive) return alreadyActive;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.locator('#post-title-inp').click({force:true}).catch(() => {});
+
+    await modeButton.waitFor({state:'visible', timeout:10000})
+      .catch(() => { throw new Error('E_EDITOR_MODE_MENU'); });
+
+    try {
+      await modeButton.click({timeout:5000});
+    } catch {
+      if (attempt === 1) throw new Error('E_EDITOR_MODE_MENU');
+      continue;
+    }
+
+    const clicked = await clickVisibleHtmlOption();
+    if (!clicked) {
+      if (attempt === 1) throw new Error('E_EDITOR_HTML_MODE');
+      continue;
+    }
+
+    const htmlMirror = await waitForActiveHtmlMirror(7000);
+    if (htmlMirror) return htmlMirror;
   }
 
-  const htmlMirror = page.locator('.cm-s-tistory-html:visible').first();
-  await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
-  if (await htmlMirror.locator('.CodeMirror-code').count() < 1) throw new Error('E_EDITOR_HTML_BODY');
-  return htmlMirror;
+  const diag = await page.evaluate(() => ({
+    modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
+    htmlOption: document.querySelector('#editor-mode-html')?.outerHTML || null,
+    mirrors: [...document.querySelectorAll('.CodeMirror')].map((el,index) => {
+      const r=el.getBoundingClientRect();
+      const s=getComputedStyle(el);
+      return {index,className:el.className,width:r.width,height:r.height,display:s.display,visibility:s.visibility,hasCode:!!el.querySelector('.CodeMirror-code')};
+    })
+  })).catch(() => ({probe:'failed'}));
+  console.error('EDITOR_HTML_MODE_DIAG '+JSON.stringify(diag));
+  throw new Error('E_EDITOR_HTML_MODE');
 }
 
 let editorConnection, editorContext, publicBrowser, editorPage, imageTempDir;
