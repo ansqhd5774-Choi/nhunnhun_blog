@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "34cfb19cd379aa8757088acc2fe155fc4427251b88e177b8aced97c0fceb7bb3",
   "url": "https://nhunnhun.tistory.com/66",
   "articleId": "66",
+  "previousTitle": "비타민 D(Vitamin D)의 놀라운 성능, 올인원 건강 보호막",
+  "title": "비타민D 결핍 기준·하루 권장량 총정리｜혈액검사 수치·1000·2000IU 복용법",
   "sourceCommit": "3bd1bf6c7835388616365f4846bef58bc26d0fc2",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T17:19:22.555Z"
+  "timestamp": "2026-10-05T17:19:33.515Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 14,
+    "h2Styled": 14,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 14,
+    "tables": 4,
+    "tableWraps": 4,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 4,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
