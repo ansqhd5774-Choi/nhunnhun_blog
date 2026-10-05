@@ -449,5 +449,6 @@ try {
   catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
   if (imageTempDir) try { await rm(imageTempDir, {recursive:true, force:true}); }
   catch { console.error('E_LOCAL_TEMP_CLEANUP'); process.exitCode = 1; fatalExitCode = 1; }
-  if (fatalExitCode) setTimeout(() => process.exit(fatalExitCode), 0);
+  const finalExitCode = fatalExitCode || process.exitCode || 0;
+  setTimeout(() => process.exit(finalExitCode), 0);
 }
