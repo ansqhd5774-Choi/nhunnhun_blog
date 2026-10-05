@@ -1,4 +1,9 @@
 // Classify provider exceptions without exposing messages, URLs, or credentials.
+export function hasHumanVerificationFailure(responses) {
+  return responses.some(response =>
+    (/\/manage\/dkaptcha\//.test(response.path) && response.status >= 400)
+    || (response.path === '/manage/post.json' && response.status === 403));
+}
 export function safeRuntimeDiagnostic(error) {
   const message = String(error?.message ?? '');
   return {

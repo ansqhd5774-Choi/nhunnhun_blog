@@ -2,8 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { safeRuntimeDiagnostic } from '../publishing/runtime-diagnostics.mjs';
+import { safeRuntimeDiagnostic, hasHumanVerificationFailure } from '../publishing/runtime-diagnostics.mjs';
 import { ensureEditorRendering } from '../publishing/local-browser.mjs';
+
+test('successful widget and publication responses are not human verification failures',()=>{
+  assert.equal(hasHumanVerificationFailure([
+    {path:'/manage/dkaptcha/widgetId',status:200},
+    {path:'/manage/post.json',status:200},
+  ]),false);
+  assert.equal(hasHumanVerificationFailure([{path:'/manage/dkaptcha/widgetId',status:403}]),true);
+  assert.equal(hasHumanVerificationFailure([{path:'/manage/post.json',status:403}]),true);
+});
 
 test('editor rendering correction targets its own CDP session and fails closed',async()=>{
   const page={};

@@ -1,5 +1,5 @@
 import { verificationContext } from './verification-context.mjs';
-import { safeRuntimeDiagnostic } from './runtime-diagnostics.mjs';
+import { safeRuntimeDiagnostic, hasHumanVerificationFailure } from './runtime-diagnostics.mjs';
 import { openHtmlMode } from './html-mode.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering } from './local-browser.mjs';
@@ -253,8 +253,7 @@ try {
         const text=[...(signals.notices||[]),...(signals.dialogs||[]).map(x=>x.message),signals.layerText||''].join(' ');
         if (/하루.{0,30}(?:공개|새롭게).{0,30}발행|최대\s*(?:15|30)개|공개\s*발행.{0,30}제한/.test(text)) return 'E_TISTORY_DAILY_PUBLISH_LIMIT';
         if (/자동입력|보안문자|captcha|recaptcha|사람인지|로봇/i.test(text)) return 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED';
-        if (submitResponses.some(x => /\/manage\/dkaptcha\//.test(x.path))) return 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED';
-        if (submitResponses.some(x => x.path === '/manage/post.json' && x.status === 403)) return 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED';
+        if (hasHumanVerificationFailure(submitResponses)) return 'E_TISTORY_HUMAN_VERIFICATION_REQUIRED';
         return null;
       };
       page.on('response', recordSubmitResponse);

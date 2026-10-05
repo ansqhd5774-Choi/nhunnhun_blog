@@ -364,10 +364,11 @@ test('human-verification failure stays blocked until manual clearance', () => {
   assert.equal(eligible(post,state),false);
 });
 
-test('publisher recognizes dkaptcha probe and 403 post response as human verification', () => {
+test('publisher uses the human verification response classifier', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
-  assert.match(publish,/dkaptcha/);
-  assert.match(publish,/x\.path === '\/manage\/post\.json' && x\.status === 403/);
+  assert.match(publish,/hasHumanVerificationFailure\(submitResponses\)/);
+  const diagnostic=readFileSync(new URL('../publishing/runtime-diagnostics.mjs',import.meta.url),'utf8');
+  assert.match(diagnostic,/response\.path === '\/manage\/post\.json' && response\.status === 403/);
 });
 
 
