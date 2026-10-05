@@ -9,6 +9,7 @@ on:
       - 'publishing/local-browser.mjs'
       - 'publishing/mutation-gate.mjs'
       - 'maintenance/ensure-tistory-chrome.cmd'
+      - 'maintenance/check-tistory-chrome.cmd'
       - 'publishing/runner-gate.mjs'
       - 'tests/runner-gate.test.mjs'
       - 'publishing/update-core.mjs'
@@ -89,7 +90,7 @@ jobs:
       - run: pnpm test
       - run: node --test tests/public-verification.test.mjs
       - run: pnpm run validate:update
-      - run: call maintenance\ensure-tistory-chrome.cmd
+      - run: call maintenance\check-tistory-chrome.cmd
       - run: pnpm run update
         env:
           UPDATE_ENABLED: 'true'
