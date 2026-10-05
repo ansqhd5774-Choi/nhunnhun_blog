@@ -29,7 +29,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: nhunnhun-validation
+  group: nhunnhun-validation-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   validate:
