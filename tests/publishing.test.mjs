@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { localBrowserConfig, assertDedicatedProfile, assertLocalGit, openEditorContext, openPublicBrowser } from '../publishing/local-browser.mjs';
+import { localBrowserConfig, assertDedicatedProfile, assertLocalCdpUrl, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser } from '../publishing/local-browser.mjs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
 import { checkUpdateSource, eligibleUpdate, updateFingerprint } from '../publishing/update-core.mjs';
@@ -174,25 +174,29 @@ test('validation remains hosted; public publisher is Windows CMD only', () => {
   assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
 });
 
-test('active browser sources contain no cloud session or Linux-only temp dependency', () => {
+test('active browser sources use only local persistent Chrome and no cloud session', () => {
   for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
-    const s=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
-    assert.doesNotMatch(s,/@browserbasehq\/sdk|Browserbase|connectOverCDP|BROWSERBASE_|\/tmp\//);
-    assert.doesNotMatch(s,/restore-last-session/);
+    const source=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
+    assert.doesNotMatch(source,/@browserbasehq\/sdk|Browserbase|BROWSERBASE_|\/tmp\//);
+    assert.doesNotMatch(source,/restore-last-session/);
   }
+  const local=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
+  assert.match(local,/connectOverCDP/);
+  assert.match(local,/127\.0\.0\.1/);
+  assert.match(local,/_shouldCloseConnectionOnClose = true/);
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(p,/tmpdir\(\)/);
   assert.match(p,/publicBrowser = await openPublicBrowser\(browserConfig\)/);
   assert.match(p,/verificationContext\(publicBrowser\)/);
+  assert.match(p,/closeEditorConnection\(editorConnection\)/);
   const verification=readFileSync(new URL('../publishing/verification-context.mjs',import.meta.url),'utf8');
   assert.match(verification,/context\.route\('\*\*\/\*'/);
   assert.match(verification,/serviceWorkers: 'block'/);
-  assert.match(p,/\[publicBrowser, editorContext\]/);
   assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click'));
   assert.ok(p.indexOf("E_SOURCE_DRIFT")<p.indexOf("phase:'submitting'"));
 });
 
-test('configuration rejects missing executables, missing profiles and ordinary Chrome profiles', async () => {
+test('configuration rejects missing executables, missing profiles, remote CDP and ordinary Chrome profiles', async () => {
   const temp=await mkdtemp(join(tmpdir(),'tistory-config-test-'));
   try {
     const exe=join(temp,'chrome.exe'); await writeFile(exe,'fixture');
@@ -203,7 +207,11 @@ test('configuration rejects missing executables, missing profiles and ordinary C
       assert.throws(()=>assertDedicatedProfile(value),/E_LOCAL_PROFILE_REQUIRED/);
     }
     const profile=join(temp,'dedicated');
-    assert.equal((await localBrowserConfig({TISTORY_CHROME_PATH:exe,TISTORY_PROFILE_DIR:profile})).profileDir,profile);
+    const config=await localBrowserConfig({TISTORY_CHROME_PATH:exe,TISTORY_PROFILE_DIR:profile});
+    assert.equal(config.profileDir,profile);
+    assert.equal(config.cdpUrl,'http://127.0.0.1:9223');
+    assert.equal(assertLocalCdpUrl('http://localhost:9333'),'http://localhost:9333');
+    assert.throws(()=>assertLocalCdpUrl('https://example.com:9223'),/E_LOCAL_CDP_REQUIRED/);
     await assert.rejects(localBrowserConfig({TISTORY_CHROME_PATH:exe,TISTORY_PROFILE_DIR:exe}),/E_LOCAL_PROFILE_ACCESS/);
   } finally {await rm(temp,{recursive:true,force:true});}
 });
@@ -212,22 +220,34 @@ test('missing Git fails closed before browser or publication', () => {
   assert.throws(()=>assertLocalGit(()=>{throw Error('fixture');}),/E_LOCAL_GIT_REQUIRED/);
 });
 
-test('authenticated profile and anonymous browser have separate launch contracts', async () => {
-  const calls=[], config={chromePath:'fixture-chrome',profileDir:'fixture-profile'};
+test('authenticated editor attaches to local persistent Chrome and disconnects without closing it', async () => {
+  const calls=[];
+  const context={kind:'editor-context'};
+  const browser={
+    _shouldCloseConnectionOnClose:false,
+    contexts:()=>[context],
+    close:async()=>{calls.push(['disconnect',browser._shouldCloseConnectionOnClose]);}
+  };
   const engine={
-    launchPersistentContext:async(...args)=>{calls.push(['editor',...args]);return {kind:'editor'};},
+    connectOverCDP:async(...args)=>{calls.push(['editor',...args]);return browser;},
     launch:async(...args)=>{calls.push(['public',...args]);return {kind:'public'};}
   };
-  assert.equal((await openEditorContext(config,{engine,headless:false})).kind,'editor');
-  assert.equal((await openEditorContext(config,{engine})).kind,'editor');
+  const config={chromePath:'fixture-chrome',profileDir:'fixture-profile',cdpUrl:'http://127.0.0.1:9223'};
+  const connection=await openEditorConnection(config,{engine});
+  assert.equal(connection.context,context);
   assert.equal((await openPublicBrowser(config,engine)).kind,'public');
-  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
-  await assert.rejects(openEditorContext(config,{engine:{launchPersistentContext:async()=>{throw Error('private path');}}}),/^Error: E_LOCAL_BROWSER_LAUNCH$/);
+  await closeEditorConnection(connection);
+  assert.deepEqual(calls,[
+    ['editor','http://127.0.0.1:9223',{timeout:15000,isLocal:true,noDefaults:true}],
+    ['public',{headless:true,executablePath:'fixture-chrome'}],
+    ['disconnect',true]
+  ]);
+  await assert.rejects(openEditorConnection(config,{engine:{connectOverCDP:async()=>{throw Error('offline');}}}),/^Error: E_LOCAL_BROWSER_CONNECT$/);
 });
 
 test('login bootstrap confirms administrator page and never submits posts', () => {
   const s=readFileSync(new URL('../publishing/login.mjs',import.meta.url),'utf8');
-  assert.match(s,/headless:false/);
+  assert.match(s,/openEditorConnection/);
   assert.match(s,/url\.origin === BLOG && url\.pathname === '\/manage\/posts'/);
   assert.match(s,/name:'글쓰기', exact:true/);
   assert.match(s,/LOGIN_SAVED/);
