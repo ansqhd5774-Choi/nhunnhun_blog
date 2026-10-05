@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync,rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join,resolve,dirname,basename } from 'node:path';
+import { Queue } from './queue.mjs';
+const request={task_type:'NEW',topic:'가상 시험 작업'};
+function fixture(fn){const root=resolve(tmpdir()),dir=mkdtempSync(join(root,'nh-queue-'));try{fn(dir);}finally{if(dirname(resolve(dir))!==root||!basename(dir).startsWith('nh-queue-'))throw new Error('E_TEST_CLEANUP');rmSync(dir,{recursive:true,force:true});}}
+test('registered work survives database closure and reopening',()=>fixture(dir=>{let q=new Queue(join(dir,'queue.db'));const id=q.enqueue(request).job.job_id;q.close();q=new Queue(join(dir,'queue.db'));assert.equal(q.get(id).topic,request.topic);q.close();}));
+test('normalized duplicate registration returns the original work',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));const a=q.enqueue(request);const b=q.enqueue({...request,topic:' 가상   시험 작업 '});assert.equal(b.job.job_id,a.job.job_id);assert.equal(b.duplicate,true);q.close();}));
+test('two independent connections cannot claim the same job',()=>fixture(dir=>{const a=new Queue(join(dir,'q.db')),b=new Queue(join(dir,'q.db'));a.enqueue(request);assert.ok(a.claim('worker-a'));assert.equal(b.claim('worker-b'),null);a.close();b.close();}));
+test('stale worker cannot apply a late result after lease recovery',()=>fixture(dir=>{let now=10000;const q=new Queue(join(dir,'q.db'),{clock:()=>now});q.enqueue(request);const a=q.claim('a',1000);now+=1001;const b=q.claim('b',1000);assert.ok(b);assert.throws(()=>q.transition(a.job_id,a,'RESEARCHING'),/E_STALE_WORKER/);q.close();}));
+test('state version rejects obsolete callbacks within the same lease',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));q.enqueue(request);const a=q.claim('a');q.transition(a.job_id,a,'RESEARCHING');assert.throws(()=>q.transition(a.job_id,a,'CANCELLED'),/E_STALE_WORKER/);q.close();}));
+test('WAL snapshot restores all registered jobs without overwriting live data',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));const id=q.enqueue(request).job.job_id;const snapshot=q.backup(join(dir,'snapshot.db'));const restore=new Queue(snapshot);assert.equal(restore.get(id).state,'QUEUED');assert.throws(()=>q.backup(snapshot),/E_BACKUP_DESTINATION/);restore.close();q.close();}));
+test('malformed target and LLM supplied approval fields are rejected',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));assert.throws(()=>q.enqueue({...request,approved:true}),/E_JOB_SCHEMA/);assert.throws(()=>q.enqueue({task_type:'UPDATE',topic:'수정',article_id:'111',target_url:'https://other.tistory.com/111',expected_title:'원제목',revision:'r1'}),/E_UPDATE_TARGET/);q.close();}));
+test('known credential patterns are rejected before payload storage',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));assert.throws(()=>q.enqueue({...request,topic:'github_pat_fake12345678901234567890'}),/E_SECRET_INPUT/);assert.equal(q.list().length,0);q.close();}));
+test('unconfirmed publication cannot become DONE or ready without approval',()=>fixture(dir=>{const q=new Queue(join(dir,'q.db'));q.enqueue(request);let a=q.claim('a');for(const state of ['RESEARCHING','EVIDENCE_READY','DRAFTING','VALIDATING','AWAITING_APPROVAL'])a=q.transition(a.job_id,a,state);assert.throws(()=>q.transition(a.job_id,a,'READY_TO_INTEGRATE'),/E_APPROVAL_REQUIRED/);q.release(a.job_id,a);q.close();}));

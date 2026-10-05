@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {matchingIntent} from './inventory.mjs';
+test('known duplicate topics hold NEW and retain exact numeric update URL',()=>{const entries=[{title:'사과 효능·영양성분',url:'https://nhunnhun.tistory.com/356'},{title:'바나나 보관법',url:'https://nhunnhun.tistory.com/123'}];assert.equal(matchingIntent(' 사과 ',entries)[0].url,'https://nhunnhun.tistory.com/356');assert.equal(matchingIntent('바나나',entries).length,1);assert.equal(matchingIntent('새로운 식품',entries).length,0);assert.throws(()=>matchingIntent('',entries));});

@@ -1,0 +1,9 @@
+# Local producer deployment review
+
+This change prepares the keyword producer and connects approved delivery through the existing Windows/CMD publish workflow. NEW and UPDATE share one mutation concurrency group. Anonymous desktop/mobile quality verification must finish before published/updated ledger completion. Human verification and daily/rate limits do not authorize automatic retry.
+
+The producer defaults to disabled publication and unverified security maintenance. It requires current source, clean tracked integration, bound content/evidence/review hashes, a fresh remote snapshot, no active/uncertain/held publication, and a verified shared lock. No authenticated sessions, runtime databases, model files, or credentials are included. Existing posts, updates and ledgers are unchanged.
+
+Validation: 122 distinct local tests, NEW19 and UPDATE19 source validation; packaged control and local Git preparation tests. Existing /370 anonymous quality verification passed at1440/390. Delivery success/failure uses fixtures. Real NEW/UPDATE publishing E2E and reboot recovery remain untested. Nectarine research was added but the actual image gate accepted only2/3 required images and kept HOLD. GSC access returned payment_required. Windows10 security maintenance and the remote Tistory human-verification hold remain unresolved.
+
+The remote mutation switch is currently true. Main merge of these shared files can trigger both publishing workflows. Coordinate the existing runner, hold pending/uncertain work, and explicitly disable remote mutations before deployment. Do not merge or re-enable publication merely because the draft PR or CI passes. Confirm dedicated-profile login on the runner PC, verify public state before ledger recovery, and obtain the scoped public-test authorization before any actual publication.

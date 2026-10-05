@@ -16,6 +16,10 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/publish-posts.yml'
+      - 'publishing/public-quality.mjs'
+      - 'publishing/verify-updated-public.mjs'
+      - 'publishing/verification-context.mjs'
+      - 'tests/active-standard.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,7 +49,7 @@ jobs:
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
   publish:
     concurrency:
-      group: nhunnhun-tistory-publish
+      group: nhunnhun-tistory-mutation
       cancel-in-progress: false
     needs: validate
     if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'

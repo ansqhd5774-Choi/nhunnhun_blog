@@ -1,12 +1,15 @@
 import { access, mkdir, realpath, stat } from 'node:fs/promises';
 import { constants } from 'node:fs';
-import { isAbsolute, resolve } from 'node:path';
+import { isAbsolute, resolve,relative } from 'node:path';
+import {fileURLToPath} from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright-core';
 
 export function assertDedicatedProfile(profileDir) {
   if (!profileDir || !isAbsolute(profileDir)) throw new Error('E_LOCAL_PROFILE_REQUIRED');
   if (/[\\/]Google[\\/]Chrome[\\/]User Data(?:[\\/]|$)/i.test(profileDir)) throw new Error('E_LOCAL_PROFILE_REQUIRED');
+  const rel=relative(fileURLToPath(new URL('../',import.meta.url)),resolve(profileDir));
+  if(!rel||(!rel.startsWith('..')&&!isAbsolute(rel)))throw new Error('E_LOCAL_PROFILE_REPO');
 }
 export async function localBrowserConfig(env = process.env) {
   const chromePath = env.TISTORY_CHROME_PATH;

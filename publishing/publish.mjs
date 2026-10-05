@@ -9,6 +9,7 @@ import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticle
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
 import { assertImageReview } from './image-review.mjs';
+import {publicAudit} from './public-quality.mjs';
 
 
 function imageSources(html) {
@@ -106,6 +107,7 @@ try {
     const ledger = new Ledger();
     const queue = [];
     for (const post of await loadPosts()) {
+      const qualityAudit=await publicAudit(post,url);
       const state = await ledger.read(post.id);
       if (eligible(post, state)) {
         checkPublishHtml(post);
@@ -375,7 +377,7 @@ try {
       ) throw new Error('E_EDITORIAL_PUBLIC_CONTRACT');
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
-      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()}, state.sha);
+      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,sourceCommit,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString(),verification:'anonymous_full_body_editorial_pc_mobile',desktop:qualityAudit.desktop,mobile:qualityAudit.mobile}, state.sha);
       console.log(`PUBLISHED: ${post.id} ${url}`);
     } else console.log('NO_PENDING_POSTS');
   }
