@@ -178,6 +178,7 @@ test('active browser sources contain no cloud session or Linux-only temp depende
   for(const name of ['publish.mjs','login.mjs','smoke.mjs','local-browser.mjs']){
     const s=readFileSync(new URL('../publishing/'+name,import.meta.url),'utf8');
     assert.doesNotMatch(s,/@browserbasehq\/sdk|Browserbase|connectOverCDP|BROWSERBASE_|\/tmp\//);
+    assert.doesNotMatch(s,/restore-last-session/);
   }
   const p=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(p,/tmpdir\(\)/);
@@ -219,7 +220,7 @@ test('authenticated profile and anonymous browser have separate launch contracts
   };
   assert.equal((await openEditorContext(config,{engine,headless:false})).kind,'editor');
   assert.equal((await openPublicBrowser(config,engine)).kind,'public');
-  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--restore-last-session']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
+  assert.deepEqual(calls,[['editor','fixture-profile',{headless:false,executablePath:'fixture-chrome',args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']}],['public',{headless:true,executablePath:'fixture-chrome'}]]);
   await assert.rejects(openEditorContext(config,{engine:{launchPersistentContext:async()=>{throw Error('private path');}}}),/^Error: E_LOCAL_BROWSER_LAUNCH$/);
 });
 
