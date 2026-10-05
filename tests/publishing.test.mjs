@@ -380,7 +380,8 @@ test('publisher closes overlays, opens the mode layer, and writes through HTML C
   assert.match(publish,/editor-mode-layer-btn-open/);
   assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
   assert.match(publish,/EDITOR_MODE_DIAG/);
-  assert.match(publish,/htmlOption\.click\(\{force:true\}\)/);
+  assert.match(publish,/document\.querySelector\('#editor-mode-html'\)/);
+  assert.match(publish,/nativeHtmlClick/);
   assert.match(publish,/EDITOR_HTML_MODE_DIAG/);
   assert.match(publish,/EDITOR_HTML_OPTION_DIAG/);
   assert.match(publish,/EDITOR_HTML_POSTCLICK_DIAG/);

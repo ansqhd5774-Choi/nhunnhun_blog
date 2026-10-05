@@ -149,7 +149,13 @@ async function switchToHtmlEditor(page) {
     };
   }).catch(()=>({probe:'failed'}));
   console.log('EDITOR_HTML_OPTION_DIAG '+JSON.stringify(htmlOptionDiag));
-  await htmlOption.click({force:true}).catch(() => { throw new Error('E_EDITOR_HTML_MODE'); });
+  const nativeHtmlClick = await page.evaluate(() => {
+    const el = document.querySelector('#editor-mode-html');
+    if (!el) return false;
+    el.click();
+    return true;
+  }).catch(() => false);
+  if (!nativeHtmlClick) throw new Error('E_EDITOR_HTML_MODE');
   const postClickDiag = await page.evaluate(() => ({
     modeText: document.querySelector('#editor-mode-layer-btn-open')?.textContent || null,
     htmlExists: !!document.querySelector('#editor-mode-html'),
