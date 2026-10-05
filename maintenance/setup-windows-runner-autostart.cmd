@@ -46,7 +46,7 @@ if errorlevel 1 (
 
 echo [5/7] Create 2-minute watchdog
 schtasks /Delete /TN "%WATCHDOG_NAME%" /F >nul 2>nul
-schtasks /Create /TN "%WATCHDOG_NAME%" /TR "cmd.exe /d /c \"\"%WATCHDOG_SCRIPT%\" >nul 2>nul\"" /SC MINUTE /MO 2 /RL LIMITED /F >nul
+schtasks /Create /TN "%WATCHDOG_NAME%" /TR "\"%WATCHDOG_SCRIPT%\"" /SC MINUTE /MO 2 /RL LIMITED /F >nul
 if errorlevel 1 (
   echo FAIL: WATCHDOG_TASK_CREATE
   exit /b 21
