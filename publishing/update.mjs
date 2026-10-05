@@ -237,7 +237,7 @@ async function verifyMobile(browser,update){
   }finally{await context.close();}
 }
 
-let editorContext,publicBrowser,tempDir,editorPage;
+let editorConnection,editorContext,publicBrowser,tempDir,editorPage;
 let stage='configuration';
 try{
   if(process.env.UPDATE_ENABLED!=='true'){
