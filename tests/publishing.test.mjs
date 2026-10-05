@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { localBrowserConfig, assertDedicatedProfile, assertLocalCdpUrl, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser } from '../publishing/local-browser.mjs';
+import { localBrowserConfig, assertDedicatedProfile, assertLocalCdpUrl, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from '../publishing/local-browser.mjs';
 import { parse } from 'yaml';
 import { checkPost, checkPublishHtml, eligible, fingerprint, assertArticleUrl, plainText } from '../publishing/core.mjs';
 import { checkUpdateSource, eligibleUpdate, updateFingerprint } from '../publishing/update-core.mjs';
@@ -345,4 +345,21 @@ test('persistent Chrome helper binds CDP to loopback only', () => {
   assert.match(helper,/remote-debugging-port=%TISTORY_CDP_PORT%/);
   assert.match(helper,/user-data-dir="%TISTORY_PROFILE_DIR%"/);
   assert.doesNotMatch(helper,/0\.0\.0\.0|powershell|pwsh/i);
+});
+
+
+test('persistent editor reuses authenticated Tistory tab and closes extras', async () => {
+  const closed=[];
+  const auth={url:()=> 'https://nhunnhun.tistory.com/manage/posts',close:async()=>closed.push('auth')};
+  const extra={url:()=> 'about:blank',close:async()=>closed.push('extra')};
+  const context={pages:()=>[extra,auth],newPage:async()=>{throw Error('must not create');}};
+  const page=await freshEditorPage(context);
+  assert.equal(page,auth);
+  assert.deepEqual(closed,['extra']);
+});
+
+test('persistent editor creates one tab only when browser has no pages', async () => {
+  const created={url:()=> 'about:blank'};
+  const context={pages:()=>[],newPage:async()=>created};
+  assert.equal(await freshEditorPage(context),created);
 });
