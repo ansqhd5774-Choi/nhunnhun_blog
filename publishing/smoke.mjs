@@ -1,10 +1,10 @@
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext, freshEditorPage } from './local-browser.mjs';
-let context;
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, freshEditorPage } from './local-browser.mjs';
+let connection;
 try {
   assertLocalGit();
-  context = await openEditorContext(await localBrowserConfig());
-  const page = await freshEditorPage(context);
+  connection = await openEditorConnection(await localBrowserConfig());
+  const page = await freshEditorPage(connection.context);
   await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded', timeout:45000});
   try {
     await page.getByRole('link', {name:'글쓰기', exact:true}).first().waitFor({state:'visible', timeout:15000});
@@ -17,6 +17,6 @@ try {
   console.error(/^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_LOCAL_SMOKE');
   process.exitCode = 1;
 } finally {
-  try { await context?.close(); }
-  catch { console.error('E_LOCAL_BROWSER_CLOSE'); process.exitCode = 1; }
+  try { await closeEditorConnection(connection); }
+  catch { console.error('E_LOCAL_BROWSER_DISCONNECT'); process.exitCode = 1; }
 }
