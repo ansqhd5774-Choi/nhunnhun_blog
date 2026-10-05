@@ -1,4 +1,5 @@
 import { verificationContext } from './verification-context.mjs';
+import { safeRuntimeDiagnostic } from './runtime-diagnostics.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
@@ -414,6 +415,21 @@ try {
 } catch (error) {
   const code = /^(?:E_[A-Z_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
+  console.error('RUNTIME_SAFE_DIAG '+JSON.stringify(safeRuntimeDiagnostic(error)));
+  if (editorPage && stage === 'mode-menu') try {
+    console.log('MODE_MENU_SAFE_DIAG '+JSON.stringify(await editorPage.evaluate(()=>{
+      const buttons=[...document.querySelectorAll('#editor-mode-layer-btn-open')];
+      return { count:buttons.length, buttons:buttons.map(button=>{
+        const rect=button.getBoundingClientRect();
+        const x=rect.left+rect.width/2, y=rect.top+rect.height/2;
+        const hit=document.elementFromPoint(x,y);
+        return {visible:rect.width>0&&rect.height>0,disabled:button.disabled,
+          insideViewport:x>=0&&y>=0&&x<innerWidth&&y<innerHeight,
+          hitWithinButton:!!hit&&(hit===button||button.contains(hit)),
+          hitTag:hit?.tagName??null};
+      })};
+    }))));
+  } catch { console.log('MODE_MENU_SAFE_DIAG_UNAVAILABLE'); }
   if (stage === 'local-browser') console.error('LOCAL_BROWSER_SAFE_DIAG '+JSON.stringify({code}));
   if (editorPage && stage !== 'final-submit' && stage !== 'public-verification') try {
     console.log('EDITOR_CONTROLS: '+JSON.stringify(await editorPage.evaluate(()=>({
