@@ -167,8 +167,11 @@ async function switchToHtmlEditor(page) {
   console.log('EDITOR_HTML_POSTCLICK_DIAG '+JSON.stringify(postClickDiag));
 
   const modeSettled = await page.waitForFunction(() => {
-    const mode = document.querySelector('#editor-mode-layer-btn-open');
-    return /HTML/i.test(mode?.textContent || '');
+    const html = document.querySelector('.cm-s-tistory-html');
+    if (!html || !html.querySelector('.CodeMirror-code')) return false;
+    const r = html.getBoundingClientRect();
+    const s = getComputedStyle(html);
+    return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
   }, {timeout:10000}).then(()=>true).catch(()=>false);
   if (!modeSettled) {
     const diag = await page.evaluate(() => ({
@@ -183,7 +186,7 @@ async function switchToHtmlEditor(page) {
     throw new Error('E_EDITOR_HTML_MODE');
   }
 
-  const htmlMirror = page.locator('.CodeMirror:visible').last();
+  const htmlMirror = page.locator('.cm-s-tistory-html:visible').first();
   await htmlMirror.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_EDITOR_HTML_BODY'); });
   if (await htmlMirror.locator('.CodeMirror-code').count() < 1) throw new Error('E_EDITOR_HTML_BODY');
   return htmlMirror;

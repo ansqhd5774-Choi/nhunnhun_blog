@@ -388,7 +388,8 @@ test('publisher closes overlays, opens the mode layer, and writes through HTML C
   assert.match(publish,/DIALOG_DIAG/);
   assert.match(publish,/DIALOG_ACTION/);
   assert.match(publish,/stage === 'html-mode'/);
-  assert.match(publish,/page\.locator\('\.CodeMirror:visible'\)\.last\(\)/);
+  assert.match(publish,/document\.querySelector\('\.cm-s-tistory-html'\)/);
+  assert.match(publish,/page\.locator\('\.cm-s-tistory-html:visible'\)\.first\(\)/);
   assert.match(publish,/htmlMirror\.locator\('\.CodeMirror-code'\)/);
   assert.match(publish,/htmlCode\.click\(\{force:true\}\)/);
   assert.match(publish,/keyboard\.insertText\(bodyHtml\)/);
