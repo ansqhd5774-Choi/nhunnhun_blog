@@ -1,6 +1,6 @@
 import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser } from './local-browser.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorContext, openPublicBrowser, freshEditorPage } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -121,7 +121,7 @@ try {
       editorContext = await openEditorContext(browserConfig);
       imageTempDir = await mkdtemp(join(tmpdir(), 'tistory-images-'));
       stage = 'editor-open';
-      const page = await editorContext.newPage();
+      const page = await freshEditorPage(editorContext);
       editorPage = page;
       page.setDefaultTimeout(20000);
       // The ordinary editor is used; no retired/undocumented Tistory write endpoint or cookie export.
