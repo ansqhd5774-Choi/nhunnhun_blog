@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "0411c7751b5b75d80b9b82f52ccc9401a61e9f494fd0a77d5a68a42eb7d94950",
   "url": "https://nhunnhun.tistory.com/367",
   "articleId": "367",
+  "previousTitle": "생강청 효능·먹는 법 총정리｜감기·혈당·칼로리·보관법",
+  "title": "생강청 효능·먹는 법 총정리｜감기·혈당·칼로리·보관법",
   "sourceCommit": "5795b8d6a7d22d882bf3393f3afafa201469ebfc",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-05T16:02:17.482Z"
+  "timestamp": "2026-10-05T16:02:30.238Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 13,
+    "h2Styled": 13,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 13,
+    "tables": 2,
+    "tableWraps": 2,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
