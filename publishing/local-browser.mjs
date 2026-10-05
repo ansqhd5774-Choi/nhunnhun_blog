@@ -34,8 +34,18 @@ export function assertLocalGit(run = execFileSync) {
 }
 export async function openEditorContext(config, { headless = true, engine = chromium } = {}) {
   try {
-    return await engine.launchPersistentContext(config.profileDir, {headless, executablePath:config.chromePath, args:['--restore-last-session']});
+    return await engine.launchPersistentContext(config.profileDir, {
+      headless,
+      executablePath:config.chromePath,
+      args:['--no-first-run','--no-default-browser-check','--disable-session-crashed-bubble']
+    });
   } catch { throw new Error('E_LOCAL_BROWSER_LAUNCH'); }
+}
+export async function freshEditorPage(context) {
+  for (const page of context.pages()) {
+    try { await page.close({runBeforeUnload:false}); } catch {}
+  }
+  return await context.newPage();
 }
 export async function openPublicBrowser(config, engine = chromium) {
   try { return await engine.launch({headless:true, executablePath:config.chromePath}); }
