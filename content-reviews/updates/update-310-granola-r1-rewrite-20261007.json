@@ -9,7 +9,7 @@
     "status": "resolved",
     "reason": "그래놀라는 귀리·견과류·감미료 등을 섞어 구운 가공 시리얼이며 사용자가 기존 숫자 URL의 음식 글 전체 재작성을 요청했다."
   },
-  "sourceDigest": "f6df7edebbf7421d2956bd6c665ea3e7ba47d29fe9247d437a035e4317dbeeff",
+  "sourceDigest": "4036f8364bf4b840dbaaac4fbae5c02a7d68d59776d952c6ab2e73bd0df2ddec",
   "intent": {
     "primaryQuestion": "그래놀라는 실제로 다이어트와 아침식사에 좋은지, 몇 g을 먹고 어떤 영양표시를 보며 무엇과 함께 먹어야 하는가?",
     "readerSituation": "건강식으로 알려진 그래놀라를 사거나 먹으려 하지만 칼로리와 당류가 걱정되고 30g 같은 숫자가 권장량인지, 오트밀보다 나은지 판단하려는 상황",
