@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'publishing/content-*.mjs'
+      - 'publishing/cross-domain.mjs'
+      - 'publishing/standards/**'
+      - 'publishing/validate-content.mjs'
+      - 'content-reviews/**'
+      - 'tests/content-*.test.mjs'
       - 'updates/**'
       - 'publishing/update.mjs'
       - 'publishing/local-browser.mjs'
@@ -18,6 +24,9 @@ on:
       - 'publishing/validate-update.mjs'
       - 'publishing/verify-updated-public.mjs'
       - 'tests/public-verification.test.mjs'
+      - 'publishing/editorial.mjs'
+      - 'publishing/core.mjs'
+      - 'pnpm-lock.yaml'
       - 'package.json'
       - '.github/workflows/update-posts.yml'
   workflow_dispatch:
@@ -61,12 +70,19 @@ jobs:
         run: node publishing/runner-gate.mjs --queue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Content standard for changed source
+        run: pnpm run validate:content:changed
+        if: github.event_name == 'push'
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.before }}
+          CONTENT_HEAD_SHA: ${{ github.sha }}
+      - run: pnpm run validate:content
       - run: pnpm test
       - run: node --test tests/public-verification.test.mjs
       - run: pnpm run validate:update
   update:
     concurrency:
-      group: nhunnhun-tistory-update-runtime
+      group: nhunnhun-tistory-mutation
       cancel-in-progress: false
     needs: validate-update
     if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate-update.outputs.should_update == 'true'

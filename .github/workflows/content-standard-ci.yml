@@ -1,16 +1,64 @@
 name: Content standard CI
 on:
   push:
-    branches: ['work/content-standard-r1-20261007']
+    branches: [main, 'work/content-standard-r1-20261007']
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'docs/**'
+      - 'posts/**'
+      - 'updates/**'
+      - 'content-reviews/**'
+      - 'publishing/content-*.mjs'
+      - 'publishing/cross-domain.mjs'
+      - 'publishing/standards/**'
+      - 'publishing/validate*.mjs'
+      - 'publishing/editorial.mjs'
+      - 'publishing/core.mjs'
+      - 'publishing/update-core.mjs'
+      - 'publishing/publish.mjs'
+      - 'publishing/update.mjs'
+      - 'publishing/verify-updated-public.mjs'
+      - 'tests/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'docs/**'
+      - 'posts/**'
+      - 'updates/**'
+      - 'content-reviews/**'
+      - 'publishing/content-*.mjs'
+      - 'publishing/cross-domain.mjs'
+      - 'publishing/standards/**'
+      - 'publishing/validate*.mjs'
+      - 'publishing/editorial.mjs'
+      - 'publishing/core.mjs'
+      - 'publishing/update-core.mjs'
+      - 'publishing/publish.mjs'
+      - 'publishing/update.mjs'
+      - 'publishing/verify-updated-public.mjs'
+      - 'tests/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/**'
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: content-standard-ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  source-snapshot:
+  content-quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v5
@@ -18,15 +66,24 @@ jobs:
           node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Baseline regression tests
-        run: pnpm test && node --test tests/public-verification.test.mjs
-      - name: Export locked dependencies for isolated offline tests
-        if: always()
-        run: tar -czf "${{ runner.temp }}/nhunnhun-dependencies.tgz" node_modules
+      - name: Unit and regression tests
+        run: pnpm test
+      - name: Validate all R1 sources without modifying legacy articles
+        run: pnpm run validate:content
+      - name: Require R1 for changed publication or update sources
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        run: pnpm run validate:content:changed
+        env:
+          CONTENT_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          CONTENT_HEAD_SHA: ${{ github.sha }}
+      - name: Existing update source and legacy rendering regression
+        run: pnpm run validate:update
+      - name: Offline R4 browser preview
+        run: node tests/content-visual.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: content-standard-dependencies
-          path: ${{ runner.temp }}/nhunnhun-dependencies.tgz
-          retention-days: 1
-          if-no-files-found: error
+          name: content-standard-preview
+          path: /tmp/nhunnhun-content-preview
+          retention-days: 7
+          if-no-files-found: warn
