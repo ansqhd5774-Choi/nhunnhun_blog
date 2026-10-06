@@ -1,0 +1,61 @@
+name: OpenAI 글 초안 작성
+on:
+  pull_request:
+    paths: ['authoring/**', 'tests/authoring.test.mjs', '.github/workflows/generate-draft.yml']
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: '독자의 질문을 포함한 글 주제'
+        required: true
+        type: string
+      article_id:
+        description: '영문 소문자·숫자·하이픈 ID (예: sesame-oil-storage-20261007)'
+        required: true
+        type: string
+      domain:
+        description: '주 분야'
+        required: true
+        type: choice
+        options: [food, nutrient, medicine, disease]
+permissions:
+  contents: read
+concurrency:
+  group: openai-draft-writer
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test tests/authoring.test.mjs
+  write:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: 최신 근거 조사 및 미승인 초안 작성
+        run: node authoring/generate.mjs
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-6-sol' }}
+          ARTICLE_TOPIC: ${{ inputs.topic }}
+          ARTICLE_ID: ${{ inputs.article_id }}
+          ARTICLE_DOMAIN: ${{ inputs.domain }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: draft-${{ inputs.article_id }}
+          path: generated-drafts/
+          if-no-files-found: error
+          retention-days: 14
