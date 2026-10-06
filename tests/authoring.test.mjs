@@ -30,6 +30,8 @@ test('API 오류가 키·원문을 출력하지 않고 재시도하지 않음', 
   let calls = 0;
   await assert.rejects(responseRequest({}, 'private-key', async () => { calls++; return {ok:false,status:401,json:async()=>({error:{message:'private-key'}})}; }), /^Error: E_OPENAI_HTTP_401$/);
   assert.equal(calls, 1);
+  await assert.rejects(responseRequest({}, 'private-key', async () => ({ok:false,status:429,json:async()=>({error:{message:'You exceeded your current quota: private-key'}})})), /E_OPENAI_QUOTA/);
+  await assert.rejects(responseRequest({}, 'private-key', async () => ({ok:false,status:429,json:async()=>({error:{code:'rate_limit_exceeded'}})})), /E_OPENAI_RATE_LIMIT/);
   await assert.rejects(responseRequest({}, 'private-key', async () => { throw new Error('private-key'); }), /E_OPENAI_TRANSPORT_STATE_UNKNOWN/);
 });
 test('전체 생성은 source와 미승인 검토서를 저장하고 기존 산출물을 덮어쓰지 않음', async () => {
