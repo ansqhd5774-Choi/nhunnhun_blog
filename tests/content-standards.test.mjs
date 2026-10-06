@@ -58,3 +58,14 @@ test('medicine contraindications require a visibly labeled safety block',()=>{co
 test('malformed benefit evidence is rejected with diagnostics instead of crashing',()=>{const p=fixture('nutrient',{enabled:['combinations']});p.manifest.combinations[0].relationship='benefit';p.manifest.combinations[0].sourceIds='ref-a';assert.doesNotThrow(()=>evaluate(p));has(p,'E_CONTENT_COMBINATION_EVIDENCE');});
 test('non-array warning resolutions cannot crash the reviewer',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>',`<p>${'긴 문장입니다. '.repeat(80)}</p><h2>`);refresh(p);p.manifest.review.warningResolutions='invalid';assert.doesNotThrow(()=>evaluate(p));has(p,'E_CONTENT_REVIEW_SCHEMA');});
 test('comparison subjects must be distinct text labels',()=>{const p=fixture('nutrient',{enabled:['comparison']});p.manifest.comparisons[0].left={not:'a label'};has(p,'E_CONTENT_COMPARISON_BASIS');});
+
+
+test('active content validation enforces scan density but archival audit may skip it',()=>{
+  const p=fixture();
+  p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리</h2>','<h2>추가 설명</h2><p>'+ '가'.repeat(320) +'</p><h2>핵심 정리</h2>');
+  refresh(p);
+  has(p,'E_CONTENT_SCAN_EMPHASIS');
+  const archival=evaluateContent(p.source,p.manifest,{today:'2026-10-07',enforceScanDensity:false});
+  assert.equal(archival.passed,true,JSON.stringify(archival.errors));
+  assert.equal(archival.scanDensityPolicy,'archival-skip');
+});
