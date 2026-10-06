@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "f3b8503437c77a253567f2706b16d1f23398c0604d0227c9b0af21082f724ae4",
   "url": "https://nhunnhun.tistory.com/79",
   "articleId": "79",
+  "previousTitle": "카카오 (Cacao)의 비밀!! 건강 전문가가 알려주는 효능과 효과!!",
+  "title": "카카오 영양·섭취량｜카카오닙스·가루 차이, 카페인·중금속 주의",
   "sourceCommit": "8f787b167a7c8573240f23f18637407004be9b09",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T16:33:37.698Z"
+  "timestamp": "2026-10-06T16:33:53.839Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 18,
+    "h2Styled": 18,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 18,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
