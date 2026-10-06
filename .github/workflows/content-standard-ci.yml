@@ -7,17 +7,26 @@ permissions:
 jobs:
   source-snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Export tracked source for isolated implementation and regression tests
-        run: git archive --format=zip HEAD -o "${{ runner.temp }}/nhunnhun-source.zip"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-node@v5
         with:
-          name: content-standard-source
-          path: ${{ runner.temp }}/nhunnhun-source.zip
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Baseline regression tests
+        run: pnpm test && node --test tests/public-verification.test.mjs
+      - name: Export locked dependencies for isolated offline tests
+        if: always()
+        run: tar -czf "${{ runner.temp }}/nhunnhun-dependencies.tgz" node_modules
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: content-standard-dependencies
+          path: ${{ runner.temp }}/nhunnhun-dependencies.tgz
           retention-days: 1
           if-no-files-found: error
