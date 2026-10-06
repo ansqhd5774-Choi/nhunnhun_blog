@@ -275,7 +275,7 @@
     "renderSha256": "fdf37c0f5921f8144c7f767c3c3d1af4799ef9fc314f208b217b2f0a8d5d41f4"
   },
   {
-    "path": "updates/update-292-zeaxanthin-full-rewrite-r3-r2-20261007.json",
+    "path": "changes/archive-updates/update-292-zeaxanthin-full-rewrite-r3-r2-20261007.json",
     "sourceSha256": "9cbd6b8bf5dce95ee8a709bac17fbbd2101dbc92ca74e275928161e00b817219",
     "renderSha256": "89e1822ef0f1fa7b1aff2a7839eb880b8d6fabb0626464370f65cbd3b7cb5bf7"
   },
