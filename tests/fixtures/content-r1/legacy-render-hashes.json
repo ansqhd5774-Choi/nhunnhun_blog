@@ -290,7 +290,7 @@
     "renderSha256": "7c169cd066680a4e564571646969379060c2f152bfa07d2591c6f5d00f6a32ea"
   },
   {
-    "path": "updates/update-310-granola-full-rewrite-r3-20261007.json",
+    "path": "changes/archive-updates/update-310-granola-full-rewrite-r3-20261007.json",
     "sourceSha256": "3fe7b8d5c59b3005ef5d4ca52c987549c57ab6fbe1e40e39b9652924d8bc9dac",
     "renderSha256": "8c6a61911f3ce0526731b15e7137d7bbbd19afc1f9b08940ad3400294e3b580f"
   },
