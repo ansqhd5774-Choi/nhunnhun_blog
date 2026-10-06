@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "092c39b68877a4586f5775ad56dcd28907d6104053912466d2e077755c53f949",
   "url": "https://nhunnhun.tistory.com/232",
   "articleId": "232",
+  "previousTitle": "카르노산(Carnosic acid) 대사 활성화!! 에너지 생산과 신진대사 촉진!",
+  "title": "카르노산 효능·섭취량｜로즈마리 성분, 대사·다이어트 근거와 부작용",
   "sourceCommit": "b4ac4acaefecbf79e4f53d46670e39b0799daa7a",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T16:13:30.826Z"
+  "timestamp": "2026-10-06T16:13:44.614Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 16,
+    "h2Styled": 16,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 16,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
