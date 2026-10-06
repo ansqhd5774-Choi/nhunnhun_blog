@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "3f688e133af20bdb809e1e6fc4d05f49dbb22784c7c18a03526e10bbf356b8f7",
   "url": "https://nhunnhun.tistory.com/343",
   "articleId": "343",
+  "previousTitle": "피크노제놀 (Pycnogenol) 블루베리보다 항산화 효과 50배! 심혈관 건강에 탁월!",
+  "title": "피크노제놀 효능·복용량｜항산화 50배 사실? 혈압·혈당·부작용 근거",
   "sourceCommit": "154c47bd1b414f628e8ad4f8d3eaf8dcca22657f",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T17:55:58.861Z"
+  "timestamp": "2026-10-06T17:56:10.359Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 22,
+    "h2Styled": 22,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 22,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
