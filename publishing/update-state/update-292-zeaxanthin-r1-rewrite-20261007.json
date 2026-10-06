@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "fa1129019542d872d3ca07019140445bb9e598a87efd8886daca0bb901d1094f",
   "url": "https://nhunnhun.tistory.com/292",
   "articleId": "292",
+  "previousTitle": "지아잔틴 효능·섭취량｜눈 피로·블루라이트·황반변성 근거와 음식",
+  "title": "지아잔틴 효능·섭취량｜AREDS2 대상·황반변성·눈 피로·음식·주의사항",
   "sourceCommit": "7cd03e7fb29de72ac8bb17f4d52cb86c9b7f0b46",
   "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-06T23:23:46.806Z"
+  "timestamp": "2026-10-06T23:24:01.059Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 19,
+    "h2Styled": 19,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 19,
+    "tables": 4,
+    "tableWraps": 4,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 17,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
