@@ -1,0 +1,463 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "그래놀라 — /310: ‘최고의 아침식사’라는 제목과 질병 예방·다이어트 효과 중심의 본문을 근거와 섭취 조건 중심으로 재검토",
+    "topic": "그래놀라",
+    "meaning": "시판 또는 홈메이드 그래놀라의 칼로리·당류·적정 섭취량·다이어트 활용·제품 선택과 아침식사 구성을 설명하는 음식 안내",
+    "entityId": "food:granola",
+    "status": "resolved",
+    "reason": "그래놀라는 귀리·견과류·감미료 등을 섞어 구운 가공 시리얼이며 사용자가 기존 숫자 URL의 음식 글 전체 재작성을 요청했다."
+  },
+  "sourceDigest": "95c7cc26d9100133ff2a7a70ec8ca9f543a2e33a73ba33aa0b7a6628aaac5dbb",
+  "intent": {
+    "primaryQuestion": "그래놀라는 실제로 다이어트와 아침식사에 좋은지, 몇 g을 먹고 어떤 영양표시를 보며 무엇과 함께 먹어야 하는가?",
+    "readerSituation": "건강식으로 알려진 그래놀라를 사거나 먹으려 하지만 칼로리와 당류가 걱정되고 30g 같은 숫자가 권장량인지, 오트밀보다 나은지 판단하려는 상황",
+    "nextActions": [
+      "내 제품의 1회 표시량과 열량·당류·포화지방을 확인한다.",
+      "처음에는 실제 저울로 1회량을 재어 과다 섭취를 막는다.",
+      "무가당 요거트·우유·두유와 과일을 이용해 한 끼를 구성한다.",
+      "체중 감량 중에는 그래놀라를 기존 음식에 추가하기보다 다른 고열량 아침이나 간식을 대체하는 방식으로 사용한다.",
+      "알레르기·셀리악병·당뇨 식사관리가 있으면 일반 추천보다 표시사항과 개인 식사계획을 우선한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "그래놀라는 약이나 보충제처럼 장기 사용기간을 정하는 대상이 아니며 핵심은 제품 선택과 한 끼 섭취량이다."
+    },
+    "comparison": {
+      "applies": true,
+      "reason": "검색자가 다이어트 아침식사로 그래놀라와 오트밀 중 무엇이 더 적합한지 실제로 비교할 가능성이 높다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "요거트 조합은 특별한 상승효과를 주장하지 않고 한 끼 구성과 섭취량 관리 예시로만 설명한다."
+    },
+    "products": {
+      "applies": true,
+      "reason": "그래놀라는 제품별 당류·포화지방·식이섬유·원재료 차이가 커 라벨 기반 제품 선택이 핵심이다."
+    },
+    "foodReplacement": {
+      "applies": true,
+      "reason": "오트밀·무가당 뮤즐리·통곡물 시리얼이 목적에 따라 그래놀라를 대체할 수 있어 실제 대안을 제시한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "그래놀라는 필수영양소가 아니며 그래놀라 자체의 결핍이나 필요량을 설정할 수 없다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "완제품 그래놀라의 선택은 농산물 품종보다 원재료 배합과 영양표시 차이가 더 중요하다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "산지보다 곡물·견과류·감미료·오일 배합과 영양표시가 구매 판단에 직접 영향을 준다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "상온 유통 가공 시리얼이라 제철 정보가 구매·섭취 판단의 핵심 변수가 아니다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "가격 비교는 판매처와 용량 변동이 커 이번 검색의도인 영양·다이어트 선택에는 포함하지 않는다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "그래놀라와 관련된 민간요법이 핵심 검색 질문이 아니며 질병 치료 수단으로 다루지 않는다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "질병 자가진단이 아니라 식품 라벨과 섭취량을 확인하는 구매·식사 선택 글이다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "운동 전후 스포츠 영양이 아니라 일반 아침식사와 다이어트용 그래놀라 선택이 중심이다."
+    },
+    "diet": {
+      "applies": true,
+      "reason": "그래놀라를 다이어트 식사에 넣을 조건과 요거트·과일을 포함한 실제 한 끼 구성이 핵심 검색의도다."
+    },
+    "vulnerableGroups": {
+      "applies": true,
+      "reason": "당뇨병 식사관리, 견과류 알레르기, 셀리악병에서는 일반 제품 선택 기준만으로 부족해 별도 주의가 필요하다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "약물이나 치료를 중단하는 주제가 아니므로 적용되지 않는다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "복용 누락이라는 개념이 없는 일반 식품이라 적용되지 않는다."
+    },
+    "myths": {
+      "applies": true,
+      "reason": "저당이면 저칼로리, 유기농이면 저당, 통곡물이면 질병 예방 같은 실제 구매 오해를 바로잡을 필요가 있다."
+    },
+    "latest": {
+      "applies": true,
+      "reason": "2026 K-FIND 제품 데이터와 2026 곡물 식이섬유 체계적 문헌고찰이 현재 판단을 직접 보완한다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 그래놀라는 정확히 어떤 음식인가요?",
+      "answerQuote": "‘그래놀라’는 하나의 고정된 영양성분을 가진 식품명이 아니라 조리법과 배합이 다른 제품군으로 보는 편이 정확합니다.",
+      "sourceIds": [
+        "foodsafety-label"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "2. 그래놀라 30g은 몇 칼로리인가요?",
+      "answerQuote": "이 표는 그래놀라 전체의 평균값이 아니라 특정 제품 한 개의 예시입니다.",
+      "sourceIds": [
+        "kfind-granola"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 그래놀라의 장점은 무엇인가요?",
+      "answerQuote": "잘 고른 그래놀라는 아침에 통곡물·견과류·씨앗을 간편하게 먹는 방법이 될 수 있습니다.",
+      "sourceIds": [
+        "wholegrain-meta"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 그래놀라는 하루에 몇 g 먹어야 하나요?",
+      "answerQuote": "그래놀라 자체에 공식적인 하루 권장량은 없습니다.",
+      "sourceIds": [
+        "foodsafety-label"
+      ]
+    },
+    {
+      "module": "preparation",
+      "heading": "10. 그래놀라와 요거트는 어떻게 조합하면 좋나요?",
+      "answerQuote": "요거트와 그래놀라 조합의 목적은 특별한 ‘시너지 효능’이 아니라 한 그릇의 구성 균형과 섭취량 관리입니다.",
+      "sourceIds": [
+        "harvard-sugar"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "13. 그래놀라는 어떻게 보관하나요?",
+      "answerQuote": "개봉 후에는 습기와 공기를 막아 서늘하고 건조한 곳에 밀봉 보관하는 것이 기본입니다.",
+      "sourceIds": [
+        "usda-storage"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "6. 그래놀라 영양표시는 어떤 순서로 보면 되나요?",
+      "answerQuote": "이 숫자는 한국 법정 기준이나 그래놀라의 공식 건강 기준이 아니라 제품 비교용 참고선입니다.",
+      "sourceIds": [
+        "foodsafety-label",
+        "harvard-carbs"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "12. 알레르기·글루텐은 무엇을 확인해야 하나요?",
+      "answerQuote": "그래놀라에는 견과류·우유·대두·밀 등이 들어갈 수 있어 알레르기가 있다면 제품별 원재료와 알레르기 표시를 확인해야 합니다.",
+      "sourceIds": [
+        "fda-gluten"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "18. 그래서 나는 어떻게 먹으면 되나요?",
+      "answerQuote": "내일 아침 바로 적용하려면 세 단계면 충분합니다.",
+      "sourceIds": [
+        "foodsafety-label",
+        "satiety-2026"
+      ]
+    },
+    {
+      "module": "comparison",
+      "heading": "9. 그래놀라와 오트밀, 다이어트에는 무엇이 더 낫나요?",
+      "answerQuote": "직접적인 ‘그래놀라 vs 오트밀 체중감량 우월성’ 시험으로 결론내릴 수는 없습니다.",
+      "sourceIds": [
+        "harvard-oats",
+        "kfind-granola"
+      ]
+    },
+    {
+      "module": "alternatives",
+      "heading": "16. 그래놀라 대신 무엇을 먹을 수 있나요?",
+      "answerQuote": "목적에 따라 대안이 달라집니다.",
+      "sourceIds": [
+        "harvard-oats",
+        "harvard-carbs"
+      ]
+    },
+    {
+      "module": "product_variants",
+      "heading": "7. ‘저당 그래놀라’면 무조건 좋은 선택인가요?",
+      "answerQuote": "‘저당’이라는 한 가지 장점만 보고 전체 제품을 평가하면 놓치는 항목이 생길 수 있습니다.",
+      "sourceIds": [
+        "kfind-granola"
+      ]
+    },
+    {
+      "module": "food_sources",
+      "heading": "16. 그래놀라 대신 무엇을 먹을 수 있나요?",
+      "answerQuote": "더 큰 부피와 따뜻한 식사를 원하면 무가당 오트밀, 씹는 식감을 원하지만 감미료를 줄이고 싶다면 무가당 뮤즐리, 빠른 아침이 필요하면 통곡물 시리얼과 우유·두유를 선택할 수 있습니다.",
+      "sourceIds": [
+        "harvard-oats",
+        "harvard-carbs"
+      ]
+    },
+    {
+      "module": "diet",
+      "heading": "5. 그래놀라는 다이어트에 도움이 되나요?",
+      "answerQuote": "다이어트에서 중요한 질문은 ‘그래놀라를 먹으면 살이 빠지나?’가 아니라 ‘기존에 먹던 더 높은 열량의 아침·간식을 무엇으로, 얼마나 바꾸는가?’입니다.",
+      "sourceIds": [
+        "satiety-2026"
+      ]
+    },
+    {
+      "module": "vulnerable_groups",
+      "heading": "12. 알레르기·글루텐은 무엇을 확인해야 하나요?",
+      "answerQuote": "귀리 자체는 글루텐을 포함하지 않지만 재배·가공 과정에서 밀·보리·호밀과 교차접촉할 수 있으므로 셀리악병처럼 글루텐을 엄격히 피해야 하는 경우에는 ‘글루텐 프리’ 표시와 제조 정보를 확인하는 편이 안전합니다.",
+      "sourceIds": [
+        "fda-gluten"
+      ]
+    },
+    {
+      "module": "myths",
+      "heading": "17. 자주 하는 오해 5가지",
+      "answerQuote": "저당이면 저칼로리다?",
+      "sourceIds": [
+        "harvard-sugar",
+        "wholegrain-meta"
+      ]
+    },
+    {
+      "module": "latest",
+      "heading": "최신 근거 · 2026",
+      "answerQuote": "그래놀라의 다이어트 가치는 ‘효능’보다 제품 선택·계량·대체 식사의 질에서 결정된다고 보는 것이 현실적입니다.",
+      "sourceIds": [
+        "kfind-granola",
+        "satiety-2026"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "included",
+      "reason": "그래놀라 선택에서 식이섬유·단백질·포화지방의 실제 함량이 포만감과 한 끼 구성 판단에 직접 연결된다.",
+      "relationship": "nutrient-source",
+      "heading": "6. 그래놀라 영양표시는 어떤 순서로 보면 되나요?",
+      "answerQuote": "1회분 식이섬유 4g 이상·당류 8g 미만을 하나의 실용적 기준으로 제시합니다.",
+      "sourceIds": [
+        "foodsafety-label",
+        "harvard-carbs"
+      ]
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "일반적인 그래놀라 선택에서 특정 의약품의 효능·복용법이나 약물 상호작용을 설명할 근거와 필요성이 없다."
+    },
+    "disease": {
+      "status": "included",
+      "reason": "당뇨병 식사관리와 셀리악병에서는 일반 그래놀라 선택보다 탄수화물·글루텐 표시가 더 중요한 위험 맥락이 된다.",
+      "relationship": "risk-context",
+      "heading": "12. 알레르기·글루텐은 무엇을 확인해야 하나요?",
+      "answerQuote": "귀리 자체는 글루텐을 포함하지 않지만 재배·가공 과정에서 밀·보리·호밀과 교차접촉할 수 있으므로 셀리악병처럼 글루텐을 엄격히 피해야 하는 경우에는 ‘글루텐 프리’ 표시와 제조 정보를 확인하는 편이 안전합니다.",
+      "sourceIds": [
+        "fda-gluten"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "kfind-granola",
+      "url": "https://various.foodsafetykorea.go.kr/nutrient/general/food/detail.do?searchFoodCd=P116-400070200-0444&searchMonthCd=AVG&searchRegionCd=ZZ",
+      "title": "K-FIND 그래놀라 저당 렌틸 오트",
+      "kind": "nutrition-database",
+      "role": "nutrition",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "2026 기준 특정 국내 그래놀라 한 제품의 100g 영양성분과 30g 1회 섭취참고량을 제품 사례로 사용하며 전체 그래놀라 평균으로 일반화하지 않는다."
+    },
+    {
+      "id": "foodsafety-label",
+      "url": "https://www.foodsafetykorea.go.kr/portal/board/boardDetail.do?bbs_no=bbs420&menu_no=3714&ntctxt_no=1069325",
+      "title": "식품안전나라 영양성분표",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "국내 포장식품의 기준량과 열량·탄수화물·당류·지방·포화지방 등 영양표시를 비교하는 방법을 뒷받침한다."
+    },
+    {
+      "id": "harvard-carbs",
+      "url": "https://nutritionsource.hsph.harvard.edu/carbohydrates/",
+      "title": "Harvard Nutrition Source Carbohydrates",
+      "kind": "article",
+      "role": "nutrition",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "통곡물이 첫 원재료인 시리얼과 1회분 식이섬유 4g 이상·당류 8g 미만이라는 실용적 비교 기준을 제공하며 한국 법정 기준은 아니다."
+    },
+    {
+      "id": "harvard-sugar",
+      "url": "https://nutritionsource.hsph.harvard.edu/carbohydrates/added-sugar-in-the-diet/",
+      "title": "Harvard Nutrition Source Added Sugar",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "꿀·시럽 등 여러 감미료도 첨가당 공급원이 될 수 있고 시리얼·요거트에서 당류가 누적될 수 있다는 맥락에 사용한다."
+    },
+    {
+      "id": "harvard-oats",
+      "url": "https://nutritionsource.hsph.harvard.edu/food-features/oats/",
+      "title": "Harvard Nutrition Source Oats",
+      "kind": "article",
+      "role": "nutrition",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "귀리와 오트밀의 식이섬유·조리 특성을 설명해 그래놀라와의 정성적 아침식사 비교와 대체 선택에 사용한다."
+    },
+    {
+      "id": "satiety-2026",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40644449/",
+      "title": "Cereal Fibers and Satiety: A Systematic Review",
+      "kind": "systematic-review",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "건강한 사람의 곡물 식이섬유와 포만감·자유 섭취 열량 연구를 검토한 2026 체계적 문헌고찰로 그래놀라 자체의 체중감량 효과를 증명하는 자료는 아니다."
+    },
+    {
+      "id": "wholegrain-meta",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36789934/",
+      "title": "Whole grain consumption and cardiovascular outcomes meta-analysis",
+      "kind": "systematic-review",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "통곡물 섭취와 심혈관질환·사망 위험의 장기 관찰 근거를 제공하지만 특정 그래놀라 제품의 질병 예방효과로 직접 적용하지 않는다."
+    },
+    {
+      "id": "fda-gluten",
+      "url": "https://www.fda.gov/consumers/consumer-updates/gluten-free-means-what-it-says",
+      "title": "FDA Gluten-Free Means What It Says",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "셀리악병에서 글루텐 프리 표시의 의미와 포장식품 글루텐 회피 필요성을 안전 정보로 사용한다."
+    },
+    {
+      "id": "usda-storage",
+      "url": "https://ask.fsis.usda.gov/article/How-long-can-you-store-boxed-dated-foods",
+      "title": "USDA FSIS boxed dated foods storage",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "일반 시리얼의 개봉 전후 상온 보관 품질 가이드로 사용하며 견과류·오일이 많은 개별 그래놀라의 제조사 보관 지침을 우선한다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [
+    {
+      "left": "그래놀라",
+      "right": "오트밀",
+      "goal": "다이어트 아침식사에서 열량 관리·편의성·포만감 측면의 선택",
+      "basis": "같은 아침식사 목적을 기준으로 제품 배합과 조리 수분 차이를 정성적으로 비교하며 100g 숫자를 직접 우열로 계산하지 않는다.",
+      "directness": "qualitative",
+      "limitations": "그래놀라와 오트밀의 체중감량 효과를 같은 조건에서 직접 비교한 근거로 우열을 확정하지 않으며 제품과 조리법에 따라 결과가 달라진다.",
+      "heading": "9. 그래놀라와 오트밀, 다이어트에는 무엇이 더 낫나요?",
+      "answerQuote": "직접적인 ‘그래놀라 vs 오트밀 체중감량 우월성’ 시험으로 결론내릴 수는 없습니다.",
+      "sourceIds": [
+        "harvard-oats",
+        "kfind-granola"
+      ]
+    }
+  ],
+  "combinations": [],
+  "selectionCriteria": [
+    {
+      "criterion": "1회 기준량과 실제 섭취량",
+      "whyItMatters": "같은 영양성분 숫자라도 30g 제품과 50g 제품은 한 끼 섭취량이 달라 단순 비교하면 오해가 생긴다.",
+      "howToCheck": "영양정보 상단의 총내용량·100g 또는 1회 기준량을 먼저 보고 실제 먹을 g으로 환산한다.",
+      "heading": "6. 그래놀라 영양표시는 어떤 순서로 보면 되나요?",
+      "answerQuote": "30g인지 50g인지에 따라 숫자의 의미가 달라짐",
+      "sourceIds": [
+        "foodsafety-label"
+      ]
+    },
+    {
+      "criterion": "당류와 포화지방을 함께 비교",
+      "whyItMatters": "저당 제품도 코코넛오일·견과류·초콜릿 배합에 따라 포화지방과 총열량이 높을 수 있다.",
+      "howToCheck": "비슷한 1회량끼리 당류와 포화지방 값을 나란히 비교하고 앞면의 저당 문구만으로 판단하지 않는다.",
+      "heading": "7. ‘저당 그래놀라’면 무조건 좋은 선택인가요?",
+      "answerQuote": "저당·고단백·통곡물 같은 앞면 문구보다 실제 영양표의 열량·당류·포화지방·1회량을 함께 보세요.",
+      "sourceIds": [
+        "kfind-granola"
+      ]
+    },
+    {
+      "criterion": "통곡물과 감미료의 원재료 순서",
+      "whyItMatters": "그래놀라의 실제 곡물 비중과 설탕·시럽·오일 사용 정도를 영양표만으로 모두 알기 어렵다.",
+      "howToCheck": "원재료명 앞쪽에 통귀리·통곡물이 있는지 보고 설탕·시럽·꿀 같은 감미료가 얼마나 앞에 위치하는지 확인한다.",
+      "heading": "6. 그래놀라 영양표시는 어떤 순서로 보면 되나요?",
+      "answerQuote": "통곡물이 첫 원재료에 있고, 1회분 식이섬유 4g 이상·당류 8g 미만을 하나의 실용적 기준으로 제시합니다.",
+      "sourceIds": [
+        "harvard-carbs"
+      ]
+    }
+  ],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-07",
+    "reviewer": {
+      "name": "ChatGPT GPT-5.6 Sol",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "칼로리·당류·몇 g·다이어트·오트밀 비교·요거트 조합·제품 선택을 실제 구매와 한 끼 행동 순서로 모두 답했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "K-FIND의 특정 제품값은 예시로만 사용하고 30g을 공식 권장량으로 일반화하지 않았으며 2026 체계적 문헌고찰의 적용 범위를 구분했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "포만감 가능성과 실제 에너지 섭취 감소를 구분하고 그래놀라 자체의 체중감량·질병예방 효과를 보장하지 않았다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "그래놀라와 오트밀을 같은 아침식사 목적에서 정성 비교하고 직접 체중감량 우월성 시험이 없음을 명시했다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "그래놀라와 요거트 조합은 특별한 상승효과가 아니라 단백질 보완과 양 조절을 위한 식사 구성 예시로만 설명했다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "식이섬유·단백질은 영양 연결로, 당뇨 식사관리와 셀리악병은 위험 맥락으로 포함하고 의약품 연결은 구체적 필요가 없어 제외했다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "견과류 등 알레르기와 셀리악병의 글루텐 교차접촉, 당뇨병의 실제 탄수화물 섭취량 확인을 제품 선택 가까이에 배치했다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "건강식 과장을 바로잡되 부정문만 반복하지 않고 실제로 고르고 먹는 방법과 대체 아침식사를 충분히 제시했다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "R4 강조를 핵심 판단·행동·주의·참고에만 사용했고 긴 문단 전체나 근거가 불확실한 효능에 확정 색상을 쓰지 않았다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "그래놀라 원물·홈메이드 그래놀라·요거트 조합이라는 서로 다른 역할의 이미지 3개와 원출처·라이선스·alt를 확인했다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "기존 /310의 검색의도를 유지하면서 /204 오트밀과 /365 그릭요거트는 보완 내부링크로만 연결하고 최신 공식·원문 근거를 본문 가까이에 배치했다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
