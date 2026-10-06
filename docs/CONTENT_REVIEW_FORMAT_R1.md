@@ -22,7 +22,7 @@ npm run validate:content
 
 scaffold는 stdout으로 **미승인 빈 검토서**를 출력한다. 작성자가 실제 조사·검토를 채워 지정 경로에 저장한다. 해시 도구는 source 전체 JSON을 키 정렬한 후 SHA256을 계산한다. body뿐 아니라 이미지·category·status·approved까지 바뀌면 재검토해야 한다. 검토서 자체의 해시가 아니므로 자기참조는 없다.
 
-`--all`은 모든 R1을 검사하고 과거 미변경 source는 legacy로 집계한다. `--changed`는 CI가 제공한 정확한 base/head SHA 범위의 source 또는 검토서 변경을 검사한다. `--check`와 실제 발행·수정은 R1을 반드시 요구한다. 테스트 fixture를 real posts에 복사해 발행하지 않는다.
+`--all`은 모든 R1을 검사하고 과거 미변경 source는 legacy로 집계한다. **Scan Density 최소 강조량은 소급 감사에서는 적용하지 않고**, `--changed`, `--check`, 실제 발행·수정 직전에 강제한다. 이미 공개 완료된 R1 글도 다음에 다시 수정하면 새 최소 강조량을 충족해야 한다. `--changed`는 CI가 제공한 정확한 base/head SHA 범위의 source 또는 검토서 변경을 검사한다. `--check`와 실제 발행·수정은 R1을 반드시 요구한다. 테스트 fixture를 real posts에 복사해 발행하지 않는다.
 
 ## 3. 검토서 최상위 필드
 
@@ -86,6 +86,7 @@ checks 11개는 readerIntent, accuracy, expectations, comparison, combinations, 
 | E_CONTENT_MODULE_CITATION | 해당 답변 가까이 올바른 원문 출처 연결 |
 | E_CONTENT_KR_AUTHORIZATION | 정확한 국내 의약품 허가사항 확인 |
 | E_CONTENT_REVIEW_CHECK | 실제 11개 검토를 수행하고 판단 이유 작성 |
+| E_CONTENT_SCAN_EMPHASIS | 해당 H2 길이에 맞게 굵은 핵심어·형광펜·배지 등 스캔 앵커를 추가하고 결론·조건·행동이 눈에 보이게 배치 |
 | E_EDITORIAL_R4_* | 허용된 의미형 HTML과 렌더 계약 확인 |
 
 이 검토서는 자동 의료 검증 또는 법적·전문적 감수 인증이 아니다. PASS 문구는 계약 검사 결과이며 실제 게시 완료는 별도의 표준 공개 검증으로 판단한다.
