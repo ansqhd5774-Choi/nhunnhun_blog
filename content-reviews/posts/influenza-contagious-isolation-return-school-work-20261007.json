@@ -9,7 +9,7 @@
     "status": "resolved",
     "reason": "독감 환자의 전염 가능 시기와 격리·등교·출근 판단을 묻는 질병 관리 검색의도로 명확히 분류된다."
   },
-  "sourceDigest": "461f7e53615a7346918e417f9efb2b8737b00df7097b42277a93fdd041c8e349",
+  "sourceDigest": "3ef90f93fbbc81dc6cfa21c2df4ac7994b8bca1e6c155fa6c62244b47bb98b62",
   "intent": {
     "primaryQuestion": "독감 확진 또는 의심 뒤 며칠 쉬어야 하고 해열제 사용 여부에 따라 학교·회사 복귀 시점이 어떻게 달라지는가?",
     "readerSituation": "본인이나 자녀가 독감에 걸려 가족·동료에게 옮길까 걱정하면서 결석·병가 기간과 안전한 복귀 시점을 바로 결정하려는 상황",
@@ -135,7 +135,7 @@
     {
       "module": "self_check",
       "heading": "9. 학교·회사 복귀 전 체크리스트",
-      "answerQuote": "위 조건을 충족한 뒤에도 며칠간은 마스크, 손위생, 환기, 고위험군과의 거리두기를 더 신경 쓰는 것이 좋습니다.",
+      "answerQuote": "복귀 후에도 마스크·손위생·환기와 고위험군 접촉 최소화를 며칠간 더 신경 쓰는 것이 좋습니다.",
       "sourceIds": [
         "kdca-2026",
         "cdc-school"
