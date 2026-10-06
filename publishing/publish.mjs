@@ -341,8 +341,7 @@ try {
           timestamp:new Date().toISOString()
         }, state.sha);
         console.log(`SCHEDULED: ${post.id} ${post.scheduledAt}`);
-        return;
-      }
+      } else {
       const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
         .filter(a => (a.textContent || '').replace(/\\s+/g,' ').trim().includes(title))
         .map(a => a.href)
@@ -455,6 +454,7 @@ try {
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
       await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()}, state.sha);
       console.log(`PUBLISHED: ${post.id} ${url}`);
+      }
     } else console.log('NO_PENDING_POSTS');
   }
 } catch (error) {
