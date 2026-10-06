@@ -1,0 +1,532 @@
+{
+  "version": "R1",
+  "domain": "nutrient",
+  "classification": {
+    "rawInput": "지아잔틴 — /292 재작성 시작",
+    "topic": "지아잔틴",
+    "meaning": "지아잔틴의 눈 건강 효과와 실제 섭취량, AREDS2 적용대상, 음식·보충제 선택, 흡연자와 취약집단 주의를 설명하는 영양소 안내",
+    "entityId": "nutrient:zeaxanthin",
+    "status": "resolved",
+    "reason": "지아잔틴은 황반색소를 구성하는 카로티노이드이며 사용자가 기존 영양소 숫자 URL의 전체 재작성을 요청했다."
+  },
+  "sourceDigest": "2ae35fd7836c7a5ce141f0b093f71e11c5ea1bfede12fb973834454825814b63",
+  "intent": {
+    "primaryQuestion": "지아잔틴은 실제로 눈 건강에 어떤 도움을 주며, 나는 AREDS2나 일반 루테인지아잔틴 보충제를 먹을 필요가 있는가?",
+    "readerSituation": "눈 피로·블루라이트·황반변성을 걱정해 지아잔틴 제품을 찾지만 2mg과 국내 10~30mg 숫자의 차이, 음식과 보충제 선택, 흡연자 주의를 구분하기 어려운 상황",
+    "nextActions": [
+      "AMD 진단을 받았다면 현재 단계를 확인해 AREDS2 대상인지 안과와 확인한다.",
+      "건강기능식품은 원료 인정번호와 루테인+총지아잔틴의 하루 합산량을 확인한다.",
+      "건강한 사람은 다양한 지아잔틴·루테인 식품을 기본으로 하고 화면 눈 피로는 사용 습관을 먼저 조정한다.",
+      "흡연력·임신·수유·복용약이 있으면 제품별 주의사항을 확인한다.",
+      "갑작스러운 중심시야 변화나 시력 저하는 보충제 효과를 기다리지 말고 안과 검사를 받는다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": true,
+      "reason": "눈 피로 연구는 6개월, AREDS 계열은 수년 추적이라 연구기간과 개인의 효과 판단 시점을 구분해야 한다."
+    },
+    "comparison": {
+      "applies": true,
+      "reason": "독자가 루테인과 지아잔틴의 차이와 AREDS2의 10대2 비율 의미를 자주 혼동하므로 역할 차이를 비교한다."
+    },
+    "combinations": {
+      "applies": true,
+      "reason": "AREDS2의 핵심 근거가 지아잔틴 단독이 아니라 루테인·비타민·미네랄 복합제이므로 조합의 목적과 적용대상을 설명해야 한다."
+    },
+    "products": {
+      "applies": true,
+      "reason": "국내 개별인정 원료는 인정번호별 기능성과 일일섭취량이 달라 제품 선택 기준이 핵심이다."
+    },
+    "foodReplacement": {
+      "applies": true,
+      "reason": "건강한 사람의 일반 섭취는 음식으로 가능하지만 특정 AMD 환자의 AREDS2 근거를 음식이 대체하지 못한다는 범위를 설명해야 한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "지아잔틴은 공식 결핍증과 RDA가 설정된 필수영양소가 아니므로 결핍 모듈을 적용하지 않는다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "기능성 성분 글이라 식품 품종 자체가 주 검색의도는 아니며 함량은 변동 가능성만 설명한다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "원산지보다 원료 인정번호·함량·AMD 단계가 보충제 선택에 더 중요한 판단 요소다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "계절성 식품 구매보다 눈 건강 근거와 보충제 적용대상이 핵심이다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "판매 가격은 변동성이 크고 이번 글의 임상적 선택 기준을 바꾸지 않아 제외한다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "지아잔틴과 관련된 민간요법이 핵심 검색 질문이 아니며 표준 안과 평가를 대체하지 않는다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "자가진단으로 AMD 단계를 정할 수 없고 AREDS2 대상 판단은 안과 검사로 해야 하므로 임의 체크도구를 만들지 않는다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "운동과 지아잔틴의 직접적인 사용 판단이 이번 검색의도와 관련이 없다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "특정 식단 처방보다 지아잔틴 공급 식품과 보충제 선택 범위를 설명하는 것이 핵심이다."
+    },
+    "vulnerableGroups": {
+      "applies": true,
+      "reason": "흡연자·과거 흡연자, 임산부·수유부·어린이는 제형 또는 국내 원료별 주의가 달라 반드시 구분해야 한다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "AREDS2를 임의로 중단하도록 지시하지 않고 지속 여부는 안과 추적과 상담으로 판단하도록 한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "특정 제품의 복용 누락 공식 안내가 없는 일반 기능성 성분 글이라 적용하지 않는다."
+    },
+    "myths": {
+      "applies": true,
+      "reason": "2mg이 공식 권장량, 블루라이트 손상 예방, 건강한 사람의 AMD 예방 같은 오해가 검색에서 반복된다."
+    },
+    "latest": {
+      "applies": true,
+      "reason": "NEI 2025 갱신, 2026 임상시험 통합 분석, 국내 2026 건조한 눈 기능성 추가가 현재 판단에 영향을 준다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 지아잔틴은 무엇이고 눈에서 어떤 역할을 하나요?",
+      "answerQuote": "지아잔틴(zeaxanthin)은 루테인과 같은 잔토필계 카로티노이드",
+      "sourceIds": [
+        "nei-faq",
+        "diet-review"
+      ]
+    },
+    {
+      "module": "role",
+      "heading": "1. 지아잔틴은 무엇이고 눈에서 어떤 역할을 하나요?",
+      "answerQuote": "황반색소는 들어오는 빛의 일부를 흡수하고 산화로 인한 부담을 완충하는 데 관여합니다.",
+      "sourceIds": [
+        "nei-faq",
+        "diet-review"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 황반변성에는 어느 정도 효과가 있나요?",
+      "answerQuote": "AREDS 또는 AREDS2 복합제는 중기 AMD에서 진행성 AMD로 악화될 위험을 약 25% 낮춘 근거가 있습니다.",
+      "sourceIds": [
+        "nei-trials",
+        "nei-faq"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "2. 누가 지아잔틴 보충제를 실제로 고려할 이유가 있나요?",
+      "answerQuote": "보충제 필요성은 나이보다 현재 황반변성 단계가 더 중요합니다.",
+      "sourceIds": [
+        "nei-trials"
+      ]
+    },
+    {
+      "module": "expectations",
+      "heading": "5. 눈 피로와 안구건조에는 도움이 되나요?",
+      "answerQuote": "눈 피로 근거는 황반변성보다 훨씬 제한적입니다.",
+      "sourceIds": [
+        "screen-trial"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "7. 지아잔틴 하루 섭취량은 몇 mg인가요?",
+      "answerQuote": "지아잔틴 단독의 공식 일일권장량(RDA)은 설정돼 있지 않습니다.",
+      "sourceIds": [
+        "nei-trials",
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "12. 보충제는 언제, 어떻게 먹어야 하나요?",
+      "answerQuote": "제품 라벨의 지아잔틴 mg만 보지 말고 하루 기준 루테인+총지아잔틴 합계와 다른 비타민·미네랄 함량까지 확인하세요.",
+      "sourceIds": [
+        "nei-supp",
+        "kr-2018"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "13. 부작용·흡연·임신·약물은 무엇을 주의해야 하나요?",
+      "answerQuote": "AREDS2는 일반 종합비타민보다 많은 양의 비타민·미네랄을 포함하므로 다른 약·영양제와 함께 먹을 때 확인이 필요합니다.",
+      "sourceIds": [
+        "nei-supp",
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "15. 제품을 계속 먹을지 무엇으로 판단하나요?",
+      "answerQuote": "중기 AMD라면 안과의 황반 상태와 진행 위험을 기준으로 AREDS2 지속 여부를 확인하는 것이 핵심입니다.",
+      "sourceIds": [
+        "nei-supp"
+      ]
+    },
+    {
+      "module": "timeline",
+      "heading": "14. 얼마나 오래 먹어야 효과를 판단할 수 있나요?",
+      "answerQuote": "한 달 먹으면 시력이 선명해진다처럼 정해진 체감 시간표는 근거가 없습니다.",
+      "sourceIds": [
+        "screen-trial",
+        "amd-2026",
+        "nei-trials"
+      ]
+    },
+    {
+      "module": "long_term",
+      "heading": "14. 얼마나 오래 먹어야 효과를 판단할 수 있나요?",
+      "answerQuote": "연구기간을 개인의 효과 보장기간으로 바꾸지 말고 목적에 맞는 검사나 증상 변화를 통해 재평가해야 합니다.",
+      "sourceIds": [
+        "screen-trial",
+        "nei-trials"
+      ]
+    },
+    {
+      "module": "follow_up",
+      "heading": "15. 제품을 계속 먹을지 무엇으로 판단하나요?",
+      "answerQuote": "시야가 휘어지거나 중심이 가려지고 갑자기 시력이 떨어지면 영양제 효과를 기다리지 말고 안과 검사를 우선하세요.",
+      "sourceIds": [
+        "nei-supp"
+      ]
+    },
+    {
+      "module": "comparison",
+      "heading": "9. 루테인과 지아잔틴은 무엇이 다른가요?",
+      "answerQuote": "임상 연구에서는 두 성분을 함께 사용한 경우가 많아 어느 하나가 항상 더 우월하다고 결론내리기 어렵습니다.",
+      "sourceIds": [
+        "nei-faq",
+        "diet-review"
+      ]
+    },
+    {
+      "module": "alternatives",
+      "heading": "11. 음식과 보충제 중 무엇을 선택해야 하나요?",
+      "answerQuote": "음식과 AREDS2는 같은 목표의 단순 대체재가 아닙니다.",
+      "sourceIds": [
+        "nei-supp",
+        "diet-review"
+      ]
+    },
+    {
+      "module": "combinations",
+      "heading": "3. 황반변성에는 어느 정도 효과가 있나요?",
+      "answerQuote": "이 효과는 지아잔틴 2mg 단독의 효과가 아니라 복합제 전체의 결과입니다.",
+      "sourceIds": [
+        "nei-trials",
+        "nei-faq"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "13. 부작용·흡연·임신·약물은 무엇을 주의해야 하나요?",
+      "answerQuote": "다른 약·영양제와 함께 먹을 때 확인이 필요합니다.",
+      "sourceIds": [
+        "nei-supp"
+      ]
+    },
+    {
+      "module": "product_variants",
+      "heading": "8. 국내 루테인지아잔틴 제품은 무엇을 확인해야 하나요?",
+      "answerQuote": "루테인지아잔틴이라는 이름이 같아도 개별인정 원료의 기능성과 일일섭취량은 다를 수 있습니다.",
+      "sourceIds": [
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "8. 국내 루테인지아잔틴 제품은 무엇을 확인해야 하나요?",
+      "answerQuote": "제품 앞면보다 원료명·인정번호·하루 섭취량·기능성 문구를 먼저 확인하세요.",
+      "sourceIds": [
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "module": "food_sources",
+      "heading": "10. 지아잔틴은 어떤 음식으로 섭취할 수 있나요?",
+      "answerQuote": "노란 옥수수·오렌지 파프리카·달걀노른자·일부 잎채소와 구기자",
+      "sourceIds": [
+        "diet-review"
+      ]
+    },
+    {
+      "module": "vulnerable_groups",
+      "heading": "13. 부작용·흡연·임신·약물은 무엇을 주의해야 하나요?",
+      "answerQuote": "임산부·수유부·영유아·어린이는 일부 국내 원료에서 섭취를 피하도록 표시돼 있습니다.",
+      "sourceIds": [
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "module": "myths",
+      "heading": "6. 블루라이트 차단 효과는 어디까지 사실인가요?",
+      "answerQuote": "지아잔틴을 스마트폰 블루라이트 손상 방지제로 설명하는 것은 현재 사람 근거를 넘어섭니다.",
+      "sourceIds": [
+        "aao-blue"
+      ]
+    },
+    {
+      "module": "latest",
+      "heading": "최신 근거 · 2026",
+      "answerQuote": "지아잔틴 단독 효과가 아니라 루테인 단독 또는 루테인·지아잔틴 조합을 함께 분석한 결과",
+      "sourceIds": [
+        "nei-trials",
+        "amd-2026",
+        "kr-2018"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "included",
+      "reason": "건강한 사람의 일반 섭취는 옥수수·달걀·색채소 같은 식품으로 가능하며 보충제와의 역할 차이를 설명해야 한다.",
+      "relationship": "nutrient-source",
+      "heading": "10. 지아잔틴은 어떤 음식으로 섭취할 수 있나요?",
+      "answerQuote": "건강한 사람은 한 식품의 mg 수치를 맞추기보다 여러 색의 채소와 달걀·옥수수 등을 다양하게 먹는 방법이 현실적입니다.",
+      "sourceIds": [
+        "diet-review"
+      ]
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "AREDS2는 고용량 복합 보충제이지만 처방약의 용법·중단·대체를 다루는 약학 글은 아니어서 의약품 연결을 강제하지 않는다."
+    },
+    "disease": {
+      "status": "included",
+      "reason": "지아잔틴 보충제의 가장 강한 근거가 연령관련황반변성의 특정 단계에서 나온 만큼 질병 단계와 적용 범위를 연결해야 한다.",
+      "relationship": "treatment-context",
+      "heading": "3. 황반변성에는 어느 정도 효과가 있나요?",
+      "answerQuote": "AREDS 또는 AREDS2 복합제는 중기 AMD에서 진행성 AMD로 악화될 위험을 약 25% 낮춘 근거가 있습니다.",
+      "sourceIds": [
+        "nei-trials",
+        "nei-faq"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "nei-trials",
+      "url": "https://www.nei.nih.gov/eye-health-information/clinical-trials/age-related-eye-disease-studies-aredsareds2/about-areds-and-areds2",
+      "title": "AREDS/AREDS2 Clinical Trials",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "AREDS2 대상, 구성량, 중기 AMD에서 진행 위험 약 25% 감소, AMD 발생 예방 효과 없음과 흡연자 베타카로틴 위험을 확인했다."
+    },
+    {
+      "id": "nei-faq",
+      "url": "https://www.nei.nih.gov/eye-health-information/clinical-trials/age-related-eye-disease-studies-aredsareds2/aredsareds2-frequently-asked-questions",
+      "title": "AREDS/AREDS2 Frequently Asked Questions",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "루테인 10mg·지아잔틴 2mg 구성과 베타카로틴 대체 의미를 확인하며 지아잔틴 단독 효과로 일반화하지 않는다."
+    },
+    {
+      "id": "nei-supp",
+      "url": "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/age-related-macular-degeneration/nutritional-supplements-age-related-macular-degeneration",
+      "title": "AREDS2 Supplements for AMD",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "AREDS2의 고용량 비타민·미네랄, 약물과의 상호작용 가능성, 현재·과거 흡연자의 구형 AREDS 베타카로틴 회피를 확인했다."
+    },
+    {
+      "id": "aao-blue",
+      "url": "https://aao.org/eye-health/tips-prevention/blue-light-digital-eye-strain",
+      "title": "Digital Devices and Your Eyes",
+      "kind": "guideline",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "디지털 화면 블루라이트와 사람 망막 손상·AMD 사이 의미 있는 연관 근거가 없고 디지털 눈 불편이 사용 습관과 관련됨을 확인했다."
+    },
+    {
+      "id": "screen-trial",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39963662/",
+      "title": "Lutein/zeaxanthin in high electronic screen users, 2025",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "70명, 6개월, 루테인 10mg+지아잔틴 이성질체 2mg 복합제에서 일부 눈물·회복 지표가 개선됐지만 주관적 지표 차이는 없었다."
+    },
+    {
+      "id": "amd-2026",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42028334/",
+      "title": "Lutein-containing supplementation in AMD randomized trials, 2026",
+      "kind": "systematic-review",
+      "role": "health",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "9개 시험 860명을 합친 분석에서 황반색소와 일부 시각 기능 개선을 보고했으나 루테인 단독·복합 제형이 섞여 지아잔틴 단독 효과로 볼 수 없다."
+    },
+    {
+      "id": "diet-review",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11494239/",
+      "title": "Potential roles of dietary zeaxanthin and lutein in macular health",
+      "kind": "systematic-review",
+      "role": "nutrition",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "지아잔틴·루테인의 식품 공급원, 황반 분포, 미국 DRI 미설정과 식이 근거의 한계를 설명하는 데 사용한다."
+    },
+    {
+      "id": "kr-2018",
+      "url": "https://www.foodsafetykorea.go.kr/portal/board/boardDetail.do?ans_yn=N&bbs_no=bbs987&bbs_type_cd=01&menu_grp=MENU_NEW01&menu_no=2660&ntctxt_no=1067907&nticmatr_yn=N",
+      "title": "루테인지아잔틴복합추출물 제2018-4호",
+      "kind": "official",
+      "role": "product",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "황반색소밀도 유지와 2026년 추가된 건조한 눈 기능성, 각 기능성의 합산 일일섭취량 및 주의사항을 확인했다."
+    },
+    {
+      "id": "kr-2025",
+      "url": "https://www.foodsafetykorea.go.kr/portal/board/boardDetail.do?bbs_no=bbs987&menu_grp=MENU_NEW01&menu_no=2660&ntctxt_no=1105993",
+      "title": "루테인지아잔틴추출복합물 제2025-35호",
+      "kind": "official",
+      "role": "product",
+      "checkedAt": "2026-10-07",
+      "scopeNote": "해당 개별인정형 원료의 황반색소밀도 유지 기능성, 루테인+총지아잔틴 합 12~30mg/일과 취약집단 주의사항을 확인했다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [
+    {
+      "left": "루테인",
+      "right": "지아잔틴",
+      "goal": "눈 건강 보충제에서 두 카로티노이드의 역할과 AREDS2 함량 차이를 이해하기 위한 비교",
+      "basis": "AREDS2의 동일 복합제 안에서 루테인 10mg과 지아잔틴 2mg이 사용됐다는 조건과 황반 분포를 정성적으로 비교한다.",
+      "directness": "qualitative",
+      "limitations": "두 성분을 단독으로 같은 조건에서 직접 비교해 어느 하나가 눈 건강에 항상 더 우월하다고 확정한 근거는 부족하다.",
+      "heading": "9. 루테인과 지아잔틴은 무엇이 다른가요?",
+      "answerQuote": "임상 연구에서는 두 성분을 함께 사용한 경우가 많아 어느 하나가 항상 더 우월하다고 결론내리기 어렵습니다.",
+      "sourceIds": [
+        "nei-faq",
+        "diet-review"
+      ]
+    }
+  ],
+  "combinations": [
+    {
+      "items": [
+        "AREDS2 항산화 비타민·아연·구리",
+        "루테인 10mg",
+        "지아잔틴 2mg"
+      ],
+      "relationship": "benefit",
+      "purpose": "중기 AMD 또는 한쪽 진행성 AMD 환자에서 진행성 AMD로의 진행 위험을 낮추는 특정 복합제 구성",
+      "heading": "3. 황반변성에는 어느 정도 효과가 있나요?",
+      "answerQuote": "AREDS 또는 AREDS2 복합제는 중기 AMD에서 진행성 AMD로 악화될 위험을 약 25% 낮춘 근거가 있습니다.",
+      "sourceIds": [
+        "nei-trials",
+        "nei-faq"
+      ]
+    }
+  ],
+  "selectionCriteria": [
+    {
+      "criterion": "AREDS2 대상 여부",
+      "whyItMatters": "AREDS2는 AMD가 없는 사람의 예방용이 아니라 특정 AMD 단계에서 진행 억제 근거가 있는 복합제다.",
+      "howToCheck": "제품 구매 전 안과에서 현재 AMD 단계와 한쪽 눈의 진행성 AMD 여부를 확인한다.",
+      "heading": "2. 누가 지아잔틴 보충제를 실제로 고려할 이유가 있나요?",
+      "answerQuote": "보충제 필요성은 나이보다 현재 황반변성 단계가 더 중요합니다.",
+      "sourceIds": [
+        "nei-trials"
+      ]
+    },
+    {
+      "criterion": "국내 개별인정 원료번호와 기능성",
+      "whyItMatters": "같은 루테인지아잔틴 제품명이어도 원료별 인정 기능성과 일일섭취량이 다를 수 있다.",
+      "howToCheck": "제품 표시에서 원료명·인정번호·하루 섭취량·기능성 문구를 확인한다.",
+      "heading": "8. 국내 루테인지아잔틴 제품은 무엇을 확인해야 하나요?",
+      "answerQuote": "제품 앞면보다 원료명·인정번호·하루 섭취량·기능성 문구를 먼저 확인하세요.",
+      "sourceIds": [
+        "kr-2018",
+        "kr-2025"
+      ]
+    },
+    {
+      "criterion": "베타카로틴 포함 여부와 흡연력",
+      "whyItMatters": "구형 AREDS의 베타카로틴은 현재 또는 과거 흡연자에서 폐암 위험 증가와 관련됐다.",
+      "howToCheck": "AREDS 계열 제품은 베타카로틴이 없는 AREDS2 제형인지 확인하고 흡연력을 의료진에게 알린다.",
+      "heading": "13. 부작용·흡연·임신·약물은 무엇을 주의해야 하나요?",
+      "answerQuote": "현재 또는 과거 흡연자는 베타카로틴이 들어간 구형 AREDS 제형을 피해야 하며",
+      "sourceIds": [
+        "nei-supp"
+      ]
+    }
+  ],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-07",
+    "reviewer": {
+      "name": "ChatGPT GPT-5.6 Sol",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "효능 나열보다 AREDS2 대상 여부, 2mg과 국내 합산량 차이, 음식·제품 선택, 눈 피로와 블루라이트의 실제 행동을 중심으로 재구성했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "NEI 2025 갱신 자료, AAO 2025 안내, 2025 화면 사용자 시험, 2026 임상시험 통합 분석과 식약처 개별인정 원료를 적용 범위별로 분리했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "AREDS2의 약 25% 진행 위험 감소를 특정 AMD 단계와 복합제 결과로 한정하고 건강한 사람의 예방·시력 향상으로 확대하지 않았다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "루테인과 지아잔틴의 AREDS2 함량과 분포를 비교하되 직접 우월성 근거가 없음을 명시했다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "AREDS2 복합제가 특정 AMD 단계에서 근거가 있다는 조합 이익만 인정하고 건강한 사람에게 10대2 비율을 일반화하지 않았다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "식품 공급원과 AMD 질병 단계를 실제 선택에 연결하고 처방약 변경을 요구하는 약학 내용은 구체적 필요가 없어 제외했다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "구형 AREDS 베타카로틴의 흡연자 위험, 국내 원료의 임신·수유·어린이 주의, 다른 약·영양제와의 확인 필요성을 별도 주의 박스로 제시했다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "근거 부족만 반복하지 않고 누가 먹을지, 무엇을 고를지, 음식으로 어떻게 섭취할지와 안과 진료 전환 행동까지 제공했다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "R4 scan-density 기준을 고려해 각 긴 H2에 굵은 핵심 사실과 의미형 형광펜 또는 주의·진료 배지를 분산 배치했다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "망막·옥수수·달걀노른자로 역할이 다른 이미지 3개를 사용하고 원출처·라이선스·alt를 유지해 주제 관련성을 확보했다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "기존 /292 검색의도를 유지하면서 /392 인공눈물과 최신화된 /70 베타카로틴만 관련 내부링크로 연결하고 핵심 주장 가까이에 외부 근거를 배치했다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
