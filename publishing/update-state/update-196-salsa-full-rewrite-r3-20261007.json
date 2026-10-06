@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "8aa43d13b144e60f8c1e480b513e0467c37bf0ec3e8bdcd489a83cf1289d9932",
   "url": "https://nhunnhun.tistory.com/196",
   "articleId": "196",
+  "previousTitle": "살사(Salsa) 다이어트와 어울리는 살사 소스!!",
+  "title": "살사소스 칼로리·재료｜나트륨·다이어트·활용법·고르는 법",
   "sourceCommit": "26349235b584b00ff9cbe680116cbf0aa0e2b8b5",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T17:06:05.801Z"
+  "timestamp": "2026-10-06T17:06:17.468Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 18,
+    "h2Styled": 18,
+    "h3": 2,
+    "h3Styled": 2,
+    "accents": 18,
+    "tables": 5,
+    "tableWraps": 5,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
