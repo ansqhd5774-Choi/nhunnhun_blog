@@ -13,6 +13,56 @@ export const CALLOUTS = Object.freeze({
   care: { tone: 'info', label: '진료·상담이 필요한 경우' }
 });
 const inline = new Set(['strong', 'em', 'u', 'mark']);
+
+export const SCAN_DENSITY_POLICY = Object.freeze({
+  version: 'R4-scan-v1',
+  thresholds: Object.freeze([
+    { minChars: 400, minAnchors: 4, minStrongLike: 2, minHighlightLike: 1 },
+    { minChars: 250, minAnchors: 3, minStrongLike: 1, minHighlightLike: 1 },
+    { minChars: 120, minAnchors: 2, minStrongLike: 1, minHighlightLike: 1 },
+  ]),
+  excludedHeadings: Object.freeze(['핵심 정리','함께 보면 좋은 글','자료 출처']),
+});
+
+function scanRequirement(chars) {
+  return SCAN_DENSITY_POLICY.thresholds.find(rule => chars >= rule.minChars) ?? null;
+}
+function isScanSection(section) {
+  if (section.level !== 2) return false;
+  const heading = normalizeText(section.heading);
+  if (SCAN_DENSITY_POLICY.excludedHeadings.includes(heading)) return false;
+  if (/FAQ$/iu.test(heading)) return false;
+  return true;
+}
+export function scanDensityReport(document) {
+  return document.sections.filter(isScanSection).map(section => {
+    const body = inspectHtml(section.body);
+    const chars = Array.from(section.text).length;
+    const strong = body.elements.filter(n => n.name === 'strong').length;
+    const marks = body.elements.filter(n => n.name === 'mark').length;
+    const colors = body.elements.filter(n => n.name === 'span' && n.attribs?.['data-tone']).length;
+    const underlines = body.elements.filter(n => n.name === 'u').length;
+    const callouts = body.elements.filter(n => n.name === 'blockquote' && n.attribs?.['data-kind']).length;
+    const anchors = strong + marks + colors + underlines + callouts * 3;
+    const strongLike = strong + callouts;
+    const highlightLike = marks + callouts;
+    const requirement = scanRequirement(chars);
+    return { heading: section.heading, chars, strong, marks, colors, underlines, callouts, anchors, strongLike, highlightLike, requirement };
+  });
+}
+export function inspectScanDensity(document, add) {
+  for (const row of scanDensityReport(document)) {
+    const r = row.requirement;
+    if (!r) continue;
+    if (row.anchors < r.minAnchors || row.strongLike < r.minStrongLike || row.highlightLike < r.minHighlightLike) {
+      add('E_CONTENT_SCAN_EMPHASIS', JSON.stringify({
+        heading: row.heading, chars: row.chars,
+        actual: { anchors: row.anchors, strongLike: row.strongLike, highlightLike: row.highlightLike },
+        required: { anchors: r.minAnchors, strongLike: r.minStrongLike, highlightLike: r.minHighlightLike }
+      }));
+    }
+  }
+}
 export function inspectEmphasis(document, add, warn) {
   let marked = 0;
   for (const node of document.elements) {
