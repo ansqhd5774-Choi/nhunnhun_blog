@@ -37,8 +37,10 @@ export async function responseRequest(body, key, fetcher = fetch) {
   } catch { throw new Error('E_OPENAI_TRANSPORT_STATE_UNKNOWN'); }
   if (!response.ok) {
     // Never echo provider messages, request headers, or the key. No automatic paid retries.
-    let code; try { code = (await response.json()).error?.code; } catch {}
-    if (response.status === 429 && code === 'insufficient_quota') throw new Error('E_OPENAI_QUOTA');
+    let failure; try { failure = (await response.json()).error; } catch {}
+    const description = `${failure?.code ?? ''} ${failure?.type ?? ''} ${failure?.message ?? ''}`;
+    if (response.status === 429 && /insufficient_quota|current quota|billing|credits|balance|spend limit/i.test(description)) throw new Error('E_OPENAI_QUOTA');
+    if (response.status === 429 && /rate_limit|rate limit|tokens per min|requests per min|too many requests/i.test(description)) throw new Error('E_OPENAI_RATE_LIMIT');
     throw new Error(`E_OPENAI_HTTP_${response.status}`);
   }
   try { return await response.json(); } catch { throw new Error('E_OPENAI_RESPONSE_JSON'); }
