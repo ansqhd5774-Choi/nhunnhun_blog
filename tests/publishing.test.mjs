@@ -56,7 +56,7 @@ test('relative assets and credential-bearing content URLs rejected', () => {
 test('cloud workflow has serial execution and an explicit main-only activation gate', () => {
   const workflow = parse(readFileSync(new URL('../.github/workflows/publish-posts.yml', import.meta.url),'utf8'));
   assert.equal(workflow.concurrency['cancel-in-progress'], false);
-  assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-publish');
+  assert.equal(workflow.jobs.publish.concurrency.group, 'nhunnhun-tistory-mutation');
   assert.equal(workflow.jobs.publish.concurrency['cancel-in-progress'], false);
   assert.deepEqual(workflow.permissions, {contents:'read'});
   assert.equal(workflow.jobs.publish.if, "vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate.outputs.should_publish == 'true'");
@@ -100,7 +100,7 @@ test('editorial template gives new posts the shared visual hierarchy', () => {
     bodyHtml:'<p><img src="https://example.org/a.jpg" alt="대표"></p><p>도입 <u>핵심 하나</u> 문장입니다.</p><p><img src="https://example.org/b.jpg" alt="설명 이미지 1"></p><blockquote><strong>핵심만 먼저:</strong> <u>핵심 둘</u> 요약입니다.</blockquote><h2>1. 첫 항목</h2><p><img src="https://example.org/c.jpg" alt="설명 이미지 2"></p><h3>소제목</h3><table><thead><tr><th>구분</th></tr></thead><tbody><tr><td>값</td></tr></tbody></table><p>설명 <a href="https://example.org/source-a">출처 A</a></p><h2>2. 두 번째</h2><p>설명 <a href="https://example.net/source-b">출처 B</a></p><h2>핵심 정리</h2><ul><li>정리</li></ul><h2>자료 출처</h2><ul><li><a href="https://example.org/source-a">출처 A</a></li><li><a href="https://example.net/source-b">출처 B</a></li></ul>'
   };
   const rendered=renderEditorialPost(post);
-  assert.equal(EDITORIAL_TEMPLATE_VERSION,'R3');
+  assert.equal(EDITORIAL_TEMPLATE_VERSION,'R4'); // Legacy fixture still renders with the R3 path.
   assert.match(rendered,/바나나, 이것만 먼저 보세요/);
   assert.match(rendered,/width:34px;height:4px/);
   assert.match(rendered,/font-size:26px/);
@@ -155,7 +155,10 @@ test('only canonical publish workflow may invoke the public publisher', () => {
   for(const name of readdirSync(dir).filter(n=>/\.ya?ml$/.test(n))){
     if(name==='publish-posts.yml') continue;
     const content=readFileSync(new URL(name,dir),'utf8');
-    if(/pnpm\s+(?:run\s+)?publish\b|publishing\/publish\.mjs/.test(content)) offenders.push(name);
+    // Watching the publisher path is not invoking it. Inspect executable steps, not path filters.
+    const workflow=parse(content);
+    const commands=Object.values(workflow.jobs??{}).flatMap(job=>(job.steps??[]).map(step=>step.run??step.uses??'')).join('\n');
+    if(/pnpm\s+(?:run\s+)?publish\b|publishing\/publish\.mjs/.test(commands)) offenders.push(name);
   }
   assert.deepEqual(offenders,[]);
 });
@@ -164,7 +167,7 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs', import.meta.url),'utf8');
   const validate=readFileSync(new URL('../publishing/validate.mjs', import.meta.url),'utf8');
   assert.match(publish,/renderEditorialPost\(post\)/);
-  assert.match(publish,/assertEditorialContract\(stagedHtml, post\.bodyHtml\)/);
+  assert.match(publish,/assertEditorialContract\(stagedHtml, post\.bodyHtml,\{version:editorialVersionFor\(post\)\}\)/);
   assert.match(publish,/E_EDITORIAL_PUBLIC_CONTRACT/);
   assert.match(publish,/host\.innerText\|\|host\.textContent/);
   assert.doesNotMatch(publish,/DOMParser\(\)\.parseFromString/);

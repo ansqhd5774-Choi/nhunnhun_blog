@@ -2,10 +2,12 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
 
-const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved'];
+const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard'];
 
 export function checkUpdateSource(update, filename){
   if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');
+  if(update.contentStandard!==undefined&&update.contentStandard!=='R1') throw new Error('E_CONTENT_STANDARD_VERSION');
+  if(update.contentStandard==='R1'&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(update.id) || filename!==`${update.id}.json`) throw new Error('E_UPDATE_ID');
   if(!/^\d+$/.test(update.articleId||'')) throw new Error('E_UPDATE_ARTICLE');
   if(update.targetUrl!==`${BLOG}/${update.articleId}`) throw new Error('E_UPDATE_URL');
@@ -23,7 +25,8 @@ export function checkUpdateSource(update, filename){
 }
 export function updateFingerprint(update){
   return createHash('sha256').update(JSON.stringify([
-    update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml
+    update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml,
+    ...(update.contentStandard ? [update.contentStandard,update.category] : [])
   ])).digest('hex');
 }
 export async function loadUpdates(directory='updates'){

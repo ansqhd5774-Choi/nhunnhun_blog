@@ -4,8 +4,9 @@ import sanitizeHtml from 'sanitize-html';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
-  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved'];
+  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
+  if (post.contentStandard !== undefined && post.contentStandard !== 'R1') throw new Error('E_CONTENT_STANDARD_VERSION');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
   if (typeof post.title !== 'string' || !post.title.trim() || post.title.length > 150 || /[\r\n]/.test(post.title)) throw new Error('E_TITLE');
   if (typeof post.category !== 'string' || !post.category.trim()) throw new Error('E_CATEGORY');
@@ -37,8 +38,8 @@ export function checkPublishHtml(post) {
   // Strict publishing HTML is checked only for a post that can create a NEW public article.
   // Already-published source may retain richer archival markup without becoming eligible for republishing.
   const clean = sanitizeHtml(post.bodyHtml, {
-    allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span'],
-    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'] },
+    allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span','mark'],
+    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'], mark:['data-tone'], span:['data-tone'], blockquote:['data-kind'] },
     allowedSchemes: ['https'], allowProtocolRelative: false,
   });
   const normalizeVoidSyntax = html => html.replace(/<(img|br|hr)(\b[^>]*?)\s*\/?\s*>/gi, '<$1$2>');
@@ -52,6 +53,7 @@ export function fingerprint(post) {
   // Preserve fingerprints of legacy posts that predate representativeImageUrl.
   if (post.representativeImageUrl) parts.push(post.representativeImageUrl);
   if (post.scheduledAt) parts.push(post.scheduledAt);
+  if (post.contentStandard) parts.push(post.contentStandard);
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
 }
 export async function loadPosts(directory = 'posts') {

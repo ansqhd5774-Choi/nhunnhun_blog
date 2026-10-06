@@ -1,5 +1,11 @@
 # ChatGPT에서 블로그 작업 이어가기
 
+## ACTIVE 인수인계 — 2026-10-07
+
+작성 시작 전 최신 main에서 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 읽는다. 음식·영양소·약·질병 중 주 분류와 다른 세 분야 연결을 구분하며 장기 사용·비교·병용·제품·산지·민간요법·자가 점검을 관련성에 맞게 검토한다.
+
+source + 같은 id의 content-reviews를 한 변경으로 저장하고 실제 검토 후 해시를 일치시킨다. 코드 PASS는 의미 검토를 대체하지 않는다. 실제 발행/수정 대상은 R1 필수이며 legacy 글은 일괄 수정하지 않는다. 한 건 실행·공통 브라우저 mutex·Windows self-hosted CMD를 유지한다. 아래의 과거 클라우드 발행 연결 기록을 현재 운영 상태로 사용하지 않는다. 현재 실행 경로는 README와 실제 YAML을 읽는다.
+
 대상 블로그: https://nhunnhun.tistory.com/
 저장소: https://github.com/ansqhd5774-Choi/nhunnhun_blog
 공개 범위: 비공개 / 기본 브랜치: main

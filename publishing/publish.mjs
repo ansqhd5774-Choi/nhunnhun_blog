@@ -1,3 +1,5 @@
+import { assertEmphasisContract } from './content-emphasis.mjs';
+import { assertContentStandard } from './content-standards.mjs';
 import { verificationContext } from './verification-context.mjs';
 import { safeRuntimeDiagnostic, hasHumanVerificationFailure } from './runtime-diagnostics.mjs';
 import { openHtmlMode } from './html-mode.mjs';
@@ -9,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticleUrl } from './core.mjs';
 import { Ledger } from './ledger.mjs';
-import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
+import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
 import { assertImageReview } from './image-review.mjs';
 
 
@@ -112,6 +114,7 @@ try {
       const state = await ledger.read(post.id);
       if (eligible(post, state)) {
         checkPublishHtml(post);
+        assertContentStandard(post);
         assertImageReview(post);
         queue.push({post, previousStateSha: state?.phase === 'failed' ? state.sha : undefined});
       }
@@ -168,7 +171,7 @@ try {
       await page.locator('#post-title-inp').fill(post.title);
       stage = 'image-upload';
       const editorialHtml = renderEditorialPost(post);
-      const editorialExpected = editorialExpectations(post.bodyHtml);
+      const editorialExpected = editorialExpectations(post.bodyHtml,{version:editorialVersionFor(post)});
       const sources = [...new Set(imageSources(editorialHtml))];
       const representativeSource = post.representativeImageUrl || sources[0] || null;
       const uploadOrder = representativeSource ? [representativeSource, ...sources.filter(src => src !== representativeSource)] : sources;
@@ -182,7 +185,7 @@ try {
       await page.keyboard.insertText(bodyHtml);
       const stagedHtml = await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       if (!stagedHtml.trim()) throw new Error('E_EDITOR_HTML_BODY');
-      assertEditorialContract(stagedHtml, post.bodyHtml);
+      assertEditorialContract(stagedHtml, post.bodyHtml,{version:editorialVersionFor(post)});
       stage = 'category-tags';
       await page.locator('#category-btn').click();
       await page.locator('#category-list').waitFor({state:'visible'});
@@ -305,7 +308,7 @@ try {
         console.log('FINAL_SUBMIT_SIGNALS '+JSON.stringify(signals));
         const signalCode=classifySubmitSignals(signals);
         if(signalCode) throw new Error(signalCode);
-        if (/^E_[A-Z_]+$/.test(error?.message ?? '')) throw error;
+        if (/^E_[A-Z0-9_]+$/.test(error?.message ?? '')) throw error;
         if (submitResponses.some(x => x.status === 429)) throw new Error('E_PUBLISH_RATE_LIMIT');
         if (submitResponses.some(x => x.status >= 400)) throw new Error('E_PUBLISH_HTTP');
         throw new Error('E_FINAL_SUBMIT_INTERACTION');
@@ -357,6 +360,7 @@ try {
       if (!(await publicPage.locator('body').innerText()).includes(post.title)) throw new Error('E_PUBLICATION_UNCERTAIN');
       const content = publicPage.locator('.contents_style');
       if (await content.count() !== 1) throw new Error('E_BODY_UNVERIFIED');
+      if(post.contentStandard==='R1') assertEmphasisContract(await content.innerHTML(),post.bodyHtml);
       const actual = (await content.innerText()).replace(/\s+/g,' ').trim();
       // Materialize the final editorial HTML in the browser and compare rendered innerText.
       // textContent collapses table cells and block boundaries differently from the live page,
@@ -441,7 +445,7 @@ try {
         editorialSnapshot.responsiveImages !== editorialExpected.images ||
         (editorialExpected.images > 0 && editorialSnapshot.priorityImages < 1) ||
         editorialSnapshot.highlights !== editorialExpected.highlights ||
-        (editorialExpected.highlights >= 2 && editorialSnapshot.highlightColors < 2) ||
+        (editorialSnapshot.highlightColors < editorialExpected.minimumHighlightColors) ||
         editorialSnapshot.quickCards !== editorialExpected.quick ||
         editorialSnapshot.faqQ !== editorialExpected.faq ||
         editorialSnapshot.faqA !== editorialExpected.faq ||
@@ -450,6 +454,18 @@ try {
         (editorialExpected.related && editorialSnapshot.relatedCards !== editorialExpected.relatedLinks) ||
         (editorialExpected.sources && !editorialSnapshot.sourcesStyled)
       ) throw new Error('E_EDITORIAL_PUBLIC_CONTRACT');
+      if (post.contentStandard === 'R1') {
+        const mobileContext = await verificationContext(publicBrowser, {viewport:{width:390,height:844}});
+        try {
+          const mobilePage = await mobileContext.newPage();
+          await mobilePage.goto(url, {waitUntil:'domcontentloaded'});
+          const mobileContent = mobilePage.locator('.contents_style');
+          if (await mobileContent.count() !== 1 || (await mobileContent.innerText()).replace(/\s+/g,' ').trim() !== expectedText) throw new Error('E_CONTENT_MOBILE_BODY');
+          assertEmphasisContract(await mobileContent.innerHTML(), post.bodyHtml);
+          const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+          if (overflow) throw new Error('E_CONTENT_MOBILE_OVERFLOW');
+        } finally { await mobileContext.close(); }
+      }
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
       await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()}, state.sha);
@@ -458,7 +474,7 @@ try {
     } else console.log('NO_PENDING_POSTS');
   }
 } catch (error) {
-  const code = /^(?:E_[A-Z_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
+  const code = /^(?:E_[A-Z0-9_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message ?? '') ? error.message : 'E_RUNTIME';
   console.error(`DIAGNOSTIC: ${stage} ${code}`);
   console.error('RUNTIME_SAFE_DIAG '+JSON.stringify(safeRuntimeDiagnostic(error)));
   if (editorPage && stage === 'mode-menu') try {

@@ -1,4 +1,6 @@
-export const EDITORIAL_TEMPLATE_VERSION='R3';
+import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract } from './content-emphasis.mjs';
+export const EDITORIAL_TEMPLATE_VERSION='R4';
+export const editorialVersionFor = post => post?.contentStandard === 'R1' ? 'R4' : 'R3';
 
 const ACCENT='<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;border-radius:999px;margin:48px 0 10px;"></div>';
 const H2='<h2 style="margin:0 0 18px;padding:0;font-size:26px;line-height:1.4;font-weight:800;letter-spacing:-0.02em;color:#111827;border:0;background:none;">';
@@ -58,14 +60,16 @@ export function assertEditorialSource(post){
   return post;
 }
 
-export function editorialExpectations(sourceHtml){
+export function editorialExpectations(sourceHtml,{version='R3'}={}){
   const latest=count(sourceHtml,/<h2>최신 근거\s*·?\s*\d{4}<\/h2>\s*<blockquote>/g);
   return {
     h2:count(sourceHtml,/<h2>/g)-latest,
     h3:count(sourceHtml,/<h3>/g),
     tables:count(sourceHtml,/<table>/g),
     images:count(sourceHtml,/<img\b/g),
-    highlights:count(sourceHtml,/<u>/g),
+    version,
+    highlights:version==='R4'?emphasisExpectations(sourceHtml).highlights:count(sourceHtml,/<u>/g),
+    minimumHighlightColors:version==='R4'?emphasisExpectations(sourceHtml).minimumHighlightColors:(count(sourceHtml,/<u>/g)>=2?2:count(sourceHtml,/<u>/g)),
     faq:count(sourceHtml,/<p><strong>Q\.\s*[^<]+<\/strong><br\/?/g),
     latest,
     quick:/<blockquote><strong>핵심만 먼저:<\/strong>/g.test(sourceHtml) ? 1 : 0,
@@ -76,12 +80,12 @@ export function editorialExpectations(sourceHtml){
   };
 }
 
-export function applyEditorialTemplate(html,{title=''}={}){
+export function applyEditorialTemplate(html,{title='',version='R3'}={}){
   let out=html;
   const topic=topicFromTitle(title);
 
   // Restrained multi-color highlighter: source <u> marks only short key phrases.
-  out=applyHighlights(out);
+  out=version==='R4'?renderSemanticEmphasis(out):applyHighlights(out);
 
   // Hero and lead.
   out=out.replace(
@@ -148,8 +152,9 @@ export function applyEditorialTemplate(html,{title=''}={}){
   return out;
 }
 
-export function assertEditorialContract(renderedHtml,sourceHtml){
-  const e=editorialExpectations(sourceHtml);
+export function assertEditorialContract(renderedHtml,sourceHtml,{version='R3'}={}){
+  const e=editorialExpectations(sourceHtml,{version});
+  if(version==='R4') assertEmphasisContract(renderedHtml,sourceHtml);
   const h2=count(renderedHtml,/<h2\b/g);
   const h2Styled=count(renderedHtml,/<h2\b[^>]*font-size:26px[^>]*font-weight:800[^>]*>/g);
   const accents=count(renderedHtml,/<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;/g);
@@ -159,7 +164,7 @@ export function assertEditorialContract(renderedHtml,sourceHtml){
   const tableWraps=count(renderedHtml,/<div style="overflow-x:auto;[^"]*"><table\b/g);
   const images=count(renderedHtml,/<img\b/g);
   const responsiveImages=count(renderedHtml,/<img\b[^>]*style="[^"]*width:100%;[^"]*max-width:720px;[^"]*"/g);
-  const highlights=count(renderedHtml,/<span style="background:linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\);padding:0 \.06em;">/gi);
+  const highlights=count(renderedHtml,/<span\b[^>]*style="background:linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\);padding:0 \.06em;">/gi);
   const highlightColors=new Set([...renderedHtml.matchAll(/background:linear-gradient\(transparent 45%,(#[0-9a-f]{6}) 45%\)/gi)].map(m=>m[1].toLowerCase()));
   const q=count(renderedHtml,/>Q\.<\/span>/g);
   const a=count(renderedHtml,/>A\.<\/span>/g);
@@ -168,7 +173,7 @@ export function assertEditorialContract(renderedHtml,sourceHtml){
   if(tables!==e.tables || tableWraps!==e.tables) throw new Error('E_EDITORIAL_TABLE_CONTRACT');
   if(images!==e.images || responsiveImages!==e.images) throw new Error('E_EDITORIAL_IMAGE_CONTRACT');
   if(highlights!==e.highlights) throw new Error('E_EDITORIAL_HIGHLIGHT_CONTRACT');
-  if(e.highlights>=2 && highlightColors.size<2) throw new Error('E_EDITORIAL_HIGHLIGHT_COLOR_CONTRACT');
+  if(highlightColors.size<e.minimumHighlightColors) throw new Error('E_EDITORIAL_HIGHLIGHT_COLOR_CONTRACT');
   if(q!==e.faq || a!==e.faq) throw new Error('E_EDITORIAL_FAQ_CONTRACT');
   if(e.latest && count(renderedHtml,/<div\b[^>]*background:#fbfcfe;[^>]*>[\s\S]*?최신 근거\s*·?\s*\d{4}[\s\S]*?<\/div>/g)!==e.latest) throw new Error('E_EDITORIAL_LATEST_CONTRACT');
   if(e.quick && !/이것만 먼저 보세요<\/p>/.test(renderedHtml)) throw new Error('E_EDITORIAL_QUICK_CONTRACT');
@@ -180,6 +185,7 @@ export function assertEditorialContract(renderedHtml,sourceHtml){
 
 export function renderEditorialPost(post){
   assertEditorialSource(post);
-  const rendered=applyEditorialTemplate(post.bodyHtml,{title:post.title});
-  return assertEditorialContract(rendered,post.bodyHtml);
+  const version=editorialVersionFor(post);
+  const rendered=applyEditorialTemplate(post.bodyHtml,{title:post.title,version});
+  return assertEditorialContract(rendered,post.bodyHtml,{version});
 }

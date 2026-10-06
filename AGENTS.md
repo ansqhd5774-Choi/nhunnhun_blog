@@ -1,5 +1,14 @@
 # nhunnhun 티스토리 작업 기준
 
+## ACTIVE — Content Standard R1 / Editorial R4 (2026-10-07)
+
+- 음식·영양소·약·질병의 신규 작성 및 앞으로의 전체 수정은 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 먼저 읽는다.
+- 내용·문체·새 강조 규칙은 위 R1/R4를 우선하며 기존 실행 규칙 R2의 인증·승인·CMD·발행·보안 규칙은 유지한다. 아래와 과거 문서의 R3 강조 지시는 변경 없는 legacy source에만 적용한다.
+- source의 contentStandard=R1과 실제 category, 같은 id의 content-reviews 검토서를 함께 작성한다. 본문·이미지·승인 상태 변경 후 실제 재검토 없이 해시만 바꾸지 않는다.
+- AI가 의미를 분류·검토하며 자동 게이트는 계약 검증만 한다. PASS를 의사 감수·의학적 진실·독자 만족도 측정이라고 보고하지 않는다.
+- 여러 GPT는 글/브랜치를 분리한다. ready 다중 pending과 실제 발행/수정은 기존 한 건 제한을 유지하며 신규/수정 브라우저는 공통 mutex를 사용한다. 자동 queue 구현으로 오인하지 않는다.
+- 새 규격을 이유로 기존 글·ledger·스킨·광고·카테고리를 일괄 수정하지 않는다.
+
 - 한국어로 간결하게 보고한다. 대상은 https://nhunnhun.tistory.com/ 이다.
 - 작업 시작 시 README.md, docs/STATUS.md, 해당 workstreams 문서와 최신 실제 상태를 확인한다.
 - 부모의 sources/는 읽기 전용이다. 이 프로젝트 안에서만 파일을 생성·수정한다.

@@ -1,5 +1,11 @@
 # BLOG PLUGIN & EXECUTION RULES R2
 
+## 적용 우선순위 보완 — 2026-10-07
+
+실행·인증·안전 운영 규칙 R2는 유지한다. 다만 신규 작성/앞으로 수정하는 글의 **내용·문체·의미형 강조**는 `CONTENT_STANDARD_R1.md`와 `EDITORIAL_PUBLISH_STANDARD_R4.md`가 아래 R3 관련 조항보다 우선한다. 변경 없는 기존 source에는 R3 호환 렌더를 유지한다. R4의 `<u>`는 실제 밑줄이고 `<mark data-tone>`만 형광펜이며, 색을 순환시키거나 최소 2색을 강제하지 않는다.
+
+새로운 실제 mutation 전에는 source와 content-reviews의 R1 계약을 통과해야 한다. 검토 기록은 AI/사람 및 동일 작성자/독립 검토를 구분하며 자동 게이트를 의료 감수라고 표현하지 않는다. 신규/기존 수정은 같은 브라우저 mutex로 직렬화한다. 자세한 작성 절차는 `CONTENT_WRITER_PROMPT_R1.md`를 따른다.
+
 Status: **ACTIVE**  
 Target: `https://nhunnhun.tistory.com/`  
 Effective: 2026-10-04 (Asia/Seoul)  

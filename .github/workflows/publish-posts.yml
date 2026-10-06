@@ -3,6 +3,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'publishing/content-*.mjs'
+      - 'publishing/cross-domain.mjs'
+      - 'publishing/standards/**'
+      - 'publishing/validate-content.mjs'
+      - 'content-reviews/**'
+      - 'tests/content-*.test.mjs'
       - 'posts/**'
       - 'publishing/publish.mjs'
       - 'publishing/runner-gate.mjs'
@@ -55,6 +61,13 @@ jobs:
         run: node publishing/runner-gate.mjs --queue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Content standard for changed source
+        run: pnpm run validate:content:changed
+        if: github.event_name == 'push'
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.before }}
+          CONTENT_HEAD_SHA: ${{ github.sha }}
+      - run: pnpm run validate:content
       - run: pnpm test
       - run: pnpm validate
         env:
@@ -62,7 +75,7 @@ jobs:
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
   publish:
     concurrency:
-      group: nhunnhun-tistory-publish
+      group: nhunnhun-tistory-mutation
       cancel-in-progress: false
     needs: validate
     if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate.outputs.should_publish == 'true'
