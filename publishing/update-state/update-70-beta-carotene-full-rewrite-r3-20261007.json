@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "b26f347868ef40ce5f8c1a8b4b701debac2c60ebf5c5aa0d46a1e091f7a12ea9",
   "url": "https://nhunnhun.tistory.com/70",
   "articleId": "70",
+  "previousTitle": "베타카로틴(beta carotene) 주황색 식재료의 힘으로 건강을 높여보세요!",
+  "title": "베타카로틴 효능·음식｜비타민A 전환·보충제 차이·흡연자 주의",
   "sourceCommit": "9f36272aaf622e70d862beae46f1154ec3d7a2d0",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T17:16:31.930Z"
+  "timestamp": "2026-10-06T17:16:44.428Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 20,
+    "h2Styled": 20,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 20,
+    "tables": 4,
+    "tableWraps": 4,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
