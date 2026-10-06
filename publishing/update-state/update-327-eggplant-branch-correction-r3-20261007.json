@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "e30a959afffbe945c4148a38a66f9552eb6ddfd391578c66643417d9347aef71",
   "url": "https://nhunnhun.tistory.com/327",
   "articleId": "327",
+  "previousTitle": "가지(Branch)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
   "sourceCommit": "b7204676e138575d0599640e7848b68accc63cd3",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T17:46:52.138Z"
+  "timestamp": "2026-10-06T17:47:02.577Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 20,
+    "h2Styled": 20,
+    "h3": 3,
+    "h3Styled": 3,
+    "accents": 20,
+    "tables": 4,
+    "tableWraps": 4,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 6,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
