@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "923169b671cffc3c23dd6e89ff61b06210dd0fc526bc660210c596b64a3ba6ba",
   "url": "https://nhunnhun.tistory.com/204",
   "articleId": "204",
+  "previousTitle": "오트밀(oatmeal) 다이어트! 체중 감량과 영양 공급을 동시에!!",
+  "title": "오트밀 칼로리·다이어트｜하루 섭취량·조리법·혈당·첨가당 주의",
   "sourceCommit": "68fbc4cca636197871d263c5384b8f4097be9edc",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T16:43:29.987Z"
+  "timestamp": "2026-10-06T16:43:44.188Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 18,
+    "h2Styled": 18,
+    "h3": 2,
+    "h3Styled": 2,
+    "accents": 18,
+    "tables": 5,
+    "tableWraps": 5,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 7,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
