@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
-import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract, EMPHASIS_PALETTE, CALLOUTS } from '../publishing/content-emphasis.mjs';
+import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract, inspectScanDensity, scanDensityReport, SCAN_DENSITY_POLICY, EMPHASIS_PALETTE, CALLOUTS } from '../publishing/content-emphasis.mjs';
+import { inspectHtml } from '../publishing/content-html.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract } from '../publishing/editorial.mjs';
 import { checkPublishHtml } from '../publishing/core.mjs';
 import { checkMeasurements } from '../publishing/verify-updated-public.mjs';
@@ -29,3 +30,35 @@ function luminance(hex){const rgb=hex.slice(1).match(/../g).map(v=>parseInt(v,16
 function contrast(a,b){const values=[luminance(a),luminance(b)].sort((x,y)=>y-x);return (values[0]+0.05)/(values[1]+0.05);}
 for(const [name,p]of Object.entries(EMPHASIS_PALETTE))test(`palette ${name}: minimum 4.5:1 text contrast`,()=>{assert.ok(contrast(p.color,p.background)>=4.5);assert.ok(contrast(p.color,'#ffffff')>=4.5);assert.ok(contrast('#111827',p.background)>=4.5);});
 test('unchanged historical source retains its original R3 output hash',()=>{const path=new URL('./fixtures/content-r1/legacy-render-hashes.json',import.meta.url);assert.ok(existsSync(path));const data=JSON.parse(readFileSync(path,'utf8'));let count=0;for(const item of data){const rawSource=readFileSync(new URL('../'+item.path,import.meta.url),'utf8');const source=rawSource.replace(/\r\n/g,'\n');const inputHash=createHash('sha256').update(source).digest('hex');if(inputHash!==item.sourceSha256)continue;const p=JSON.parse(source);if(item.error){assert.throws(()=>renderEditorialPost(p),new RegExp(item.error));}else{assert.equal(createHash('sha256').update(renderEditorialPost(p)).digest('hex'),item.renderSha256,item.path);}count++;}assert.ok(count>0);});
+
+
+test('scan density requires both bold and highlight for a normal 120+ character section',()=>{
+  const doc=inspectHtml('<h2>1. 훑어보기 테스트</h2><p><strong>핵심 사실</strong>'+ '가'.repeat(170) +'</p>');
+  const errors=[]; inspectScanDensity(doc,(code,detail)=>errors.push({code,detail}));
+  assert.ok(errors.some(e=>e.code==='E_CONTENT_SCAN_EMPHASIS'));
+});
+test('scan density passes a 120+ character section with bold plus semantic highlight',()=>{
+  const doc=inspectHtml('<h2>1. 훑어보기 테스트</h2><p><strong>핵심 사실</strong> <mark data-tone="key">한눈에 볼 결론</mark>'+ '가'.repeat(170) +'</p>');
+  const errors=[]; inspectScanDensity(doc,(code,detail)=>errors.push({code,detail}));
+  assert.deepEqual(errors,[]);
+});
+test('250+ character sections need three scan anchors, not merely one bold and one mark',()=>{
+  const thin=inspectHtml('<h2>1. 중간 길이</h2><p><strong>조건</strong> <mark data-tone="key">결론</mark>'+ '가'.repeat(280) +'</p>');
+  const errors=[]; inspectScanDensity(thin,(code,detail)=>errors.push({code,detail}));
+  assert.ok(errors.some(e=>e.code==='E_CONTENT_SCAN_EMPHASIS'));
+  const dense=inspectHtml('<h2>1. 중간 길이</h2><p><strong>조건</strong> <mark data-tone="key">결론</mark> <strong>행동 기준</strong>'+ '가'.repeat(280) +'</p>');
+  const denseErrors=[]; inspectScanDensity(dense,(code,detail)=>denseErrors.push({code,detail}));
+  assert.deepEqual(denseErrors,[]);
+});
+test('a labeled safety callout counts as a strong scan anchor',()=>{
+  const doc=inspectHtml('<h2>1. 위험 신호</h2><blockquote data-kind="danger"><p>'+ '가'.repeat(280) +'</p></blockquote>');
+  const errors=[]; inspectScanDensity(doc,(code,detail)=>errors.push({code,detail}));
+  assert.deepEqual(errors,[]);
+});
+test('summary, FAQ, related links and sources are excluded from scan-density minimums',()=>{
+  const doc=inspectHtml('<h2>핵심 정리</h2><p>'+ '가'.repeat(500) +'</p><h2>자주 묻는 FAQ</h2><p>'+ '나'.repeat(500) +'</p><h2>함께 보면 좋은 글</h2><p>'+ '다'.repeat(500) +'</p><h2>자료 출처</h2><p>'+ '라'.repeat(500) +'</p>');
+  assert.equal(scanDensityReport(doc).length,0);
+  const errors=[]; inspectScanDensity(doc,(code,detail)=>errors.push({code,detail}));
+  assert.deepEqual(errors,[]);
+});
+test('scan density policy is versioned for diagnostics',()=>assert.equal(SCAN_DENSITY_POLICY.version,'R4-scan-v1'));

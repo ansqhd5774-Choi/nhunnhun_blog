@@ -62,7 +62,7 @@ export function runContentCli(args = process.argv.slice(2), env = process.env) {
       if (kind === 'posts') checkPost(source, basename(path)); else checkUpdateSource(source, basename(path));
       if (args[0] !== '--check' && kind === 'posts' && source.status === 'draft' && !source.approved) { drafts++; continue; }
       if ((args.length === 0 || args[0] === '--all') && source.contentStandard === undefined) { legacy++; continue; }
-      const report = assertContentStandard(source, {kind});
+      const report = assertContentStandard(source, {kind, enforceScanDensity: args[0] !== '--all'});
       renderEditorialPost(source);
       console.log('CONTENT_CONTRACT_PASS ' + JSON.stringify({path,domain:report.domain,semanticVerification:report.semanticVerification,warnings:report.warnings}));
       checked++;

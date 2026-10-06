@@ -41,9 +41,9 @@ test('compatible-only is distinct from extra benefit',()=>{const p=fixture('nutr
 test('comparison without a common basis fails',()=>{const p=fixture('food',{enabled:['comparison']});p.manifest.comparisons[0].basis='';has(p,'E_CONTENT_COMPARISON_BASIS');});
 test('product selection must say how to check the criterion',()=>{const p=fixture('nutrient',{enabled:['products']});p.manifest.selectionCriteria[0].howToCheck='';has(p,'E_CONTENT_SELECTION_CRITERION');});
 test('editor-only criticism is blocked',()=>{const p=fixture();p.source.bodyHtml+='<p>기존 표현은 삭제하는 것이 맞습니다.</p>';refresh(p);has(p,'E_CONTENT_EDITOR_MEMO');});
-test('urgent safety instructions are not penalized as negative tone',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리','<p>호흡이 어려우면 즉시 진료가 필요합니다. 임의로 약을 중단하지 마세요.</p><h2>핵심 정리');refresh(p);assert.equal(evaluate(p).passed,true,JSON.stringify(evaluate(p).errors));});
+test('urgent safety instructions are not penalized as negative tone',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리','<p>호흡이 어려우면 즉시 진료가 필요합니다. 임의로 약을 중단하지 마세요.</p><h2>핵심 정리');refresh(p);const report=evaluateContent(p.source,p.manifest,{today:'2026-10-07',enforceScanDensity:false});assert.equal(report.passed,true,JSON.stringify(report.errors));});
 test('technical terms need nearby plain-language explanations',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리','<p>생체이용률을 확인합니다.</p><h2>핵심 정리');refresh(p);has(p,'E_CONTENT_TERM_UNEXPLAINED');});
-test('nearby glossary explanation passes',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리','<p>생체이용률은 섭취한 성분이 몸에서 이용될 수 있는 정도를 뜻합니다.</p><h2>핵심 정리');p.manifest.glossary=[{term:'생체이용률',explanation:'섭취한 성분이 몸에서 이용될 수 있는 정도'}];refresh(p);assert.equal(evaluate(p).passed,true,JSON.stringify(evaluate(p).errors));});
+test('nearby glossary explanation passes',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리','<p>생체이용률은 섭취한 성분이 몸에서 이용될 수 있는 정도를 뜻합니다.</p><h2>핵심 정리');p.manifest.glossary=[{term:'생체이용률',explanation:'섭취한 성분이 몸에서 이용될 수 있는 정도'}];refresh(p);const report=evaluateContent(p.source,p.manifest,{today:'2026-10-07',enforceScanDensity:false});assert.equal(report.passed,true,JSON.stringify(report.errors));});
 test('pending editorial review cannot pass',()=>{const p=fixture();p.manifest.review.status='pending';has(p,'E_CONTENT_REVIEW_REQUIRED');});
 test('review checklist requires an explanation, not only true/pass',()=>{const p=fixture();p.manifest.review.checks.accuracy.note='';has(p,'E_CONTENT_REVIEW_CHECK');});
 test('scaffold never fabricates approval or resolved classification',()=>{const p=fixture();const s=reviewScaffold(p.source);assert.equal(s.review.status,'pending');assert.equal(s.classification.status,'unresolved');assert.equal(s.sources.length,0);assert.equal(evaluateContent(p.source,s).passed,false);});
@@ -58,3 +58,14 @@ test('medicine contraindications require a visibly labeled safety block',()=>{co
 test('malformed benefit evidence is rejected with diagnostics instead of crashing',()=>{const p=fixture('nutrient',{enabled:['combinations']});p.manifest.combinations[0].relationship='benefit';p.manifest.combinations[0].sourceIds='ref-a';assert.doesNotThrow(()=>evaluate(p));has(p,'E_CONTENT_COMBINATION_EVIDENCE');});
 test('non-array warning resolutions cannot crash the reviewer',()=>{const p=fixture();p.source.bodyHtml=p.source.bodyHtml.replace('<h2>',`<p>${'긴 문장입니다. '.repeat(80)}</p><h2>`);refresh(p);p.manifest.review.warningResolutions='invalid';assert.doesNotThrow(()=>evaluate(p));has(p,'E_CONTENT_REVIEW_SCHEMA');});
 test('comparison subjects must be distinct text labels',()=>{const p=fixture('nutrient',{enabled:['comparison']});p.manifest.comparisons[0].left={not:'a label'};has(p,'E_CONTENT_COMPARISON_BASIS');});
+
+
+test('active content validation enforces scan density but archival audit may skip it',()=>{
+  const p=fixture();
+  p.source.bodyHtml=p.source.bodyHtml.replace('<h2>핵심 정리</h2>','<h2>추가 설명</h2><p>'+ '가'.repeat(320) +'</p><h2>핵심 정리</h2>');
+  refresh(p);
+  has(p,'E_CONTENT_SCAN_EMPHASIS');
+  const archival=evaluateContent(p.source,p.manifest,{today:'2026-10-07',enforceScanDensity:false});
+  assert.equal(archival.passed,true,JSON.stringify(archival.errors));
+  assert.equal(archival.scanDensityPolicy,'archival-skip');
+});

@@ -7,7 +7,7 @@ try{
   const updates=await loadUpdates();
   for(const update of updates){
     // Old source is rendered unchanged for historical audits; live mutation always requires R1.
-    if(update.contentStandard!==undefined) assertContentStandard(update);
+    if(update.contentStandard!==undefined) assertContentStandard(update,{enforceScanDensity:false});
     if(update.imageReview) assertImageReview(update);
     renderEditorialPost(update);
   }
