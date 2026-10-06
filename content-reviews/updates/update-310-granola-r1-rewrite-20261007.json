@@ -9,7 +9,7 @@
     "status": "resolved",
     "reason": "그래놀라는 귀리·견과류·감미료 등을 섞어 구운 가공 시리얼이며 사용자가 기존 숫자 URL의 음식 글 전체 재작성을 요청했다."
   },
-  "sourceDigest": "95c7cc26d9100133ff2a7a70ec8ca9f543a2e33a73ba33aa0b7a6628aaac5dbb",
+  "sourceDigest": "f6df7edebbf7421d2956bd6c665ea3e7ba47d29fe9247d437a035e4317dbeeff",
   "intent": {
     "primaryQuestion": "그래놀라는 실제로 다이어트와 아침식사에 좋은지, 몇 g을 먹고 어떤 영양표시를 보며 무엇과 함께 먹어야 하는가?",
     "readerSituation": "건강식으로 알려진 그래놀라를 사거나 먹으려 하지만 칼로리와 당류가 걱정되고 30g 같은 숫자가 권장량인지, 오트밀보다 나은지 판단하려는 상황",
@@ -228,7 +228,7 @@
     {
       "module": "myths",
       "heading": "17. 자주 하는 오해 5가지",
-      "answerQuote": "저당이면 저칼로리다?",
+      "answerQuote": "저당이어도 포화지방·열량이 높을 수 있습니다.",
       "sourceIds": [
         "harvard-sugar",
         "wholegrain-meta"
@@ -388,7 +388,7 @@
       "whyItMatters": "저당 제품도 코코넛오일·견과류·초콜릿 배합에 따라 포화지방과 총열량이 높을 수 있다.",
       "howToCheck": "비슷한 1회량끼리 당류와 포화지방 값을 나란히 비교하고 앞면의 저당 문구만으로 판단하지 않는다.",
       "heading": "7. ‘저당 그래놀라’면 무조건 좋은 선택인가요?",
-      "answerQuote": "저당·고단백·통곡물 같은 앞면 문구보다 실제 영양표의 열량·당류·포화지방·1회량을 함께 보세요.",
+      "answerQuote": "열량·당류·포화지방·1회량을 함께 확인",
       "sourceIds": [
         "kfind-granola"
       ]
