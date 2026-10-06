@@ -1,7 +1,14 @@
 {
-  "phase": "submitting",
+  "phase": "failed",
   "fingerprint": "b7e3982fee31ef4aa688c1f442bc2f4a0cb6973a44b685462033efd970fb9086",
+  "failureCode": "E_TISTORY_DAILY_PUBLISH_LIMIT",
+  "publicMutationConfirmed": false,
   "sourceCommit": "1c287e797ae2bceb1c46164281bae62270eb2987",
   "editorialTemplateVersion": "R3",
-  "timestamp": "2026-10-06T12:59:20.429Z"
+  "evidence": {
+    "submitHttpStatus": 403,
+    "exactTitlePublicSearch": "not_found",
+    "checkedAt": "2026-10-06T13:02:00Z"
+  },
+  "timestamp": "2026-10-06T13:02:00Z"
 }
