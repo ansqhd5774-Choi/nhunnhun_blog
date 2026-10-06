@@ -5,3 +5,8 @@ templates/article.md는 작성용 초안 틀이다. 기존 글 일괄 변환이�
 산출물: inventory.csv (URL, 카테고리, 수정일, 유입근거, 문제, 우선순위, 상태), drafts/작업ID/, 글별 원문 백업, changes/기록.
 현재 후보: /352의 목록 잔여 문구. 원문 확인 후 해당 문구만 수정하는 별도 작업 가능.
 완료 기준: 승인된 글만 원문 백업 후 수정하고 실제 본문·표·링크·PC/모바일을 확인한다. 질병 치료를 단정하거나 검증 없는 수치를 채우지 않는다.
+
+
+## 새 작성·수정 기준
+
+`docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 먼저 읽는다. contentStandard=R1 source와 같은 id의 검토서를 함께 준비한다. 새 강조는 Editorial R4이며 이전 문서의 R3 순환 강조는 legacy에만 적용한다.

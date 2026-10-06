@@ -129,3 +129,8 @@ Evidence:
 - `evidence/blog-source-r2-20261003.json`
 - `evidence/post-195-rewrite-20261003.json`
 - `evidence/final-blog-seo-20261003.json`
+
+
+## 2026-10-07 / Content Standard R1·Editorial R4 소스 구축
+
+`docs/CONTENT_STANDARD_R1.md`와 `changes/20261007-content-standard-r1.md`를 현재 작성/검증 기준으로 추가했다. 4개 분야·46개 질문·19개 확장·문체·의미형 강조·검토 해시를 신규 및 기존 수정 경로에 연결했다. 기존 글·ledger·스킨·광고는 변경하지 않는다. 로컬 단위/회귀 165개, 기존 source 80개의 렌더 보존, 3개 화면 폭 오프라인 미리보기를 확인했다. 최종 GitHub 통합/CI는 해당 PR/commit을 확인하며 실제 공개 발행은 이번 범위에 포함하지 않는다.

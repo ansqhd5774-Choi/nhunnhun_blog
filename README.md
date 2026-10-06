@@ -1,5 +1,13 @@
 # nhunnhun_blog
 
+## ACTIVE — 건강 콘텐츠 품질 기준 R1
+
+새 글과 앞으로 수정하는 글은 [CONTENT_STANDARD_R1](docs/CONTENT_STANDARD_R1.md)의 네 분야 질문·선택·연결·문체 기준과 [Editorial R4](docs/EDITORIAL_PUBLISH_STANDARD_R4.md)의 의미형 강조를 적용한다. [작성 GPT 지침](docs/CONTENT_WRITER_PROMPT_R1.md) → [분야별 상세](docs/content/DOMAIN_GUIDES_R1.md) → [검토서 형식](docs/CONTENT_REVIEW_FORMAT_R1.md) 순서로 읽는다.
+
+`contentStandard: "R1"` source와 같은 id의 `content-reviews/posts|updates/*.json`을 함께 검증한다. `npm run test:content`, `npm run validate:content`, `node publishing/validate-content.mjs --check posts/<id>.json`을 제공한다. GitHub Actions는 AI가 아니라 작성·검토 증거를 확인하는 자동화다. 의학적 의미·정확성은 실제 근거를 읽는 편집 검토가 필요하다.
+
+기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당하며 새 내용·강조는 R1/R4가 우선한다. 인증·Windows CMD·one-item·source drift·ledger·공개 검증은 유지한다. 자동 queue나 유료 AI API는 추가하지 않았다.
+
 사용자 티스토리 블로그 https://nhunnhun.tistory.com/ 의 반복 관리용 프로젝트.
 GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
 기준일: 2026-10-04 (Asia/Seoul). 실제 사이트명: 건강 식품.

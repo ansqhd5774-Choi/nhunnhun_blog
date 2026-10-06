@@ -1,5 +1,9 @@
 # Tistory Editorial Publish Standard R3
 
+## 호환 범위 변경 — 2026-10-07
+
+이 문서의 R3 렌더/다색 순환은 **변경 없는 legacy source용**으로 보존한다. 신규 글과 앞으로 수정하는 글은 `CONTENT_STANDARD_R1.md` 및 `EDITORIAL_PUBLISH_STANDARD_R4.md`가 우선한다. R4는 `<u>` 밑줄을 보존하고 `<mark data-tone>`의 의미별 색을 사용한다. 과거 글·ledger를 일괄 다시 저장하지 않는다. 아래는 보존된 기존 R3 규격이다.
+
 Status: ACTIVE
 Target: 신규 티스토리 공개 글
 Supersedes: R2 for new publications only. 기존 published ledger와 과거 글은 재발행하지 않는다.

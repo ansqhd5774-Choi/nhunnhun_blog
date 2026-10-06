@@ -1,3 +1,4 @@
+import { assertEmphasisContract } from './content-emphasis.mjs';
 import { verificationContext } from './verification-context.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
@@ -27,7 +28,7 @@ export function checkMeasurements(m,e) {
   if(m.images!==e.images || m.images<3 || m.missingAlt || m.brokenImages || m.nonNativeImages) throw new Error('E_QA_IMAGES');
   if(m.h2!==e.h2 || m.h3!==e.h3 || m.badHeadingStyles) throw new Error('E_QA_HEADINGS');
   if(m.tables!==e.tables || m.badTableWraps) throw new Error('E_QA_TABLES');
-  if(m.highlights!==e.highlights || (e.highlights>=2 && m.highlightColors<2) || m.hiddenHighlights) throw new Error('E_QA_HIGHLIGHTS');
+  if(m.highlights!==e.highlights || (m.highlightColors < (e.minimumHighlightColors ?? (e.highlights>=2?2:e.highlights))) || m.hiddenHighlights) throw new Error('E_QA_HIGHLIGHTS');
   if(m.faqQ!==e.faq || m.faqA!==e.faq || !m.heroPriority || m.badLazyImages) throw new Error('E_QA_STRUCTURE');
   return true;
 }
@@ -139,6 +140,7 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
     });
     console.log('PUBLIC_QA_METRICS '+JSON.stringify({articleId:update.articleId,width,...metrics}));
     checkMeasurements(metrics,expected);
+    if(update.contentStandard==='R1') assertEmphasisContract(await root.innerHTML(),update.bodyHtml);
     if(assetChecks) {
       const og=ogAsset(await page.locator('meta[property="og:image"]').getAttribute('content'));
       const hero=await images.first().getAttribute('src');
@@ -156,7 +158,7 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
   } finally {await context.close();}
 }
 async function main() {
-  const [{loadUpdates,updateFingerprint},{UpdateLedger},{localBrowserConfig,openPublicBrowser},{renderEditorialPost,editorialExpectations}]=await Promise.all([
+  const [{loadUpdates,updateFingerprint},{UpdateLedger},{localBrowserConfig,openPublicBrowser},{renderEditorialPost,editorialExpectations,editorialVersionFor}]=await Promise.all([
     import('./update-core.mjs'),import('./update-ledger.mjs'),import('./local-browser.mjs'),import('./editorial.mjs')
   ]);
   const ledger=new UpdateLedger(),updates=await loadUpdates();
@@ -172,7 +174,7 @@ async function main() {
       try {
         const state=await ledger.read(update.id);
         if(state?.phase!=='updated'||state.url!==update.targetUrl||state.fingerprint!==updateFingerprint(update)) throw new Error('E_QA_LEDGER');
-        const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml);
+        const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml,{version:editorialVersionFor(update)});
         const desktop=await verify(browser,update,1440,expected,rendered,true);
         const mobile=await verify(browser,update,390,expected,rendered,false);
         console.log('PUBLIC_QA_PASS '+JSON.stringify({articleId:update.articleId,url:update.targetUrl,title:update.title,desktop,mobile}));

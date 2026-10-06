@@ -3,15 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/publishing.test.mjs tests/runner-gate.test.mjs tests/verification-context.test.mjs tests/runtime-diagnostics.test.mjs tests/html-mode.test.mjs",
+    "test": "node --test tests/publishing.test.mjs tests/runner-gate.test.mjs tests/verification-context.test.mjs tests/runtime-diagnostics.test.mjs tests/html-mode.test.mjs tests/public-verification.test.mjs tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs",
     "validate": "node publishing/validate.mjs",
     "publish": "node publishing/publish.mjs",
     "validate:update": "node publishing/validate-update.mjs",
-    "update": "node publishing/update.mjs"
+    "update": "node publishing/update.mjs",
+    "test:content": "node --test tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs",
+    "validate:content": "node publishing/validate-content.mjs --all",
+    "validate:content:changed": "node publishing/validate-content.mjs --changed"
   },
   "dependencies": {
     "playwright-core": "1.63.0",
-    "sanitize-html": "2.18.0"
+    "sanitize-html": "2.18.0",
+    "htmlparser2": "12.0.0"
   },
   "devDependencies": {
     "yaml": "2.9.1"

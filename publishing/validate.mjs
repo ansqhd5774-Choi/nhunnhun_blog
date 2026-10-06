@@ -1,3 +1,4 @@
+import { assertContentStandard } from './content-standards.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
 import { loadPosts, checkPublishHtml, eligible } from './core.mjs';
@@ -7,8 +8,8 @@ import { assertImageReview } from './image-review.mjs';
 
 function diagnoseHtml(html) {
   const clean = sanitizeHtml(html, {
-    allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span'],
-    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'] },
+    allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span','mark'],
+    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'], mark:['data-tone'], span:['data-tone'], blockquote:['data-kind'] },
     allowedSchemes: ['https'], allowProtocolRelative: false,
   });
   if (clean === html) return null;
@@ -29,6 +30,7 @@ try {
     const state = await ledger.read(post.id);
     if (eligible(post, state)) {
       checkPublishHtml(post);
+      assertContentStandard(post);
       assertImageReview(post);
       renderEditorialPost(post);
       pending++;
@@ -36,7 +38,7 @@ try {
   }
   console.log(`PASS: ${posts.length} posts validated; ${pending} pending new publication; editorial=${EDITORIAL_TEMPLATE_VERSION}.`);
 } catch (error) {
-  const code = /^E_[A-Z_]+$/.test(error?.message ?? '') ? error.message : 'E_VALIDATE_RUNTIME';
+  const code = /^E_[A-Z0-9_]+$/.test(error?.message ?? '') ? error.message : 'E_VALIDATE_RUNTIME';
   if (code === 'E_HTML_REQUIRES_REVIEW') {
     for (const name of (await readdir('posts')).filter(n => n.endsWith('.json')).sort()) {
       const post = JSON.parse(await readFile('posts/'+name,'utf8'));

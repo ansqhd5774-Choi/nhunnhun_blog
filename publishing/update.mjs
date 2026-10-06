@@ -1,3 +1,5 @@
+import { assertEmphasisContract } from './content-emphasis.mjs';
+import { assertContentStandard } from './content-standards.mjs';
 import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
@@ -6,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BLOG } from './core.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering } from './local-browser.mjs';
-import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
+import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
 import { assertImageReview } from './image-review.mjs';
@@ -241,7 +243,7 @@ function assertSnapshot(snapshot,expected){
   if(snapshot.h3!==expected.h3||snapshot.h3Styled!==expected.h3) throw new Error('E_UPDATE_PUBLIC_H3');
   if(snapshot.tables!==expected.tables||snapshot.tableWraps!==expected.tables) throw new Error('E_UPDATE_PUBLIC_TABLE');
   if(snapshot.images!==expected.images||snapshot.responsiveImages!==expected.images||snapshot.nativeImages<expected.images) throw new Error('E_UPDATE_PUBLIC_IMAGE');
-  if(snapshot.highlights!==expected.highlights||(expected.highlights>=2&&snapshot.highlightColors<2)) throw new Error('E_UPDATE_PUBLIC_HIGHLIGHT');
+  if(snapshot.highlights!==expected.highlights||(snapshot.highlightColors<expected.minimumHighlightColors)) throw new Error('E_UPDATE_PUBLIC_HIGHLIGHT');
   if(snapshot.faqQ!==expected.faq||snapshot.faqA!==expected.faq) throw new Error('E_UPDATE_PUBLIC_FAQ');
   if(snapshot.latest!==expected.latest) throw new Error('E_UPDATE_PUBLIC_LATEST');
   if(expected.summary&&!snapshot.summaryBox) throw new Error('E_UPDATE_PUBLIC_SUMMARY');
@@ -256,6 +258,7 @@ async function verifyDesktop(browser,update,targetHtml,expected){
     if(!(await page.locator('body').innerText()).includes(update.title)) throw new Error('E_UPDATE_PUBLIC_TITLE');
     const content=page.locator('.contents_style');
     if(await content.count()!==1) throw new Error('E_UPDATE_PUBLIC_CONTENT');
+    if(update.contentStandard==='R1') assertEmphasisContract(await content.innerHTML(),update.bodyHtml);
     const actual=(await content.innerText()).replace(/\s+/g,' ').trim();
     const expectedText=await materializedText(page,targetHtml);
     if(!expectedText||actual!==expectedText) throw new Error('E_UPDATE_PUBLIC_BODY');
@@ -300,6 +303,7 @@ try{
     for(const update of await loadUpdates()){
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
+        assertContentStandard(update);
         assertImageReview(update);
         queue.push(update);
       }
@@ -364,7 +368,7 @@ try{
 
       stage='render-update';
       const rendered=renderEditorialPost(update);
-      const expected=editorialExpectations(update.bodyHtml);
+      const expected=editorialExpectations(update.bodyHtml,{version:editorialVersionFor(update)});
       const sources=[...new Set(imageSources(rendered))];
       const imageMap=new Map();
       for(let i=0;i<sources.length;i++){
@@ -389,7 +393,7 @@ try{
       await page.keyboard.press('ControlOrMeta+A');
       await page.keyboard.insertText(targetHtml);
       const staged=await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
-      assertEditorialContract(staged,update.bodyHtml);
+      assertEditorialContract(staged,update.bodyHtml,{version:editorialVersionFor(update)});
 
       stage='publish-dialog';
       await page.locator('#publish-layer-btn').click();
