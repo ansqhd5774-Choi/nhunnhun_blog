@@ -1,9 +1,36 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "fingerprint": "1360f0909086207ea910cd08d1fff91ac0809ae86b37cb23620edfb805cc5477",
   "url": "https://nhunnhun.tistory.com/310",
   "articleId": "310",
+  "previousTitle": "그래놀라 칼로리·당류·다이어트｜건강하게 고르는 법·아침식사 조합",
+  "title": "그래놀라 칼로리·다이어트｜1회 섭취량·당류·요거트 조합·고르는 법",
   "sourceCommit": "4f08e505133b1bec97000b5b4fe1174d913a6d86",
   "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-06T22:31:21.486Z"
+  "timestamp": "2026-10-06T22:31:34.921Z",
+  "verification": "anonymous_full_body_editorial_pc_mobile",
+  "desktop": {
+    "h2": 22,
+    "h2Styled": 22,
+    "h3": 0,
+    "h3Styled": 0,
+    "accents": 22,
+    "tables": 3,
+    "tableWraps": 3,
+    "images": 3,
+    "responsiveImages": 3,
+    "nativeImages": 3,
+    "highlights": 9,
+    "highlightColors": 4,
+    "faqQ": 6,
+    "faqA": 6,
+    "latest": 1,
+    "summaryBox": true,
+    "relatedCards": 2,
+    "sourcesStyled": true
+  },
+  "mobile": {
+    "overflow": false,
+    "wideImages": 0
+  }
 }
