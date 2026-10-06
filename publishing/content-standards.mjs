@@ -8,7 +8,7 @@ import disease from './standards/disease.mjs';
 import { CONTENT_STANDARD_VERSION, DOMAINS, SITE_CATEGORIES, MODULES, EXTENSIONS, REVIEW_CHECKS, SOURCE_KINDS, SOURCE_ROLES, ENTITY_DOMAINS, UNAMBIGUOUS_TOPICS, normTopic, TOPIC_ENTITIES, TOPIC_EXTENSIONS } from './standards/common.mjs';
 import { inspectHtml, normalizeText, sectionByHeading, assertPublicHttps, textOf } from './content-html.mjs';
 import { inspectTone } from './content-tone.mjs';
-import { inspectEmphasis } from './content-emphasis.mjs';
+import { inspectEmphasis, inspectScanDensity, SCAN_DENSITY_POLICY } from './content-emphasis.mjs';
 import { checkDecisionDetails } from './content-decisions.mjs';
 import { checkCrossDomain } from './cross-domain.mjs';
 
@@ -23,7 +23,7 @@ function validDay(day, today) {
   const date = new Date(day + 'T00:00:00Z');
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === day && day <= today;
 }
-export function evaluateContent(source, manifest, { today = todayInSeoul() } = {}) {
+export function evaluateContent(source, manifest, { today = todayInSeoul(), enforceScanDensity = true } = {}) {
   const errors = [], warnings = [];
   const add = (code, detail) => errors.push({ code, detail });
   const warn = (code, detail) => warnings.push({ code, detail });
@@ -95,13 +95,14 @@ export function evaluateContent(source, manifest, { today = todayInSeoul() } = {
   checkDecisionDetails(manifest, document, sources, add);
   inspectTone(document, manifest, add, warn);
   inspectEmphasis(document, add, warn);
+  if (enforceScanDensity) inspectScanDensity(document, add);
   const r = manifest.review;
   if (!object(r) || r.status !== 'approved' || !validDay(r.checkedAt, today) || !object(r.reviewer) || !['human','ai'].includes(r.reviewer.kind) || !completeText(r.reviewer.name, 2) || !['same-author','independent'].includes(r.reviewer.independence)) add('E_CONTENT_REVIEW_REQUIRED', '실제 편집 검토 기록');
   for (const check of REVIEW_CHECKS) if (r?.checks?.[check]?.status !== 'pass' || !completeText(r.checks[check].note, 12)) add('E_CONTENT_REVIEW_CHECK', check);
   for (const warning of warnings) if (!(Array.isArray(r?.warningResolutions) ? r.warningResolutions : []).some(x => x?.code === warning.code && completeText(x.note, 12))) add('E_CONTENT_WARNING_REVIEW', warning.code);
   if (r && !Array.isArray(r.warningResolutions)) add('E_CONTENT_REVIEW_SCHEMA', 'warningResolutions array');
   // PASS proves the declared contract and review evidence exist. It is NOT an independent medical/semantic verdict.
-  return result({ domain, requiredModules: [...required], reviewedBy: r?.reviewer, semanticVerification: 'editor-attested-not-automatically-proven' });
+  return result({ domain, requiredModules: [...required], reviewedBy: r?.reviewer, semanticVerification: 'editor-attested-not-automatically-proven', scanDensityPolicy: enforceScanDensity ? SCAN_DENSITY_POLICY.version : 'archival-skip' });
 }
 export function readContentReview(source, { kind = source?.articleId ? 'updates' : 'posts', root = process.cwd() } = {}) {
   if (!['posts','updates'].includes(kind) || !/^[a-z0-9][a-z0-9-]{2,79}$/.test(source?.id ?? '')) throw new Error('E_CONTENT_REVIEW_PATH');
