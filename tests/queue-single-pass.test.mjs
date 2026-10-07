@@ -17,7 +17,7 @@ test('one writer call without plan, claim labels, emphasis or repair',async()=>{
     assert.equal(prompt.instructions.reduce((n,s)=>n+s.targetChars,0),2300);
     assert.ok(prompt.instructions.every(s=>s.include.length>20));
     assert.ok(input.messages[0].content.includes('수치·단위'));
-    assert.ok(input.messages[0].content.includes('확인되지 않은')); 
+    assert.ok(input.messages[0].content.includes('확인되지 않은'));
     assert.ok(!JSON.stringify(input.format).includes('sourceIds'));
     return {ok:true,body:(async function*(){yield Buffer.from(JSON.stringify({done:true,message:{content:JSON.stringify(raw)}})+'\n');})()};}});
   assert.equal(calls,1);assert.equal(article.sections[0].heading,raw.sections[0].heading);
