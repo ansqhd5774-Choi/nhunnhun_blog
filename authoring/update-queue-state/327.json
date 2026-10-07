@@ -1,7 +1,7 @@
 {
-  "status": "PENDING_RETRY",
+  "status": "SKIPPED",
   "policyVersion": "R5.3",
-  "runId": "37673681029",
+  "runId": "37675087533",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -11,14 +11,14 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r53-20261008-7034c152",
-  "baseSha": "81abd02690a01e6b81660316352516cbb6fce78a",
-  "startedAt": "2026-10-07T19:23:46.504Z",
-  "heartbeatAt": "2026-10-07T19:24:32.667Z",
-  "recovered": true,
+  "sourceId": "auto-327-r53-20261008-62200bf4",
+  "baseSha": "71e0a217b52cb417ab448a4c43cd3b808b6fbcff",
+  "startedAt": "2026-10-07T19:34:17.769Z",
+  "heartbeatAt": "2026-10-07T19:34:53.894Z",
+  "recovered": false,
   "skippedCurrent": [],
-  "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
-  "rejectedSourceId": "auto-327-r53-20261008-7034c152",
-  "rejectionReason": "R5.3 baseline rejected before Tistory mutation: irrelevant agricultural evidence and unsupported food-health claims.",
+  "failedAt": "2026-10-07T19:34:54.781Z",
+  "error": "E_QUEUE_EXISTING_UPDATE_PENDING",
+  "details": null,
   "publicMutation": false
 }
