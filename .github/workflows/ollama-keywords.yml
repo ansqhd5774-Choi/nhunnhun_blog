@@ -9,8 +9,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: nhunnhun-ollama-keywords
-  cancel-in-progress: false
+  group: nhunnhun-ollama-keywords-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   test:
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
