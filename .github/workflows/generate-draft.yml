@@ -6,6 +6,7 @@ on:
       - 'tests/authoring.test.mjs'
       - 'tests/ollama-authoring.test.mjs'
       - '.github/workflows/generate-draft.yml'
+      - '.github/actions/setup-node-pnpm/**'
 permissions:
   contents: read
 concurrency:
@@ -16,9 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+      - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
