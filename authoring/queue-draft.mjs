@@ -95,7 +95,7 @@ function sourceBundle(evidence){
     scopeNote:s.scopeNote,notes:s.notes.slice(0,1400)
   }));
 }
-function outputBudget(scope){
+export function outputBudget(scope){
   return ({focused:3000,standard:4500,comprehensive:6000,deep:7500})[scope]??4500;
 }
 function allSectionText(section){return [section.strongPoint,...(section.paragraphs??[])].map(norm).filter(Boolean);}
@@ -179,7 +179,7 @@ async function repairArticle(item,evidence,extensions,required,scope,currentTitl
   return ollamaJson([
     {role:'system',content:`기존 초안을 한 번만 교정한다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이다. 실패 항목만 고치되 전체 글을 불필요하게 늘리지 않는다. core 모듈 누락은 실제 근거로 답하고, 근거가 부족하면 확인 가능한 한계를 정확히 설명한다. 선택 모듈은 삭제해도 된다. claims의 sourceIds와 주장 범위를 맞춘다. highlightPhrase·underlinePhrase는 반드시 해당 paragraphs의 실제 구절이어야 한다. 권장 분량 ${min}~${max}자는 경고 범위이지 강제 목표가 아니다. 같은 설명을 반복해서 통과시키지 않는다.`},
     {role:'user',content:JSON.stringify({failures,existingArticle:article,requiredCoreModules:required,scope,currentTitle,extensions,sources:sourceBundle(evidence)})}
-  ],schema(required,evidence.sources),{model,fetcher,numPredict:outputBudget(scope)});
+  ],schema(required,selectDraftSources(evidence)),{model,fetcher,numPredict:outputBudget(scope)});
 }
 
 export async function draftArticle(item,evidence,extensions=conservativeExtensions(item),{model,fetcher=fetch,currentTitle=''}={}){
