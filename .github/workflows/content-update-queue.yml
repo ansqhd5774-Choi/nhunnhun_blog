@@ -1,0 +1,59 @@
+name: 콘텐츠 수정 Queue Producer
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['automation/content-update-queue.json', 'automation/update-queue-ready/**']
+  pull_request:
+    paths: ['automation/**', 'tests/update-queue.test.mjs', '.github/workflows/content-update-queue.yml']
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-content-update-queue
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test tests/update-queue.test.mjs tests/keyword-authoring.test.mjs
+  producer:
+    if: github.event_name != 'pull_request' && vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    concurrency:
+      group: nhunnhun-tistory-mutation
+      cancel-in-progress: false
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: write
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node automation/run-update-queue.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: content-update-producer-${{ github.run_id }}
+          path: |
+            automation/update-queue-results/
+            authoring/results/
+          if-no-files-found: ignore
+          retention-days: 30

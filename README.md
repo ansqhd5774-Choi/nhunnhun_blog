@@ -6,7 +6,7 @@
 
 `contentStandard: "R1"` source와 같은 id의 `content-reviews/posts|updates/*.json`을 함께 검증한다. `npm run test:content`, `npm run validate:content`, `node publishing/validate-content.mjs --check posts/<id>.json`을 제공한다. GitHub Actions는 AI가 아니라 작성·검토 증거를 확인하는 자동화다. 의학적 의미·정확성은 실제 근거를 읽는 편집 검토가 필요하다.
 
-기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당하며 새 내용·강조는 R1/R4가 우선한다. 인증·Windows CMD·one-item·source drift·ledger·공개 검증은 유지한다. 자동 queue나 유료 AI API는 추가하지 않았다.
+기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당하며 새 내용·강조는 R1/R4가 우선한다. 인증·Windows CMD·one-item·source drift·ledger·공개 검증은 유지한다. URL별 Queue Producer의 구현과 운영 검증 범위는 [CONTENT_UPDATE_QUEUE](docs/CONTENT_UPDATE_QUEUE.md)를 따른다. 유료 AI API는 사용하지 않는다.
 
 사용자 티스토리 블로그 https://nhunnhun.tistory.com/ 의 반복 관리용 프로젝트.
 GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
