@@ -76,7 +76,7 @@ function auditSchema(){
 }
 export async function auditReview(item,source,review,evidence,{model,fetcher=fetch}={}){
   return ollamaJson([
-    {role:'system',content:'최종 편집 검토다. 실제 source·review·근거를 읽고 11개 항목을 각각 pass/fail로 판단한다. 형식 통과를 위해 무조건 pass하지 않는다. 주장 범위, 독자 질문, 비교·조합 구분, 안전, 문체, 강조, 이미지 검토 기록, 링크와 검색의도를 점검한다. 하나라도 의심되면 fail이다.'},
+    {role:'system',content:'최종 편집 검토다. 실제 source·review·근거를 읽고 11개 항목을 각각 pass/fail로 판단한다. 형식 통과를 위해 무조건 pass하지 않는다. 다른 주제로 바뀐 설명, 확인되지 않은 수치·효능·권장량, 출처와 다른 주장, 필요한 의료 안전정보 누락은 fail이다. 출처 이름에 주제 단어가 있어도 그 연구의 대상·형태·결과가 주장과 일치하는지 확인한다. 근거 부족인 선택 항목을 제외했거나 확인 자료의 한계를 정확하게 설명한 것은 실패 사유가 아니다. 모든 글에 임상시험·비교·조합·제품 추천을 강제하지 않는다. 같은 요약의 적절한 재등장은 허용하고 의미 없는 반복은 구분한다. 이미지 검토 기록만으로 실제 이미지를 보았다고 주장하지 않는다. 판단은 코드의 의미 증명이 아니라 AI 편집 검토임을 유지한다.'},
     {role:'user',content:JSON.stringify({item,source,review,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,notes:s.notes.slice(0,2200)}))})}
   ],auditSchema(),{model,fetcher,numPredict:4500});
 }

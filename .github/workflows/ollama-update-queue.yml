@@ -18,6 +18,9 @@ on:
       - 'authoring/ollama.mjs'
       - 'authoring/keywords.mjs'
       - 'tests/update-queue.test.mjs'
+      - 'publishing/content-standards.mjs'
+      - 'publishing/standards/**'
+      - 'tests/content-standards.test.mjs'
       - '.github/workflows/ollama-update-queue.yml'
 
 permissions:
@@ -37,7 +40,7 @@ jobs:
           node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
+      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs
 
   produce:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')

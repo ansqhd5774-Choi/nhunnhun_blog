@@ -81,7 +81,7 @@ checks 11개는 readerIntent, accuracy, expectations, comparison, combinations, 
 | E_CONTENT_STANDARD_REQUIRED | 해당 발행/수정 source를 실제 검토한 R1으로 준비 |
 | E_CONTENT_REVIEW_MISSING / STALE | 검토서 경로 확인, 변경 내용을 재검토 후 최신 해시 |
 | E_CONTENT_CLASSIFICATION / CATEGORY_MISMATCH | 원문 의미·주 도메인·실제 category 일치 |
-| E_CONTENT_TOPIC_EXTENSION | 알려진 종합 안내에서 필수 확장 질문 누락 보완 |
+| W_CONTENT_TOPIC_EXTENSION_OMITTED | 추천 프로필의 제외 이유를 검토하고 기록; 적용을 강제하지 않음 |
 | E_CONTENT_REQUIRED_MODULE / ANSWER_NOT_FOUND | 제목만 추가하지 말고 독자가 사용할 답을 작성 |
 | E_CONTENT_MODULE_CITATION | 해당 답변 가까이 올바른 원문 출처 연결 |
 | E_CONTENT_KR_AUTHORIZATION | 정확한 국내 의약품 허가사항 확인 |

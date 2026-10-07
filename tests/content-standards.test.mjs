@@ -16,8 +16,14 @@ test('unresolved classification cannot pass',()=>{const p=fixture();p.manifest.c
 test('watermelon cannot use medicine rules',()=>{const p=fixture('medicine');p.manifest.classification.topic='수박';has(p,'E_CONTENT_CLASSIFICATION_CONFLICT');});
 test('eating pear retains original words and normalized fruit meaning',()=>{const p=fixture('food',{entityId:'food:pear',topic:'배'});p.manifest.classification.rawInput='먹는 배 글을 적어줘';assert.equal(evaluate(p).passed,true,JSON.stringify(evaluate(p).errors));assert.equal(p.manifest.classification.rawInput,'먹는 배 글을 적어줘');});
 test('pear without disambiguation is blocked',()=>{const p=fixture('food',{entityId:'food:pear',topic:'배'});p.manifest.classification.meaning='모호한 단어';has(p,'E_CONTENT_AMBIGUOUS_TOPIC');});
-test('apple profile requires regional and cultivar decisions',()=>{const p=fixture('food',{entityId:'food:apple',topic:'사과'});p.manifest.extensions.origins.applies=false;has(p,'E_CONTENT_TOPIC_EXTENSION');});
-test('vitamin C profile cannot silently omit product comparison',()=>{const p=fixture('nutrient',{entityId:'nutrient:vitamin-c',topic:'비타민C'});assert.equal(evaluate(p).passed,true,JSON.stringify(evaluate(p).errors));p.manifest.extensions.products.applies=false;has(p,'E_CONTENT_TOPIC_EXTENSION');});
+for(const [domain,entityId,topic,key] of [['food','food:apple','사과','origins'],['nutrient','nutrient:vitamin-c','비타민C','products']])test(`${topic} profile permits a reviewed optional omission without forcing unsupported modules`,()=>{
+  const p=fixture(domain,{entityId,topic});
+  p.manifest.extensions[key]={applies:false,reason:'이번 독자의 질문 범위와 확인한 자료로는 해당 확장을 뒷받침하지 못해 제외했습니다.'};
+  p.manifest.review.warningResolutions.push({code:'W_CONTENT_TOPIC_EXTENSION_OMITTED',note:'추천 프로필은 검토했고 현재 질문에 필요하지 않은 확장은 제외했습니다.'});
+  const report=evaluate(p);
+  assert.equal(report.passed,true,JSON.stringify(report.errors));
+  assert.ok(report.warnings.some(w=>w.code==='W_CONTENT_TOPIC_EXTENSION_OMITTED'));
+});
 test('changing entity ID does not evade known-topic requirements',()=>{const p=fixture('food',{entityId:'food:apple',topic:'사과'});p.manifest.classification.entityId='food:other';has(p,'E_CONTENT_ENTITY_CANONICAL');});
 for(const field of ['title','bodyHtml','category','representativeImageUrl']) test(`review is invalidated by changed ${field}`,()=>{const p=fixture();p.source[field]+=' 변경';has(p,'E_CONTENT_REVIEW_STALE');});
 test('review is invalidated by approval changes',()=>{const p=fixture();p.source.approved=false;has(p,'E_CONTENT_REVIEW_STALE');});

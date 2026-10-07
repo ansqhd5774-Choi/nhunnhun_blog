@@ -43,7 +43,7 @@ export const ENTITY_DOMAINS = Object.freeze({
 });
 export const normTopic = value => String(value ?? '').normalize('NFC').replace(/[\s®™]/gu, '').toLowerCase();
 export const UNAMBIGUOUS_TOPICS = Object.freeze({ '수박':'food', '먹는배':'food', '과일배':'food', '비타민c':'nutrient', '타이레놀':'medicine', '아세트아미노펜':'medicine', '고혈압':'disease', '당뇨병':'disease' });
-// Broad-guide regression profiles from the user's examples. These do not diagnose or recommend treatment.
+// Broad-guide identities and suggested questions. Profiles never prove applicability or evidence.
 export const TOPIC_ENTITIES = Object.freeze({ '사과':'food:apple', '배':'food:pear', '먹는배':'food:pear', '과일배':'food:pear', '수박':'food:watermelon', '비타민c':'nutrient:vitamin-c', '피크노제놀':'nutrient:pycnogenol', '감기약':'medicine:cold-remedy', '감기':'disease:common-cold' });
 export const TOPIC_EXTENSIONS = Object.freeze({
   'food:apple': ['cultivars','origins','seasonality','comparison','diet'],
