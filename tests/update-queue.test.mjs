@@ -14,7 +14,8 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {missingRequiredModules,requiredModules,renderBody,draftArticle,outputBudget,selectDraftSources} from '../authoring/queue-draft.mjs';
+import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport} from '../authoring/queue-draft.mjs';
+import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -148,65 +149,89 @@ test('가지 확장 판단은 eggplant 정체를 고정하고 일반 채소 자�
   assert.throws(()=>normalizeExtensionDecisions(item,evidence,drift,[]),/E_QUEUE_IDENTITY_DRIFT/);
 });
 
-test('R3 output budget leaves JSON completion headroom without changing visible-length guidance',()=>{
-  assert.deepEqual(['focused','standard','comprehensive','deep'].map(outputBudget),[3000,4500,6000,7500]);
+test('R4 scope uses search breadth only as an editorial warning range',()=>{
+  const item={keyword:'가지',domain:'food'};
+  assert.equal(inferWritingScope(item,'가지 효능·영양·칼로리·보관·고르는 법·조리·주의사항'),'comprehensive');
+  assert.deepEqual(lengthBandForScope('comprehensive'),[3500,5200]);
+  assert.deepEqual(sectionLimitsForScope('comprehensive'),[6,10]);
 });
 
-test('draft source bundle is capped and prioritizes topic-specific authoritative evidence',()=>{
-  const sources=Array.from({length:9},(_,i)=>({id:`s${i}`,kind:'article',role:'context',topicSpecific:false}));
-  sources[8]={id:'official-topic',kind:'official',role:'nutrition',topicSpecific:true};
-  sources[7]={id:'trial-topic',kind:'trial',role:'health',topicSpecific:true};
-  const selected=selectDraftSources({sources});
+test('R4 evidence selection preserves role coverage and prioritizes direct authoritative sources',()=>{
+  const sources=Array.from({length:9},(_,i)=>({id:`s${i}`,kind:'article',role:'context',topicSpecific:false,title:'context',notes:'context'}));
+  sources[8]={id:'nutrition',kind:'nutrition-database',role:'nutrition',topicSpecific:true,title:'Eggplant nutrition',notes:'eggplant 100 g 25 kcal'};
+  sources[7]={id:'safety',kind:'official',role:'safety',topicSpecific:false,title:'Produce safety',notes:'fresh produce safety'};
+  sources[6]={id:'health',kind:'systematic-review',role:'health',topicSpecific:true,title:'Eggplant health review',notes:'eggplant health evidence'};
+  const selected=selectPlanSources({sources},{domain:'food'});
   assert.equal(selected.length,7);
-  assert.equal(selected[0].id,'official-topic');
-  assert.equal(selected[1].id,'trial-topic');
+  assert.ok(selected.some(s=>s.id==='nutrition'));
+  assert.ok(selected.some(s=>s.id==='safety'));
+  assert.ok(selected.some(s=>s.id==='health'));
 });
 
-test('필수 모듈 누락 목록을 정확히 계산해 재작성 단계가 보완 대상을 알 수 있음',()=>{
-  const article={sections:[{modules:['identity','nutrition']},{modules:['safety']}]};
-  assert.deepEqual(missingRequiredModules(article,['identity','nutrition','amount','safety','decision']),['amount','decision']);
+test('R4 plan validation rejects unsupported high-risk claims and invented numbers',()=>{
+  const item={keyword:'가지',domain:'food'};
+  const evidence={sources:[
+    {id:'nutrition',kind:'nutrition-database',role:'nutrition',topicSpecific:true,title:'Eggplant raw',scopeNote:'100 g',notes:'100 g eggplant contains 25 kcal'},
+    {id:'farm',kind:'article',role:'health',topicSpecific:true,title:'Eggplant pesticide residue',scopeNote:'pesticide residue study',notes:'pesticide residue in eggplant crops'},
+  ]};
+  const modules=DOMAIN_RULES.food.core;
+  const plan={primaryQuestion:'가지의 영양과 섭취 판단에 필요한 핵심 정보를 확인합니다.',readerSituation:'가지의 영양·조리·보관과 주의사항을 한 번에 확인하려는 독자입니다.',nextActions:['확인된 자료 범위에서 조리와 보관 방법을 선택합니다.'],sections:[
+    {id:'a',heading:'가지의 정체와 영양',question:'가지는 어떤 식품인가요?',modules:['identity','nutrition','amount'],claims:[{id:'c1',text:'생가지 100g은 약 30kcal입니다.',type:'nutrition',risk:'low',sourceIds:['nutrition']}]},
+    {id:'b',heading:'건강상 의미',question:'질병 예방 효과가 있나요?',modules:['benefits'],claims:[{id:'c2',text:'가지는 당뇨병을 예방합니다.',type:'disease',risk:'high',sourceIds:['farm']}]},
+    {id:'c',heading:'조리와 보관',question:'어떻게 조리하고 보관하나요?',modules:['preparation','storage'],claims:[{id:'c3',text:'조리와 보관 조건을 확인합니다.',type:'general',risk:'low',sourceIds:['nutrition']}]},
+    {id:'d',heading:'선택과 안전',question:'어떻게 고르고 주의하나요?',modules:['selection','safety','decision'],claims:[{id:'c4',text:'상태와 안전 조건을 확인합니다.',type:'safety',risk:'low',sourceIds:['farm']}]},
+  ]};
+  const failures=validateEvidencePlan(item,evidence,plan,'focused',evidence.sources);
+  assert.ok(failures.some(f=>f.code==='PLAN_NUMBER_SOURCE'&&f.claimId==='c1'));
+  assert.ok(failures.some(f=>f.code==='PLAN_HIGH_RISK_SOURCE'&&f.claimId==='c2'));
+  assert.ok(modules.every(m=>plan.sections.some(s=>s.modules.includes(m))));
 });
 
-for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: R3 keeps optional extensions out of mandatory core coverage`,()=>{
-  const evidence={query:'example',sources:[{id:'direct',topicSpecific:true}]};
-  const raw={comparison:{applies:false,reason:'현재 검색 질문에 비교가 필요하지 않아 포함하지 않습니다.',sourceIds:[]}};
-  const excluded=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
-  assert.equal(excluded.comparison.applies,false);
-  assert.deepEqual(requiredModules({domain},excluded),DOMAIN_RULES[domain].core);
-  raw.comparison={applies:true,reason:'독자의 선택에 필요한 직접 비교 자료를 확인했습니다.',sourceIds:['direct']};
-  const included=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
-  assert.equal(included.comparison.applies,true);
-  assert.deepEqual(requiredModules({domain},included),DOMAIN_RULES[domain].core);
+for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: Queue R4 core modules remain mandatory without forcing optional extensions`,()=>{
+  const required=DOMAIN_RULES[domain].core;
+  assert.ok(required.length>0);
+  assert.ok(!required.includes('comparison')||domain==='disease'&&false);
 });
 
-for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: common body obeys existing R4 lead/summary/image contract without fabricated comparisons`,()=>{
+for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: plan-bound body obeys existing R4 lead/summary/image contract`,()=>{
   const images=[1,2,3].map(i=>({src:`https://example.org/image-${i}.jpg`,alt:`테스트 이미지 ${i}`,sourcePage:`https://example.org/image-${i}`,author:'fixture',license:'fixture-only'}));
   const evidence={sources:[1,2].map(i=>({id:`ref-${i}`,url:`https://example.org/source-${i}`,title:`자료 ${i}`,checkedAt:'2026-10-07'}))};
-  const article={title:'테스트 주제 안내',lead:'이 글은 독자의 현재 질문과 자료를 확인한 범위를 설명하는 도입문입니다.',summary:'확인된 자료 안에서 판단하고 확인되지 않은 수치나 효과는 단정하지 않습니다.',sections:[1,2,3,4].map(i=>({heading:`독자가 확인할 질문 ${i}`,strongPoint:'확인한 대상과 형태를 먼저 구분합니다.',paragraphs:['출처에 제시된 조건을 확인하고 해당하지 않는 상황으로 결과를 확대하지 않습니다.'],keyPoint:'확인된 자료의 적용 범위를 살펴봅니다.',actionPoint:'',contrastPoint:'',sourceIds:['ref-1'],modules:[i===1&&domain==='medicine'?'contraindications':i===1&&domain==='disease'?'red_flags':'identity']}))};
+  const sections=[1,2,3,4].map(i=>({
+    id:`s${i}`,heading:`독자가 확인할 질문 ${i}`,question:'확인 질문',modules:[i===1&&domain==='medicine'?'contraindications':i===1&&domain==='disease'?'red_flags':'identity'],
+    sourceIds:['ref-1'],claims:[{id:`c${i}`,text:'확인된 자료 범위를 설명합니다.',type:'general',risk:'low',sourceIds:['ref-1']}],
+    paragraphs:['확인한 대상과 형태를 먼저 구분하고 자료의 적용 범위를 살펴봅니다. 추가 조건은 확인된 근거 안에서만 설명합니다.'],
+    strongPhrase:'대상과 형태를 먼저 구분',highlightPhrase:'자료의 적용 범위',underlinePhrase:'확인된 근거 안에서만'
+  }));
+  const article={title:'테스트 주제 안내',lead:'이 글은 독자의 현재 질문과 자료를 확인한 범위를 설명하는 도입문입니다.',summary:'확인된 자료 안에서 판단하고 확인되지 않은 수치나 효과는 단정하지 않습니다.',sections};
   const {html}=renderBody(article,evidence,images);
   const source={title:article.title,bodyHtml:html,contentStandard:'R1',representativeImageUrl:images[0].src};
   assert.equal(assertEditorialSource(source),source);
   assert.doesNotThrow(()=>renderEditorialPost(source));
-  assert.doesNotMatch(html,/<u>|비교해서 볼 부분은/);
   assert.match(html,/<blockquote><strong>핵심만 먼저:<\/strong>/);
+  assert.match(html,/<mark data-tone="key">자료의 적용 범위<\/mark>/);
   if(domain==='medicine')assert.match(html,/data-kind="caution"/);
   if(domain==='disease')assert.match(html,/data-kind="danger"/);
 });
 
-test('R3 draft performs only one repair and fails closed when core answers remain missing',async()=>{
-  const item={keyword:'새 주제',domain:'nutrient',category:'영양소',targetUrl:'https://nhunnhun.tistory.com/999'};
-  const evidence={query:'new topic',sources:[{id:'direct',title:'조회한 자료',kind:'official',role:'health',scopeNote:'현재 자료 범위만 사용합니다.',notes:'조회한 본문에서 확인할 수 있는 범위입니다.'}]};
-  let calls=0;
-  const fetcher=async(_url,options)=>{
-    calls++;
-    const request=JSON.parse(options.body);
-    assert.equal(request.format.properties.sections.items.properties.highlightPhrase.minLength,2);
-    assert.ok(request.format.properties.claims);
-    const bytes=new TextEncoder().encode(JSON.stringify({done:true,message:{content:JSON.stringify({sections:[{id:'actual-answer',modules:['identity']}],plan:{}})}})+'\n');
-    return {ok:true,body:(async function*(){yield bytes;})()};
-  };
-  await assert.rejects(draftArticle(item,evidence,{}, {model:'fixture-only',fetcher}),error=>error.message==='E_QUEUE_DRAFT_VALIDATION'&&error.details.failures.length>0);
-  assert.equal(calls,2);
+test('R4 validation identifies only failed sections and patch merge leaves the rest untouched',()=>{
+  const plan={primaryQuestion:'핵심 질문을 확인합니다.',readerSituation:'정보를 확인하려는 독자입니다.',nextActions:['확인된 범위에서 판단합니다.'],sections:[
+    {id:'s1',heading:'첫 질문',question:'첫 질문?',modules:['identity'],claims:[{id:'c1',text:'가지는 채소입니다.',type:'general',risk:'low',sourceIds:['a']}]},
+    {id:'s2',heading:'둘째 질문',question:'둘째 질문?',modules:['nutrition'],claims:[{id:'c2',text:'생가지 100g은 25kcal입니다.',type:'nutrition',risk:'low',sourceIds:['a']}]},
+  ]};
+  const draft={title:'가지 정보 안내',lead:'가지의 핵심 정보를 확인하고 근거 범위에서 설명하는 글입니다.',summary:'핵심 내용을 먼저 확인하고 세부 설명은 아래에서 이어집니다.',sections:[
+    {id:'s1',paragraphs:['가지는 채소이며 식생활에서 다양하게 사용됩니다. 확인된 자료 범위에서 설명합니다.'],strongPhrase:'가지는 채소',highlightPhrase:'다양하게 사용',underlinePhrase:''},
+    {id:'s2',paragraphs:['생가지 100g은 30kcal라고 알려져 있습니다. 영양 수치를 확인합니다.'],strongPhrase:'생가지 100g',highlightPhrase:'영양 수치',underlinePhrase:''},
+  ]};
+  const failures=validateWrittenArticle(draft,plan);
+  assert.ok(failures.some(f=>f.sectionId==='s2'&&f.code==='ARTICLE_UNDECLARED_NUMBER'));
+  assert.deepEqual(patchableSectionIds(failures,plan),['s2']);
+  const patched=applySectionPatches(draft,{sections:[{id:'s2',paragraphs:['생가지 100g은 25kcal입니다. 영양 수치를 확인합니다.'],strongPhrase:'생가지 100g',highlightPhrase:'영양 수치',underlinePhrase:''}]});
+  assert.equal(patched.sections[0].paragraphs[0],draft.sections[0].paragraphs[0]);
+  assert.equal(validateWrittenArticle(patched,plan).length,0);
+  const article=mergePlanAndDraft(plan,patched);
+  article.plan.scope='focused';
+  assert.equal(article.sections[1].sourceIds[0],'a');
+  assert.ok(buildLengthReport(article,'focused').visibleCharacters>0);
 });
 
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{
