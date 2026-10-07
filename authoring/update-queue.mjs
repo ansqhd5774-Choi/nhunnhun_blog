@@ -6,6 +6,7 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 
 const BLOG='https://nhunnhun.tistory.com';
 // R5.3 ACTIVE — simple writer
+// R5.3 PRODUCER TRIGGER
 const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
 const STATE_DIR='authoring/update-queue-state';
 export const QUEUE_POLICY_VERSION='R5.3';
