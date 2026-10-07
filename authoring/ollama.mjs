@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { buildDraft } from './generate.mjs';
 import { reviewScaffold } from '../publishing/validate-content.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
+import { SITE_CATEGORIES } from '../publishing/standards/common.mjs';
 
 const esc = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export const articleSchema = {type:'object',additionalProperties:false,required:['title','summary','sections','reviewNotes'],properties:{
@@ -22,7 +23,7 @@ export function assembleEvidenceArticle(plan,job) {
   return {title:job.proposedTitle,summary:job.evidenceSummary,reviewNotes:'Ollama가 제공된 질문 모듈의 순서를 구성했습니다. 본문 문장은 편집자가 출처를 확인해 입력한 문장이며 Ollama의 자유 생성 문장이 아닙니다. 최종 R1·이미지·R4 검토는 미완료입니다.',sections:plan.sectionIds.map(id=>{const {id:_,...section}=outline.find(s=>s.id===id);return section;})};
 }
 export function validateJob(job) {
-  if (!job || !/^[a-z0-9][a-z0-9-]{2,79}$/.test(job.id??'') || job.kind!=='rewrite' || !/^\d+$/.test(job.articleId??'') || job.targetUrl!==`https://nhunnhun.tistory.com/${job.articleId}` || !job.expectedCurrentTitle || job.domain!=='nutrient' || job.category!=='영양소') throw new Error('E_OLLAMA_JOB');
+  if (!job || !/^[a-z0-9][a-z0-9-]{2,79}$/.test(job.id??'') || job.kind!=='rewrite' || !/^\d+$/.test(job.articleId??'') || job.targetUrl!==`https://nhunnhun.tistory.com/${job.articleId}` || !job.expectedCurrentTitle || !SITE_CATEGORIES[job.domain]?.includes(job.category)) throw new Error('E_OLLAMA_JOB');
   if (!Array.isArray(job.sources) || job.sources.length<2 || new Set(job.sources.map(s=>s.id)).size!==job.sources.length) throw new Error('E_OLLAMA_SOURCES');
   for (const source of job.sources) {
     const url = new URL(source.url);
