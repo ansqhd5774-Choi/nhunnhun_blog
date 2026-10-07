@@ -1,14 +1,17 @@
-name: Setup Node and pnpm
-description: Install pinned pnpm, configure Node 24 and restore the pnpm store cache.
+name: Setup Node and pnpm cache
+description: Configure Node 24 and restore pnpm store paths without third-party setup actions.
 runs:
   using: composite
   steps:
-    - uses: pnpm/action-setup@v4
-      with:
-        version: 11.19.0
-        run_install: false
     - uses: actions/setup-node@v5
       with:
         node-version: '24'
-        cache: pnpm
-        cache-dependency-path: pnpm-lock.yaml
+    - uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local/share/pnpm/store
+          ~/AppData/Local/pnpm/store
+          ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
