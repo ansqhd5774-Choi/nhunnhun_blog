@@ -12,6 +12,18 @@ on:
       - 'authoring/update-producer.mjs'
       - 'publishing/content-standards.mjs'
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '공개 변경 없이 1건 생성·검토만 수행'
+        type: boolean
+        default: true
+      article_id:
+        description: 'dry_run 대상 숫자 URL ID'
+        type: string
+        default: '327'
+  workflow_run:
+    workflows: ['Validate and update Tistory posts']
+    types: [completed]
   pull_request:
     paths:
       - 'authoring/update-queue.txt'
@@ -19,11 +31,13 @@ on:
       - 'authoring/queue-*.mjs'
       - 'authoring/update-producer.mjs'
       - 'authoring/update-queue-finalize.mjs'
+      - 'authoring/update-queue-reconcile.mjs'
       - 'authoring/update-queue-dispatch.mjs'
       - 'authoring/update-queue-summary.mjs'
       - 'authoring/ollama.mjs'
       - 'authoring/keywords.mjs'
       - 'tests/update-queue.test.mjs'
+      - 'tests/queue-efficient.test.mjs'
       - 'publishing/content-standards.mjs'
       - 'publishing/standards/**'
       - 'tests/content-standards.test.mjs'
@@ -39,6 +53,7 @@ concurrency:
 
 jobs:
   test:
+    if: github.event_name != 'workflow_run'
     name: test-${{ matrix.suite }}
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
@@ -50,7 +65,7 @@ jobs:
       matrix:
         include:
           - suite: authoring
-            tests: tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
+            tests: tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs tests/queue-efficient.test.mjs
           - suite: content
             tests: tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs
     steps:
@@ -66,8 +81,8 @@ jobs:
       - run: node --test ${{ matrix.tests }}
 
   produce:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
-    needs: test
+    if: github.event_name != 'pull_request' && github.event_name != 'workflow_run' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
+    needs: [test, reconcile]
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     timeout-minutes: 120
     concurrency:
@@ -107,7 +122,8 @@ jobs:
         env:
           OLLAMA_MODEL: qwen3:4b
           OLLAMA_HOST: http://127.0.0.1:11434
-          QUEUE_WRITER_PARALLELISM: '2'
+          QUEUE_DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          QUEUE_ARTICLE_ID: ${{ inputs.article_id || '327' }}
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -142,14 +158,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
 
-  finalize:
-    if: needs.dispatch.result == 'success'
-    needs: [produce, dispatch]
+  reconcile:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
       run:
         shell: cmd
-    timeout-minutes: 30
+    timeout-minutes: 5
     permissions:
       contents: write
       actions: read
@@ -164,17 +179,14 @@ jobs:
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: 기존 update workflow 완료·공개 상태·원장 확인
-        run: node authoring/update-queue-finalize.mjs
+      - name: 기존 update 완료 상태 1회 확인 — 대기 없이 러너 반환
+        run: node authoring/update-queue-reconcile.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ARTICLE_ID: ${{ needs.produce.outputs.article_id }}
-          SOURCE_ID: ${{ needs.produce.outputs.source_id }}
-          SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
 
   summary:
     if: ${{ always() && github.event_name != 'pull_request' }}
-    needs: [test, produce, dispatch, finalize]
+    needs: [test, produce, dispatch, reconcile]
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
       run:

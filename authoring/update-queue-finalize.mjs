@@ -37,14 +37,14 @@ async function consumerRun(token,commitSha) {
   if(!response.ok) throw Error('E_QUEUE_FINALIZE_RUN_READ');
   return (await response.json()).workflow_runs.find(run=>run.event==='workflow_dispatch' && run.head_sha===commitSha);
 }
-export async function finalizeQueuedUpdate({sourceId,articleId,token,commitSha,timeoutMs=25*60*1000,pollMs=15000}={}){
+export async function finalizeQueuedUpdate({sourceId,articleId,token,commitSha,timeoutMs=0,pollMs=15000}={}){
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??'')||!/^\d+$/.test(articleId??'')||!token||!/^[a-f0-9]{40}$/.test(commitSha??''))throw new Error('E_QUEUE_FINALIZE_INPUT');
   const sourceFile=await getJsonFile(`updates/${sourceId}.json`,token);
   if(!sourceFile)throw new Error('E_QUEUE_FINALIZE_SOURCE');
   const source=sourceFile.value,expectedFingerprint=updateFingerprint(source),started=Date.now();
   if(source.articleId!==articleId || source.targetUrl!==`https://nhunnhun.tistory.com/${articleId}`) throw Error('E_QUEUE_FINALIZE_TARGET');
   let ledger=null;
-  while(Date.now()-started<timeoutMs){
+  do{
     ledger=(await getJsonFile(`publishing/update-state/${sourceId}.json`,token))?.value??null;
     const run=await consumerRun(token,commitSha);
     if(ledger?.phase==='updated'&&ledger.sourceCommit===commitSha&&ledger.verification&&ledger.fingerprint===expectedFingerprint&&ledger.url===source.targetUrl&&consumerMatches(run,commitSha)&&await publicMatches(source)){
@@ -56,8 +56,9 @@ export async function finalizeQueuedUpdate({sourceId,articleId,token,commitSha,t
     }
     if(ledger?.phase==='failed'&&ledger.publicMutationConfirmed===false)break;
     if(run?.status==='completed'&&run.conclusion!=='success')break;
+    if(timeoutMs===0)return {status:'PENDING',articleId,sourceId,consumerStatus:run?.status??'not-found'};
     await sleep(pollMs);
-  }
+  }while(Date.now()-started<timeoutMs);
   const statePath=`authoring/update-queue-state/${articleId}.json`,previous=await getJsonFile(statePath,token);
   const uncertain=!(ledger?.phase==='failed'&&ledger.publicMutationConfirmed===false);
   const value={...(previous?.value??{}),status:'BLOCKED',articleId,sourceId,blockedAt:new Date().toISOString(),error:uncertain?'E_QUEUE_MUTATION_UNCERTAIN':'E_QUEUE_UPDATE_NOT_COMPLETED',ledgerPhase:ledger?.phase??null,publicMutation:uncertain?null:false};

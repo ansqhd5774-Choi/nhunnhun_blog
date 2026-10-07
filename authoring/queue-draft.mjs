@@ -226,7 +226,7 @@ export async function reusableImages(root,item){
 function attribution(images){
   return images.map((x,i)=>`<li><a href="${esc(x.sourcePage)}">이미지 ${i+1} 원출처</a> — ${esc(x.author)}, ${esc(x.license)}</li>`).join('');
 }
-function glossaryPass(html){
+export function glossaryPass(html){
   const glossary=[];let out=html;
   for(const [term,explanation] of Object.entries(GLOSSARY_DEFS)){
     if(out.includes(term)&&!out.includes(explanation))out=out.replace(term,`${term}(${explanation})`);

@@ -10,7 +10,7 @@ const BLOG='https://nhunnhun.tistory.com';
 // R5.3 BASELINE 2 TRIGGER
 const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
 const STATE_DIR='authoring/update-queue-state';
-export const QUEUE_POLICY_VERSION='R5.3';
+export const QUEUE_POLICY_VERSION='R5.4';
 const LEGACY_BLOCKED_STATUSES=new Set(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW']);
 
 export function parseUpdateQueue(text){
@@ -92,6 +92,7 @@ function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now
   return Number.isFinite(stamp)&&now-stamp>130*60*1000;
 }
 export function shouldRetryState(qstate){
+  if(qstate?.error==='E_QUEUE_MUTATION_UNCERTAIN'||qstate?.publicMutation===null)return false;
   return LEGACY_BLOCKED_STATUSES.has(qstate?.status)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
 }
 export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
@@ -99,6 +100,8 @@ export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,curr
   const skipped=[];
   for(const item of items){
     const qstate=await readQueueState(root,item.articleId);
+    if(qstate?.error==='E_QUEUE_MUTATION_UNCERTAIN'||qstate?.publicMutation===null)
+      throw Object.assign(new Error('E_QUEUE_MUTATION_UNCERTAIN'),{queueState:qstate,item});
     if(qstate?.status==='RUNNING'&&!staleRunning(qstate,currentRunId)) throw Object.assign(new Error('E_QUEUE_ACTIVE'),{queueState:qstate,item});
     if(qstate?.status==='ERROR_SYSTEM') throw Object.assign(new Error('E_QUEUE_SYSTEM_REQUIRES_REVIEW'),{queueState:qstate,item});
     if(qstate?.status==='READY_FOR_UPDATE') throw Object.assign(new Error('E_QUEUE_AWAITING_UPDATE_EVIDENCE'),{queueState:qstate,item});
@@ -177,7 +180,7 @@ export async function restoreArchivedSources(root,ids) {
 export function queueSourceId(item,date,seed=''){
   const day=String(date).replaceAll('-','');
   let hash=0;for(const ch of `${item.articleId}:${item.keyword}:${seed}`) hash=(hash*33+ch.codePointAt(0))>>>0;
-  return `auto-${item.articleId}-r53-${day}-${hash.toString(16).padStart(8,'0').slice(0,8)}`;
+  return `auto-${item.articleId}-r54-${day}-${hash.toString(16).padStart(8,'0').slice(0,8)}`;
 }
 
 export async function cli(args=process.argv.slice(2),env=process.env){

@@ -31,11 +31,12 @@ export const CURATED_QUEUE_QUERIES=Object.freeze({
 });
 
 const plain=html=>sanitizeHtml(String(html),{allowedTags:[],allowedAttributes:{}}).replace(/\s+/g,' ').trim();
-export function sourceMainText(html) {
+export function sourceMainText(html,{article=false}={}) {
   const doc=parseDocument(html);
   const find=(node,name)=>[...(node.name===name?[node]:[]),...(node.children??[]).flatMap(child=>find(child,name))];
   const text=node=>['script','style','nav','header','footer'].includes(node.name)?'':node.type==='text'?node.data:(node.children??[]).map(text).join(' ');
-  return text(find(doc,'main')[0]??find(doc,'body')[0]??doc).replace(/\s+/g,' ').trim();
+  const articleBody=node=>String(node.attribs?.class??'').split(/\s+/).includes('contents_style')?node:(node.children??[]).map(articleBody).find(Boolean);
+  return text((article?articleBody(doc):null)??find(doc,'main')[0]??find(doc,'body')[0]??doc).replace(/\s+/g,' ').trim();
 }
 const decode=v=>String(v).replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 const safeId=(host,index)=>`web-${index}-${host.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase().slice(0,28)||'source'}`;
@@ -63,7 +64,7 @@ export function classifyWebSource(url,domain){
   const nutrition=domain==='food'&&/(usda\.gov$|foodsafetykorea\.go\.kr$)/.test(host);
   return {kind:official?'official':'article',role:authorization?'authorization':nutrition?'nutrition':'health'};
 }
-async function fetchSource(url,domain,index,fetcher){
+export async function fetchSource(url,domain,index,fetcher){
   let response;try{response=await fetcher(url,{headers:{'User-Agent':'Mozilla/5.0 nhunnhun-review-bot'},redirect:'follow',signal:AbortSignal.timeout(25000)});}catch{return null;}
   if(!response.ok)return null;
   const type=(response.headers?.get?.('content-type')||'').toLowerCase();
