@@ -7,6 +7,11 @@ import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, 
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
+import '../authoring/queue-research.mjs';
+import '../authoring/queue-draft.mjs';
+import '../authoring/queue-review.mjs';
+import '../authoring/update-producer.mjs';
+import '../authoring/update-queue-finalize.mjs';
 
 test('queue parses category keyword and canonical existing URL in order',()=>{
   const rows=parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n영양소 - 아연 - https://nhunnhun.tistory.com/314\n약 - CPC - https://nhunnhun.tistory.com/277\n');
