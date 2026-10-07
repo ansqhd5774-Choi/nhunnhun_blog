@@ -1,0 +1,208 @@
+{
+  "status": "BLOCKED_GENERATION",
+  "item": {
+    "id": "q-335",
+    "order": 62,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "통밀빵",
+    "articleId": "335",
+    "targetUrl": "https://nhunnhun.tistory.com/335"
+  },
+  "sourceId": "auto-335-r1-20261007-88368891",
+  "baseSha": "f4584088162d1ff0fe65351593561257c4245bec",
+  "startedAt": "2026-10-07T06:42:33.253Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    },
+    {
+      "articleId": "339"
+    },
+    {
+      "articleId": "312"
+    },
+    {
+      "articleId": "330"
+    },
+    {
+      "articleId": "296"
+    },
+    {
+      "articleId": "120"
+    },
+    {
+      "articleId": "240"
+    },
+    {
+      "articleId": "196"
+    },
+    {
+      "articleId": "130"
+    },
+    {
+      "articleId": "326"
+    },
+    {
+      "articleId": "309"
+    },
+    {
+      "articleId": "318"
+    },
+    {
+      "articleId": "136"
+    },
+    {
+      "articleId": "315"
+    },
+    {
+      "articleId": "47"
+    },
+    {
+      "articleId": "127"
+    },
+    {
+      "articleId": "247"
+    },
+    {
+      "articleId": "73"
+    },
+    {
+      "articleId": "283"
+    },
+    {
+      "articleId": "329"
+    },
+    {
+      "articleId": "204"
+    },
+    {
+      "articleId": "325"
+    },
+    {
+      "articleId": "131"
+    },
+    {
+      "articleId": "338"
+    },
+    {
+      "articleId": "248"
+    },
+    {
+      "articleId": "324"
+    },
+    {
+      "articleId": "359"
+    },
+    {
+      "articleId": "328"
+    },
+    {
+      "articleId": "322"
+    },
+    {
+      "articleId": "344"
+    },
+    {
+      "articleId": "332"
+    },
+    {
+      "articleId": "241"
+    },
+    {
+      "articleId": "48"
+    },
+    {
+      "articleId": "79"
+    },
+    {
+      "articleId": "278"
+    },
+    {
+      "articleId": "49"
+    }
+  ],
+  "blockedAt": "2026-10-07T06:43:45.271Z",
+  "error": "E_OLLAMA_LENGTH_LIMIT",
+  "details": {
+    "outputTokens": 2000,
+    "promptTokens": 2952
+  },
+  "publicMutation": false
+}
