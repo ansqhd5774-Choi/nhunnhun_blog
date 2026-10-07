@@ -112,6 +112,7 @@ jobs:
         with:
           ref: ${{ needs.produce.outputs.commit_sha }}
           fetch-depth: 1
+          sparse-checkout: authoring
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
@@ -155,8 +156,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
+      - uses: ./.github/actions/setup-node-pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Queue 성공·실패·남은 항목 요약
         run: node authoring/update-queue-summary.mjs
