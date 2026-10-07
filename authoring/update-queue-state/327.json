@@ -1,5 +1,5 @@
 {
-  "status": "SKIPPED",
+  "status": "PENDING_RETRY",
   "policyVersion": "R5.3",
   "runId": "37675087533",
   "item": {
@@ -17,8 +17,6 @@
   "heartbeatAt": "2026-10-07T19:34:53.894Z",
   "recovered": false,
   "skippedCurrent": [],
-  "failedAt": "2026-10-07T19:34:54.781Z",
-  "error": "E_QUEUE_EXISTING_UPDATE_PENDING",
-  "details": null,
-  "publicMutation": false
+  "publicMutation": false,
+  "retryReason": "R5.3 baseline 3: curated section evidence + confirmed internal links"
 }
