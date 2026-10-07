@@ -68,7 +68,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   const running={
     status:'RUNNING',policyVersion:QUEUE_POLICY_VERSION,runId:process.env.GITHUB_RUN_ID??null,item,sourceId,baseSha,
     startedAt:new Date().toISOString(),heartbeatAt:new Date().toISOString(),recovered:selected.recovered===true,
-    skippedCurrent:selected.skipped.map(x=>({articleId:x.articleId,sourceId:x.sourceId??null,status:x.skipStatus??x.legacyStatus??null}))
+    skippedCurrent:selected.skipped.map(x=>({articleId:x.articleId,sourceId:x.sourceId??null,status:x.skipStatus??x.blockedStatus??null}))
   };
   await writeQueueState(root,item.articleId,running);
 
