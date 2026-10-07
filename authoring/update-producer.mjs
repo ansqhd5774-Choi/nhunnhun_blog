@@ -46,6 +46,20 @@ async function commitPaths(root,item,sourceId,message,archivedIds=[]){
   git(['push','origin','HEAD:main'],root);
   return git(['rev-parse','HEAD'],root);
 }
+async function commitBlockedStateBatch(root,{excludeArticleId=null,force=false,batchSize=5}={}){
+  const prefix='authoring/update-queue-state/';
+  const changed=changedPaths(root).map(path=>path.replaceAll('\\','/'));
+  const statePaths=changed.filter(path=>path.startsWith(prefix)&&(!excludeArticleId||path!==`${prefix}${excludeArticleId}.json`));
+  if(!statePaths.length||(!force&&statePaths.length<batchSize))return null;
+  const bad=changed.filter(path=>!path.startsWith(prefix));
+  if(bad.length)throw Object.assign(new Error('E_QUEUE_STATE_BATCH_DIFF'),{details:{bad}});
+  git(['config','user.name','nhunnhun-ollama'],root);
+  git(['config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],root);
+  git(['add','--',...statePaths]);
+  git(['commit','-m',`chore(authoring): checkpoint ${statePaths.length} queue states`],root);
+  git(['push','origin','HEAD:main'],root);
+  return git(['rev-parse','HEAD'],root);
+}
 function writeOutput(values){
   if(!process.env.GITHUB_OUTPUT)return;
   const fs=requireNodeFs();
@@ -65,15 +79,15 @@ function blockStatus(error){
 }
 function itemLevelBlock(status){return status!=='BLOCKED_SYSTEM';}
 
-export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,batchStartedAt=Date.now(),maxRuntimeMinutes=Number(process.env.QUEUE_MAX_RUNTIME_MINUTES||90)}={}){
+export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,batchStartedAt=Date.now(),maxRuntimeMinutes=Number(process.env.QUEUE_MAX_RUNTIME_MINUTES||90),metrics=[]}={}){
   assertLocalOnly(process.env);
-  const baseSha=git(['rev-parse','HEAD'],root);
+  let baseSha=git(['rev-parse','HEAD'],root);
   if(baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
   const selected=await selectNextQueueItem(root,{fetcher});
   if(!selected.item){console.log('QUEUE_COMPLETE');onOutput?.({complete:'true'});return {complete:true};}
-  const item=selected.item,sourceId=queueSourceId(item,todayInSeoul(),baseSha.slice(0,12));
+  const item=selected.item,sourceId=queueSourceId(item,todayInSeoul(),baseSha.slice(0,12)),itemStartedAt=Date.now();
   const running={
-    status:'RUNNING',item,sourceId,baseSha,startedAt:new Date().toISOString(),
+    status:'RUNNING',policyVersion:'R4.1',item,sourceId,baseSha,startedAt:new Date().toISOString(),
     skippedCurrent:selected.skipped.map(x=>({articleId:x.articleId,sourceId:x.sourceId}))
   };
   await writeQueueState(root,item.articleId,running);
@@ -87,10 +101,14 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   };
   try{
     const current=await fetchPublic(item,fetcher);
+    const evidenceStarted=Date.now();
     const evidence=await collectEvidence(item,current.html,{model,fetcher});
+    const evidenceMs=Date.now()-evidenceStarted;
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,baseSha});
 
+    const planStarted=Date.now();
     const planned=await planArticle(item,evidence,{model,fetcher,currentTitle:current.title});
+    const planMs=Date.now()-planStarted;
     await checkpoint('plan',{scope:planned.scope,required:planned.required,selectedSourceIds:planned.sources.map(s=>s.id),plan:planned.plan});
     await checkpoint('plan-validation',{failures:planned.failures});
     if(planned.failures.length)throw Object.assign(new Error('E_QUEUE_PLAN_VALIDATION'),{details:{failures:planned.failures,scope:planned.scope}});
@@ -98,7 +116,9 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const extensions=conservativeExtensions(item);
     await checkpoint('scope',{currentTitle:current.title,scope:planned.scope,lengthBand:lengthBandForScope(planned.scope),extensions});
 
-    let draft=await writeArticleFromPlan(item,planned.plan,planned.scope,{model,fetcher});
+    const draftStarted=Date.now();
+    let draft=await writeArticleFromPlan(item,planned.plan,planned.scope,{model,fetcher,parallel:process.env.OLLAMA_SECTION_PARALLEL!=='false'});
+    const draftMs=Date.now()-draftStarted;
     await checkpoint('draft-v1',draft);
     let draftFailures=validateWrittenArticle(draft,planned.plan);
     await checkpoint('validation-v1',{failures:draftFailures});
@@ -120,6 +140,8 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const required=planned.required,lengthReport=buildLengthReport(article,planned.scope);
     await checkpoint('draft-final',{article,required});
     await checkpoint('length-report',lengthReport);
+    const metric={articleId:item.articleId,keyword:item.keyword,status:'DRAFT_VALID',evidenceMs,planMs,draftMs,totalMs:Date.now()-itemStartedAt,scope:planned.scope,visibleCharacters:lengthReport.visibleCharacters,planRepaired:planned.repaired};
+    metrics.push(metric);await checkpoint('metrics',metric);
 
     const images=await reusableImages(root,item);
     const rendered=renderBody(article,evidence,images);
@@ -137,6 +159,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     assertImageReview(source);
     checkUpdateSource(source,`${sourceId}.json`);
     renderEditorialPost(source);
+    if(commit){const flushed=await commitBlockedStateBatch(root,{excludeArticleId:item.articleId,force:true});if(flushed)baseSha=flushed;}
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
     archivedIds=await archiveCompletedSources(root,item);
     operationalWritten=true;
@@ -158,12 +181,17 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     }
     if(archivedIds.length) await restoreArchivedSources(root,archivedIds);
     const status=blockStatus(error),code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED';
-    await writeQueueState(root,item.articleId,{...running,status,blockedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false});
-    if(commit&&remoteMain(root)===baseSha)await commitPaths(root,item,sourceId,`chore(authoring): block queued rewrite ${item.articleId}`);
+    const blockedState={...running,status,blockedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false};
+    await writeQueueState(root,item.articleId,blockedState);
+    await checkpoint('blocked-state',blockedState);
+    metrics.push({articleId:item.articleId,keyword:item.keyword,status,error:code,totalMs:Date.now()-itemStartedAt});
+    await writeFile(resolve(resultDir,'metrics-summary.json'),JSON.stringify(metrics,null,2)+'\n');
     if(itemLevelBlock(status)){
       const elapsedMinutes=(Date.now()-batchStartedAt)/60000;
+      if(commit&&remoteMain(root)===baseSha){const flushed=await commitBlockedStateBatch(root,{batchSize:5});if(flushed)baseSha=flushed;}
       console.log('QUEUE_ITEM_BLOCKED_CONTINUE '+JSON.stringify({articleId:item.articleId,status,error:code,blockedCount:blockedCount+1,elapsedMinutes:Number(elapsedMinutes.toFixed(1))}));
-      if(elapsedMinutes<maxRuntimeMinutes)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,batchStartedAt,maxRuntimeMinutes});
+      if(elapsedMinutes<maxRuntimeMinutes)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,batchStartedAt,maxRuntimeMinutes,metrics});
+      if(commit&&remoteMain(root)===baseSha)await commitBlockedStateBatch(root,{force:true});
       console.log('QUEUE_BATCH_TIME_LIMIT '+JSON.stringify({maxRuntimeMinutes,blockedCount:blockedCount+1}));
       onOutput?.({complete:'false'});
       return {blocked:true,item,status,error:code};

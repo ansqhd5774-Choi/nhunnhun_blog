@@ -66,15 +66,19 @@ export function isTopicSpecificSource(source,query){
 }
 export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const query=await englishQuery(item,{model,fetcher});
-  let pubmed=[];try{pubmed=await research(query,fetcher,{retmax:5,sort:'pub date'});}catch{}
-  const web=[];let index=0;
-  for(const url of externalLinks(publicHtml)){const source=await fetchSource(url,item.domain,++index,fetcher);if(source)web.push(source);}
-  if(item.domain==='food') {
-    for(const [url,role] of [['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']]) {
-      const source=await fetchSource(url,item.domain,++index,fetcher);
-      if(source) web.unshift({...source,kind:'official',role,scopeNote:'일반 채소 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'});
-    }
-  }
+  const links=externalLinks(publicHtml);
+  const generic=item.domain==='food'?[
+    ['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],
+    ['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']
+  ]:[];
+  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date'}).catch(()=>[]);
+  const webPromise=Promise.all(links.map((url,index)=>fetchSource(url,item.domain,index+1,fetcher))).then(values=>values.filter(Boolean));
+  const genericPromise=Promise.all(generic.map(async([url,role],index)=>{
+    const source=await fetchSource(url,item.domain,links.length+index+1,fetcher);
+    return source?{...source,kind:'official',role,scopeNote:'일반 채소 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'}:null;
+  })).then(values=>values.filter(Boolean));
+  const [pubmed,web,genericSources]=await Promise.all([pubmedPromise,webPromise,genericPromise]);
+  web.unshift(...genericSources);
   const map=new Map();
   for(const s of [...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))])if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));

@@ -24,20 +24,26 @@ export function conservativeExtensions(item){
   }]));
 }
 
-function writerSchema(plan){
-  const ids=plan.sections.map(s=>s.id);
-  return {type:'object',additionalProperties:false,required:['title','lead','summary','sections'],properties:{
-    title:{type:'string',minLength:8,maxLength:150},
-    lead:{type:'string',minLength:30,maxLength:220},
-    summary:{type:'string',minLength:30,maxLength:220},
-    sections:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','paragraphs','strongPhrase','highlightPhrase','underlinePhrase'],properties:{
-      id:{type:'string',enum:ids},
-      paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:30,maxLength:190}},
-      strongPhrase:{type:'string',minLength:2,maxLength:70},
-      highlightPhrase:{type:'string',minLength:2,maxLength:70},
-      underlinePhrase:{type:'string',maxLength:60}
-    }}}
-  }};
+function sectionSchema(ids){
+  return {type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','paragraphs','strongPhrase','highlightPhrase','underlinePhrase'],properties:{
+    id:{type:'string',enum:ids},
+    paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:30,maxLength:190}},
+    strongPhrase:{type:'string',minLength:2,maxLength:70},
+    highlightPhrase:{type:'string',minLength:2,maxLength:70},
+    underlinePhrase:{type:'string',maxLength:60}
+  }}};
+}
+function writerGroupSchema(ids,{withMeta=false}={}){
+  const properties={sections:sectionSchema(ids)},required=['sections'];
+  if(withMeta){
+    Object.assign(properties,{
+      title:{type:'string',minLength:8,maxLength:150},
+      lead:{type:'string',minLength:30,maxLength:220},
+      summary:{type:'string',minLength:30,maxLength:220},
+    });
+    required.unshift('title','lead','summary');
+  }
+  return {type:'object',additionalProperties:false,required,properties};
 }
 function patchSchema(ids){
   return {type:'object',additionalProperties:false,required:['sections'],properties:{
@@ -59,12 +65,16 @@ function claimBundle(plan){
     approvedClaims:section.claims.map(({id,text,type,risk})=>({id,text,type,risk}))
   }));
 }
-export async function writeArticleFromPlan(item,plan,scope,{model,fetcher=fetch}={}){
-  const [min,max]=lengthBandForScope(scope);
-  return ollamaJson([
-    {role:'system',content:`한국어 건강정보 글 작성자다. 이미 코드 검증을 통과한 Evidence Plan만 자연스러운 본문으로 변환한다. canonicalSubject는 "${item.keyword}"이며 다른 대상으로 바꾸지 않는다. 새로운 사실·수치·효능·용량·상호작용·질병효과를 추가하지 않는다. 각 section의 approvedClaims만 설명하고, 그 범위 안에서 연결문장·쉬운 풀이만 덧붙인다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이지만 글자수를 채우려고 반복하지 않는다. 답이 끝나면 즉시 완전한 JSON을 닫는다. section id는 plan과 정확히 일치해야 한다. strongPhrase, highlightPhrase는 paragraphs 안에 실제 존재하는 서로 다른 짧은 구절을 그대로 복사한다. underlinePhrase도 필요한 경우 paragraphs의 실제 구절을 복사하고 필요 없으면 빈 문자열이다. 강조를 위해 새로운 문장을 만들지 않는다. 같은 내용을 표현만 바꿔 반복하지 않는다. JSON만 출력한다.`},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,scope,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,sections:claimBundle(plan)})}
-  ],writerSchema(plan),{model,fetcher,numPredict:writerBudget(scope),numCtx:12288});
+export async function writeArticleFromPlan(item,plan,scope,{model,fetcher=fetch,parallel=true}={}){
+  const [min,max]=lengthBandForScope(scope),all=claimBundle(plan);
+  const midpoint=Math.ceil(all.length/2),groups=[all.slice(0,midpoint),all.slice(midpoint)].filter(group=>group.length);
+  const baseSystem=`한국어 건강정보 글 작성자다. 이미 코드 검증을 통과한 Evidence Plan만 자연스러운 본문으로 변환한다. canonicalSubject는 "${item.keyword}"이며 다른 대상으로 바꾸지 않는다. 새로운 사실·수치·효능·용량·상호작용·질병효과를 추가하지 않는다. 각 section의 approvedClaims만 설명하고 그 범위 안에서 연결문장·쉬운 풀이만 덧붙인다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이지만 글자수를 채우려고 반복하지 않는다. section id는 plan과 정확히 일치해야 한다. strongPhrase, highlightPhrase는 paragraphs 안의 실제 존재하는 서로 다른 짧은 구절을 그대로 복사한다. underlinePhrase도 필요한 경우 본문 구절을 복사하고 필요 없으면 빈 문자열이다. 같은 내용을 반복하지 않는다. JSON만 출력한다.`;
+  const runGroup=(sections,index)=>ollamaJson([
+    {role:'system',content:baseSystem+(index===0?' 이 그룹은 문서 제목·도입·핵심요약도 함께 작성한다.':' 이 그룹은 sections만 작성한다.')},
+    {role:'user',content:JSON.stringify({keyword:item.keyword,scope,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,sections})}
+  ],writerGroupSchema(sections.map(s=>s.id),{withMeta:index===0}),{model,fetcher,numPredict:Math.max(1800,Math.ceil(writerBudget(scope)/groups.length)+500),numCtx:12288});
+  const results=parallel&&groups.length>1?await Promise.all(groups.map(runGroup)):await groups.reduce(async(accP,group,index)=>{const acc=await accP;acc.push(await runGroup(group,index));return acc;},Promise.resolve([]));
+  return {title:results[0].title,lead:results[0].lead,summary:results[0].summary,sections:results.flatMap(result=>result.sections)};
 }
 
 function numericTokens(text){
