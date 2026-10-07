@@ -1,0 +1,27 @@
+{
+  "state": "draft-created-needs-editor-review",
+  "provider": "ollama-local",
+  "model": "qwen3:4b",
+  "jobDigest": "fcac757351b0c1d1c9d906c6051177e7a7d8be0dde33a97706dcaa9700f78239",
+  "sourceCommit": null,
+  "startedAt": "2026-10-07T00:16:52.929Z",
+  "sourcesCheckedAt": [
+    "2026-10-07",
+    "2026-10-07",
+    "2026-10-07"
+  ],
+  "receivedChunks": 44,
+  "receivedCharacters": 180,
+  "lastProgressAt": "2026-10-07T00:16:53.989Z",
+  "generationMode": "evidence-bound-outline",
+  "completedAt": "2026-10-07T00:16:54.007Z",
+  "promptTokens": 418,
+  "outputTokens": 44,
+  "remaining": [
+    "image-review",
+    "source-recheck",
+    "R1-review",
+    "R4-render-review",
+    "explicit-update-approval"
+  ]
+}
