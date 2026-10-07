@@ -92,7 +92,7 @@ async function usdaNutritionSource(query,fetcher){
   const nutrients=(food.foodNutrients??[]).filter(n=>Number.isFinite(Number(n?.value))&&n?.nutrientName&&n?.unitName).slice(0,40);
   const notes=[
     `USDA FoodData Central food: ${food.description}.`,
-    'Nutrient values in this search result are reported on the database basis; use the displayed serving/basis exactly as provided and do not infer a recommended intake.',
+    'FoodData Central nutrient amounts are expressed per 100 g of food for the database nutrient record. These values are composition data, not a recommended intake.',
     ...nutrients.map(n=>`${n.nutrientName}: ${n.value} ${n.unitName}`)
   ].join(' ');
   return {
@@ -103,7 +103,7 @@ async function usdaNutritionSource(query,fetcher){
     notes:notes.slice(0,6000),
     kind:'nutrition-database',
     role:'nutrition',
-    scopeNote:'USDA FoodData Central 검색 결과의 식품 영양자료다. 표시된 식품·기준·단위만 사용하며 권장 섭취량으로 확대하지 않는다.'
+    scopeNote:'USDA FoodData Central 식품 영양자료다. 영양소 amount는 식품 100 g 기준으로 해석하며 권장 섭취량으로 확대하지 않는다.'
   };
 }
 
