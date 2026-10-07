@@ -1,0 +1,146 @@
+{
+  "articleId": "327",
+  "keyword": "가지",
+  "canonical": "Solanum melongena",
+  "sources": [
+    {
+      "id": "cur-usda-eggplant",
+      "title": "USDA National Nutrient Database SR28 — Eggplant, raw (NDB 11209)",
+      "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg11.pdf",
+      "kind": "nutrition-database",
+      "role": "nutrition",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-ucd-eggplant",
+      "title": "UC Davis Postharvest Research and Extension Center — Eggplant",
+      "url": "https://postharvest.ucdavis.edu/ar/produce-facts-sheets/eggplant",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-pubmed-30064803",
+      "title": "Health benefits and bioactive compounds of eggplant",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30064803/",
+      "kind": "systematic-review",
+      "role": "health",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-pubmed-31744060",
+      "title": "Daily Ingestion of Eggplant Powder Improves Blood Pressure and Psychological State in Stressed Individuals",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31744060/",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-pubmed-10973133",
+      "title": "Eggplant infusion has a modest and transitory effect on hypercholesterolemic subjects",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/10973133/",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-pubmed-34434275",
+      "title": "Solanum melongena allergy — a comprehensive review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34434275/",
+      "kind": "systematic-review",
+      "role": "safety",
+      "checkedAt": "2026-10-08"
+    },
+    {
+      "id": "cur-fda-produce",
+      "title": "FDA — Selecting and Serving Produce Safely",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-08"
+    }
+  ],
+  "sections": {
+    "s1": {
+      "sourceIds": [
+        "cur-pubmed-30064803",
+        "cur-ucd-eggplant"
+      ],
+      "facts": [
+        "가지는 학명 Solanum melongena인 가지과의 열매채소이며 세계 여러 지역에서 재배된다.",
+        "시중 가지는 품종에 따라 길이·모양·색이 다양하며, 표준 보라색 가지 외에 일본형·중국형·흰색 품종도 있다.",
+        "표준 보라색 가지는 단단함과 표면의 윤기, 신선한 녹색 꼭지가 품질을 판단하는 핵심 기준이다."
+      ]
+    },
+    "s2": {
+      "sourceIds": [
+        "cur-usda-eggplant",
+        "cur-pubmed-30064803"
+      ],
+      "facts": [
+        "USDA SR28 기준 생가지 100g은 약 25kcal, 탄수화물 5.88g, 식이섬유 3.0g, 단백질 0.98g, 지방 0.18g이다.",
+        "생가지 100g의 칼륨은 약 229mg, 비타민 C는 약 2.2mg, 비타민 K는 약 3.5µg이다. 따라서 비타민 C나 K가 특별히 고함량인 식품으로 표현하지 않는다.",
+        "보라색 껍질에는 안토시아닌을 포함한 페놀성 화합물이 있으며, 가지의 생리활성 성분 연구에서 중요한 부분을 차지한다."
+      ]
+    },
+    "s3": {
+      "sourceIds": [
+        "cur-pubmed-31744060",
+        "cur-pubmed-10973133",
+        "cur-pubmed-30064803"
+      ],
+      "facts": [
+        "일반적인 가지를 꾸준히 먹는다고 모든 사람에게 정해진 신체 변화가 생기는 것은 아니다. 현실적인 장점은 저열량 채소와 식이섬유를 식단에 추가하는 것이다.",
+        "100명의 정상고혈압·1기 고혈압 및 스트레스 참가자를 대상으로 한 무작위시험에서 가지 분말 1.2g/day을 12주 섭취했을 때 일부 혈압 및 심리 지표 개선이 보고됐다. 이 결과는 분말 캡슐 연구이므로 평범한 가지 반찬의 동일 효과로 확대하지 않는다.",
+        "고콜레스테롤 환자 38명의 5주 가지 추출 음료 연구에서는 대조군 대비 뚜렷한 콜레스테롤 개선이 확인되지 않았고 효과는 modest/transitory로 평가됐다."
+      ]
+    },
+    "s4": {
+      "sourceIds": [
+        "cur-usda-eggplant"
+      ],
+      "facts": [
+        "가지 자체의 단백질은 100g당 약 1g이므로 두부·콩·닭고기·생선 같은 단백질 식품과 함께 먹으면 한 끼 영양 구성이 보완된다.",
+        "토마토·마늘은 가지와 조리 궁합이 좋은 재료지만, 특정 질병을 예방하는 특별한 시너지로 단정할 직접 근거는 없다.",
+        "가지는 기름을 잘 흡수하는 식재료이므로 올리브오일 등은 풍미를 높이는 정도로 소량 사용하면 열량 증가를 줄일 수 있다."
+      ]
+    },
+    "s5": {
+      "sourceIds": [
+        "cur-fda-produce",
+        "cur-pubmed-34434275",
+        "cur-ucd-eggplant"
+      ],
+      "facts": [
+        "신선 농산물은 먹기 전에 흐르는 물로 충분히 씻고, 멍들거나 손상된 부위는 잘라내며, 비누나 세제를 사용해 씻지 않는다.",
+        "가지 알레르기는 흔하지 않지만 문헌에 보고돼 있으며 위장관·피부·호흡기 증상 등이 나타날 수 있다.",
+        "가지는 저온장해에 민감한 작물이라 10°C 아래에 여러 날 두면 표면 함몰·갈변 등 품질 저하가 생길 수 있다."
+      ]
+    },
+    "s6": {
+      "sourceIds": [
+        "cur-ucd-eggplant",
+        "cur-fda-produce"
+      ],
+      "facts": [
+        "표준 보라색 가지는 껍질이 진한 보라색이고 윤기가 나며 단단한 것을 고른다.",
+        "꼭지가 신선한 녹색이고, 멍·상처·부패가 없으며 크기에 비해 탄탄한 것을 고른다.",
+        "지나치게 익은 가지는 속이 푸석해지고 쓴맛이 강해질 수 있다."
+      ]
+    }
+  },
+  "internalLinks": [
+    {
+      "label": "비타민 C",
+      "url": "https://nhunnhun.tistory.com/93"
+    },
+    {
+      "label": "토마토",
+      "url": "https://nhunnhun.tistory.com/125"
+    },
+    {
+      "label": "마늘",
+      "url": "https://nhunnhun.tistory.com/146"
+    }
+  ]
+}
