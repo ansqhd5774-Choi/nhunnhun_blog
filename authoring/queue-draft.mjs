@@ -194,13 +194,32 @@ export function buildLengthReport(article,scope){
   };
 }
 
+function validReusableImageSet(source){
+  if(!Array.isArray(source?.imageReview)||source.imageReview.length<3)return null;
+  const images=source.imageReview.slice(0,3);
+  if(images.every(x=>x?.visualChecked===true&&x.src&&x.sourcePage&&x.author&&x.license)&&images[0].role==='hero'&&images[0].composition==='closeup')return images;
+  return null;
+}
+async function jsonFiles(root,dir){
+  try{return (await readdir(resolve(root,dir))).filter(n=>n.endsWith('.json')).sort().reverse();}catch(error){if(error?.code==='ENOENT')return [];throw error;}
+}
 export async function reusableImages(root,item){
-  const files=(await readdir(resolve(root,'updates'))).filter(n=>n.endsWith('.json')).sort().reverse();
-  for(const file of files){
-    let source;try{source=JSON.parse(await readFile(resolve(root,'updates',file),'utf8'));}catch{continue;}
-    if(source.articleId!==item.articleId||!Array.isArray(source.imageReview)||source.imageReview.length<3)continue;
-    const images=source.imageReview.slice(0,3);
-    if(images.every(x=>x?.visualChecked===true&&x.src&&x.sourcePage&&x.author&&x.license)&&images[0].role==='hero'&&images[0].composition==='closeup')return images;
+  // 1) Exact article update/archive evidence always wins.
+  for(const dir of ['updates','authoring/update-source-archive']){
+    for(const file of await jsonFiles(root,dir)){
+      let source;try{source=JSON.parse(await readFile(resolve(root,dir,file),'utf8'));}catch{continue;}
+      if(source.articleId!==item.articleId)continue;
+      const images=validReusableImageSet(source);if(images)return images;
+    }
+  }
+  // 2) Reuse already visually reviewed Commons assets from a newer post about the same named subject.
+  // Avoid one-character keywords because substring matching would be too broad.
+  if(String(item.keyword??'').trim().length>=2){
+    for(const file of await jsonFiles(root,'posts')){
+      let source;try{source=JSON.parse(await readFile(resolve(root,'posts',file),'utf8'));}catch{continue;}
+      if(!String(source.title??'').includes(item.keyword))continue;
+      const images=validReusableImageSet(source);if(images)return images;
+    }
   }
   throw new Error('E_QUEUE_IMAGE_REVIEW_REQUIRED');
 }

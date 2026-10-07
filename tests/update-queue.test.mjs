@@ -8,14 +8,14 @@ import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources,shouldRetryState,QUEUE_POLICY_VERSION } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
-import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource} from '../authoring/queue-research.mjs';
+import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource,classifyEvidenceSufficiency,CURATED_QUEUE_QUERIES} from '../authoring/queue-research.mjs';
 import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan} from '../authoring/queue-draft.mjs';
-import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton} from '../authoring/queue-plan.mjs';
+import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan,reusableImages} from '../authoring/queue-draft.mjs';
+import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton,deterministicClaimType,deterministicClaimRisk} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -27,6 +27,14 @@ test('queue parses category keyword and canonical existing URL in order',()=>{
   assert.deepEqual(rows.map(x=>[x.order,x.domain,x.keyword,x.articleId]),[[1,'food','가지','327'],[2,'nutrient','아연','314'],[3,'medicine','CPC','277']]);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 가지2 - https://nhunnhun.tistory.com/327'),/E_QUEUE_DUPLICATE_ARTICLE/);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https:\\//nhunnhun.tistory.com/327'),/E_QUEUE_ROW_1/);
+});
+
+test('R5.2 has a pinned canonical English query for every queued keyword',async()=>{
+  const queue=parseUpdateQueue(await readFile(new URL('../authoring/update-queue.txt',import.meta.url),'utf8'));
+  const missing=[...new Set(queue.map(item=>item.keyword).filter(keyword=>!CURATED_QUEUE_QUERIES[keyword]))];
+  assert.deepEqual(missing,[]);
+  assert.equal(CURATED_QUEUE_QUERIES['잣'],'pine nut');
+  assert.equal(CURATED_QUEUE_QUERIES['CPC'],'cetylpyridinium chloride');
 });
 
 test('queue automation refuses paid external AI keys and remote Ollama hosts',()=>{
@@ -75,7 +83,7 @@ test('selector skips item-level BLOCKED state and continues with the next keywor
     await mkdir(join(root,'content-reviews','updates'),{recursive:true});
     await mkdir(join(root,'publishing','update-state'),{recursive:true});
     await writeFile(join(root,'authoring','update-queue.txt'),'음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 바나나 - https://nhunnhun.tistory.com/328\n');
-    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_DRAFT_VALIDATION'}));
+    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_DRAFT_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}));
     const fetcher=async()=>({ok:true,text:async()=>'<meta property="og:title" content="현재 글">'});
     const selected=await selectNextQueueItem(root,{fetcher});
     assert.equal(selected.item.articleId,'328');
@@ -92,9 +100,11 @@ test('USDA nutrition rate limit is evidence degradation, not a content failure',
   assert.equal(result.status,'rate-limited');
 });
 
-test('R5 automatically retries legacy plan-validation blocks but skips current-policy blocks',async()=>{
+test('R5.2 retries repairable legacy blocks but skips current-policy blocks',async()=>{
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),true);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:'R5'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_EVIDENCE',error:'E_QUEUE_RESEARCH_HIGH_QUALITY',policyVersion:'R5.1'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_GENERATION',error:'E_OLLAMA_LENGTH_LIMIT',policyVersion:'R5.1'}),true);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}),false);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:QUEUE_POLICY_VERSION}),false);
   const root=await mkdtemp(join(tmpdir(),'queue-r5-retry-'));
@@ -109,6 +119,26 @@ test('R5 automatically retries legacy plan-validation blocks but skips current-p
     assert.equal(selected.item.articleId,'327');
     assert.equal(selected.recovered,true);
   }finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('R5.2 derives claim type and risk in code instead of trusting model labels',()=>{
+  const food={domain:'food'};
+  const benefitSection={id:'benefits-amount'};
+  assert.equal(deterministicClaimType(food,benefitSection,'이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'benefit');
+  assert.equal(deterministicClaimRisk('benefit','이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'low');
+  assert.equal(deterministicClaimType({domain:'nutrient'},{id:'safety-interactions'},'확인되지 않은 상호작용은 단정하지 않습니다.'),'general');
+  assert.equal(deterministicClaimRisk('general','확인되지 않은 상호작용은 단정하지 않습니다.'),'low');
+  assert.equal(deterministicClaimType({domain:'medicine'},{id:'audience-amount-use'},'1회 500 mg을 복용합니다.'),'dose');
+  assert.equal(deterministicClaimRisk('dose','1회 500 mg을 복용합니다.'),'high');
+});
+
+test('R5.2 evidence sufficiency is domain-specific instead of requiring two strong sources everywhere',()=>{
+  const nutrientSources=[{id:'pmid-1',kind:'article',role:'health',topicSpecific:true,title:'Niacin review',notes:'niacin evidence'}];
+  assert.deepEqual(classifyEvidenceSufficiency({domain:'nutrient'},nutrientSources),{directCount:1,strongCount:0,claimMode:'conservative'});
+  assert.throws(()=>classifyEvidenceSufficiency({domain:'nutrient'},[{id:'x',kind:'article',role:'health',topicSpecific:false}]),/E_QUEUE_RESEARCH_TOPIC_SPECIFIC/);
+  assert.throws(()=>classifyEvidenceSufficiency({domain:'medicine'},nutrientSources),/E_QUEUE_KR_AUTHORIZATION_MISSING/);
+  const medicineSources=[{id:'mfds',kind:'official',role:'authorization',topicSpecific:true}];
+  assert.equal(classifyEvidenceSufficiency({domain:'medicine'},medicineSources).directCount,1);
 });
 
 test('protected diff permits batched queue-state checkpoints without allowing unrelated files',()=>{
@@ -302,6 +332,27 @@ test('R5 writer splits one keyword into two concurrent section-generation reques
   assert.equal(calls,2);
   assert.equal(maxActive,2);
   assert.deepEqual(article.sections.map(s=>s.id),['s1','s2','s3','s4']);
+});
+
+test('R5.2 reuses only previously visual-checked image sets for the same subject',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-images-'));
+  try{
+    await mkdir(join(root,'updates'),{recursive:true});
+    await mkdir(join(root,'posts'),{recursive:true});
+    const imageReview=[0,1,2].map(i=>({
+      src:`https://commons.wikimedia.org/wiki/Special:Redirect/file/Test_${i}.jpg?width=960`,
+      alt:`표고버섯 테스트 이미지 ${i}`,
+      role:i===0?'hero':i===1?'detail':'context',
+      composition:i===0?'closeup':i===1?'cross-section':'context',
+      sourcePage:`https://commons.wikimedia.org/wiki/File:Test_${i}.jpg`,
+      author:'fixture',license:'CC BY 2.0',visualChecked:true
+    }));
+    await writeFile(join(root,'posts','shiitake.json'),JSON.stringify({id:'shiitake',title:'표고버섯 영양과 보관법',imageReview}));
+    const images=await reusableImages(root,{articleId:'393',keyword:'표고버섯'});
+    assert.equal(images.length,3);
+    assert.equal(images[0].role,'hero');
+    await assert.rejects(reusableImages(root,{articleId:'999',keyword:'배'}),/E_QUEUE_IMAGE_REVIEW_REQUIRED/);
+  }finally{await rm(root,{recursive:true,force:true});}
 });
 
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{

@@ -7,6 +7,29 @@ import { ollamaJson } from './queue-ollama.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { EXTENSIONS, TOPIC_ENTITIES, TOPIC_EXTENSIONS, normTopic } from '../publishing/standards/common.mjs';
 
+export const CURATED_QUEUE_QUERIES=Object.freeze({
+  '가지':'eggplant','간장':'soy sauce','갈치':'hairtail fish','감자':'potato','계란':'egg','고등어':'mackerel',
+  '고추':'chili pepper','그래놀라':'granola','김치':'kimchi','깻잎':'perilla leaf','껌':'chewing gum','닭고기':'chicken meat',
+  '대마종자유':'hemp seed oil','땅콩버터':'peanut butter','라임':'lime fruit','레몬에이드':'lemonade','마늘':'garlic','망고':'mango',
+  '멜론':'melon','문어':'octopus','미라클베리':'miracle fruit','미역':'Undaria pinnatifida','밀배아':'wheat germ','바나나':'banana',
+  '바나나잎':'banana leaf','배':'pear','보리':'barley','복숭아':'peach','브라질너트':'Brazil nut','브로콜리':'broccoli',
+  '사탕무':'beetroot','살사 소스':'salsa sauce','생강':'ginger','수박':'watermelon','시나몬':'cinnamon','아마씨':'flaxseed',
+  '아몬드버터':'almond butter','아스파라거스':'asparagus','애플사이다비니거':'apple cider vinegar','양파':'onion','연근':'lotus root',
+  '연어':'salmon','오미자':'Schisandra chinensis','오이':'cucumber','오트밀':'oatmeal','옥수수':'corn','요구르트':'yogurt',
+  '우롱차':'oolong tea','잣':'pine nut','전복':'abalone','참외':'Korean melon','청양고추':'Cheongyang chili pepper',
+  '체리':'cherry','치아씨드':'chia seed','치차론':'pork rind','카옌페퍼':'cayenne pepper','카카오':'cocoa','코코넛':'coconut',
+  '퀴노아':'quinoa','통밀빵':'whole wheat bread','팔각':'star anise','팜오일':'palm oil','표고버섯':'shiitake mushroom',
+  '해삼':'sea cucumber','현미':'brown rice','호박씨':'pumpkin seed',
+  '나이아신':'niacin','니아신':'niacin','레시틴':'lecithin','레티놀':'retinol','로즈힙':'rose hip','루테올린':'luteolin',
+  '루테인':'lutein','리코펜':'lycopene','마그네슘':'magnesium','마카':'maca','밀크씨슬':'milk thistle','베타글루칸':'beta glucan',
+  '베타알라닌':'beta alanine','베타인':'betaine','베타카로틴':'beta carotene','비오틴':'biotin','비타민 A':'vitamin A',
+  '비타민 B6':'vitamin B6','산사자':'Crataegus pinnatifida fruit','아연':'zinc','알릴시스테인':'S-allyl cysteine','엽산':'folic acid',
+  '지아잔틴':'zeaxanthin','철분':'iron','침향':'agarwood','카르노산':'carnosic acid','카제인':'casein','카테킨':'catechin',
+  '커큐민':'curcumin','코엔자임 Q10':'coenzyme Q10','콜레우스 포스콜리':'Coleus forskohlii','크로세틴':'crocetin',
+  '클로로필':'chlorophyll','펙틴':'pectin','피크노제놀':'Pycnogenol','홍삼':'red ginseng','효모':'yeast',
+  'CPC':'cetylpyridinium chloride','아세트아미노펜':'acetaminophen','인도메타신':'indomethacin',
+});
+
 const plain=html=>sanitizeHtml(String(html),{allowedTags:[],allowedAttributes:{}}).replace(/\s+/g,' ').trim();
 export function sourceMainText(html) {
   const doc=parseDocument(html);
@@ -152,6 +175,7 @@ export async function usdaNutritionSource(query,fetcher,{apiKey=process.env.USDA
 }
 
 async function englishQuery(item,{model,fetcher}){
+  const curated=CURATED_QUEUE_QUERIES[item.keyword];if(curated)return curated;
   const verified=VERIFIED_ALIASES[item.keyword];if(verified?.englishQuery)return verified.englishQuery;
   const cache=await readQueryCache(),key=queryCacheKey(item),cached=cache.get(key);
   if(cached)return cached;
@@ -171,6 +195,17 @@ export function isTopicSpecificSource(source,query){
   const haystack=`${source?.title??''} ${source?.notes??''}`.toLowerCase();
   return terms.some(term=>haystack.includes(term));
 }
+export function classifyEvidenceSufficiency(item,sources,nutrition=null){
+  const strong=(sources??[]).filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
+  const direct=(sources??[]).filter(s=>s.topicSpecific===true&&(s.role==='health'||s.role==='nutrition'||s.role==='authorization'));
+  // Food/nutrient articles may proceed conservatively with one direct source; medicine/disease retain strict source gates.
+  if(item?.domain==='food'&&!nutrition&&!direct.length)throw new Error('E_QUEUE_RESEARCH_TOPIC_SPECIFIC');
+  if(item?.domain==='nutrient'&&!direct.length)throw new Error('E_QUEUE_RESEARCH_TOPIC_SPECIFIC');
+  if(item?.domain==='medicine'&&!(sources??[]).some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
+  if(item?.domain==='disease'&&!(sources??[]).some(s=>['official','guideline'].includes(s.kind)&&s.role==='health'))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
+  return {directCount:direct.length,strongCount:strong.length,claimMode:strong.length>=2?'full':'conservative'};
+}
+
 export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const query=await englishQuery(item,{model,fetcher});
   const external=externalLinks(publicHtml);
@@ -178,7 +213,7 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
     ['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],
     ['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']
   ]:[];
-  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date'}).catch(()=>[]);
+  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date',minResults:1}).catch(()=>[]);
   const externalPromise=Promise.all(external.map((url,i)=>fetchSource(url,item.domain,i+1,fetcher)));
   const fixedPromise=Promise.all(fixed.map(async([url,role],i)=>{
     const source=await fetchSource(url,item.domain,external.length+i+1,fetcher);
@@ -193,11 +228,11 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
   for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
-  const high=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
-  if(high.length<2)throw new Error('E_QUEUE_RESEARCH_HIGH_QUALITY');
-  if(item.domain==='medicine'&&!sources.some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
-  if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
-  return {query,sources,nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}};
+  const evidenceProfile=classifyEvidenceSufficiency(item,sources,nutrition);
+  return {
+    query,sources,evidenceProfile,
+    nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}
+  };
 }
 
 export const DOMAIN_EXTENSION_ALLOW=Object.freeze({
