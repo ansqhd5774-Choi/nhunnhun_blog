@@ -54,6 +54,7 @@ jobs:
         env:
           MUTATION_REQUESTED: ${{ inputs.publish }}
       - uses: ./.github/actions/setup-node-pnpm
+      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
         run: node publishing/runner-gate.mjs --queue
@@ -89,6 +90,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
       - uses: ./.github/actions/setup-node-pnpm
+      - run: npm install --global pnpm@11.19.0
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
