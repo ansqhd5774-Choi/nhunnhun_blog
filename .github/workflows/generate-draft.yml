@@ -1,7 +1,7 @@
 name: OpenAI 글 초안 작성
 on:
   pull_request:
-    paths: ['authoring/**', 'tests/authoring.test.mjs', '.github/workflows/generate-draft.yml']
+    paths: ['authoring/**', 'tests/authoring.test.mjs', 'tests/ollama-authoring.test.mjs', '.github/workflows/generate-draft.yml']
   workflow_dispatch:
     inputs:
       topic:
@@ -32,7 +32,7 @@ jobs:
           node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: node --test tests/authoring.test.mjs
+      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs
   write:
     if: github.event_name == 'workflow_dispatch'
     needs: test
