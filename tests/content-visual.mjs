@@ -7,7 +7,13 @@ import { chromium } from 'playwright-core';
 import { fixture } from './fixtures/content-r1/factory.mjs';
 import { renderEditorialPost } from '../publishing/editorial.mjs';
 import { assertEmphasisContract, CALLOUTS } from '../publishing/content-emphasis.mjs';
-const executablePath = [process.env.CHROME_PATH,'/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser'].filter(Boolean).find(existsSync);
+const executablePath = [
+  process.env.CHROME_PATH,
+  process.env.ProgramFiles&&join(process.env.ProgramFiles,'Google','Chrome','Application','chrome.exe'),
+  process.env['ProgramFiles(x86)']&&join(process.env['ProgramFiles(x86)'],'Google','Chrome','Application','chrome.exe'),
+  process.env.LOCALAPPDATA&&join(process.env.LOCALAPPDATA,'Google','Chrome','Application','chrome.exe'),
+  '/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser'
+].filter(Boolean).find(existsSync);
 if (!executablePath) throw new Error('E_CONTENT_PREVIEW_BROWSER_REQUIRED');
 const directory = process.env.CONTENT_PREVIEW_DIR || join(tmpdir(),'nhunnhun-content-preview');
 mkdirSync(directory,{recursive:true});

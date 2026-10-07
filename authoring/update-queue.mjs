@@ -7,6 +7,8 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 const BLOG='https://nhunnhun.tistory.com';
 const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
 const STATE_DIR='authoring/update-queue-state';
+export const QUEUE_POLICY_VERSION='R5';
+const ITEM_BLOCKED_STATUSES=new Set(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW']);
 
 export function parseUpdateQueue(text){
   const rows=String(text).replace(/^\uFEFF/,'').split(/\r?\n/).map(s=>s.trim()).filter(s=>s&&!s.startsWith('#'));
@@ -80,28 +82,42 @@ export async function isAlreadyCurrent(root,item,{fetcher=fetch}={}){
   return {current:false};
 }
 
-export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch}={}){
+function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now()){
+  if(qstate?.status!=='RUNNING')return false;
+  if(currentRunId&&qstate.runId&&String(qstate.runId)!==String(currentRunId))return true;
+  const stamp=Date.parse(qstate.heartbeatAt||qstate.startedAt||'');
+  return Number.isFinite(stamp)&&now-stamp>130*60*1000;
+}
+export function shouldRetryState(qstate){
+  return qstate?.error==='E_QUEUE_PLAN_VALIDATION'&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
+}
+export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
   const items=parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8'));
   const skipped=[];
   for(const item of items){
     const qstate=await readQueueState(root,item.articleId);
-    if(qstate?.status==='RUNNING'||qstate?.status==='BLOCKED_SYSTEM') throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
+    if(qstate?.status==='RUNNING'&&!staleRunning(qstate,currentRunId)) throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
+    if(qstate?.status==='BLOCKED_SYSTEM') throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
     if(qstate?.status==='READY_FOR_UPDATE') throw Object.assign(new Error('E_QUEUE_AWAITING_UPDATE_EVIDENCE'),{queueState:qstate,item});
-    if(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW'].includes(qstate?.status)){skipped.push({...item,blockedStatus:qstate.status,error:qstate.error});continue;}
+    if(ITEM_BLOCKED_STATUSES.has(qstate?.status)&&!shouldRetryState(qstate)){skipped.push({...item,blockedStatus:qstate.status,error:qstate.error});continue;}
     const current=await isAlreadyCurrent(root,item,{fetcher});
     if(current.current){skipped.push({...item,sourceId:current.sourceId});continue;}
     if(qstate?.status==='DONE') throw Object.assign(new Error('E_QUEUE_DONE_DRIFT'),{queueState:qstate,item});
-    return {item,skipped};
+    return {item,skipped,recovered:qstate?.status==='RUNNING'||shouldRetryState(qstate)};
   }
   return {item:null,skipped,complete:true};
 }
 
-export function assertProtectedDiff(paths,articleId,sourceId,archivedIds=[]){
+export function assertProtectedDiff(paths,articleId,sourceId,archivedIds=[],stateArticleIds=[]){
   const allowed=new Set([
     `updates/${sourceId}.json`,
     `content-reviews/updates/${sourceId}.json`,
     `${STATE_DIR}/${articleId}.json`,
   ]);
+  for(const stateArticleId of stateArticleIds){
+    if(!/^\d+$/.test(String(stateArticleId)))throw Error('E_QUEUE_STATE_ID');
+    allowed.add(`${STATE_DIR}/${stateArticleId}.json`);
+  }
   for(const id of archivedIds) {
     if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(id)) throw Error('E_QUEUE_ARCHIVE_ID');
     for(const path of [`updates/${id}.json`,`content-reviews/updates/${id}.json`,`authoring/update-source-archive/${id}.json`,`authoring/update-review-archive/${id}.json`]) allowed.add(path);

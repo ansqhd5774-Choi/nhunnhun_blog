@@ -192,9 +192,10 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(validate,/renderEditorialPost\(post\)/);
 });
 
-test('validation remains hosted; public publisher is Windows CMD only', () => {
+test('validation and public publisher use the Windows CMD self-hosted runner with mutation isolated to publish', () => {
   const w=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
-  assert.equal(w.jobs.validate['runs-on'],'ubuntu-latest');
+  assert.deepEqual(w.jobs.validate['runs-on'],['self-hosted','Windows','X64','tistory-publisher']);
+  assert.deepEqual(w.jobs.validate.defaults,{run:{shell:'cmd'}});
   assert.deepEqual(w.jobs.publish['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.publish.defaults,{run:{shell:'cmd'}});
   assert.equal(w.jobs.publish['timeout-minutes'],12);
@@ -344,9 +345,10 @@ test('existing-post update source is locked to one numeric public URL', () => {
   assert.throws(()=>eligibleUpdate(update,{phase:'submitting',fingerprint:updateFingerprint(update),url:update.targetUrl}),/E_UPDATE_EXISTING_STATE_REQUIRES_REVIEW/);
 });
 
-test('existing-post update workflow is separated from new publication', () => {
+test('existing-post update workflow is separated from new publication on the Windows self-hosted runner', () => {
   const w=parse(readFileSync(new URL('../.github/workflows/update-posts.yml',import.meta.url),'utf8'));
-  assert.equal(w.jobs['validate-update']['runs-on'],'ubuntu-latest');
+  assert.deepEqual(w.jobs['validate-update']['runs-on'],['self-hosted','Windows','X64','tistory-publisher']);
+  assert.deepEqual(w.jobs['validate-update'].defaults,{run:{shell:'cmd'}});
   assert.deepEqual(w.jobs.update['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.update.defaults,{run:{shell:'cmd'}});
   assert.equal(w.jobs.update.needs,'validate-update');

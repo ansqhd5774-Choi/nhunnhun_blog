@@ -23,6 +23,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/**'
+      - '.github/actions/setup-node-pnpm/**'
   pull_request:
     paths:
       - 'AGENTS.md'
@@ -45,6 +46,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/**'
+      - '.github/actions/setup-node-pnpm/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -53,7 +55,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   content-quality:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -61,10 +66,11 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Unit and regression tests
         run: pnpm test
@@ -79,11 +85,13 @@ jobs:
       - name: Existing update source and legacy rendering regression
         run: pnpm run validate:update
       - name: Offline R4 browser preview
-        run: node tests/content-visual.mjs
+        run: node tests\content-visual.mjs
+        env:
+          CONTENT_PREVIEW_DIR: ${{ runner.temp }}/nhunnhun-content-preview
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: content-standard-preview
-          path: /tmp/nhunnhun-content-preview
+          path: ${{ runner.temp }}/nhunnhun-content-preview
           retention-days: 7
           if-no-files-found: warn

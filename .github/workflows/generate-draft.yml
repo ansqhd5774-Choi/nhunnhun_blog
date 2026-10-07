@@ -6,19 +6,25 @@ on:
       - 'tests/authoring.test.mjs'
       - 'tests/ollama-authoring.test.mjs'
       - '.github/workflows/generate-draft.yml'
+      - '.github/actions/setup-node-pnpm/**'
 permissions:
   contents: read
 concurrency:
   group: authoring-regression-tests
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: cmd
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
+      - run: pnpm test

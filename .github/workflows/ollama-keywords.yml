@@ -10,16 +10,20 @@ permissions:
   contents: read
 concurrency:
   group: nhunnhun-ollama-keywords
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs
   write:
@@ -34,10 +38,11 @@ jobs:
         shell: cmd
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 키워드 조사·초안 작성·결과 브랜치 저장
         run: node authoring/keywords.mjs --save-branches

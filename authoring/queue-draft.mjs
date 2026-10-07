@@ -24,12 +24,9 @@ export function conservativeExtensions(item){
   }]));
 }
 
-function writerSchema(plan){
-  const ids=plan.sections.map(s=>s.id);
-  return {type:'object',additionalProperties:false,required:['title','lead','summary','sections'],properties:{
-    title:{type:'string',minLength:8,maxLength:150},
-    lead:{type:'string',minLength:30,maxLength:220},
-    summary:{type:'string',minLength:30,maxLength:220},
+function sectionWriterSchema(sections,{withMeta=false}={}){
+  const ids=sections.map(s=>s.id);
+  const properties={
     sections:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','paragraphs','strongPhrase','highlightPhrase','underlinePhrase'],properties:{
       id:{type:'string',enum:ids},
       paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:30,maxLength:190}},
@@ -37,7 +34,17 @@ function writerSchema(plan){
       highlightPhrase:{type:'string',minLength:2,maxLength:70},
       underlinePhrase:{type:'string',maxLength:60}
     }}}
-  }};
+  };
+  const required=['sections'];
+  if(withMeta){
+    Object.assign(properties,{
+      title:{type:'string',minLength:8,maxLength:150},
+      lead:{type:'string',minLength:30,maxLength:220},
+      summary:{type:'string',minLength:30,maxLength:220},
+    });
+    required.unshift('title','lead','summary');
+  }
+  return {type:'object',additionalProperties:false,required,properties};
 }
 function patchSchema(ids){
   return {type:'object',additionalProperties:false,required:['sections'],properties:{
@@ -50,21 +57,36 @@ function patchSchema(ids){
     }}}
   }};
 }
-function writerBudget(scope){
-  return ({focused:2800,standard:4000,comprehensive:5500,deep:6500})[scope]??4000;
+function groupBudget(scope,count,withMeta){
+  const perSection=scope==='deep'?650:scope==='comprehensive'?600:520;
+  return Math.min(withMeta?4200:3400,900+count*perSection+(withMeta?500:0));
 }
-function claimBundle(plan){
-  return plan.sections.map(section=>({
+function claimBundle(sections){
+  return sections.map(section=>({
     id:section.id,heading:section.heading,question:section.question,modules:section.modules,
     approvedClaims:section.claims.map(({id,text,type,risk})=>({id,text,type,risk}))
   }));
 }
-export async function writeArticleFromPlan(item,plan,scope,{model,fetcher=fetch}={}){
-  const [min,max]=lengthBandForScope(scope);
-  return ollamaJson([
-    {role:'system',content:`한국어 건강정보 글 작성자다. 이미 코드 검증을 통과한 Evidence Plan만 자연스러운 본문으로 변환한다. canonicalSubject는 "${item.keyword}"이며 다른 대상으로 바꾸지 않는다. 새로운 사실·수치·효능·용량·상호작용·질병효과를 추가하지 않는다. 각 section의 approvedClaims만 설명하고, 그 범위 안에서 연결문장·쉬운 풀이만 덧붙인다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이지만 글자수를 채우려고 반복하지 않는다. 답이 끝나면 즉시 완전한 JSON을 닫는다. section id는 plan과 정확히 일치해야 한다. strongPhrase, highlightPhrase는 paragraphs 안에 실제 존재하는 서로 다른 짧은 구절을 그대로 복사한다. underlinePhrase도 필요한 경우 paragraphs의 실제 구절을 복사하고 필요 없으면 빈 문자열이다. 강조를 위해 새로운 문장을 만들지 않는다. 같은 내용을 표현만 바꿔 반복하지 않는다. JSON만 출력한다.`},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,scope,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,sections:claimBundle(plan)})}
-  ],writerSchema(plan),{model,fetcher,numPredict:writerBudget(scope),numCtx:12288});
+function splitSections(sections,parallelism=2){
+  const count=Math.max(1,Math.min(parallelism,sections.length));
+  const groups=Array.from({length:count},()=>[]);
+  sections.forEach((section,index)=>groups[index%count].push(section));
+  return groups.filter(group=>group.length);
+}
+async function writeSectionGroup(item,plan,scope,sections,index,{model,fetcher}){
+  const [min,max]=lengthBandForScope(scope),withMeta=index===0;
+  const result=await ollamaJson([
+    {role:'system',content:`한국어 건강정보 글 작성자다. 이미 코드 검증을 통과한 Evidence Plan의 지정 섹션만 작성한다. canonicalSubject는 "${item.keyword}"이며 다른 대상으로 바꾸지 않는다. 새로운 사실·수치·효능·용량·상호작용·질병효과를 추가하지 않는다. 각 section의 approvedClaims만 설명하고 연결문장·쉬운 풀이만 덧붙인다. 전체 글 권장 범위는 ${min}~${max}자이지만 이 요청은 전체가 아니라 일부 섹션이므로 글자수를 채우려고 늘리지 않는다. section id는 요청과 정확히 일치해야 한다. strongPhrase, highlightPhrase는 paragraphs 안의 실제 서로 다른 짧은 구절을 그대로 복사한다. underlinePhrase도 필요한 경우 실제 구절을 복사하고 필요 없으면 빈 문자열이다. 강조를 위해 새 문장을 만들지 않는다. 같은 설명을 반복하지 않는다. ${withMeta?'title·lead·summary는 전체 계획을 대표하도록 짧고 정확하게 작성한다.':'title·lead·summary를 출력하지 않는다.'} JSON만 출력한다.`},
+    {role:'user',content:JSON.stringify({keyword:item.keyword,scope,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,sections:claimBundle(sections)})}
+  ],sectionWriterSchema(sections,{withMeta}),{model,fetcher,numPredict:groupBudget(scope,sections.length,withMeta),numCtx:8192});
+  return result;
+}
+export async function writeArticleFromPlan(item,plan,scope,{model,fetcher=fetch,parallelism=Number(process.env.QUEUE_WRITER_PARALLELISM||2)}={}){
+  const groups=splitSections(plan.sections,parallelism);
+  const results=await Promise.all(groups.map((sections,index)=>writeSectionGroup(item,plan,scope,sections,index,{model,fetcher})));
+  const meta=results[0],order=new Map(plan.sections.map((section,index)=>[section.id,index]));
+  const sections=results.flatMap(result=>result.sections??[]).sort((a,b)=>(order.get(a.id)??999)-(order.get(b.id)??999));
+  return {title:meta.title,lead:meta.lead,summary:meta.summary,sections};
 }
 
 function numericTokens(text){

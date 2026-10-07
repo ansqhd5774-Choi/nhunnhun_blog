@@ -163,6 +163,18 @@ export async function freshEditorPage(context) {
 
   return anchor || context.newPage();
 }
+export async function installLightweightRouting(page){
+  const tracker=/^(?:www\.)?(?:google-analytics\.com|googletagmanager\.com|doubleclick\.net|googlesyndication\.com)$/i;
+  try{
+    await page.route('**/*',async route=>{
+      const request=route.request();
+      let host='';try{host=new URL(request.url()).hostname;}catch{}
+      if(request.resourceType()==='font'||tracker.test(host))return route.abort();
+      return route.continue();
+    });
+  }catch{throw new Error('E_EDITOR_ROUTING');}
+}
+
 export async function ensureEditorRendering(context, page) {
   // noDefaults preserves the user's Chrome settings but skips Playwright's
   // focus emulation. Hidden tabs can suspend the animation-frame polling

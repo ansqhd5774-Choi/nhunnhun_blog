@@ -29,6 +29,7 @@ on:
       - 'pnpm-lock.yaml'
       - 'package.json'
       - '.github/workflows/update-posts.yml'
+      - '.github/actions/setup-node-pnpm/**'
   workflow_dispatch:
     inputs:
       update:
@@ -48,7 +49,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   validate-update:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     outputs:
       should_update: ${{ steps.mutation-gate.outputs.should_mutate }}
     steps:
@@ -61,10 +65,11 @@ jobs:
         run: node publishing/mutation-gate.mjs updates
         env:
           MUTATION_REQUESTED: ${{ inputs.update }}
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
         run: node publishing/runner-gate.mjs --queue
@@ -77,9 +82,8 @@ jobs:
           CONTENT_BASE_SHA: ${{ github.event.before }}
           CONTENT_HEAD_SHA: ${{ github.sha }}
       - run: pnpm run validate:content
-      - run: pnpm test
-      - run: node --test tests/public-verification.test.mjs
-      - run: pnpm run validate:update
+      - name: Revalidate update source at mutation boundary
+        run: pnpm run validate:update
   update:
     concurrency:
       group: nhunnhun-tistory-mutation
@@ -97,12 +101,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test
       - run: node --test tests/public-verification.test.mjs
