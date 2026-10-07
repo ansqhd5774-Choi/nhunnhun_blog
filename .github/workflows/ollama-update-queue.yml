@@ -49,6 +49,9 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node --test ${{ matrix.tests }}
@@ -79,6 +82,9 @@ jobs:
           ref: main
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 로컬 AI 전용 Gate
@@ -138,6 +144,9 @@ jobs:
           ref: main
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 기존 update workflow 완료·공개 상태·원장 확인
@@ -160,6 +169,9 @@ jobs:
           ref: main
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Queue 성공·실패·남은 항목 요약
