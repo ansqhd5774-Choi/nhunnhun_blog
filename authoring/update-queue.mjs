@@ -100,7 +100,7 @@ export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,curr
     if(qstate?.status==='ERROR_SYSTEM') throw Object.assign(new Error('E_QUEUE_SYSTEM_REQUIRES_REVIEW'),{queueState:qstate,item});
     if(qstate?.status==='READY_FOR_UPDATE') throw Object.assign(new Error('E_QUEUE_AWAITING_UPDATE_EVIDENCE'),{queueState:qstate,item});
     if(qstate?.status==='SKIPPED'&&qstate?.policyVersion===QUEUE_POLICY_VERSION){skipped.push({...item,skipStatus:qstate.status,error:qstate.error});continue;}
-    if(LEGACY_BLOCKED_STATUSES.has(qstate?.status)&&!shouldRetryState(qstate)){skipped.push({...item,legacyStatus:qstate.status,error:qstate.error});continue;}
+    if(LEGACY_BLOCKED_STATUSES.has(qstate?.status)&&!shouldRetryState(qstate)){skipped.push({...item,blockedStatus:qstate.status,error:qstate.error});continue;}
     const current=await isAlreadyCurrent(root,item,{fetcher});
     if(current.current){skipped.push({...item,sourceId:current.sourceId});continue;}
     if(qstate?.status==='DONE') throw Object.assign(new Error('E_QUEUE_DONE_DRIFT'),{queueState:qstate,item});
