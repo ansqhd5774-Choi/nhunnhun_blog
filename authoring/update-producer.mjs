@@ -126,10 +126,10 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await checkpoint('plan-v1',{scope:planned.scope,required:planned.required,skeleton:planned.skeleton,selectedSourceIds:planned.sources.map(s=>s.id),plan:planned.initialPlan});
     await checkpoint('plan-validation-v1',{failures:planned.initialFailures});
     if(planned.repaired){
-      await checkpoint('plan-v2',{scope:planned.scope,plan:planned.plan});
+      await checkpoint('plan-v2',{scope:planned.scope,downgraded:planned.downgraded===true,plan:planned.plan});
       await checkpoint('plan-validation-v2',{failures:planned.failures});
     }
-    if(planned.failures.length)throw Object.assign(new Error('E_QUEUE_PLAN_VALIDATION'),{details:{failures:planned.failures,initialFailures:planned.initialFailures,scope:planned.scope,repaired:planned.repaired}});
+    if(planned.failures.length)throw Object.assign(new Error('E_QUEUE_PLAN_VALIDATION'),{details:{failures:planned.failures,initialFailures:planned.initialFailures,scope:planned.scope,repaired:planned.repaired,downgraded:planned.downgraded===true}});
 
     const extensions=conservativeExtensions(item);
     await checkpoint('scope',{currentTitle:current.title,scope:planned.scope,lengthBand:lengthBandForScope(planned.scope),extensions});
