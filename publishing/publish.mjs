@@ -78,7 +78,6 @@ async function uploadImage(page, sourceUrl, index) {
     throw new Error('E_IMAGE_UPLOAD_RESPONSE');
   }
   if (!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_IMAGE_UPLOAD');
-  await page.waitForTimeout(400);
   return data.url;
 }
 function replaceImageSources(html, mapping, representativeSource) {
