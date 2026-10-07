@@ -15,7 +15,7 @@ import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
 import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport} from '../authoring/queue-draft.mjs';
-import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan} from '../authoring/queue-plan.mjs';
+import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,coreSkeleton} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -154,6 +154,14 @@ test('R4 scope uses search breadth only as an editorial warning range',()=>{
   assert.equal(inferWritingScope(item,'가지 효능·영양·칼로리·보관·고르는 법·조리·주의사항'),'comprehensive');
   assert.deepEqual(lengthBandForScope('comprehensive'),[3500,5200]);
   assert.deepEqual(sectionLimitsForScope('comprehensive'),[6,10]);
+});
+
+test('R4.1 deterministic skeleton covers every domain core before Ollama planning',()=>{
+  for(const domain of ['food','nutrient','medicine','disease']){
+    const covered=new Set(coreSkeleton(domain).flatMap(section=>section.modules));
+    for(const module of DOMAIN_RULES[domain].core)assert.ok(covered.has(module),`${domain} missing ${module}`);
+  }
+  assert.deepEqual(coreSkeleton('food').at(-1).modules,['decision']);
 });
 
 test('R4 evidence selection preserves role coverage and prioritizes direct authoritative sources',()=>{
