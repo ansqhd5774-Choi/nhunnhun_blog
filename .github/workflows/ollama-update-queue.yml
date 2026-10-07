@@ -35,9 +35,13 @@ concurrency:
 jobs:
   test:
     name: test-${{ matrix.suite }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - suite: authoring
@@ -53,7 +57,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node --test ${{ matrix.tests }}
 
@@ -87,7 +90,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 로컬 AI 전용 Gate
         run: node authoring\update-queue.mjs assert-local-only
@@ -113,7 +115,10 @@ jobs:
   dispatch:
     if: needs.produce.result == 'success' && needs.produce.outputs.complete != 'true' && needs.produce.outputs.source_id != ''
     needs: produce
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     permissions:
       actions: write
       contents: read
@@ -135,7 +140,10 @@ jobs:
   finalize:
     if: needs.dispatch.result == 'success'
     needs: [produce, dispatch]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     timeout-minutes: 30
     permissions:
       contents: write
@@ -150,7 +158,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 기존 update workflow 완료·공개 상태·원장 확인
         run: node authoring/update-queue-finalize.mjs
@@ -163,7 +170,10 @@ jobs:
   summary:
     if: ${{ always() && github.event_name != 'pull_request' }}
     needs: [test, produce, dispatch, finalize]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     permissions:
       contents: read
     steps:
@@ -176,7 +186,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Queue 성공·실패·남은 항목 요약
         run: node authoring/update-queue-summary.mjs
