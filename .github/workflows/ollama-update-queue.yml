@@ -5,7 +5,12 @@ on:
     - cron: '*/30 * * * *'
   push:
     branches: [main]
-    paths: ['authoring/update-queue.txt']
+    paths:
+      - 'authoring/update-queue.txt'
+      - 'authoring/update-queue.mjs'
+      - 'authoring/queue-r53.mjs'
+      - 'authoring/update-producer.mjs'
+      - 'publishing/content-standards.mjs'
   workflow_dispatch:
   pull_request:
     paths:
