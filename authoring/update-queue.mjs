@@ -89,7 +89,7 @@ function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now
   return Number.isFinite(stamp)&&now-stamp>130*60*1000;
 }
 export function shouldRetryState(qstate){
-  return ['E_QUEUE_PLAN_VALIDATION','E_QUEUE_FOOD_NUTRITION_SOURCE','E_QUEUE_RESEARCH_HIGH_QUALITY','E_QUEUE_RESEARCH_TOPIC_SPECIFIC','E_OLLAMA_LENGTH_LIMIT','E_QUEUE_IMAGE_REVIEW_REQUIRED'].includes(qstate?.error)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
+  return ITEM_BLOCKED_STATUSES.has(qstate?.status)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
 }
 export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
   const items=parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8'));
