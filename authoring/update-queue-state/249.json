@@ -1,0 +1,73 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-249",
+    "order": 7,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "고추",
+    "articleId": "249",
+    "targetUrl": "https://nhunnhun.tistory.com/249"
+  },
+  "sourceId": "auto-249-r1-20261007-30f6a6c0",
+  "baseSha": "23d7252b543be643da00136cb1d4bf704eae4b98",
+  "startedAt": "2026-10-07T05:35:23.595Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:36:11.627Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c6",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "preparation"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "storage"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
