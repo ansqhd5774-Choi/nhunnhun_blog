@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
 import { collectEvidence } from './queue-research.mjs';
 import { reusableImages, conservativeExtensions } from './queue-draft.mjs';
-import { collectInternalLinks, writeR53Article, renderR53Body, R53_REQUIRED_MODULES } from './queue-r53.mjs';
+import { applyCuratedEvidence, collectInternalLinks, writeR53Article, renderR53Body, R53_REQUIRED_MODULES } from './queue-r53.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
@@ -93,7 +93,8 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
 
   try{
     const current=await timed('publicFetchMs',()=>fetchPublic(item,fetcher));
-    const evidence=await timed('evidenceMs',()=>collectEvidence(item,current.html,{model,fetcher}));
+    let evidence=await timed('evidenceMs',()=>collectEvidence(item,current.html,{model,fetcher}));
+    evidence=await applyCuratedEvidence(root,item,evidence);
     const internalLinks=await timed('internalLinkMs',()=>collectInternalLinks(root,item,current.html,evidence));
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,internalLinks,baseSha});
 
