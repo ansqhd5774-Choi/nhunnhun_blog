@@ -7,7 +7,7 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 const BLOG='https://nhunnhun.tistory.com';
 const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
 const STATE_DIR='authoring/update-queue-state';
-export const QUEUE_POLICY_VERSION='R5.1';
+export const QUEUE_POLICY_VERSION='R5.2';
 const ITEM_BLOCKED_STATUSES=new Set(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW']);
 
 export function parseUpdateQueue(text){
@@ -89,7 +89,7 @@ function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now
   return Number.isFinite(stamp)&&now-stamp>130*60*1000;
 }
 export function shouldRetryState(qstate){
-  return ['E_QUEUE_PLAN_VALIDATION','E_QUEUE_FOOD_NUTRITION_SOURCE'].includes(qstate?.error)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
+  return ['E_QUEUE_PLAN_VALIDATION','E_QUEUE_FOOD_NUTRITION_SOURCE','E_QUEUE_RESEARCH_HIGH_QUALITY','E_QUEUE_RESEARCH_TOPIC_SPECIFIC','E_OLLAMA_LENGTH_LIMIT'].includes(qstate?.error)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
 }
 export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
   const items=parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8'));
