@@ -87,7 +87,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   if(!selected.item){console.log('QUEUE_COMPLETE');onOutput?.({complete:'true'});return {complete:true};}
   const item=selected.item,sourceId=queueSourceId(item,todayInSeoul(),baseSha.slice(0,12)),itemStartedAt=Date.now();
   const running={
-    status:'RUNNING',item,sourceId,baseSha,startedAt:new Date().toISOString(),
+    status:'RUNNING',policyVersion:'R4.1',item,sourceId,baseSha,startedAt:new Date().toISOString(),
     skippedCurrent:selected.skipped.map(x=>({articleId:x.articleId,sourceId:x.sourceId}))
   };
   await writeQueueState(root,item.articleId,running);
