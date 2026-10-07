@@ -68,17 +68,11 @@ function writeOutput(values){
 }
 function requireNodeFs(){throw new Error('E_QUEUE_INTERNAL_OUTPUT');}
 
-function blockStatus(error){
+function failureStatus(error){
   const code=String(error?.message??'E_QUEUE_FAILED');
-  if(['E_OLLAMA_LENGTH_LIMIT','E_OLLAMA_TIMEOUT'].includes(code))return 'BLOCKED_GENERATION';
-  if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING)/.test(code)||['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT'].includes(code))return 'BLOCKED_SYSTEM';
-  if(/IMAGE_REVIEW/.test(code))return 'BLOCKED_IMAGE';
-  if(/RESEARCH|AUTHORIZATION|PRIMARY_SOURCE|HEALTH_EVIDENCE/.test(code))return 'BLOCKED_EVIDENCE';
-  if(/IDENTITY|ENGLISH_QUERY|CLASSIFICATION/.test(code))return 'BLOCKED_ENTITY';
-  if(/REVIEW|CONTENT_/.test(code))return 'BLOCKED_REVIEW';
-  return 'BLOCKED_CONTENT';
+  if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING|TIMEOUT)/.test(code)||['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT'].includes(code))return 'ERROR_SYSTEM';
+  return 'SKIPPED';
 }
-function itemLevelBlock(status){return status!=='BLOCKED_SYSTEM';}
 
 export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,batchStartedAt=Date.now(),batchStateIds=[],maxRuntimeMinutes=Number(process.env.QUEUE_MAX_RUNTIME_MINUTES||90)}={}){
   assertLocalOnly(process.env);
@@ -170,25 +164,16 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
       await rm(resolve(root,'content-reviews','updates',`${sourceId}.json`),{force:true});
     }
     if(archivedIds.length) await restoreArchivedSources(root,archivedIds);
-    const status=blockStatus(error),code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED';
-    await writeQueueState(root,item.articleId,{...running,status,policyVersion:QUEUE_POLICY_VERSION,blockedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false});
+    const status=failureStatus(error),code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED';
+    await writeQueueState(root,item.articleId,{...running,status,policyVersion:QUEUE_POLICY_VERSION,finishedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false});
     await writeMetrics(status,code);
-    const nextBatch=[...new Set([...batchStateIds,item.articleId])];
-    if(itemLevelBlock(status)){
-      const elapsedMinutes=(Date.now()-batchStartedAt)/60000;
-      console.log('QUEUE_ITEM_BLOCKED_CONTINUE '+JSON.stringify({articleId:item.articleId,status,error:code,blockedCount:blockedCount+1,elapsedMinutes:Number(elapsedMinutes.toFixed(1)),batchedStates:nextBatch.length}));
-      if(elapsedMinutes<maxRuntimeMinutes)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,batchStartedAt,batchStateIds:nextBatch,maxRuntimeMinutes});
-      let checkpointSha=null;
-      if(commit&&remoteMain(root)===baseSha)checkpointSha=await commitStateBatch(root,nextBatch,`chore(authoring): checkpoint ${nextBatch.length} queue states`);
-      console.log('QUEUE_BATCH_TIME_LIMIT '+JSON.stringify({maxRuntimeMinutes,blockedCount:blockedCount+1,checkpointSha}));
-      onOutput?.({complete:'false',commit_sha:checkpointSha||''});
-      return {blocked:true,item,status,error:code,checkpointSha};
-    }
-    if(commit&&remoteMain(root)===baseSha)await commitStateBatch(root,nextBatch,`chore(authoring): checkpoint ${nextBatch.length} queue states`);
-    throw error;
+    if(commit&&remoteMain(root)===baseSha)await commitStateBatch(root,[...new Set([...batchStateIds,item.articleId])],`chore(authoring): record ${status.toLowerCase()} queue item ${item.articleId}`);
+    console.log(status==='SKIPPED'?'QUEUE_ITEM_SKIPPED ':'QUEUE_SYSTEM_ERROR ',JSON.stringify({articleId:item.articleId,error:code}));
+    if(status==='ERROR_SYSTEM')throw error;
+    onOutput?.({complete:'false',article_id:item.articleId,source_id:'',target_url:item.targetUrl,source_title:'',commit_sha:''});
+    return {skipped:true,item,error:code};
   }
 }
-
 async function main(){
   const fs=await import('node:fs');
   const result=await runQueueProducer({commit:!process.argv.includes('--no-commit'),onOutput:values=>{
