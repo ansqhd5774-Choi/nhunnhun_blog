@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {changedPaths} from '../authoring/update-producer.mjs';
-import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources } from '../authoring/update-queue.mjs';
+import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources,shouldRetryState,QUEUE_POLICY_VERSION } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
 import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions} from '../authoring/queue-research.mjs';
@@ -14,8 +14,8 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport} from '../authoring/queue-draft.mjs';
-import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan} from '../authoring/queue-plan.mjs';
+import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan} from '../authoring/queue-draft.mjs';
+import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -82,6 +82,28 @@ test('selector skips item-level BLOCKED state and continues with the next keywor
     assert.equal(selected.skipped[0].articleId,'327');
     assert.equal(selected.skipped[0].blockedStatus,'BLOCKED_CONTENT');
   }finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('R5 automatically retries legacy plan-validation blocks but skips current-policy blocks',async()=>{
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}),false);
+  const root=await mkdtemp(join(tmpdir(),'queue-r5-retry-'));
+  try{
+    await mkdir(join(root,'authoring','update-queue-state'),{recursive:true});
+    await mkdir(join(root,'updates'),{recursive:true});
+    await mkdir(join(root,'content-reviews','updates'),{recursive:true});
+    await mkdir(join(root,'publishing','update-state'),{recursive:true});
+    await writeFile(join(root,'authoring','update-queue.txt'),'음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 바나나 - https://nhunnhun.tistory.com/328\n');
+    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}));
+    const selected=await selectNextQueueItem(root,{fetcher:async()=>({ok:true,text:async()=>'<meta property="og:title" content="현재 글">'})});
+    assert.equal(selected.item.articleId,'327');
+    assert.equal(selected.recovered,true);
+  }finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('protected diff permits batched queue-state checkpoints without allowing unrelated files',()=>{
+  assert.equal(assertProtectedDiff(['authoring/update-queue-state/327.json','authoring/update-queue-state/269.json'],'327','auto-327',[],['269']),true);
+  assert.throws(()=>assertProtectedDiff(['authoring/update-queue-state/999.json'],'327','auto-327',[],['269']),/E_QUEUE_PROTECTED_DIFF/);
 });
 
 test('generic Ollama rewrite job accepts food and medicine categories but keeps URL locked',()=>{
@@ -168,23 +190,36 @@ test('R4 evidence selection preserves role coverage and prioritizes direct autho
   assert.ok(selected.some(s=>s.id==='health'));
 });
 
-test('R4 plan validation rejects unsupported high-risk claims and invented numbers',()=>{
+test('R5 deterministic skeleton covers every food core module without asking the model to invent module placement',()=>{
+  const item={keyword:'가지',domain:'food'};
+  const skeleton=buildCoreSkeleton(item);
+  const covered=new Set(skeleton.flatMap(s=>s.modules));
+  assert.equal(skeleton.length,5);
+  assert.ok(DOMAIN_RULES.food.core.every(module=>covered.has(module)));
+  assert.ok(skeleton.some(s=>s.modules.includes('decision')));
+});
+
+test('R5 plan validation rejects unsupported high-risk claims and invented numbers while skeleton stays complete',()=>{
   const item={keyword:'가지',domain:'food'};
   const evidence={sources:[
     {id:'nutrition',kind:'nutrition-database',role:'nutrition',topicSpecific:true,title:'Eggplant raw',scopeNote:'100 g',notes:'100 g eggplant contains 25 kcal'},
     {id:'farm',kind:'article',role:'health',topicSpecific:true,title:'Eggplant pesticide residue',scopeNote:'pesticide residue study',notes:'pesticide residue in eggplant crops'},
+    {id:'safety',kind:'official',role:'safety',topicSpecific:false,title:'Produce safety',scopeNote:'general produce safety',notes:'wash fresh produce under running water and discard spoiled produce'},
   ]};
-  const modules=DOMAIN_RULES.food.core;
-  const plan={primaryQuestion:'가지의 영양과 섭취 판단에 필요한 핵심 정보를 확인합니다.',readerSituation:'가지의 영양·조리·보관과 주의사항을 한 번에 확인하려는 독자입니다.',nextActions:['확인된 자료 범위에서 조리와 보관 방법을 선택합니다.'],sections:[
-    {id:'a',heading:'가지의 정체와 영양',question:'가지는 어떤 식품인가요?',modules:['identity','nutrition','amount'],claims:[{id:'c1',text:'생가지 100g은 약 30kcal입니다.',type:'nutrition',risk:'low',sourceIds:['nutrition']}]},
-    {id:'b',heading:'건강상 의미',question:'질병 예방 효과가 있나요?',modules:['benefits'],claims:[{id:'c2',text:'가지는 당뇨병을 예방합니다.',type:'disease',risk:'high',sourceIds:['farm']}]},
-    {id:'c',heading:'조리와 보관',question:'어떻게 조리하고 보관하나요?',modules:['preparation','storage'],claims:[{id:'c3',text:'조리와 보관 조건을 확인합니다.',type:'general',risk:'low',sourceIds:['nutrition']}]},
-    {id:'d',heading:'선택과 안전',question:'어떻게 고르고 주의하나요?',modules:['selection','safety','decision'],claims:[{id:'c4',text:'상태와 안전 조건을 확인합니다.',type:'safety',risk:'low',sourceIds:['farm']}]},
-  ]};
+  const skeleton=buildCoreSkeleton(item);
+  let claim=0;
+  const plan={primaryQuestion:'가지의 영양과 섭취 판단에 필요한 핵심 정보를 확인합니다.',readerSituation:'가지의 영양·조리·보관과 주의사항을 한 번에 확인하려는 독자입니다.',nextActions:['확인된 자료 범위에서 조리와 보관 방법을 선택합니다.'],sections:skeleton.map(section=>({
+    ...section,
+    heading:section.heading,
+    question:section.question,
+    claims:[{id:`c${++claim}`,text:'확인된 자료 범위에서 실용적인 판단 기준을 설명합니다.',type:'general',risk:'low',sourceIds:['nutrition']}]
+  }))};
+  plan.sections[0].claims=[{id:'c1',text:'생가지 100g은 약 30kcal입니다.',type:'nutrition',risk:'low',sourceIds:['nutrition']}];
+  plan.sections[1].claims=[{id:'c2',text:'가지는 당뇨병을 예방합니다.',type:'disease',risk:'high',sourceIds:['farm']}];
   const failures=validateEvidencePlan(item,evidence,plan,'focused',evidence.sources);
   assert.ok(failures.some(f=>f.code==='PLAN_NUMBER_SOURCE'&&f.claimId==='c1'));
   assert.ok(failures.some(f=>f.code==='PLAN_HIGH_RISK_SOURCE'&&f.claimId==='c2'));
-  assert.ok(modules.every(m=>plan.sections.some(s=>s.modules.includes(m))));
+  assert.ok(!failures.some(f=>f.code==='PLAN_CORE_MODULE'));
 });
 
 for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: Queue R4 core modules remain mandatory without forcing optional extensions`,()=>{
@@ -232,6 +267,31 @@ test('R4 validation identifies only failed sections and patch merge leaves the r
   article.plan.scope='focused';
   assert.equal(article.sections[1].sourceIds[0],'a');
   assert.ok(buildLengthReport(article,'focused').visibleCharacters>0);
+});
+
+test('R5 writer splits one keyword into two concurrent section-generation requests',async()=>{
+  const plan={primaryQuestion:'가지 정보를 확인합니다.',readerSituation:'가지에 대한 핵심 질문을 확인하려는 독자입니다.',nextActions:['근거 범위에서 선택합니다.'],sections:[
+    {id:'s1',heading:'질문 하나',question:'첫 질문은 무엇인가요?',modules:['identity'],claims:[{id:'c1',text:'가지는 식품입니다.',type:'general',risk:'low',sourceIds:['a']}]},
+    {id:'s2',heading:'질문 둘',question:'둘째 질문은 무엇인가요?',modules:['nutrition'],claims:[{id:'c2',text:'영양 정보는 출처 기준으로 봅니다.',type:'nutrition',risk:'low',sourceIds:['a']}]},
+    {id:'s3',heading:'질문 셋',question:'셋째 질문은 무엇인가요?',modules:['safety'],claims:[{id:'c3',text:'안전 조건을 확인합니다.',type:'safety',risk:'low',sourceIds:['a']}]},
+    {id:'s4',heading:'질문 넷',question:'넷째 질문은 무엇인가요?',modules:['decision'],claims:[{id:'c4',text:'확인된 근거에서 판단합니다.',type:'general',risk:'low',sourceIds:['a']}]},
+  ]};
+  let active=0,maxActive=0,calls=0;
+  const fetcher=async(_url,options)=>{
+    calls++;active++;maxActive=Math.max(maxActive,active);
+    const req=JSON.parse(options.body),ids=req.format.properties.sections.items.properties.id.enum;
+    const withMeta=req.format.required.includes('title');
+    await new Promise(resolve=>setTimeout(resolve,20));
+    active--;
+    const body={sections:ids.map(id=>({id,paragraphs:[`${id} 섹션은 확인된 근거 범위에서 필요한 정보를 설명합니다. 추가 사실을 만들지 않습니다.`],strongPhrase:'확인된 근거',highlightPhrase:'필요한 정보',underlinePhrase:''}))};
+    if(withMeta)Object.assign(body,{title:'가지 핵심 정보와 판단 기준',lead:'가지에 대해 확인된 근거 범위에서 필요한 내용을 정리한 안내입니다.',summary:'확인된 자료를 기준으로 영양과 안전 정보를 구분해 판단합니다.'});
+    const bytes=new TextEncoder().encode(JSON.stringify({done:true,done_reason:'stop',message:{content:JSON.stringify(body)}})+'\n');
+    return {ok:true,body:(async function*(){yield bytes;})()};
+  };
+  const article=await writeArticleFromPlan({keyword:'가지'},plan,'focused',{model:'fixture-only',fetcher,parallelism:2});
+  assert.equal(calls,2);
+  assert.equal(maxActive,2);
+  assert.deepEqual(article.sections.map(s=>s.id),['s1','s2','s3','s4']);
 });
 
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{
