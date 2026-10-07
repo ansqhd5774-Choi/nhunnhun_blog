@@ -58,6 +58,35 @@ function writerSources(item,evidence){
   return sources.filter(source=>!unsuitableFoodEvidence(source));
 }
 
+async function readCuratedEvidence(root,item){
+  try{
+    const path=resolve(root,'authoring/curated-evidence',String(item.articleId)+'.json');
+    const data=JSON.parse(await readFile(path,'utf8'));
+    if(String(data.articleId)!==String(item.articleId)||data.keyword!==item.keyword)return null;
+    return data;
+  }catch(error){if(error?.code==='ENOENT')return null;throw error;}
+}
+
+export async function applyCuratedEvidence(root,item,evidence){
+  const curated=await readCuratedEvidence(root,item);
+  if(!curated)return {...evidence,r53SectionEvidence:null,r53InternalLinks:[]};
+  const existing=new Map((evidence?.sources??[]).map(source=>[source.id,source]));
+  for(const source of curated.sources??[]){
+    existing.set(source.id,{
+      ...source,
+      topicSpecific:true,
+      scopeNote:'사전 조사에서 해당 글의 6개 작성 항목에 맞게 검증·정리한 직접 근거다.',
+      notes:(Object.values(curated.sections??{}).flatMap(section=>section?.sourceIds?.includes(source.id)?section.facts??[]:[])).join(' ')
+    });
+  }
+  return {
+    ...evidence,
+    sources:[...existing.values()],
+    r53SectionEvidence:curated.sections??null,
+    r53InternalLinks:Array.isArray(curated.internalLinks)?curated.internalLinks:[]
+  };
+}
+
 function writerSchema(specs){
   return {
     type:'object',additionalProperties:false,
@@ -123,7 +152,8 @@ async function catalogLinks(root,item,haystack){
 
 export async function collectInternalLinks(root,item,currentHtml,evidence){
   const haystack=norm(plain(currentHtml)+' '+(evidence?.sources??[]).map(s=>String(s.title??'')+' '+String(s.notes??'')).join(' '));
-  const candidates=[...existingInternalLinks(currentHtml,item),...await catalogLinks(root,item,haystack)];
+  const curated=(evidence?.r53InternalLinks??[]).map(link=>({...link,source:'curated'}));
+  const candidates=[...curated,...existingInternalLinks(currentHtml,item),...await catalogLinks(root,item,haystack)];
   const seen=new Set(),out=[];
   for(const link of candidates){
     if(seen.has(link.url))continue;
@@ -145,7 +175,9 @@ function sourceScore(source,domain,modules){
   return score;
 }
 
-function sectionSources(evidence,domain,modules){
+function sectionSources(evidence,domain,modules,sectionId=null){
+  const curatedIds=sectionId&&evidence?.r53SectionEvidence?.[sectionId]?.sourceIds;
+  if(Array.isArray(curatedIds)&&curatedIds.length)return curatedIds.filter(id=>(evidence?.sources??[]).some(source=>source.id===id));
   return [...(evidence?.sources??[])]
     .sort((a,b)=>sourceScore(b,domain,modules)-sourceScore(a,domain,modules))
     .slice(0,2)
@@ -176,13 +208,20 @@ export async function writeR53Article(item,evidence,{model,fetcher=fetch,current
     id:s.id,title:s.title,kind:s.kind,role:s.role,url:s.url,
     facts:String(s.notes??'').slice(0,1800)
   }));
-  const system='한국어 블로그 글 작성자다. 주제는 "'+item.keyword+'"이다. 제공된 6개 항목을 빠짐없이 같은 순서로 작성한다. 각 항목은 targetChars에 가까운 정보량으로 충분히 쓴다. 독자가 흥미를 느끼도록 표현은 강하고 인상적으로 쓴다. 각 항목의 사실·수치·효능은 evidence에서 직접 확인되는 내용을 바탕으로 작성한다. 자료가 충분하지 않은 항목은 같은 일반 문장을 반복하지 말고 확인 가능한 범위에서 실용적으로 설명한다. internalLinks는 이미 확인된 우리 블로그 링크다. 해당 내용이 실제로 관련될 때 label을 본문에 자연스럽게 한 번 언급한다. 링크 URL을 새로 만들거나 검색하지 않는다. JSON만 출력한다.';
+  const sectionEvidence=Object.fromEntries(specs.map(spec=>[
+    spec.id,
+    evidence?.r53SectionEvidence?.[spec.id]??{
+      sourceIds:sectionSources(evidence,item.domain,spec.modules,spec.id),
+      facts:sourcePack.filter(source=>sectionSources(evidence,item.domain,spec.modules,spec.id).includes(source.id)).map(source=>source.facts).filter(Boolean)
+    }
+  ]));
+  const system='한국어 블로그 글 작성자다. 주제는 "'+item.keyword+'"이다. 제공된 6개 항목을 빠짐없이 같은 순서로 작성한다. 각 항목은 targetChars에 가까운 정보량으로 충분히 쓴다. 독자가 흥미를 느끼도록 표현은 강하고 인상적으로 쓴다. 각 항목은 해당 sectionEvidence의 facts를 중심으로 자연스럽게 풀어쓴다. internalLinks는 이미 확인된 우리 블로그 링크다. 해당 내용이 실제로 관련될 때 label을 본문에 자연스럽게 한 번 언급한다. JSON만 출력한다.';
   const raw=await ollamaJson([
     {role:'system',content:system},
     {role:'user',content:JSON.stringify({
       keyword:item.keyword,domain:item.domain,currentTitle,
-      sections:specs.map(({id,heading,targetChars})=>({id,heading,targetChars})),
-      evidence:sourcePack,
+      sections:specs.map(({id,heading,targetChars})=>({id,heading,targetChars,evidence:sectionEvidence[id]})),
+      evidenceSources:sourcePack.map(({id,title,url})=>({id,title,url})),
       internalLinks:internalLinks.map(({key,label,url})=>({key,label,url}))
     })}
   ],writerSchema(specs),{model,fetcher,numPredict:5200,numCtx:12288});
@@ -194,7 +233,7 @@ export async function writeR53Article(item,evidence,{model,fetcher=fetch,current
     if(!paragraphs.length)throw new Error('E_R53_SECTION_EMPTY');
     return {
       ...spec,paragraphs,
-      sourceIds:sectionSources(evidence,item.domain,spec.modules),
+      sourceIds:sectionSources(evidence,item.domain,spec.modules,spec.id),
       strongPhrase:shortQuote(paragraphs[0])
     };
   });
