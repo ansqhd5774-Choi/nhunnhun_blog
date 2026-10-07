@@ -1,15 +1,31 @@
-name: Setup Node
-description: Shared Node 24 setup for NHUNNHUN workflows.
+name: Setup Node and pnpm cache
+description: Shared Node 24 setup with optional GitHub-hosted pnpm store cache.
 inputs:
+  enable-cache:
+    description: Enable actions/cache for ephemeral GitHub-hosted runners.
+    required: false
+    default: 'false'
   cache-key:
-    description: Reserved cache key supplied by workflow.
+    description: OS-scoped pnpm store cache key.
     required: false
+    default: ''
   cache-restore-key:
-    description: Reserved restore prefix supplied by workflow.
+    description: OS-scoped pnpm store restore prefix.
     required: false
+    default: ''
 runs:
   using: composite
   steps:
     - uses: actions/setup-node@v5
       with:
         node-version: '24'
+    - uses: actions/cache@v4
+      if: ${{ inputs.enable-cache == 'true' }}
+      with:
+        path: |
+          ~/.local/share/pnpm/store
+          ~/AppData/Local/pnpm/store
+          ~/.pnpm-store
+        key: ${{ inputs.cache-key }}
+        restore-keys: |
+          ${{ inputs.cache-restore-key }}
