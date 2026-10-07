@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED",
+  "status": "RETRY_READY",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -9,39 +9,41 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r1-20261007-9d0b6c38",
-  "baseSha": "3072cb71cafe62f01d65c11252a371575550d13e",
-  "startedAt": "2026-10-07T03:11:42.822Z",
-  "skippedCurrent": [],
-  "blockedAt": "2026-10-07T03:46:40.962Z",
-  "error": "E_QUEUE_REQUIRED_MODULE",
-  "details": {
-    "missing": [
-      "combinations",
-      "interactions",
-      "product_variants",
-      "diet"
-    ],
-    "required": [
-      "identity",
-      "nutrition",
-      "benefits",
-      "amount",
-      "preparation",
-      "storage",
-      "selection",
-      "safety",
-      "decision",
-      "timeline",
-      "long_term",
-      "follow_up",
-      "comparison",
-      "alternatives",
-      "combinations",
-      "interactions",
-      "product_variants",
-      "diet"
-    ]
-  },
-  "publicMutation": false
+  "publicMutation": false,
+  "retryPreparedAt": "2026-10-07T04:11:39.455Z",
+  "retryReason": "Queue R3 정보밀도·core-only·1회 보정 구조 반영 후 재실행",
+  "previousFailure": {
+    "sourceId": "auto-327-r1-20261007-9d0b6c38",
+    "baseSha": "3072cb71cafe62f01d65c11252a371575550d13e",
+    "blockedAt": "2026-10-07T03:46:40.962Z",
+    "error": "E_QUEUE_REQUIRED_MODULE",
+    "details": {
+      "missing": [
+        "combinations",
+        "interactions",
+        "product_variants",
+        "diet"
+      ],
+      "required": [
+        "identity",
+        "nutrition",
+        "benefits",
+        "amount",
+        "preparation",
+        "storage",
+        "selection",
+        "safety",
+        "decision",
+        "timeline",
+        "long_term",
+        "follow_up",
+        "comparison",
+        "alternatives",
+        "combinations",
+        "interactions",
+        "product_variants",
+        "diet"
+      ]
+    }
+  }
 }
