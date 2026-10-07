@@ -63,6 +63,9 @@ jobs:
         env:
           MUTATION_REQUESTED: ${{ inputs.update }}
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
@@ -96,6 +99,9 @@ jobs:
         with:
           ref: ${{ github.sha }}
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
