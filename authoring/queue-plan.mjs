@@ -121,32 +121,32 @@ function planSchema(skeleton,sources){
 const SECTION_CLAIM_TYPES=Object.freeze({
   food:{
     'identity-nutrition':['general','nutrition'],
-    'benefits-amount':['benefit','general'],
+    'benefits-amount':['general','benefit'],
     'preparation-storage':['general','safety'],
-    'selection-safety':['safety','general'],
+    'selection-safety':['general','safety'],
     decision:['general'],
   },
   nutrient:{
     'identity-role':['general'],
-    'benefits-expectations':['benefit','general'],
+    'benefits-expectations':['general','benefit'],
     'audience-amount-use':['general','dose'],
-    'safety-interactions':['safety','interaction'],
+    'safety-interactions':['general','safety','interaction'],
     'selection-decision':['general','safety'],
   },
   medicine:{
     'identity-indications':['general'],
     'audience-amount-use':['dose','general'],
     timeline:['general'],
-    'safety-contraindications-interactions':['safety','interaction'],
-    'medical-help':['safety','general'],
+    'safety-contraindications-interactions':['general','safety','interaction'],
+    'medical-help':['general','safety'],
     'storage-decision':['general'],
   },
   disease:{
-    'identity-symptoms':['disease','general'],
-    'causes-risk':['disease','general'],
-    'self-check-diagnosis':['disease','general'],
+    'identity-symptoms':['general','disease'],
+    'causes-risk':['general','disease'],
+    'self-check-diagnosis':['general','disease'],
     'treatment-home-care':['treatment','general'],
-    'red-flags-medical-help':['disease','safety'],
+    'red-flags-medical-help':['general','disease','safety'],
     decision:['general'],
   },
 });
@@ -181,9 +181,7 @@ function normalizedClaimSources(item,claim,sources){
   let candidates=sources.filter(source=>sourceSupportsClaim(source,claim));
   if(deterministicClaimRisk(claim.type,claim.text)==='high')candidates=candidates.filter(source=>['official','guideline','systematic-review','trial'].includes(source.kind)&&!looksAgricultural(source));
   candidates.sort((a,b)=>sourceScoreForClaim(b,claim,item)-sourceScoreForClaim(a,claim,item));
-  const allowed=new Set(candidates.map(source=>source.id));
-  const existing=[...new Set((claim.sourceIds??[]).filter(id=>allowed.has(id)))];
-  return (existing.length?existing:candidates.map(source=>source.id)).slice(0,3);
+  return candidates.slice(0,Math.min(2,candidates.length)).map(source=>source.id);
 }
 function fallbackClaimText(item,section){
   const subject=item?.keyword??'이 항목';
@@ -207,7 +205,7 @@ function normalizePlanToSkeleton(plan,skeleton,item,sources){
     const generated=byId.get(base.id)??base;
     let claims=(generated.claims??[]).map(claim=>{
       const type=deterministicClaimType(item,base,claim.text);
-      const typed={...claim,type,risk:deterministicClaimRisk(type,claim.text)};
+      const typed={id:claim.id,text:claim.text,type,risk:deterministicClaimRisk(type,claim.text)};
       return {...typed,sourceIds:normalizedClaimSources(item,typed,sources)};
     });
     const sourceById=new Map(sources.map(source=>[source.id,source]));
@@ -288,10 +286,9 @@ function failedClaimIds(failures){
 }
 function repairClaimSchema(ids,sources){
   return {type:'object',additionalProperties:false,required:['claims'],properties:{
-    claims:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','text','sourceIds'],properties:{
+    claims:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','text'],properties:{
       id:{type:'string',enum:ids},
-      text:{type:'string',minLength:8,maxLength:180},
-      sourceIds:{type:'array',minItems:1,maxItems:3,items:{type:'string',enum:sources.map(s=>s.id)}}
+      text:{type:'string',minLength:8,maxLength:180}
     }}}
   }};
 }
