@@ -25,6 +25,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/publish-posts.yml'
+      - '.github/actions/setup-node-pnpm/**'
   workflow_dispatch:
     inputs:
       publish:
@@ -87,12 +88,9 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
+      - uses: ./.github/actions/setup-node-pnpm
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm test
       - run: pnpm validate
