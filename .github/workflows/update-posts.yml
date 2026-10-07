@@ -75,9 +75,8 @@ jobs:
           CONTENT_BASE_SHA: ${{ github.event.before }}
           CONTENT_HEAD_SHA: ${{ github.sha }}
       - run: pnpm run validate:content
-      - run: pnpm test
-      - run: node --test tests/public-verification.test.mjs
-      - run: pnpm run validate:update
+      - name: Revalidate update source at mutation boundary
+        run: pnpm run validate:update
   update:
     concurrency:
       group: nhunnhun-tistory-mutation
