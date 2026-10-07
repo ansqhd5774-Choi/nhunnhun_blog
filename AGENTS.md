@@ -26,3 +26,6 @@
 - GitHub의 skin/reference/skin.html은 인증·광고 식별자를 제거한 검토용이다. REDACTED 상태의 사본을 배포하지 않는다. 최신 원본에 검증된 변경분만 반영한다.
 - GitHub 기준 작업은 실제 브랜치·커밋과 읽기/쓰기 도구를 확인한다. 다른 대화의 권한을 그대로 가정하지 않는다.
 - 사용자가 2026-10-02 GitHub 글의 클라우드 자동 게시를 요청했다. posts/*.json의 status=ready 및 approved=true로 지정한 새 글만 대상이다. 스킨 배포·기존 글 덮어쓰기·광고 클릭은 금지한다. 클라우드 계정 연결과 로그인 세션 보관은 별도 승인 후 활성화한다.
+
+## Queue R5.5 사용자 승인 단순 작성
+기존 URL 자동 수정 Producer는 docs/content/PRODUCER_SINGLE_PASS_R55.md를 따른다. SP1 생성 영수증은 내용 검토 PASS가 아니다. 내용 검토·보완 반복을 추가하지 않으며 기존 R1 직접 작성과 미변경 source 규칙은 보존한다.

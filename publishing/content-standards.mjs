@@ -124,6 +124,13 @@ export function readContentReview(source, { kind = source?.articleId ? 'updates'
   return review;
 }
 export function assertContentStandard(source, options = {}) {
+  if(source?.contentStandard==='SP1') {
+    if(!source.articleId||!/^auto-\d+-r55-/.test(source.id??''))throw Error('E_CONTENT_STANDARD_SCOPE');
+    const receipt=options.manifest??readContentReview(source,options);
+    if(receipt.version!=='SP1'||receipt.sourceDigest!==contentDigest(source)||receipt.semanticReview!=='not-performed'
+      ||receipt.policy!=='single-write-auto-publish-user-content-review')throw Error('E_CONTENT_RECEIPT_INVALID');
+    return {passed:true,errors:[],warnings:[],semanticVerification:'not-performed'};
+  }
   if (source?.contentStandard !== CONTENT_STANDARD_VERSION) throw new Error('E_CONTENT_STANDARD_REQUIRED');
   const report = evaluateContent(source, options.manifest ?? readContentReview(source, options), options);
   if (!report.passed) { const error = new Error(report.errors[0].code); error.details = report.errors; throw error; }

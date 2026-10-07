@@ -23,7 +23,7 @@ export function createStageCache(directory, { now = () => Date.now(), maxAgeMs =
 
 // Fingerprint executable policy, not article/state commits, so safe reruns can reuse drafts.
 export async function producerPolicyDigest(root) {
-  const paths = ['authoring/queue-efficient.mjs', 'authoring/queue-r53.mjs', 'authoring/queue-plan.mjs',
+  const paths = ['authoring/queue-single-pass.mjs', 'authoring/queue-efficient.mjs', 'authoring/queue-r53.mjs', 'authoring/queue-plan.mjs',
     'authoring/queue-review.mjs', 'authoring/queue-research.mjs', 'authoring/queue-ollama.mjs','authoring/queue-evidence-support.mjs',
     'authoring/ollama.mjs', 'authoring/queue-checkpoint.mjs', 'authoring/update-producer.mjs',
     'publishing/content-standards.mjs', 'publishing/editorial.mjs', 'publishing/content-emphasis.mjs',

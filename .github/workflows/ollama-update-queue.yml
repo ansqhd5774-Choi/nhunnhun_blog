@@ -38,6 +38,7 @@ on:
       - 'authoring/keywords.mjs'
       - 'tests/update-queue.test.mjs'
       - 'tests/queue-efficient.test.mjs'
+      - 'tests/queue-single-pass.test.mjs'
       - 'publishing/content-standards.mjs'
       - 'publishing/standards/**'
       - 'tests/content-standards.test.mjs'
@@ -65,7 +66,7 @@ jobs:
       matrix:
         include:
           - suite: authoring
-            tests: tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs tests/queue-efficient.test.mjs
+            tests: tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs tests/queue-efficient.test.mjs tests/queue-single-pass.test.mjs
           - suite: content
             tests: tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs
     steps:

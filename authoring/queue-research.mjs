@@ -207,7 +207,7 @@ export function classifyEvidenceSufficiency(item,sources,nutrition=null){
   return {directCount:direct.length,strongCount:strong.length,claimMode:strong.length>=2?'full':'conservative'};
 }
 
-export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
+export async function collectEvidence(item,publicHtml,{model,fetcher=fetch,advisory=false}={}){
   const query=await englishQuery(item,{model,fetcher});
   const external=externalLinks(publicHtml);
   const fixed=item.domain==='food'?[
@@ -238,7 +238,8 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
   for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
-  const evidenceProfile=classifyEvidenceSufficiency(item,sources,nutrition);
+  let evidenceProfile;
+  try{evidenceProfile=classifyEvidenceSufficiency(item,sources,nutrition);}catch(error){if(!advisory)throw error;evidenceProfile={warning:error.message};}
   return {
     query,sources,evidenceProfile,
     nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}

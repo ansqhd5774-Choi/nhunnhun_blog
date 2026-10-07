@@ -10,7 +10,7 @@ const BLOG='https://nhunnhun.tistory.com';
 // R5.3 BASELINE 2 TRIGGER
 const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
 const STATE_DIR='authoring/update-queue-state';
-export const QUEUE_POLICY_VERSION='R5.4';
+export const QUEUE_POLICY_VERSION='R5.5';
 const LEGACY_BLOCKED_STATUSES=new Set(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW']);
 
 export function parseUpdateQueue(text){
@@ -65,7 +65,7 @@ export async function currentR1Candidates(root,item){
   const out=[];
   for(const file of files){
     let source;try{source=JSON.parse(await readFile(resolve(updatesDir,file),'utf8'));}catch{continue;}
-    if(source.articleId!==item.articleId||source.targetUrl!==item.targetUrl||source.contentStandard!=='R1'||source.status!=='ready'||source.approved!==true) continue;
+    if(source.articleId!==item.articleId||source.targetUrl!==item.targetUrl||!['R1','SP1'].includes(source.contentStandard)||source.status!=='ready'||source.approved!==true) continue;
     const review=await jsonIfExists(resolve(root,'content-reviews','updates',`${source.id}.json`));
     const state=await jsonIfExists(resolve(root,'publishing','update-state',`${source.id}.json`));
     if(!review||review.sourceDigest!==contentDigest(source)||state?.phase!=='updated'||state.url!==item.targetUrl||state.fingerprint!==updateFingerprint(source)) continue;
@@ -91,10 +91,7 @@ function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now
   const stamp=Date.parse(qstate.heartbeatAt||qstate.startedAt||'');
   return Number.isFinite(stamp)&&now-stamp>130*60*1000;
 }
-export function shouldRetryState(qstate){
-  if(qstate?.error==='E_QUEUE_MUTATION_UNCERTAIN'||qstate?.publicMutation===null)return false;
-  return LEGACY_BLOCKED_STATUSES.has(qstate?.status)&&qstate?.policyVersion!==QUEUE_POLICY_VERSION;
-}
+export function shouldRetryState(){return false;}
 export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
   const items=parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8'));
   const skipped=[];
@@ -180,7 +177,7 @@ export async function restoreArchivedSources(root,ids) {
 export function queueSourceId(item,date,seed=''){
   const day=String(date).replaceAll('-','');
   let hash=0;for(const ch of `${item.articleId}:${item.keyword}:${seed}`) hash=(hash*33+ch.codePointAt(0))>>>0;
-  return `auto-${item.articleId}-r54-${day}-${hash.toString(16).padStart(8,'0').slice(0,8)}`;
+  return `auto-${item.articleId}-r55-${day}-${hash.toString(16).padStart(8,'0').slice(0,8)}`;
 }
 
 export async function cli(args=process.argv.slice(2),env=process.env){
