@@ -212,13 +212,6 @@ function linkify(text,internalLinks,used){
   return out;
 }
 
-function highlightLead(text){
-  const value=String(text??'');
-  const phrase=value.slice(0,Math.min(28,value.length));
-  if(!phrase)return value;
-  return '<mark data-tone="key">'+phrase+'</mark>'+value.slice(phrase.length);
-}
-
 function sourceLinks(evidence,ids){
   return ids.map(id=>(evidence?.sources??[]).find(s=>s.id===id)).filter(Boolean);
 }
@@ -234,8 +227,7 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
     section.paragraphs.forEach((paragraph,pIndex)=>{
-      let body=linkify(paragraph,internalLinks,usedLinks);
-      if(pIndex===0)body=highlightLead(body);
+      const body=linkify(paragraph,internalLinks,usedLinks);
       html+='\n<p>'+body+'</p>';
     });
     const citations=sourceLinks(evidence,section.sourceIds);
