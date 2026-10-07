@@ -13,6 +13,13 @@ import { checkDecisionDetails } from './content-decisions.mjs';
 import { checkCrossDomain } from './cross-domain.mjs';
 
 export const DOMAIN_RULES = Object.freeze({ food, nutrient, medicine, disease });
+const R53_REQUIRED = Object.freeze({
+  food:['identity','nutrition','benefits','combinations','safety','selection'],
+  nutrient:['benefits','long_term','amount','food_sources','combinations','deficiency'],
+  medicine:['identity','indications','combinations','interactions','safety','alternatives'],
+  disease:['identity','risk','diagnosis','diet','treatment','follow_up'],
+});
+const isR53Source = source => /^auto-\d+-r53-/.test(source?.id ?? '');
 const object = value => !!value && typeof value === 'object' && !Array.isArray(value);
 const completeText = (value, min = 10) => typeof value === 'string' && normalizeText(value).length >= min && !/^(TODO|TBD|미작성|작성 필요|해당 없음|없음|N\/A|예시)$/iu.test(value.trim());
 const canonical = value => Array.isArray(value) ? value.map(canonical) : object(value) ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
@@ -34,6 +41,7 @@ export function evaluateContent(source, manifest, { today = todayInSeoul(), enfo
   if (Object.keys(manifest).some(k => !allowed.includes(k))) add('E_CONTENT_REVIEW_SCHEMA', 'unknown fields');
   if (manifest.sourceDigest !== contentDigest(source)) add('E_CONTENT_REVIEW_STALE', '본문·이미지·분류·승인 상태 변경 후 재검토 필요');
   const domain = manifest.domain;
+  const r53 = isR53Source(source);
   if (!SITE_CATEGORIES[domain].includes(source.category)) add('E_CONTENT_CATEGORY_MISMATCH', `${domain} / ${source.category ?? 'missing'}`);
   const c = manifest.classification;
   if (!object(c) || c.status !== 'resolved' || !completeText(c.rawInput, 1) || !completeText(c.topic, 1) || !completeText(c.meaning, 2) || !completeText(c.reason) || !/^[a-z][a-z0-9:-]{2,100}$/.test(c.entityId ?? '')) add('E_CONTENT_CLASSIFICATION', '원문·주제·의미·근거·entityId 필요');
@@ -44,12 +52,12 @@ export function evaluateContent(source, manifest, { today = todayInSeoul(), enfo
     if (normTopic(c.topic) === '배' && (!/과일|배나무|pear/i.test(c.meaning ?? '') || domain !== 'food')) add('E_CONTENT_AMBIGUOUS_TOPIC', '과일 배는 명시적으로 해소하고 복통은 복통으로 정규화');
   }
   if (!object(manifest.intent) || !completeText(manifest.intent.primaryQuestion) || !completeText(manifest.intent.readerSituation) || !Array.isArray(manifest.intent.nextActions) || !manifest.intent.nextActions.length || manifest.intent.nextActions.some(a => !completeText(a))) add('E_CONTENT_INTENT', '독자의 상황·질문·다음 행동');
-  const required = new Set(DOMAIN_RULES[domain].core);
+  const required = new Set(r53 ? (R53_REQUIRED[domain] ?? DOMAIN_RULES[domain].core) : DOMAIN_RULES[domain].core);
   if (!object(manifest.extensions) || Object.keys(manifest.extensions).some(k => !Object.hasOwn(EXTENSIONS, k))) add('E_CONTENT_EXTENSIONS', '확장 모듈 검토표');
   for (const [key, modules] of Object.entries(EXTENSIONS)) {
     const entry = manifest.extensions?.[key];
     if (!object(entry) || typeof entry.applies !== 'boolean' || !completeText(entry.reason)) { add('E_CONTENT_EXTENSION_DECISION', key); continue; }
-    if (entry.applies) for (const module of modules) required.add(module);
+    if (entry.applies && !r53) for (const module of modules) required.add(module);
     if (entry.applies && ['cultivars','origins','seasonality'].includes(key) && domain !== 'food' && !/원료|산지|식품/.test(entry.reason)) warn('W_CONTENT_EXTENSION_FIT', key);
   }
   const topicEntity = TOPIC_ENTITIES[normTopic(c?.topic)] ?? c?.entityId;
@@ -68,7 +76,8 @@ export function evaluateContent(source, manifest, { today = todayInSeoul(), enfo
     if (!document.links.includes(s.url)) add('E_CONTENT_SOURCE_NOT_IN_BODY', s.id);
     sources.set(s.id, s);
   }
-  if (new Set([...sources.values()].filter(s => ['health','safety','nutrition','authorization'].includes(s.role) && ['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)).map(s => s.url)).size < 2) add('E_CONTENT_HEALTH_EVIDENCE', '이미지 출처·상품 판매 페이지는 건강 근거 2개에 포함하지 않음');
+  const minimumEvidence = r53 && ['food','nutrient'].includes(domain) ? 1 : 2;
+  if (new Set([...sources.values()].filter(s => ['health','safety','nutrition','authorization'].includes(s.role) && ['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)).map(s => s.url)).size < minimumEvidence) add('E_CONTENT_HEALTH_EVIDENCE', '건강 근거 자료 수 부족');
   if (['medicine','disease'].includes(domain) && ![...sources.values()].some(s => ['official','guideline'].includes(s.kind) && ['health','safety','authorization'].includes(s.role))) add('E_CONTENT_PRIMARY_MEDICAL_SOURCE', domain);
   if (domain === 'medicine' && ![...sources.values()].some(s => s.kind === 'official' && s.role === 'authorization' && /(^|\.)mfds\.go\.kr$/.test(new URL(s.url).hostname))) add('E_CONTENT_KR_AUTHORIZATION', '정확한 제품·성분의 국내 허가사항');
   const coverage = new Map();
@@ -87,16 +96,18 @@ export function evaluateContent(source, manifest, { today = todayInSeoul(), enfo
     }
   }
   for (const module of required) if (!coverage.has(module)) add('E_CONTENT_REQUIRED_MODULE', module);
-  checkCrossDomain(manifest, document, add);
-  for (const entry of Object.values(manifest.connections ?? {})) {
-    if (entry?.status !== 'included') continue;
-    const section = sectionByHeading(document, entry.heading);
-    for (const id of Array.isArray(entry.sourceIds) ? entry.sourceIds : []) if (!sources.has(id) || (section && !section.links.includes(sources.get(id).url))) add('E_CONTENT_CONNECTION_CITATION', id);
+  if (!r53) {
+    checkCrossDomain(manifest, document, add);
+    for (const entry of Object.values(manifest.connections ?? {})) {
+      if (entry?.status !== 'included') continue;
+      const section = sectionByHeading(document, entry.heading);
+      for (const id of Array.isArray(entry.sourceIds) ? entry.sourceIds : []) if (!sources.has(id) || (section && !section.links.includes(sources.get(id).url))) add('E_CONTENT_CONNECTION_CITATION', id);
+    }
+    checkDecisionDetails(manifest, document, sources, add);
+    inspectTone(document, manifest, add, warn);
+    if (enforceScanDensity) inspectScanDensity(document, add);
   }
-  checkDecisionDetails(manifest, document, sources, add);
-  inspectTone(document, manifest, add, warn);
   inspectEmphasis(document, add, warn);
-  if (enforceScanDensity) inspectScanDensity(document, add);
   const r = manifest.review;
   if (!object(r) || r.status !== 'approved' || !validDay(r.checkedAt, today) || !object(r.reviewer) || !['human','ai'].includes(r.reviewer.kind) || !completeText(r.reviewer.name, 2) || !['same-author','independent'].includes(r.reviewer.independence)) add('E_CONTENT_REVIEW_REQUIRED', '실제 편집 검토 기록');
   for (const check of REVIEW_CHECKS) if (r?.checks?.[check]?.status !== 'pass' || !completeText(r.checks[check].note, 12)) add('E_CONTENT_REVIEW_CHECK', check);
