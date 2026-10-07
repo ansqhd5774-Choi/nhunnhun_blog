@@ -1,0 +1,60 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-269",
+    "order": 2,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "간장",
+    "articleId": "269",
+    "targetUrl": "https://nhunnhun.tistory.com/269"
+  },
+  "sourceId": "auto-269-r1-20261007-7182f88e",
+  "baseSha": "a278c1960416e102fd8decb7c46c80be6a420018",
+  "startedAt": "2026-10-07T05:29:25.849Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:30:25.141Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "10"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "20ml"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "24"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "2주"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
