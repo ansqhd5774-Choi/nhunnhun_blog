@@ -1,0 +1,156 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-318",
+    "order": 37,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "아마씨",
+    "articleId": "318",
+    "targetUrl": "https://nhunnhun.tistory.com/318"
+  },
+  "sourceId": "auto-318-r1-20261007-7b9ec8d8",
+  "baseSha": "4e089c04f9a3b98a427bc268f353bf64e6a6a15f",
+  "startedAt": "2026-10-07T06:05:46.005Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    },
+    {
+      "articleId": "339"
+    },
+    {
+      "articleId": "312"
+    },
+    {
+      "articleId": "330"
+    },
+    {
+      "articleId": "296"
+    },
+    {
+      "articleId": "120"
+    },
+    {
+      "articleId": "240"
+    },
+    {
+      "articleId": "196"
+    },
+    {
+      "articleId": "130"
+    },
+    {
+      "articleId": "326"
+    },
+    {
+      "articleId": "309"
+    }
+  ],
+  "blockedAt": "2026-10-07T06:06:33.045Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "20g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "1개월"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
