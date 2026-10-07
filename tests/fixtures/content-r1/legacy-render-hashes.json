@@ -300,7 +300,7 @@
     "renderSha256": "1d45fb732d95854c360438559035e67983d64b4294d6645729747d3a36ed314f"
   },
   {
-    "path": "updates/update-327-eggplant-branch-correction-r3-20261007.json",
+    "path": "authoring/update-source-archive/update-327-eggplant-branch-correction-r3-20261007.json",
     "sourceSha256": "b3e3607fa2c449c5dd3fb7a4aa5de071b35b22d562df675baca1db30fd42876f",
     "renderSha256": "6743f8f691a21678186720eddd6b16946553a4e03416449e1531bebc405483e1"
   },
