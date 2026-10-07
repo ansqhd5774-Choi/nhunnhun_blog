@@ -8,7 +8,7 @@ import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources,shouldRetryState,QUEUE_POLICY_VERSION } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
-import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource,classifyEvidenceSufficiency} from '../authoring/queue-research.mjs';
+import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource,classifyEvidenceSufficiency,CURATED_QUEUE_QUERIES} from '../authoring/queue-research.mjs';
 import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
@@ -27,6 +27,14 @@ test('queue parses category keyword and canonical existing URL in order',()=>{
   assert.deepEqual(rows.map(x=>[x.order,x.domain,x.keyword,x.articleId]),[[1,'food','가지','327'],[2,'nutrient','아연','314'],[3,'medicine','CPC','277']]);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 가지2 - https://nhunnhun.tistory.com/327'),/E_QUEUE_DUPLICATE_ARTICLE/);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https:\\//nhunnhun.tistory.com/327'),/E_QUEUE_ROW_1/);
+});
+
+test('R5.2 has a pinned canonical English query for every queued keyword',async()=>{
+  const queue=parseUpdateQueue(await readFile(new URL('../authoring/update-queue.txt',import.meta.url),'utf8'));
+  const missing=[...new Set(queue.map(item=>item.keyword).filter(keyword=>!CURATED_QUEUE_QUERIES[keyword]))];
+  assert.deepEqual(missing,[]);
+  assert.equal(CURATED_QUEUE_QUERIES['잣'],'pine nut');
+  assert.equal(CURATED_QUEUE_QUERIES['CPC'],'cetylpyridinium chloride');
 });
 
 test('queue automation refuses paid external AI keys and remote Ollama hosts',()=>{
