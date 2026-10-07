@@ -302,7 +302,7 @@ async function repairFailedClaims(item,evidence,plan,failures,sources,{model,fet
   }));
   if(!targets.length)return plan;
   const repaired=await ollamaJson([
-    {role:'system',content:'한국어 Evidence Plan의 실패 claim만 짧게 고친다. 새 사실을 추가하지 않는다. PLAN_NUMBER_SOURCE면 근거에 없는 숫자·기간·비율을 모두 제거하고 정성 문장으로 바꾼다. PLAN_SCOPE면 candidateSourceIds가 직접 뒷받침할 수 있는 범위로 문장을 낮춘다. PLAN_HIGH_RISK_SOURCE면 질병 예방·치료·용량·상호작용 단정을 삭제하거나 직접 강한 근거가 있는 범위로만 제한한다. 다른 claim은 출력하지 않는다. JSON만 출력한다.'},
+    {role:'system',content:'한국어 Evidence Plan의 실패 claim만 짧게 고친다. claim id와 text만 출력하고 sourceIds/type/risk는 출력하지 않는다. 새 사실을 추가하지 않는다. PLAN_NUMBER_SOURCE면 근거에 없는 숫자·기간·비율을 모두 제거하고 정성 문장으로 바꾼다. PLAN_SCOPE면 candidateSourceIds가 직접 뒷받침할 수 있는 범위로 문장을 낮춘다. PLAN_HIGH_RISK_SOURCE면 질병 예방·치료·용량·상호작용 단정을 삭제하거나 직접 강한 근거가 있는 범위로만 제한한다. 다른 claim은 출력하지 않는다. JSON만 출력한다.'},
     {role:'user',content:JSON.stringify({keyword:item.keyword,canonicalSubject:`${item.keyword} = ${evidence.query}`,targets,sources:sourceBundle(sources)})}
   ],repairClaimSchema(targets.map(t=>t.id),sources),{model,fetcher,numPredict:Math.min(900,300+targets.length*140),numCtx:8192});
   const patches=new Map((repaired.claims??[]).map(claim=>[claim.id,claim]));
@@ -318,7 +318,7 @@ async function requestPlan(item,evidence,scope,required,sources,skeleton,{model,
   const evidenceInstruction=evidence?.evidenceProfile?.claimMode==='conservative'
     ?'현재 근거 강도가 제한적이므로 효능·권장량·안전성·상호작용을 새로 주장하지 말고, 확인된 연구 범위와 불확실성을 설명하는 정성 claim을 우선한다.'
     :'직접 근거가 있는 claim만 작성한다.';
-  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} ${evidenceInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
+  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치·claim type·risk·sourceIds는 코드가 결정하므로 출력하지 않는다. 각 claim은 id와 text만 출력한다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} ${evidenceInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
   return ollamaJson([
     {role:'system',content:baseSystem},
     {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,nutritionEvidence:evidence?.nutrition??null,sources:sourceBundle(sources)})}
