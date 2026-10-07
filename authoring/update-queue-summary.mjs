@@ -1,7 +1,7 @@
 import { readFile, readdir, appendFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parseUpdateQueue, QUEUE_POLICY_VERSION } from './update-queue.mjs';
+import { parseUpdateQueue, QUEUE_POLICY_VERSION, shouldRetryState } from './update-queue.mjs';
 
 async function readJson(path){
   try{return JSON.parse(await readFile(path,'utf8'));}catch(error){if(error?.code==='ENOENT')return null;throw error;}
@@ -25,7 +25,7 @@ export async function buildQueueSummary(root=process.cwd()){
     if(state.status==='READY_FOR_UPDATE'){counts.READY_FOR_UPDATE++;continue;}
     if(state.status==='RUNNING'){counts.RUNNING++;continue;}
     if(String(state.status??'').startsWith('BLOCKED')){
-      if(state.error==='E_QUEUE_PLAN_VALIDATION'&&state.policyVersion!==QUEUE_POLICY_VERSION)counts.RETRYABLE_LEGACY++;
+      if(shouldRetryState(state))counts.RETRYABLE_LEGACY++;
       else counts.BLOCKED++;
       failed.push({articleId:item.articleId,keyword:item.keyword,status:state.status,error:state.error??null,policyVersion:state.policyVersion??null});
       continue;
