@@ -100,7 +100,7 @@ export function assertProtectedDiff(paths,articleId,sourceId){
     `content-reviews/updates/${sourceId}.json`,
     `${STATE_DIR}/${articleId}.json`,
   ]);
-  const bad=paths.filter(p=>p&&!allowed.has(p.replaceAll('\\\\','/')));
+  const bad=paths.filter(p=>p&&!allowed.has(p.replaceAll('\\','/')));
   if(bad.length) throw Object.assign(new Error('E_QUEUE_PROTECTED_DIFF'),{paths:bad});
   return true;
 }
