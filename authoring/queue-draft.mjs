@@ -37,16 +37,43 @@ function schema(required,sources){
     }}}
   }};
 }
+function assertSectionIds(article){
+  const ids=new Set();
+  for(const section of article.sections){
+    if(ids.has(section.id))throw new Error('E_QUEUE_SECTION_ID');
+    ids.add(section.id);
+  }
+}
+export function missingRequiredModules(article,required){
+  const covered=new Set((article?.sections??[]).flatMap(s=>s.modules??[]));
+  return required.filter(module=>!covered.has(module));
+}
+function sourceBundle(evidence){
+  return evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific===true,notes:s.notes.slice(0,3000)}));
+}
+async function initialDraft(item,evidence,extensions,required,{model,fetcher}){
+  return ollamaJson([
+    {role:'system',content:`한국어 건강 블로그 작성자다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 식품·성분·질병으로 재해석하지 않는다. 필수 모듈은 ${required.join(', ')}이다. 각 필수 모듈은 sections.modules에 최소 한 번 포함해야 한다. 제공 자료 밖에서 수치·효능·용량·상호작용을 만들지 않는다. 일반 채소·일반 식단 자료를 이 식품만의 효능으로 바꾸지 않는다. 연구기간을 개인의 효과 보장기간으로 바꾸지 않는다. strongPoint/keyPoint/contrastPoint/actionPoint는 서로 다른 정보이며 모두 근거 안에서 쓴다. 독자가 실제 궁금해하는 질문 순서로 작성하고 같은 말을 반복하지 않는다. 의사 자격이나 검토 PASS를 주장하지 않는다.`},
+    {role:'user',content:JSON.stringify({keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,category:item.category,currentUrl:item.targetUrl,requiredModules:required,extensions,sources:sourceBundle(evidence)})}
+  ],schema(required,evidence.sources),{model,fetcher,numPredict:9000});
+}
+async function repairCoverage(item,evidence,extensions,required,article,missing,{model,fetcher}){
+  return ollamaJson([
+    {role:'system',content:`기존 한국어 건강 글 초안을 교정한다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 절대 다른 대상(예: 다른 채소)으로 바꾸지 않는다. 현재 빠진 필수 모듈은 ${missing.join(', ')}이다. 기존 근거 안에서 이미 해당 내용을 설명한 섹션에는 정확한 modules 태그를 추가하고, 실제 근거가 충분한 경우에만 짧은 섹션을 보완한다. 근거가 없으면 내용을 만들어 채우지 않는다. 제공된 source id만 사용한다. 수정 후 모든 필수 모듈을 sections.modules에서 최소 한 번 포함한다.`},
+    {role:'user',content:JSON.stringify({existingArticle:article,requiredModules:required,missingModules:missing,extensions,sources:sourceBundle(evidence)})}
+  ],schema(required,evidence.sources),{model,fetcher,numPredict:9000});
+}
 export async function draftArticle(item,evidence,extensions,{model,fetcher=fetch}={}){
   const required=requiredModules(item,extensions);
-  const article=await ollamaJson([
-    {role:'system',content:`한국어 건강 블로그 작성자다. 필수 모듈은 ${required.join(', ')}이다. 각 모듈은 sections.modules에 최소 한 번 포함한다. 제공 자료 밖에서 수치·효능·용량·상호작용을 만들지 않는다. 연구기간을 개인의 효과 보장기간으로 바꾸지 않는다. strongPoint/keyPoint/contrastPoint/actionPoint는 서로 다른 정보이며 모두 근거 안에서 쓴다. 독자가 실제 궁금해하는 질문 순서로 작성하고 같은 말을 반복하지 않는다. 의사 자격이나 검토 PASS를 주장하지 않는다.`},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,domain:item.domain,category:item.category,currentUrl:item.targetUrl,extensions,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,notes:s.notes.slice(0,3000)}))})}
-  ],schema(required,evidence.sources),{model,fetcher,numPredict:9000});
-  const ids=new Set();
-  for(const section of article.sections){if(ids.has(section.id))throw new Error('E_QUEUE_SECTION_ID');ids.add(section.id);}
-  const covered=new Set(article.sections.flatMap(s=>s.modules));
-  for(const module of required)if(!covered.has(module))throw Object.assign(new Error('E_QUEUE_REQUIRED_MODULE'),{module});
+  let article=await initialDraft(item,evidence,extensions,required,{model,fetcher});
+  assertSectionIds(article);
+  let missing=missingRequiredModules(article,required);
+  if(missing.length){
+    article=await repairCoverage(item,evidence,extensions,required,article,missing,{model,fetcher});
+    assertSectionIds(article);
+    missing=missingRequiredModules(article,required);
+  }
+  if(missing.length)throw Object.assign(new Error('E_QUEUE_REQUIRED_MODULE'),{details:{missing,required}});
   return {article,required};
 }
 export async function reusableImages(root,item){
