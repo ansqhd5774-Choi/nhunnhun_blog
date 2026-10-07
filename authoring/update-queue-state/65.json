@@ -1,0 +1,104 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-65",
+    "order": 6,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "고등어",
+    "articleId": "65",
+    "targetUrl": "https://nhunnhun.tistory.com/65"
+  },
+  "sourceId": "auto-65-r1-20261007-8d40c9d2",
+  "baseSha": "eca3e56fd1fa96012e7b97066e68a6e924d89dc7",
+  "startedAt": "2026-10-07T05:34:15.065Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:35:15.098Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "20g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "0.5g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "0.1g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "0.05g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "0.02g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "200g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "24"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "4°c"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c8",
+        "token": "4°c"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c8",
+        "token": "24"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "standard"
+  },
+  "publicMutation": false
+}
