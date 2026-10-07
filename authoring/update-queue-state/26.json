@@ -1,0 +1,120 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-26",
+    "order": 26,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "바나나잎",
+    "articleId": "26",
+    "targetUrl": "https://nhunnhun.tistory.com/26"
+  },
+  "sourceId": "auto-26-r1-20261007-dee00e0c",
+  "baseSha": "767bc6f49e34138d9b1354f7a63c8aa13a2c4f89",
+  "startedAt": "2026-10-07T05:53:30.130Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:54:30.890Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "5일"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "2주"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "standard"
+  },
+  "publicMutation": false
+}
