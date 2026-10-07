@@ -1,5 +1,5 @@
 {
-  "status": "READY_FOR_UPDATE",
+  "status": "BLOCKED",
   "policyVersion": "R5.3",
   "runId": "37676335167",
   "item": {
@@ -20,5 +20,10 @@
   "preparedAt": "2026-10-07T19:44:39.311Z",
   "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
   "fingerprint": "e1a15be6d3601f3c39dfad01bd3a314549901b219f1fce82aa6febbc4f660e26",
-  "validationWarnings": []
+  "validationWarnings": [],
+  "articleId": "327",
+  "blockedAt": "2026-10-07T20:05:50.276Z",
+  "error": "E_QUEUE_MUTATION_UNCERTAIN",
+  "ledgerPhase": null,
+  "publicMutation": null
 }
