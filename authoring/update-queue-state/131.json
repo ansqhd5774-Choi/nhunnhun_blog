@@ -1,0 +1,249 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-131",
+    "order": 48,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "요구르트",
+    "articleId": "131",
+    "targetUrl": "https://nhunnhun.tistory.com/131"
+  },
+  "sourceId": "auto-131-r1-20261007-d06be79b",
+  "baseSha": "6aa42819b767719d4f7d598ddca4db250979660c",
+  "startedAt": "2026-10-07T06:20:15.521Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    },
+    {
+      "articleId": "339"
+    },
+    {
+      "articleId": "312"
+    },
+    {
+      "articleId": "330"
+    },
+    {
+      "articleId": "296"
+    },
+    {
+      "articleId": "120"
+    },
+    {
+      "articleId": "240"
+    },
+    {
+      "articleId": "196"
+    },
+    {
+      "articleId": "130"
+    },
+    {
+      "articleId": "326"
+    },
+    {
+      "articleId": "309"
+    },
+    {
+      "articleId": "318"
+    },
+    {
+      "articleId": "136"
+    },
+    {
+      "articleId": "315"
+    },
+    {
+      "articleId": "47"
+    },
+    {
+      "articleId": "127"
+    },
+    {
+      "articleId": "247"
+    },
+    {
+      "articleId": "73"
+    },
+    {
+      "articleId": "283"
+    },
+    {
+      "articleId": "329"
+    },
+    {
+      "articleId": "204"
+    },
+    {
+      "articleId": "325"
+    }
+  ],
+  "blockedAt": "2026-10-07T06:21:29.086Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c1",
+        "token": "1000년"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "5g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "3g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "10mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "100mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "200g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "300g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "2회"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "40°c"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "general"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "4°c"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "24"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
