@@ -150,10 +150,10 @@ const SECTION_CLAIM_TYPES=Object.freeze({
     decision:['general'],
   },
 });
+function isUncertaintyStatement(text){return /(?:단정하지|확인되지|근거가 부족|근거가 충분하지|자료가 없|자료만으로는|알 수 없)/u.test(norm(text));}
 export function deterministicClaimType(item,section,text){
   const value=norm(text);
-  const uncertainty=/(?:단정하지|확인되지|근거가 부족|근거가 충분하지|자료가 없|자료만으로는|알 수 없)/u.test(value);
-  if(uncertainty)return 'general';
+  if(isUncertaintyStatement(value))return 'general';
   if(/(?:상호작용|병용|함께 복용|동시 복용)/u.test(value))return 'interaction';
   if(['medicine','nutrient'].includes(item?.domain)&&/(?:복용량|용량|투여량|1회|하루\s*\d+|\d+(?:[.,]\d+)?\s*(?:mg|mcg|μg|µg|ml|mL))/iu.test(value))return 'dose';
   if(['medicine','disease'].includes(item?.domain)&&/(?:치료|치료법|완치)/u.test(value))return 'treatment';
@@ -165,6 +165,7 @@ export function deterministicClaimType(item,section,text){
   return allowed[0]??'general';
 }
 export function deterministicClaimRisk(type,text){
+  if(isUncertaintyStatement(text))return 'low';
   return HIGH_RISK_TYPES.has(type)||/(?:질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u.test(text??'')?'high':'low';
 }
 function sourceScoreForClaim(source,claim,item){
@@ -254,6 +255,7 @@ function sourceSupportsClaim(source,claim){
   return source.topicSpecific===true||['official','guideline','nutrition-database'].includes(source.kind);
 }
 function highRiskClaim(claim){
+  if(isUncertaintyStatement(claim?.text))return false;
   return claim?.risk==='high'||HIGH_RISK_TYPES.has(claim?.type)||/(질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u.test(claim?.text??'');
 }
 export function validateEvidencePlan(item,evidence,plan,scope,sources=selectPlanSources(evidence,item)){
