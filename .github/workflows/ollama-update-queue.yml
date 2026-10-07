@@ -15,6 +15,7 @@ on:
       - 'authoring/update-producer.mjs'
       - 'authoring/update-queue-finalize.mjs'
       - 'authoring/update-queue-dispatch.mjs'
+      - 'authoring/update-queue-summary.mjs'
       - 'authoring/ollama.mjs'
       - 'authoring/keywords.mjs'
       - 'tests/update-queue.test.mjs'
@@ -22,6 +23,7 @@ on:
       - 'publishing/standards/**'
       - 'tests/content-standards.test.mjs'
       - '.github/workflows/ollama-update-queue.yml'
+      - '.github/actions/setup-node-pnpm/**'
 
 permissions:
   contents: read
@@ -32,15 +34,23 @@ concurrency:
 
 jobs:
   test:
+    name: test-${{ matrix.suite }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: authoring
+            tests: tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
+          - suite: content
+            tests: tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
         with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs
+      - run: node --test ${{ matrix.tests }}
 
   produce:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
@@ -66,11 +76,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: main
-          fetch-depth: 0
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 로컬 AI 전용 Gate
         run: node authoring\update-queue.mjs assert-local-only
@@ -83,11 +90,12 @@ jobs:
         env:
           OLLAMA_MODEL: qwen3:4b
           OLLAMA_HOST: http://127.0.0.1:11434
+          QUEUE_WRITER_PARALLELISM: '2'
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: queue-producer-${{ github.run_id }}
+          name: queue-producer-${{ github.run_id }}-attempt-${{ github.run_attempt }}
           path: generated-drafts/queue/${{ github.run_id }}/
           if-no-files-found: ignore
           retention-days: 7
@@ -103,6 +111,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.produce.outputs.commit_sha }}
+          fetch-depth: 1
       - uses: actions/setup-node@v5
         with:
           node-version: '24'
@@ -124,10 +133,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: main
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 기존 update workflow 완료·공개 상태·원장 확인
         run: node authoring/update-queue-finalize.mjs
@@ -136,3 +143,20 @@ jobs:
           ARTICLE_ID: ${{ needs.produce.outputs.article_id }}
           SOURCE_ID: ${{ needs.produce.outputs.source_id }}
           SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
+
+  summary:
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    needs: [test, produce, dispatch, finalize]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Queue 성공·실패·남은 항목 요약
+        run: node authoring/update-queue-summary.mjs
