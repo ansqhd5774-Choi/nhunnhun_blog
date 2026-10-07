@@ -209,12 +209,6 @@ function normalizePlanToSkeleton(plan,skeleton,item,sources){
       const typed={id:claim.id,text:claim.text,type,risk:deterministicClaimRisk(type,claim.text)};
       return {...typed,sourceIds:normalizedClaimSources(item,typed,sources)};
     });
-    const sourceById=new Map(sources.map(source=>[source.id,source]));
-    claims=claims.filter(claim=>{
-      if(highRiskClaim(claim))return true;
-      const cited=(claim.sourceIds??[]).map(id=>sourceById.get(id)).filter(Boolean);
-      return !normalizedNumbers(claim.text).some(token=>!cited.some(source=>sourceText(source).includes(token)));
-    });
     if(!claims.length){
       const id=(generated.claims??[])[0]?.id??`c${skeleton.indexOf(base)+1}`;
       const text=fallbackClaimText(item,base);
@@ -282,6 +276,24 @@ export function validateEvidencePlan(item,evidence,plan,scope,sources=selectPlan
   return failures;
 }
 
+function downgradeRepairableClaims(item,plan,failures,sources){
+  const repairable=new Set((failures??[])
+    .filter(f=>['PLAN_NUMBER_SOURCE','PLAN_SCOPE','PLAN_SOURCE'].includes(f.code))
+    .map(f=>f.claimId).filter(Boolean));
+  if(!repairable.size)return {plan,changed:false};
+  let changed=false;
+  const sections=plan.sections.map(section=>({...section,claims:section.claims.map(claim=>{
+    if(!repairable.has(claim.id)||highRiskClaim(claim))return claim;
+    const text=fallbackClaimText(item,section);
+    const type=deterministicClaimType(item,section,text);
+    const next={id:claim.id,text,type,risk:deterministicClaimRisk(type,text),sourceIds:[]};
+    next.sourceIds=normalizedClaimSources(item,next,sources);
+    changed=true;
+    return next;
+  })}));
+  return {plan:{...plan,sections},changed};
+}
+
 function failedClaimIds(failures){
   return [...new Set((failures??[]).map(f=>f.claimId).filter(Boolean))];
 }
@@ -332,12 +344,17 @@ export async function planArticle(item,evidence,{model,fetcher=fetch,currentTitl
   let plan=normalizePlanToSkeleton(rawPlan,skeleton,item,sources);
   let failures=validateEvidencePlan(item,evidence,plan,scope,sources);
   const initialPlan=plan,initialFailures=failures;
-  let repaired=false;
+  let repaired=false,downgraded=false;
   if(failures.length){
     plan=await repairFailedClaims(item,evidence,plan,failures,sources,{model,fetcher});
     plan=normalizePlanToSkeleton(plan,skeleton,item,sources);
     failures=validateEvidencePlan(item,evidence,plan,scope,sources);
     repaired=true;
   }
-  return {plan,scope,required,sources,skeleton,failures,repaired,initialPlan,initialFailures};
+  if(failures.length){
+    const result=downgradeRepairableClaims(item,plan,failures,sources);
+    plan=result.plan;downgraded=result.changed;
+    if(downgraded)failures=validateEvidencePlan(item,evidence,plan,scope,sources);
+  }
+  return {plan,scope,required,sources,skeleton,failures,repaired,downgraded,initialPlan,initialFailures};
 }
