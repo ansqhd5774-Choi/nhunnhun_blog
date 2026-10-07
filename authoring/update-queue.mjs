@@ -85,8 +85,9 @@ export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch}={})
   const skipped=[];
   for(const item of items){
     const qstate=await readQueueState(root,item.articleId);
-    if(qstate?.status==='BLOCKED'||qstate?.status==='RUNNING') throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
+    if(qstate?.status==='RUNNING'||qstate?.status==='BLOCKED_SYSTEM') throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
     if(qstate?.status==='READY_FOR_UPDATE') throw Object.assign(new Error('E_QUEUE_AWAITING_UPDATE_EVIDENCE'),{queueState:qstate,item});
+    if(['BLOCKED','BLOCKED_CONTENT','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW'].includes(qstate?.status)){skipped.push({...item,blockedStatus:qstate.status,error:qstate.error});continue;}
     const current=await isAlreadyCurrent(root,item,{fetcher});
     if(current.current){skipped.push({...item,sourceId:current.sourceId});continue;}
     if(qstate?.status==='DONE') throw Object.assign(new Error('E_QUEUE_DONE_DRIFT'),{queueState:qstate,item});
