@@ -1,0 +1,124 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-250",
+    "order": 23,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "미역",
+    "articleId": "250",
+    "targetUrl": "https://nhunnhun.tistory.com/250"
+  },
+  "sourceId": "auto-250-r1-20261007-25d1614d",
+  "baseSha": "f28d3bcbbd18f9195d8b4cfcc5b00ac3600ea4b5",
+  "startedAt": "2026-10-07T05:50:47.110Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:51:35.858Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c2",
+        "type": "general"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c3",
+        "type": "general"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "50g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "5일"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
