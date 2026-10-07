@@ -1,4 +1,4 @@
-import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, mkdir, writeFile, rename } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { updateFingerprint } from '../publishing/update-core.mjs';
@@ -86,6 +86,7 @@ export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch}={})
   for(const item of items){
     const qstate=await readQueueState(root,item.articleId);
     if(qstate?.status==='BLOCKED'||qstate?.status==='RUNNING') throw Object.assign(new Error('E_QUEUE_BLOCKED_REQUIRES_REVIEW'),{queueState:qstate,item});
+    if(qstate?.status==='READY_FOR_UPDATE') throw Object.assign(new Error('E_QUEUE_AWAITING_UPDATE_EVIDENCE'),{queueState:qstate,item});
     const current=await isAlreadyCurrent(root,item,{fetcher});
     if(current.current){skipped.push({...item,sourceId:current.sourceId});continue;}
     if(qstate?.status==='DONE') throw Object.assign(new Error('E_QUEUE_DONE_DRIFT'),{queueState:qstate,item});
@@ -94,15 +95,50 @@ export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch}={})
   return {item:null,skipped,complete:true};
 }
 
-export function assertProtectedDiff(paths,articleId,sourceId){
+export function assertProtectedDiff(paths,articleId,sourceId,archivedIds=[]){
   const allowed=new Set([
     `updates/${sourceId}.json`,
     `content-reviews/updates/${sourceId}.json`,
     `${STATE_DIR}/${articleId}.json`,
   ]);
+  for(const id of archivedIds) {
+    if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(id)) throw Error('E_QUEUE_ARCHIVE_ID');
+    for(const path of [`updates/${id}.json`,`content-reviews/updates/${id}.json`,`authoring/update-source-archive/${id}.json`,`authoring/update-review-archive/${id}.json`]) allowed.add(path);
+  }
   const bad=paths.filter(p=>p&&!allowed.has(p.replaceAll('\\','/')));
   if(bad.length) throw Object.assign(new Error('E_QUEUE_PROTECTED_DIFF'),{paths:bad});
   return true;
+}
+
+export async function archiveCompletedSources(root,item) {
+  const matches=[];
+  for(const name of (await readdir(resolve(root,'updates'))).filter(name=>name.endsWith('.json'))) {
+    const source=JSON.parse(await readFile(resolve(root,'updates',name),'utf8'));
+    if(source.articleId!==item.articleId) continue;
+    const ledger=await jsonIfExists(resolve(root,'publishing/update-state',`${source.id}.json`));
+    if(source.targetUrl!==item.targetUrl || ledger?.phase!=='updated' || ledger.url!==item.targetUrl || ledger.fingerprint!==updateFingerprint(source)) throw Error('E_QUEUE_EXISTING_UPDATE_PENDING');
+    for(const kind of ['source','review']) {
+      if(await jsonIfExists(resolve(root,`authoring/update-${kind}-archive`,`${source.id}.json`))) throw Error('E_QUEUE_ARCHIVE_EXISTS');
+    }
+    matches.push(source.id);
+  }
+  const moved=[];
+  try {for(const id of matches) {
+    await mkdir(resolve(root,'authoring/update-source-archive'),{recursive:true});
+    await rename(resolve(root,'updates',`${id}.json`),resolve(root,'authoring/update-source-archive',`${id}.json`));
+    moved.push(id);
+    if(await jsonIfExists(resolve(root,'content-reviews/updates',`${id}.json`))) {
+      await mkdir(resolve(root,'authoring/update-review-archive'),{recursive:true});
+      await rename(resolve(root,'content-reviews/updates',`${id}.json`),resolve(root,'authoring/update-review-archive',`${id}.json`));
+    }
+  }} catch(error) {await restoreArchivedSources(root,moved);throw error;}
+  return matches;
+}
+export async function restoreArchivedSources(root,ids) {
+  for(const id of ids) {
+    await rename(resolve(root,'authoring/update-source-archive',`${id}.json`),resolve(root,'updates',`${id}.json`));
+    if(await jsonIfExists(resolve(root,'authoring/update-review-archive',`${id}.json`))) await rename(resolve(root,'authoring/update-review-archive',`${id}.json`),resolve(root,'content-reviews/updates',`${id}.json`));
+  }
 }
 
 export function queueSourceId(item,date,seed=''){

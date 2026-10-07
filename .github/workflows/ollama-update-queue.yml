@@ -1,6 +1,11 @@
 name: 기존 글 Queue 로컬 Ollama 자동 수정
 
 on:
+  schedule:
+    - cron: '*/30 * * * *'
+  push:
+    branches: [main]
+    paths: ['authoring/update-queue.txt']
   workflow_dispatch:
   pull_request:
     paths:
@@ -9,6 +14,7 @@ on:
       - 'authoring/queue-*.mjs'
       - 'authoring/update-producer.mjs'
       - 'authoring/update-queue-finalize.mjs'
+      - 'authoring/update-queue-dispatch.mjs'
       - 'authoring/ollama.mjs'
       - 'authoring/keywords.mjs'
       - 'tests/update-queue.test.mjs'
@@ -34,10 +40,13 @@ jobs:
       - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
 
   produce:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
     needs: test
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     timeout-minutes: 120
+    concurrency:
+      group: nhunnhun-tistory-mutation
+      cancel-in-progress: false
     permissions:
       contents: write
     defaults:
@@ -71,13 +80,34 @@ jobs:
           OLLAMA_MODEL: qwen3:4b
           OLLAMA_HOST: http://127.0.0.1:11434
 
-  finalize:
+  dispatch:
     if: needs.produce.result == 'success' && needs.produce.outputs.complete != 'true' && needs.produce.outputs.source_id != ''
     needs: produce
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.produce.outputs.commit_sha }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: 기존 수정 workflow 명시 실행
+        run: node authoring/update-queue-dispatch.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
+
+  finalize:
+    if: needs.dispatch.result == 'success'
+    needs: [produce, dispatch]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v5
         with:
@@ -93,3 +123,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARTICLE_ID: ${{ needs.produce.outputs.article_id }}
           SOURCE_ID: ${{ needs.produce.outputs.source_id }}
+          SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}

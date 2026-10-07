@@ -1,10 +1,17 @@
 import sanitizeHtml from 'sanitize-html';
+import {parseDocument} from 'htmlparser2';
 import { research, VERIFIED_ALIASES } from './keywords.mjs';
 import { ollamaJson } from './queue-ollama.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { EXTENSIONS, TOPIC_ENTITIES, TOPIC_EXTENSIONS, normTopic } from '../publishing/standards/common.mjs';
 
 const plain=html=>sanitizeHtml(String(html),{allowedTags:[],allowedAttributes:{}}).replace(/\s+/g,' ').trim();
+export function sourceMainText(html) {
+  const doc=parseDocument(html);
+  const find=(node,name)=>[...(node.name===name?[node]:[]),...(node.children??[]).flatMap(child=>find(child,name))];
+  const text=node=>['script','style','nav','header','footer'].includes(node.name)?'':node.type==='text'?node.data:(node.children??[]).map(text).join(' ');
+  return text(find(doc,'main')[0]??find(doc,'body')[0]??doc).replace(/\s+/g,' ').trim();
+}
 const decode=v=>String(v).replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 const safeId=(host,index)=>`web-${index}-${host.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase().slice(0,28)||'source'}`;
 
@@ -18,13 +25,14 @@ export function externalLinks(html){
   const out=[];
   for(const m of String(html).matchAll(/<a\b[^>]*href=(["'])(https:\/\/[^"']+)\1/gi)){
     let u;try{u=new URL(m[2].replace(/&amp;/g,'&'));}catch{continue;}
-    if(u.username||u.password||u.hostname==='nhunnhun.tistory.com'||u.hostname.endsWith('kakaocdn.net')||u.hostname==='commons.wikimedia.org')continue;
+    if(u.username||u.password||u.hostname==='nhunnhun.tistory.com'||u.hostname.endsWith('kakaocdn.net')||u.hostname==='commons.wikimedia.org'||u.hostname==='creativecommons.org'||/^pubmed\.(ncbi\.)?nlm\.nih\.gov$/.test(u.hostname))continue;
     u.hash='';out.push(u.href);
   }
   return [...new Set(out)].slice(0,12);
 }
 export function classifyWebSource(url,domain){
   const host=new URL(url).hostname.toLowerCase();
+  if(/^pubmed\.(ncbi\.)?nlm\.nih\.gov$/.test(host))return {kind:'article',role:'context'};
   const official=/\.go\.kr$|\.gov$|\.gov\.uk$|who\.int$|foodsafetykorea\.go\.kr$|nedrug\.mfds\.go\.kr$|mfds\.go\.kr$|nih\.gov$|ncbi\.nlm\.nih\.gov$|cdc\.gov$|fda\.gov$|usda\.gov$|aao\.org$/.test(host);
   const authorization=domain==='medicine'&&(/(?:^|\.)mfds\.go\.kr$/.test(host)||/nedrug\.mfds\.go\.kr$/.test(host));
   const nutrition=domain==='food'&&/(usda\.gov$|foodsafetykorea\.go\.kr$)/.test(host);
@@ -36,9 +44,9 @@ async function fetchSource(url,domain,index,fetcher){
   const type=(response.headers?.get?.('content-type')||'').toLowerCase();
   if(type&&!/text\/html|text\/plain|application\/xhtml\+xml/.test(type))return null;
   let body;try{body=await response.text();}catch{return null;}
-  const notes=plain(body).slice(0,6000);if(notes.length<120)return null;
+  const notes=sourceMainText(body).slice(0,6000);if(notes.length<120||/checking your browser|verify you are human|enable javascript and cookies/i.test(notes))return null;
   const finalUrl=response.url||url,{kind,role}=classifyWebSource(finalUrl,domain);
-  return {id:safeId(new URL(finalUrl).hostname,index),title:pageTitle(body,finalUrl),url:finalUrl,checkedAt:todayInSeoul(),notes,kind,role,scopeNote:'실제 공개 원문을 열어 이 글의 주장과 적용 조건을 확인한 자료이며 확인한 본문 범위 밖으로 확대하지 않는다.'};
+  return {id:safeId(new URL(finalUrl).hostname,index),title:pageTitle(body,finalUrl),url:finalUrl,checkedAt:todayInSeoul(),notes,kind,role,scopeNote:'현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 연구 결과·주제별 효과는 확인된 것으로 간주하지 않는다.'};
 }
 async function englishQuery(item,{model,fetcher}){
   const verified=VERIFIED_ALIASES[item.keyword];if(verified?.englishQuery)return verified.englishQuery;
@@ -52,6 +60,12 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   let pubmed=[];try{pubmed=await research(query,fetcher,{retmax:5,sort:'pub date'});}catch{}
   const web=[];let index=0;
   for(const url of externalLinks(publicHtml)){const source=await fetchSource(url,item.domain,++index,fetcher);if(source)web.push(source);}
+  if(item.domain==='food') {
+    for(const [url,role] of [['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']]) {
+      const source=await fetchSource(url,item.domain,++index,fetcher);
+      if(source) web.unshift({...source,kind:'official',role,scopeNote:'일반 채소 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'});
+    }
+  }
   const map=new Map();
   for(const s of [...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))])if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10);
