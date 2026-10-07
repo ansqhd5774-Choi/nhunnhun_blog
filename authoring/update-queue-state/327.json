@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED",
+  "status": "RETRY_READY",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -9,12 +9,15 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r1-20261007-f624190f",
-  "baseSha": "fc3b325185905618fe6cb77679d2ad14943da24e",
-  "startedAt": "2026-10-07T02:27:26.260Z",
-  "skippedCurrent": [],
-  "blockedAt": "2026-10-07T02:46:43.691Z",
-  "error": "E_EDITORIAL_QUICK_REQUIRED",
-  "details": null,
-  "publicMutation": false
+  "publicMutation": false,
+  "retryPreparedAt": "2026-10-07T03:05:58.773Z",
+  "retryReason": "PR #46 공통 Producer 정책/R4 조립 수정 반영 후 운영 재시도",
+  "previousFailure": {
+    "sourceId": "auto-327-r1-20261007-f624190f",
+    "baseSha": "fc3b325185905618fe6cb77679d2ad14943da24e",
+    "startedAt": "2026-10-07T02:27:26.260Z",
+    "blockedAt": "2026-10-07T02:46:43.691Z",
+    "error": "E_EDITORIAL_QUICK_REQUIRED",
+    "publicMutation": false
+  }
 }
