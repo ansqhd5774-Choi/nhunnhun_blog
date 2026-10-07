@@ -1,0 +1,5 @@
+R5.3 baseline /327 generated draft rejected before Tistory mutation.
+Reason: factual and relevance failures in generated content (plant morphology hallucination, agricultural/pesticide research used as health evidence, unsupported nutrition/benefit/synergy claims, weak selection/safety answers).
+Producer run: 37673681029
+Source: auto-327-r53-20261008-7034c152
+Do not publish this source. Use as baseline evidence for the next minimal prompt/research correction.
