@@ -4,6 +4,8 @@ GitHub에는 `authoring/jobs/carnosic-acid-232-rewrite.json`에 대상 URL·기�
 
 기본 모델은 `qwen3:4b`이며 로컬 모델만 허용한다. OpenAI API 키·요금·Ollama cloud를 사용하지 않는다. 다운로드·저장 공간·PC 전력은 필요하다. Ollama 자체 인터넷 검색을 구현한 것이 아니라 편집자가 확인해 넣은 자료를 바탕으로 초안을 쓴다. 자료가 오래됐거나 질문이 바뀌면 job의 출처를 다시 확인하고 갱신한다.
 
+카르노산 job은 `evidence-bound-outline` 모드다. 작은 모델의 자유 생성 시험에서 사실 오류가 반복되어, 출처 확인 후 편집한 본문 문장을 job에 고정한다. Ollama는 질문 모듈의 순서를 구성하고 생성기는 그 근거 문장으로 글을 조립한다. 따라서 본문 전체가 Ollama의 자유 창작이라고 보고하지 않는다. 모델이 새로운 효능·용량을 끼워 넣을 수 없는 범위이며, 원래 근거 문장과 최종 글의 편집 검토는 여전히 필요하다.
+
 ## 준비와 실행
 
 이번 작업에서는 Ollama 설치·실행 상태를 확인하고 모델을 다운로드한다. Node와 프로젝트 의존성이 필요하며 기존 pnpm lockfile을 유지한다.
@@ -15,6 +17,8 @@ GitHub에는 `authoring/jobs/carnosic-acid-232-rewrite.json`에 대상 URL·기�
 5. 오류가 나타나면 중지하고 코드와 checkpoint를 전달한다. 실행 중 CMD·Ollama를 닫거나 연속 실행하지 않는다. 진행 중이라는 이유만으로 실패로 판단하지 않는다.
 
 각 실행은 별도 폴더를 사용한다. 산출물은 자동 덮어쓰기·커밋·티스토리 제출되지 않는다. GitHub에 결과를 보관하려면 `authoring/drafts/` 등 비운영 경로에 별도 저장한다. generated-drafts는 로컬 작업용으로 Git에서 제외한다.
+
+응답은 스트리밍으로 받는다. checkpoint의 receivedChunks·receivedCharacters·lastProgressAt과 partial-response.txt에 진행 내용을 저장하며, 미완료 응답은 완성 원고로 처리하지 않는다. 추론 단계에서는 글자 수가 0이어도 청크가 증가할 수 있다. `E_OLLAMA_CLAIM_REVIEW`는 확인된 카르노산 오류 표현 재생산을 발견한 경우이며 원고·근거를 편집 검토해야 한다. 이 제한된 오류 패턴 검사는 전체 의학적 의미 검증을 대신하지 않는다.
 
 ## 검토와 실제 수정은 별도
 

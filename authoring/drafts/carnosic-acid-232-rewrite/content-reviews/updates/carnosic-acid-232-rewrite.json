@@ -1,0 +1,239 @@
+{
+  "version": "R1",
+  "domain": "nutrient",
+  "classification": {
+    "rawInput": "카르노산이란? 로즈마리 성분의 효능 연구·탄산과 차이·섭취와 주의사항",
+    "topic": "",
+    "meaning": "",
+    "entityId": "",
+    "status": "unresolved",
+    "reason": ""
+  },
+  "sourceDigest": "9ae1836913ed061d31b441f178e17d4cd6c2920f8274c8b440238cfd840b6008",
+  "intent": {
+    "primaryQuestion": "",
+    "readerSituation": "",
+    "nextActions": []
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": ""
+    },
+    "comparison": {
+      "applies": false,
+      "reason": ""
+    },
+    "combinations": {
+      "applies": false,
+      "reason": ""
+    },
+    "products": {
+      "applies": false,
+      "reason": ""
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": ""
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": ""
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": ""
+    },
+    "origins": {
+      "applies": false,
+      "reason": ""
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": ""
+    },
+    "cost": {
+      "applies": false,
+      "reason": ""
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": ""
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": ""
+    },
+    "exercise": {
+      "applies": false,
+      "reason": ""
+    },
+    "diet": {
+      "applies": false,
+      "reason": ""
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": ""
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": ""
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": ""
+    },
+    "myths": {
+      "applies": false,
+      "reason": ""
+    },
+    "latest": {
+      "applies": false,
+      "reason": ""
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "role",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "benefits",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "audience",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "expectations",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "amount",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "use",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "safety",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "interactions",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "selection",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    },
+    {
+      "module": "decision",
+      "heading": "",
+      "answerQuote": "",
+      "sourceIds": []
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "not-applicable",
+      "reason": ""
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": ""
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": ""
+    }
+  },
+  "sources": [],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "pending",
+    "checkedAt": "2026-10-07",
+    "reviewer": {
+      "name": "근거 입력 AI + Ollama qwen3:4b 질문 구성 (최종 검토 미완료)",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pending",
+        "note": ""
+      },
+      "accuracy": {
+        "status": "pending",
+        "note": ""
+      },
+      "expectations": {
+        "status": "pending",
+        "note": ""
+      },
+      "comparison": {
+        "status": "pending",
+        "note": ""
+      },
+      "combinations": {
+        "status": "pending",
+        "note": ""
+      },
+      "crossDomain": {
+        "status": "pending",
+        "note": ""
+      },
+      "safety": {
+        "status": "pending",
+        "note": ""
+      },
+      "tone": {
+        "status": "pending",
+        "note": ""
+      },
+      "emphasis": {
+        "status": "pending",
+        "note": ""
+      },
+      "images": {
+        "status": "pending",
+        "note": ""
+      },
+      "linksAndSearch": {
+        "status": "pending",
+        "note": ""
+      }
+    },
+    "warningResolutions": []
+  }
+}
