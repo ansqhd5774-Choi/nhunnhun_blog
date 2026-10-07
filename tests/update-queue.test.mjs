@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem } from '../authoring/update-queue.mjs';
+import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources } from '../authoring/update-queue.mjs';
+import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
+import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
+import {classifyWebSource,sourceMainText,externalLinks} from '../authoring/queue-research.mjs';
+import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
@@ -74,4 +78,55 @@ test('queue workflow is local-only, one-at-a-time and does not pass paid AI keys
   assert.match(workflow,/update-queue-finalize\.mjs/);
   assert.match(workflow,/127\.0\.0\.1:11434/);
   assert.doesNotMatch(workflow,/OPENAI_API_KEY|ANTHROPIC_API_KEY/);
+  assert.match(workflow,/actions: write/);
+  assert.match(workflow,/update-queue-dispatch\.mjs/);
+  assert.match(workflow,/group: nhunnhun-tistory-mutation/);
+  assert.match(workflow,/CONTENT_UPDATE_QUEUE_ENABLED/);
+});
+
+test('GITHUB_TOKEN 원고 commit 뒤 main SHA 확인 후 기존 수정 workflow를 명시 호출',async()=>{
+  const sha='a'.repeat(40),calls=[];
+  const fetcher=async(url,options)=>{calls.push({url,options});return url.endsWith('main')?{ok:true,json:async()=>({object:{sha}})}:{status:204};};
+  assert.equal((await dispatchQueuedUpdate({token:'fixture',commitSha:sha,fetcher})).submitted,true);
+  assert.ok(calls[1].url.endsWith('/actions/workflows/update-posts.yml/dispatches'));
+  assert.deepEqual(JSON.parse(calls[1].options.body),{ref:'main',inputs:{update:'true'}});
+  calls.length=0;
+  await assert.rejects(dispatchQueuedUpdate({token:'fixture',commitSha:'b'.repeat(40),fetcher}),/E_QUEUE_SOURCE_DRIFT/);
+  assert.equal(calls.length,1);
+});
+test('DONE에는 같은 SHA의 실제 수동 수정 workflow 성공이 필요',()=>{
+  const run={event:'workflow_dispatch',head_sha:'actual',status:'completed',conclusion:'success'};
+  assert.equal(consumerMatches(run,'actual'),true);
+  assert.equal(consumerMatches({...run,conclusion:'failure'},'actual'),false);
+  assert.equal(consumerMatches({...run,event:'push'},'actual'),false);
+  assert.equal(consumerMatches(run,'other'),false);
+});
+test('가지는 eggplant로 조사하고 색인·저작권 페이지를 공식 건강 근거로 승격하지 않음',()=>{
+  assert.equal(VERIFIED_ALIASES['가지'].englishQuery,'eggplant');
+  assert.deepEqual(classifyWebSource('https://pubmed.ncbi.nlm.nih.gov/30064803/','food'),{kind:'article',role:'context'});
+  assert.deepEqual(externalLinks('<a href="https://pubmed.ncbi.nlm.nih.gov/30064803/">초록</a><a href="https://creativecommons.org/licenses/by/4.0/">허가</a>'),[]);
+  assert.equal(sourceMainText('<body><nav>메뉴</nav><main><script>hidden()</script><p>조회한 실제 본문</p></main></body>'),'조회한 실제 본문');
+});
+test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-archive-'));
+  try {
+    for(const dir of ['updates','publishing/update-state','content-reviews/updates'])await mkdir(join(root,dir),{recursive:true});
+    const source={id:'prior-327',articleId:'327',targetUrl:'https://nhunnhun.tistory.com/327',bodyHtml:'<p>이전 글</p>'};
+    const ledger={phase:'updated',fingerprint:updateFingerprint(source),url:source.targetUrl};
+    await writeFile(join(root,'updates/prior-327.json'),JSON.stringify(source));
+    await writeFile(join(root,'content-reviews/updates/prior-327.json'),'{}');
+    await writeFile(join(root,'publishing/update-state/prior-327.json'),JSON.stringify(ledger));
+    const ids=await archiveCompletedSources(root,source);
+    assert.deepEqual(ids,['prior-327']);
+    await assert.rejects(readFile(join(root,'updates/prior-327.json')),/ENOENT/);
+    assert.deepEqual(JSON.parse(await readFile(join(root,'authoring/update-source-archive/prior-327.json'))),source);
+    assert.deepEqual(JSON.parse(await readFile(join(root,'publishing/update-state/prior-327.json'))),ledger);
+    assert.equal(assertProtectedDiff(['updates/prior-327.json','authoring/update-source-archive/prior-327.json'],'327','new-327',ids),true);
+    assert.throws(()=>assertProtectedDiff(['publishing/update-state/prior-327.json'],'327','new-327',ids),/E_QUEUE_PROTECTED_DIFF/);
+    await restoreArchivedSources(root,ids);
+    assert.deepEqual(JSON.parse(await readFile(join(root,'updates/prior-327.json'))),source);
+    await writeFile(join(root,'publishing/update-state/prior-327.json'),JSON.stringify({...ledger,phase:'submitting'}));
+    await assert.rejects(archiveCompletedSources(root,source),/E_QUEUE_EXISTING_UPDATE_PENDING/);
+    assert.deepEqual(JSON.parse(await readFile(join(root,'updates/prior-327.json'))),source);
+  } finally {await rm(root,{recursive:true,force:true});}
 });

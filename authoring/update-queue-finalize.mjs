@@ -29,30 +29,41 @@ async function publicMatches(source){
   if(!response.ok)return false;
   return publicTitleFromHtml(await response.text())===source.title;
 }
-export async function finalizeQueuedUpdate({sourceId,articleId,token,timeoutMs=25*60*1000,pollMs=15000}={}){
-  if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??'')||!/^\d+$/.test(articleId??'')||!token)throw new Error('E_QUEUE_FINALIZE_INPUT');
+export function consumerMatches(run,commitSha) {
+  return !!(run?.event==='workflow_dispatch' && run.head_sha===commitSha && run.status==='completed' && run.conclusion==='success');
+}
+async function consumerRun(token,commitSha) {
+  const response=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/update-posts.yml/runs?per_page=100`,{headers:headers(token),signal:AbortSignal.timeout(20000)});
+  if(!response.ok) throw Error('E_QUEUE_FINALIZE_RUN_READ');
+  return (await response.json()).workflow_runs.find(run=>run.event==='workflow_dispatch' && run.head_sha===commitSha);
+}
+export async function finalizeQueuedUpdate({sourceId,articleId,token,commitSha,timeoutMs=25*60*1000,pollMs=15000}={}){
+  if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??'')||!/^\d+$/.test(articleId??'')||!token||!/^[a-f0-9]{40}$/.test(commitSha??''))throw new Error('E_QUEUE_FINALIZE_INPUT');
   const sourceFile=await getJsonFile(`updates/${sourceId}.json`,token);
   if(!sourceFile)throw new Error('E_QUEUE_FINALIZE_SOURCE');
   const source=sourceFile.value,expectedFingerprint=updateFingerprint(source),started=Date.now();
+  if(source.articleId!==articleId || source.targetUrl!==`https://nhunnhun.tistory.com/${articleId}`) throw Error('E_QUEUE_FINALIZE_TARGET');
   let ledger=null;
   while(Date.now()-started<timeoutMs){
     ledger=(await getJsonFile(`publishing/update-state/${sourceId}.json`,token))?.value??null;
-    if(ledger?.phase==='updated'&&ledger.fingerprint===expectedFingerprint&&ledger.url===source.targetUrl&&await publicMatches(source)){
+    const run=await consumerRun(token,commitSha);
+    if(ledger?.phase==='updated'&&ledger.sourceCommit===commitSha&&ledger.verification&&ledger.fingerprint===expectedFingerprint&&ledger.url===source.targetUrl&&consumerMatches(run,commitSha)&&await publicMatches(source)){
       const statePath=`authoring/update-queue-state/${articleId}.json`,previous=await getJsonFile(statePath,token);
-      const value={...(previous?.value??{}),status:'DONE',articleId,sourceId,fingerprint:expectedFingerprint,publicUrl:source.targetUrl,title:source.title,completedAt:new Date().toISOString(),publicVerified:true};
+      const value={...(previous?.value??{}),status:'DONE',articleId,sourceId,sourceCommit:commitSha,consumerRunId:run.id,fingerprint:expectedFingerprint,publicUrl:source.targetUrl,title:source.title,completedAt:new Date().toISOString(),publicVerified:true};
       await putJsonFile(statePath,value,token,previous?.sha);
       console.log('QUEUE_DONE '+JSON.stringify({articleId,sourceId,url:source.targetUrl}));
       return value;
     }
     if(ledger?.phase==='failed'&&ledger.publicMutationConfirmed===false)break;
+    if(run?.status==='completed'&&run.conclusion!=='success')break;
     await sleep(pollMs);
   }
   const statePath=`authoring/update-queue-state/${articleId}.json`,previous=await getJsonFile(statePath,token);
-  const uncertain=ledger?.phase==='submitting'||ledger?.publicMutationConfirmed===undefined&&!!ledger;
+  const uncertain=!(ledger?.phase==='failed'&&ledger.publicMutationConfirmed===false);
   const value={...(previous?.value??{}),status:'BLOCKED',articleId,sourceId,blockedAt:new Date().toISOString(),error:uncertain?'E_QUEUE_MUTATION_UNCERTAIN':'E_QUEUE_UPDATE_NOT_COMPLETED',ledgerPhase:ledger?.phase??null,publicMutation:uncertain?null:false};
   await putJsonFile(statePath,value,token,previous?.sha);
   throw new Error(value.error);
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  finalizeQueuedUpdate({sourceId:process.env.SOURCE_ID,articleId:process.env.ARTICLE_ID,token:process.env.GITHUB_TOKEN}).catch(error=>{console.error(error.message);process.exitCode=1;});
+  finalizeQueuedUpdate({sourceId:process.env.SOURCE_ID,articleId:process.env.ARTICLE_ID,token:process.env.GITHUB_TOKEN,commitSha:process.env.SOURCE_COMMIT}).catch(error=>{console.error(error.message);process.exitCode=1;});
 }

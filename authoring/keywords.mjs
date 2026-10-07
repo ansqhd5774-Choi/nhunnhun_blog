@@ -19,6 +19,7 @@ export const VERIFIED_ALIASES = Object.freeze({
   '카르노산': {domain:'nutrient',englishQuery:'carnosic acid'},
   '참기름': {domain:'food',englishQuery:'sesame oil'},
   '홍삼': {domain:'food',englishQuery:'red ginseng'},
+  '가지': {domain:'food',englishQuery:'eggplant'},
 });
 export function readPubmed(xml) {
   const doc=parseDocument(xml,{xmlMode:true,decodeEntities:true});

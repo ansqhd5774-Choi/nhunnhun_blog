@@ -2,7 +2,7 @@ import { writeFile, mkdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff } from './update-queue.mjs';
+import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources } from './update-queue.mjs';
 import { collectEvidence, decideExtensions } from './queue-research.mjs';
 import { draftArticle, reusableImages, renderBody } from './queue-draft.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
@@ -34,9 +34,9 @@ function makeSource(item,currentTitle,sourceId,article,body,images){
 function changedPaths(root){
   return git(['status','--porcelain','--untracked-files=all'],root).split(/\r?\n/).filter(Boolean).map(line=>line.slice(3).trim()).filter(Boolean);
 }
-async function commitPaths(root,item,sourceId,message){
+async function commitPaths(root,item,sourceId,message,archivedIds=[]){
   const changed=changedPaths(root);
-  assertProtectedDiff(changed,item.articleId,sourceId);
+  assertProtectedDiff(changed,item.articleId,sourceId,archivedIds);
   if(!changed.length)return null;
   git(['config','user.name','nhunnhun-ollama'],root);
   git(['config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],root);
@@ -65,6 +65,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   };
   await writeQueueState(root,item.articleId,running);
   let operationalWritten=false;
+  let archivedIds=[];
   try{
     const current=await fetchPublic(item,fetcher);
     const evidence=await collectEvidence(item,current.html,{model,fetcher});
@@ -78,14 +79,16 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     assertImageReview(source);
     checkUpdateSource(source,`${sourceId}.json`);
     renderEditorialPost(source);
+    if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
+    archivedIds=await archiveCompletedSources(root,item);
+    operationalWritten=true;
     await writeFile(resolve(root,'updates',`${sourceId}.json`),JSON.stringify(source,null,2)+'\n',{flag:'wx'});
     await mkdir(resolve(root,'content-reviews','updates'),{recursive:true});
     await writeFile(resolve(root,'content-reviews','updates',`${sourceId}.json`),JSON.stringify(review,null,2)+'\n',{flag:'wx'});
-    operationalWritten=true;
     const fp=updateFingerprint(source);
     await writeQueueState(root,item.articleId,{...running,status:'READY_FOR_UPDATE',preparedAt:new Date().toISOString(),title:source.title,fingerprint:fp,validationWarnings:report.warnings});
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
-    const commitSha=commit?await commitPaths(root,item,sourceId,`feat(authoring): prepare queued rewrite ${item.articleId}`):null;
+    const commitSha=commit?await commitPaths(root,item,sourceId,`feat(authoring): prepare queued rewrite ${item.articleId}`,archivedIds):null;
     const output={complete:'false',article_id:item.articleId,source_id:sourceId,target_url:item.targetUrl,source_title:source.title,commit_sha:commitSha||''};
     onOutput?.(output);
     console.log('QUEUE_PREPARED '+JSON.stringify({item,sourceId,commitSha,title:source.title}));
@@ -95,6 +98,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
       await rm(resolve(root,'updates',`${sourceId}.json`),{force:true});
       await rm(resolve(root,'content-reviews','updates',`${sourceId}.json`),{force:true});
     }
+    if(archivedIds.length) await restoreArchivedSources(root,archivedIds);
     await writeQueueState(root,item.articleId,{...running,status:'BLOCKED',blockedAt:new Date().toISOString(),error:/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED',details:error.details??error.failed??null,publicMutation:false});
     if(commit&&remoteMain(root)===baseSha){try{await commitPaths(root,item,sourceId,`chore(authoring): block queued rewrite ${item.articleId}`);}catch{}}
     throw error;
