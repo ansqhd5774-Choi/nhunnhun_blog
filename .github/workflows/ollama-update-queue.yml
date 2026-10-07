@@ -1,0 +1,95 @@
+name: 기존 글 Queue 로컬 Ollama 자동 수정
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'authoring/update-queue.txt'
+      - 'authoring/update-queue.mjs'
+      - 'authoring/queue-*.mjs'
+      - 'authoring/update-producer.mjs'
+      - 'authoring/update-queue-finalize.mjs'
+      - 'authoring/ollama.mjs'
+      - 'authoring/keywords.mjs'
+      - 'tests/update-queue.test.mjs'
+      - '.github/workflows/ollama-update-queue.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nhunnhun-ollama-update-queue
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/keyword-authoring.test.mjs tests/update-queue.test.mjs
+
+  produce:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: cmd
+    outputs:
+      complete: ${{ steps.producer.outputs.complete }}
+      article_id: ${{ steps.producer.outputs.article_id }}
+      source_id: ${{ steps.producer.outputs.source_id }}
+      target_url: ${{ steps.producer.outputs.target_url }}
+      source_title: ${{ steps.producer.outputs.source_title }}
+      commit_sha: ${{ steps.producer.outputs.commit_sha }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: 로컬 AI 전용 Gate
+        run: node authoring\update-queue.mjs assert-local-only
+        env:
+          OLLAMA_HOST: http://127.0.0.1:11434
+      - name: Queue 1건 조사·작성·검토·승격
+        id: producer
+        run: node authoring\update-producer.mjs
+        env:
+          OLLAMA_MODEL: qwen3:4b
+          OLLAMA_HOST: http://127.0.0.1:11434
+
+  finalize:
+    if: needs.produce.result == 'success' && needs.produce.outputs.complete != 'true' && needs.produce.outputs.source_id != ''
+    needs: produce
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: 기존 update workflow 완료·공개 상태·원장 확인
+        run: node authoring/update-queue-finalize.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTICLE_ID: ${{ needs.produce.outputs.article_id }}
+          SOURCE_ID: ${{ needs.produce.outputs.source_id }}
