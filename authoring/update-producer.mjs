@@ -4,8 +4,8 @@ import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
 import { collectEvidence } from './queue-research.mjs';
-import { writeArticleFromPlan, validateWrittenArticle, patchableSectionIds, repairArticleSections, applySectionPatches, mergePlanAndDraft, buildLengthReport, reusableImages, renderBody, conservativeExtensions } from './queue-draft.mjs';
-import { planArticle, lengthBandForScope } from './queue-plan.mjs';
+import { reusableImages, conservativeExtensions } from './queue-draft.mjs';
+import { writeSimpleArticle, discoverInternalLinks, renderSimpleBody, SIMPLE_CONTENT_SPECS } from './queue-simple-writer.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
@@ -101,7 +101,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   let archivedIds=[];
   const resultDir=resolve(root,'generated-drafts/queue',process.env.GITHUB_RUN_ID??`local-${Date.now()}`);
   await mkdir(resultDir,{recursive:true});
-  const metrics={policyVersion:QUEUE_POLICY_VERSION,articleId:item.articleId,keyword:item.keyword,startedAt:new Date().toISOString(),stages:{},writerParallelism:Number(process.env.QUEUE_WRITER_PARALLELISM||2)};
+  const metrics={policyVersion:'R5.3-simple',articleId:item.articleId,keyword:item.keyword,startedAt:new Date().toISOString(),stages:{},writerCalls:1};
   const checkpoint=async(stage,value)=>{
     const at=new Date().toISOString();
     await writeFile(resolve(resultDir,`${item.articleId}-${stage}.json`),JSON.stringify(value,null,2)+'\n');
@@ -122,45 +122,19 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const evidence=await timed('evidenceMs',()=>collectEvidence(item,current.html,{model,fetcher}));
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,baseSha});
 
-    const planned=await timed('planMs',()=>planArticle(item,evidence,{model,fetcher,currentTitle:current.title}));
-    await checkpoint('plan-v1',{scope:planned.scope,required:planned.required,skeleton:planned.skeleton,selectedSourceIds:planned.sources.map(s=>s.id),plan:planned.initialPlan});
-    await checkpoint('plan-validation-v1',{failures:planned.initialFailures});
-    if(planned.repaired){
-      await checkpoint('plan-v2',{scope:planned.scope,downgraded:planned.downgraded===true,plan:planned.plan});
-      await checkpoint('plan-validation-v2',{failures:planned.failures});
-    }
-    if(planned.failures.length)throw Object.assign(new Error('E_QUEUE_PLAN_VALIDATION'),{details:{failures:planned.failures,initialFailures:planned.initialFailures,scope:planned.scope,repaired:planned.repaired,downgraded:planned.downgraded===true}});
+    const internalLinks=await timed('internalLinkMs',()=>discoverInternalLinks(root,item,evidence,current.html,{fetcher}));
+    await checkpoint('internal-links',{internalLinks});
 
     const extensions=conservativeExtensions(item);
-    await checkpoint('scope',{currentTitle:current.title,scope:planned.scope,lengthBand:lengthBandForScope(planned.scope),extensions});
+    await checkpoint('scope',{currentTitle:current.title,mode:'simple-single-pass',sections:SIMPLE_CONTENT_SPECS[item.domain],extensions});
 
-    let [draft,images]=await Promise.all([
-      timed('writerMs',()=>writeArticleFromPlan(item,planned.plan,planned.scope,{model,fetcher})),
+    let [article,images]=await Promise.all([
+      timed('writerMs',()=>writeSimpleArticle(item,evidence,current.title,internalLinks,{model,fetcher})),
       timed('imageLookupMs',()=>reusableImages(root,item))
     ]);
-    await checkpoint('draft-v1',draft);
-    let draftFailures=await timed('validationMs',async()=>validateWrittenArticle(draft,planned.plan));
-    await checkpoint('validation-v1',{failures:draftFailures});
-
-    if(draftFailures.length){
-      const patchIds=patchableSectionIds(draftFailures,planned.plan);
-      if(!patchIds.length)throw Object.assign(new Error('E_QUEUE_DRAFT_VALIDATION'),{details:{failures:draftFailures,scope:planned.scope}});
-      const patch=await timed('patchMs',()=>repairArticleSections(item,planned.plan,draft,draftFailures,{model,fetcher}));
-      await checkpoint('patch-v1',{sectionIds:patchIds,patch});
-      const patched=applySectionPatches(draft,patch);
-      await checkpoint('draft-v2',patched);
-      draftFailures=await timed('validationMs',async()=>validateWrittenArticle(patched,planned.plan));
-      await checkpoint('validation-v2',{failures:draftFailures});
-      draft=patched;
-    }
-    if(draftFailures.length)throw Object.assign(new Error('E_QUEUE_DRAFT_VALIDATION'),{details:{failures:draftFailures,scope:planned.scope}});
-
-    const article=mergePlanAndDraft(planned.plan,draft);
-    article.plan.scope=planned.scope;
-    const required=planned.required,lengthReport=buildLengthReport(article,planned.scope);
-    await checkpoint('draft-final',{article,required});
-    await checkpoint('length-report',lengthReport);
-    const rendered=renderBody(article,evidence,images);
+    await checkpoint('draft-final',{article,internalLinks});
+    const required=[...new Set(article.sections.flatMap(section=>section.modules??[]))];
+    const rendered=renderSimpleBody(article,evidence,images,internalLinks);
     const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
     // Structural checks do not require an AI approval; catch assembly errors early.
     assertEditorialSource(source);
