@@ -1,7 +1,7 @@
 {
-  "status": "BLOCKED_CONTENT",
-  "policyVersion": "R5.1",
-  "runId": "37560028252",
+  "status": "READY_FOR_UPDATE",
+  "policyVersion": "R5.3",
+  "runId": "37673681029",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -11,51 +11,14 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r1-20261007-81da9c5b",
-  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
-  "startedAt": "2026-10-07T08:32:04.658Z",
-  "heartbeatAt": "2026-10-07T08:33:21.895Z",
+  "sourceId": "auto-327-r53-20261008-7034c152",
+  "baseSha": "81abd02690a01e6b81660316352516cbb6fce78a",
+  "startedAt": "2026-10-07T19:23:46.504Z",
+  "heartbeatAt": "2026-10-07T19:24:32.667Z",
   "recovered": true,
   "skippedCurrent": [],
-  "blockedAt": "2026-10-07T08:33:21.897Z",
-  "error": "E_QUEUE_PLAN_VALIDATION",
-  "details": {
-    "failures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "5일"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "8개월"
-      }
-    ],
-    "initialFailures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "5일"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "8개월"
-      }
-    ],
-    "scope": "comprehensive",
-    "repaired": true
-  },
-  "publicMutation": false
+  "preparedAt": "2026-10-07T19:24:33.719Z",
+  "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
+  "fingerprint": "eec0fec62e6cf92a990dd78b5c204ffa2a541c33d0bcb63ba93274658759a0be",
+  "validationWarnings": []
 }

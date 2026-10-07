@@ -1,0 +1,311 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "가지",
+    "topic": "가지",
+    "meaning": "가지 / eggplant",
+    "entityId": "food:article-327",
+    "status": "resolved",
+    "reason": "Queue R3에서 현재 URL의 주제와 canonical 검색 대상을 가지로 고정해 다른 대상으로 재해석하지 않는다."
+  },
+  "sourceDigest": "d0a4722440f2f443db91c4a59ad6f3e98b4053df13789c1b79ec16f1f5cdc1ff",
+  "intent": {
+    "primaryQuestion": "가지에 대해 독자가 알고 싶은 핵심 내용을 6개 항목으로 확인한다.",
+    "readerSituation": "가지의 성분·효과·활용·주의 정보를 한 번에 확인하려는 독자다.",
+    "nextActions": [
+      "가지 정보를 실제 선택과 활용에 적용한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "가지의 선택 확장 질문은 자동 필수화하지 않고 직접 근거와 검색 의도가 함께 확인될 때만 본문에서 다룬다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "음식(식품) 소개",
+      "answerQuote": "가지는 흰색 뿌리와 푸른 잎을 가진 식물로, 한국에서 '가지'라고 불리는 이 식물은 농업에서 중요한 작물로 자리매김했습니다.",
+      "sourceIds": [
+        "web-2-fdc-nal-usda-gov",
+        "pmid-41826248"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "영양소와 핵심 성분",
+      "answerQuote": "가지는 비타민 C, 칼륨, 섬유질, 비타민 K, 비타민 A, 칼슘, 철분 등 풍부한 영양소를 포함합니다. 특히 비타민 C는 면",
+      "sourceIds": [
+        "web-2-fdc-nal-usda-gov",
+        "web-1-fdc-nal-usda-gov"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "꾸준히 섭취시 신체 변화",
+      "answerQuote": "가지를 꾸준히 섭취하면, 몸이 풍부한 비타민과 미네랄을 흡수하여 면역력이 강해지고, 피부 건강이 개선됩니다. 특히 비타민 C가",
+      "sourceIds": [
+        "pmid-41826248",
+        "pmid-42580066"
+      ]
+    },
+    {
+      "module": "combinations",
+      "heading": "궁합이 잘맞는 음식과 시너지 효과",
+      "answerQuote": "가지는 토마토와 함께 섭취하면, 비타민 C와 칼륨이 풍부한 식품으로서 혈액 응고를 촉진하고, 심장 건강을 유지하는 데 도움을",
+      "sourceIds": [
+        "pmid-41826248",
+        "pmid-42580066"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "섭취시 주의사항",
+      "answerQuote": "가지를 섭취할 때 주의해야 할 점은, 가지가 흰색 뿌리와 푸른 잎을 가진 식물이기 때문에, 이는 식품의 풍부한 영양을 제공하는",
+      "sourceIds": [
+        "web-6-www-fda-gov",
+        "web-2-fdc-nal-usda-gov"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "좋은 제품을 고르는 방법",
+      "answerQuote": "가지를 고르는 법은, 가지가 흰색 뿌리와 푸른 잎을 가진 식물이기 때문에, 이는 식품의 풍부한 영양을 제공하는 데 기여합니다.",
+      "sourceIds": [
+        "web-2-fdc-nal-usda-gov",
+        "pmid-41826248"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "가지의 이번 작성 범위에서는 nutrient 연결을 필수로 강제하지 않고 직접 근거가 있는 내용만 본문에 남긴다."
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "가지의 이번 작성 범위에서는 medicine 연결을 필수로 강제하지 않고 직접 근거가 있는 내용만 본문에 남긴다."
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "가지의 이번 작성 범위에서는 disease 연결을 필수로 강제하지 않고 직접 근거가 있는 내용만 본문에 남긴다."
+    }
+  },
+  "sources": [
+    {
+      "id": "web-5-www-nhs-uk",
+      "url": "https://www.nhs.uk/healthier-families/food-facts/5-a-day/",
+      "title": "5 A Day – Food Facts – Healthier Families",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "일반 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다."
+    },
+    {
+      "id": "web-6-www-fda-gov",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely",
+      "title": "Selecting and Serving Produce Safely",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "일반 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다."
+    },
+    {
+      "id": "web-1-fdc-nal-usda-gov",
+      "url": "https://fdc.nal.usda.gov/food-search/",
+      "title": "Food Search | USDA FoodData Central",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 연구 결과·주제별 효과는 확인된 것으로 간주하지 않는다."
+    },
+    {
+      "id": "web-2-fdc-nal-usda-gov",
+      "url": "https://fdc.nal.usda.gov/log/",
+      "title": "Update Log | USDA FoodData Central",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 연구 결과·주제별 효과는 확인된 것으로 간주하지 않는다."
+    },
+    {
+      "id": "pmid-41826248",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41826248/",
+      "title": "Balancing Efficacy, Toxicological Selectivity and Yield Response of Insecticides Against the Invasive Spiralling Whitefly Aleurodicus dispersus in Eggplant Under Field Conditions.",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다."
+    },
+    {
+      "id": "pmid-42580066",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42580066/",
+      "title": "Evaluation of glycoalkaloids and their aglycones in vegetable-based baby foods using a validated mesostructured silica-based MSPD protocol assisted by bead homogenization and UHPLC-MS/MS.",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다."
+    },
+    {
+      "id": "pmid-42554018",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42554018/",
+      "title": "Simultaneous evaluation of the dissipation behaviours, half-lives, and dietary risks of various insecticides in eggplant.",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다."
+    },
+    {
+      "id": "pmid-42796916",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42796916/",
+      "title": "Molecular Targets and Trait Innovation in CRISPR-Edited Vegetable Crops: An Up-to-Date Review (2020-2026).",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다."
+    },
+    {
+      "id": "pmid-42793321",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42793321/",
+      "title": "Genome-Wide Identification of CRK Family Members in Solanaceae Crops and Functional Characterization of CaCRK10 and SmCRK6 in Salt Stress Response.",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-08",
+      "scopeNote": "PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-08",
+    "reviewer": {
+      "name": "Queue R3 결정론적 근거·제출 게이트",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "작성 계획의 primaryQuestion과 readerSituation을 본문 범위와 함께 기록했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "주장별 sourceId·자료 역할·고위험 자료종류 제한을 코드로 검사했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "권장 분량은 경고 범위로만 사용하고 확인되지 않은 효과나 기간을 채우지 않도록 제한했다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "비교는 필수 항목이 아니며 직접 근거와 검색 의도가 없는 비교는 생성 계약에서 강제하지 않았다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "병용·조합은 필수 항목이 아니며 근거 없는 시너지나 상호작용을 강제하지 않았다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "다른 분야 연결은 자동 필수화하지 않고 현재 주제와 직접 연결된 경우만 본문에서 다루도록 제한했다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "필수 안전 모듈과 안전 관련 claim의 자료 역할을 확인하고 고위험 주장은 별도 검사 대상으로 분리했다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "본문 생성 계약에서 과장·훈계·근거 없는 권장 표현을 금지하고 최종 톤 검사를 적용했다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "강조 문구는 별도 설명을 반복 생성하지 않고 본문 안의 구절을 강조하도록 조립했다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "기존 visualChecked 이미지 3개와 대표 이미지·출처·저작권 계약을 그대로 검증한다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "본문 sourceIds와 실제 링크를 연결하고 출처 목록 및 검색 범위 기록을 검증한다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
