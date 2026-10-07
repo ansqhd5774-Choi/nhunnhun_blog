@@ -1,6 +1,8 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { ollamaJson } from './queue-ollama.mjs';
+import { glossaryPass } from './queue-draft.mjs';
+import { fetchSource, isTopicSpecificSource } from './queue-research.mjs';
 
 const BLOG='https://nhunnhun.tistory.com';
 
@@ -67,21 +69,30 @@ async function readCuratedEvidence(root,item){
   }catch(error){if(error?.code==='ENOENT')return null;throw error;}
 }
 
-export async function applyCuratedEvidence(root,item,evidence){
+export async function applyCuratedEvidence(root,item,evidence,{fetcher=fetch,cached=(_stage,_input,action)=>action(),onCacheHit}={}){
   const curated=await readCuratedEvidence(root,item);
   if(!curated)return {...evidence,r53SectionEvidence:null,r53InternalLinks:[]};
   const existing=new Map((evidence?.sources??[]).map(source=>[source.id,source]));
-  for(const source of curated.sources??[]){
+  const retrieved=await cached('curated',{sources:curated.sources,day:new Date().toISOString().slice(0,10)},
+    ()=>Promise.all((curated.sources??[]).map(async(source,index)=>{
+      const existingSource=(evidence.sources??[]).find(s=>s.url===source.url&&s.notes);
+      return existingSource??await fetchSource(source.url,item.domain,index+1,fetcher);
+    })),onCacheHit);
+  for(const [index,source] of (curated.sources??[]).entries()){
+    const original=retrieved[index];
+    if(!original?.notes)continue;
     existing.set(source.id,{
       ...source,
-      topicSpecific:true,
-      scopeNote:'사전 조사에서 해당 글의 6개 작성 항목에 맞게 검증·정리한 직접 근거다.',
-      notes:(Object.values(curated.sections??{}).flatMap(section=>section?.sourceIds?.includes(source.id)?section.facts??[]:[])).join(' ')
+      checkedAt:original.checkedAt,
+      topicSpecific:isTopicSpecificSource(original,evidence.query),
+      scopeNote:'해당 URL에서 실제 조회한 본문 발췌다. 편집자가 정리한 절별 사실을 원문 인용으로 바꾸지 않는다.',
+      notes:original.notes,evidenceOrigin:'public-fetch'
     });
   }
   return {
     ...evidence,
     sources:[...existing.values()],
+    // Section summaries are planning hints, never substituted for source excerpts.
     r53SectionEvidence:curated.sections??null,
     r53InternalLinks:Array.isArray(curated.internalLinks)?curated.internalLinks:[]
   };
@@ -271,14 +282,24 @@ function imageAttribution(images){
 }
 
 export function renderR53Body(article,evidence,images,internalLinks=[]){
+  const strict=article.plan?.scope==='evidence-first';
   const usedLinks=new Set();
   const imageTags=images.map(x=>'<p><img src="'+esc(x.src)+'" alt="'+esc(x.alt)+'"></p>');
   let html=imageTags[0]+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
     section.paragraphs.forEach((paragraph,pIndex)=>{
-      const body=linkify(paragraph,internalLinks,usedLinks);
-      html+='\n<p>'+body+'</p>';
+      let body=linkify(paragraph,internalLinks,usedLinks);
+      const safetyKind=section.modules.includes('red_flags')?'danger':section.modules.includes('contraindications')?'caution':null;
+      if(strict&&!safetyKind){
+        const tags=['strong','mark','u','strong'];
+        for(const [anchorIndex,anchor] of (section.anchors??[]).entries()){
+          if(!paragraph.includes(anchor)||section.paragraphs.slice(0,pIndex).some(p=>p.includes(anchor)))continue;
+          const tag=tags[anchorIndex],open=tag==='mark'?'<mark data-tone="key">':'<'+tag+'>';
+          body=body.replace(esc(anchor),open+esc(anchor)+'</'+tag+'>');
+        }
+      }
+      html+=strict&&safetyKind&&pIndex===0?'\n<blockquote data-kind="'+safetyKind+'"><p>'+body+'</p></blockquote>':'\n<p>'+body+'</p>';
     });
     const citations=sourceLinks(evidence,section.sourceIds);
     if(citations.length)html+='\n<p>근거: '+citations.map(s=>'<a href="'+esc(s.url)+'">'+esc(s.title)+'</a>').join(' · ')+'</p>';
@@ -292,5 +313,5 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     for(const link of related)html+='\n<p><a href="'+esc(link.url)+'"><strong>'+esc(link.label)+'</strong></a></p>';
   }
   html+='\n<h2>자료 출처</h2><ul>'+(evidence?.sources??[]).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
-  return {html,glossary:[]};
+  return strict?glossaryPass(html):{html,glossary:[]};
 }

@@ -1,11 +1,13 @@
-import { writeFile, mkdir, rm } from 'node:fs/promises';
+import { writeFile, mkdir, rm, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
-import { collectEvidence } from './queue-research.mjs';
+import { selectNextQueueItem, parseUpdateQueue, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
+import { collectEvidence, sourceMainText } from './queue-research.mjs';
 import { reusableImages, conservativeExtensions } from './queue-draft.mjs';
-import { applyCuratedEvidence, collectInternalLinks, writeR53Article, renderR53Body, R53_REQUIRED_MODULES } from './queue-r53.mjs';
+import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './queue-r53.mjs';
+import { buildWritingContract, writeEfficientArticle, patchDraft, assembleDraft } from './queue-efficient.mjs';
+import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
@@ -53,11 +55,13 @@ function failureState(error){
   return 'SKIPPED';
 }
 
-export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null}={}){
+export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,dryRun=false,articleId=null,cacheDir=null}={}){
   assertLocalOnly(process.env);
   const baseSha=git(['rev-parse','HEAD'],root);
-  if(baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
-  const selected=await selectNextQueueItem(root,{fetcher});
+  if(!dryRun&&baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
+  const selected=dryRun?{item:parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8')).find(x=>x.articleId===articleId),skipped:[]}
+    :await selectNextQueueItem(root,{fetcher});
+  if(dryRun&&!selected.item)throw Error('E_QUEUE_DRY_RUN_TARGET');
   if(!selected.item){
     console.log('QUEUE_COMPLETE '+JSON.stringify({policyVersion:QUEUE_POLICY_VERSION}));
     onOutput?.({complete:'true',commit_sha:''});
@@ -70,16 +74,28 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     startedAt:new Date().toISOString(),heartbeatAt:new Date().toISOString(),recovered:selected.recovered===true,
     skippedCurrent:selected.skipped.map(x=>({articleId:x.articleId,sourceId:x.sourceId??null,status:x.skipStatus??x.blockedStatus??null}))
   };
-  await writeQueueState(root,item.articleId,running);
+  if(!dryRun)await writeQueueState(root,item.articleId,running);
 
   let operationalWritten=false,archivedIds=[];
   const resultDir=resolve(root,'generated-drafts/queue',process.env.GITHUB_RUN_ID??('local-'+Date.now()));
   await mkdir(resultDir,{recursive:true});
-  const metrics={policyVersion:QUEUE_POLICY_VERSION,articleId:item.articleId,keyword:item.keyword,startedAt:new Date().toISOString(),stages:{},ollamaWriterCalls:0,ollamaAuditCalls:0};
+  const metrics={attemptId:resultDir,policyVersion:QUEUE_POLICY_VERSION,articleId:item.articleId,keyword:item.keyword,startedAt:new Date().toISOString(),dryRun,stages:{},modelCalls:[],cacheHits:[],ollamaWriterCalls:0,ollamaAuditCalls:0,ollamaFormatCalls:0,ollamaRequests:0};
+  const originalFetcher=fetcher;
+  fetcher=(url,request)=>{
+    if(String(url)==='http://127.0.0.1:11434/api/chat'&&request?.method==='POST')metrics.ollamaRequests++;
+    return originalFetcher(url,request);
+  };
+  const policy=await producerPolicyDigest(root);
+  const storage=cacheDir??resolve(process.env.LOCALAPPDATA??resolve(root,'generated-drafts'),'nhunnhun-queue-cache','stages');
+  const stageCache=createStageCache(storage);
+  const cached=(stage,input,action,onHit)=>stageCache(stage,{policy,item,model,input},action,onHit);
+  const onCacheHit=stage=>{metrics.cacheHits.push(stage);console.log('QUEUE_CACHE_HIT '+JSON.stringify({articleId:item.articleId,stage}));};
+  const onMetrics=value=>{metrics.modelCalls.push(value);if(['draft','patch'].includes(value.purpose))metrics.ollamaWriterCalls++;else if(value.purpose==='anchors')metrics.ollamaFormatCalls++;else metrics.ollamaAuditCalls++;};
+  const options={model,fetcher,cached,onCacheHit,onMetrics};
   const checkpoint=async(stage,value)=>{
     const at=new Date().toISOString();
     await writeFile(resolve(resultDir,item.articleId+'-'+stage+'.json'),JSON.stringify(value,null,2)+'\n');
-    running.heartbeatAt=at;await writeQueueState(root,item.articleId,running);
+    running.heartbeatAt=at;if(!dryRun)await writeQueueState(root,item.articleId,running);
     console.log('QUEUE_STAGE '+JSON.stringify({articleId:item.articleId,stage,at}));
   };
   const timed=async(name,fn)=>{
@@ -88,40 +104,63 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   };
   const writeMetrics=async(result,error=null)=>{
     metrics.result=result;metrics.error=error;metrics.completedAt=new Date().toISOString();metrics.totalMs=Date.now()-Date.parse(metrics.startedAt);
+    metrics.cumulative=await recordAttempt(storage,item.articleId,metrics);
     await writeFile(resolve(resultDir,item.articleId+'-metrics.json'),JSON.stringify(metrics,null,2)+'\n');
   };
 
   try{
+    try{const ps=await fetcher('http://127.0.0.1:11434/api/ps',{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
+      metrics.modelPlacement=(ps.models??[]).filter(m=>m.name===model).map(({name,size,size_vram,context_length})=>({name,size,size_vram,context_length}));
+    }catch{metrics.modelPlacement=null;}
     const current=await timed('publicFetchMs',()=>fetchPublic(item,fetcher));
-    let evidence=await timed('evidenceMs',()=>collectEvidence(item,current.html,{model,fetcher}));
-    evidence=await applyCuratedEvidence(root,item,evidence);
+    let evidence=await timed('evidenceMs',()=>cached('evidence',{publicHash:digest(sourceMainText(current.html,{article:true})),day:todayInSeoul()},()=>collectEvidence(item,current.html,{model,fetcher}),onCacheHit));
+    evidence=await timed('curatedEvidenceMs',()=>applyCuratedEvidence(root,item,evidence,options));
     const internalLinks=await timed('internalLinkMs',()=>collectInternalLinks(root,item,current.html,evidence));
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,internalLinks,baseSha});
 
-    metrics.ollamaWriterCalls++;
-    const [article,images]=await Promise.all([
-      timed('writerMs',()=>writeR53Article(item,evidence,{model,fetcher,currentTitle:current.title,internalLinks})),
-      timed('imageLookupMs',()=>reusableImages(root,item))
-    ]);
+    const contract=buildWritingContract(item,evidence);
+    await checkpoint('contract',contract);
+    // Missing image approval should be detected before spending time on generation.
+    const images=await timed('imageLookupMs',()=>reusableImages(root,item));
+    let {article,raw,repaired}=await timed('writerMs',()=>writeEfficientArticle(contract,{...options,currentTitle:current.title,internalLinks}));
+    try{const ps=await fetcher('http://127.0.0.1:11434/api/ps',{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
+      metrics.modelPlacementAfterWriter=(ps.models??[]).filter(m=>m.name===model).map(({name,size,size_vram,context_length})=>({name,size,size_vram,context_length}));
+    }catch{metrics.modelPlacementAfterWriter=null;}
     await checkpoint('draft',{article,internalLinks});
 
-    const rendered=renderR53Body(article,evidence,images,internalLinks);
-    const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
+    let rendered=renderR53Body(article,evidence,images,internalLinks);
+    let source=makeSource(item,current.title,sourceId,article,rendered.html,images);
     assertEditorialSource(source);
     assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
     renderEditorialPost(source);
 
-    const required=R53_REQUIRED_MODULES[item.domain]??[];
+    const required=contract.required;
     const extensions=conservativeExtensions(item);
-    const details=await reviewDetails(item,article,evidence,extensions,{model,fetcher});
-    if(['medicine','disease'].includes(item.domain))metrics.ollamaAuditCalls++;
-    const {review,report,targetedAudit}=await timed('reviewMs',()=>finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,{model,fetcher}));
+    let details=await reviewDetails(item,article,evidence,extensions,options);
+    let reviewed;
+    try{reviewed=await timed('reviewMs',()=>finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,options));}
+    catch(error){
+      const issues=error.details?.issues??[];
+      if(repaired||error.message!=='E_QUEUE_SEMANTIC_REVIEW_FAILED'||!issues.length||issues.some(i=>!contract.sections.some(s=>s.id===i.sectionId)))throw error;
+      raw=await timed('repairMs',()=>patchDraft(raw,contract,issues,options));repaired=true;
+      article=assembleDraft(raw,contract);rendered=renderR53Body(article,evidence,images,internalLinks);
+      source=makeSource(item,current.title,sourceId,article,rendered.html,images);
+      assertEditorialSource(source);assertImageReview(source);checkUpdateSource(source,sourceId+'.json');renderEditorialPost(source);
+      details=await reviewDetails(item,article,evidence,extensions,options);
+      reviewed=await timed('reviewMs',()=>finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,options));
+    }
+    const {review,report,targetedAudit}=reviewed;
     await checkpoint('reviewed',{source,review,report,targetedAudit});
 
     assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
     renderEditorialPost(source);
+    if(dryRun){
+      await writeMetrics('DRY_RUN_VALIDATED');
+      console.log('QUEUE_DRY_RUN_VALIDATED '+JSON.stringify({articleId:item.articleId,resultDir,publicMutation:false}));
+      return {dryRun:true,source,review,resultDir,metrics};
+    }
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
 
     archivedIds=await archiveCompletedSources(root,item);
@@ -134,7 +173,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
 
     await writeMetrics('READY_FOR_UPDATE');
-    const commitSha=commit?await commitPaths(root,item,sourceId,'feat(authoring): prepare R5.3 queued rewrite '+item.articleId,archivedIds):null;
+    const commitSha=commit?await commitPaths(root,item,sourceId,'feat(authoring): prepare R5.4 queued rewrite '+item.articleId,archivedIds):null;
     const output={complete:'false',article_id:item.articleId,source_id:sourceId,target_url:item.targetUrl,source_title:source.title,commit_sha:commitSha||''};
     onOutput?.(output);
     console.log('QUEUE_PREPARED '+JSON.stringify({item,sourceId,commitSha,title:source.title,internalLinks:internalLinks.length,writerCalls:metrics.ollamaWriterCalls,auditCalls:metrics.ollamaAuditCalls}));
@@ -146,20 +185,20 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     }
     if(archivedIds.length)await restoreArchivedSources(root,archivedIds);
     const status=failureState(error),code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED';
-    await writeQueueState(root,item.articleId,{...running,status,policyVersion:QUEUE_POLICY_VERSION,failedAt:new Date().toISOString(),error:code,details:error.details??null,publicMutation:false});
+    if(!dryRun)await writeQueueState(root,item.articleId,{...running,status,policyVersion:QUEUE_POLICY_VERSION,failedAt:new Date().toISOString(),error:code,details:error.details??null,publicMutation:false});
     await writeMetrics(status,code);
     let checkpointSha=null;
-    if(commit&&status==='SKIPPED'&&remoteMain(root)===baseSha)checkpointSha=await commitPaths(root,item,sourceId,'chore(authoring): skip R5.3 queue item '+item.articleId,[]);
+    if(!dryRun&&commit&&status==='SKIPPED'&&remoteMain(root)===baseSha)checkpointSha=await commitPaths(root,item,sourceId,'chore(authoring): skip queue item '+item.articleId,[]);
     console.log('QUEUE_ITEM_'+status+' '+JSON.stringify({articleId:item.articleId,error:code,checkpointSha}));
     onOutput?.({complete:'false',commit_sha:checkpointSha||''});
-    if(status==='ERROR_SYSTEM')throw error;
+    if(dryRun||status==='ERROR_SYSTEM')throw error;
     return {skipped:true,item,error:code,checkpointSha};
   }
 }
 
 async function main(){
   const fs=await import('node:fs');
-  return runQueueProducer({commit:!process.argv.includes('--no-commit'),onOutput:values=>{
+  return runQueueProducer({dryRun:process.argv.includes('--dry-run')||process.env.QUEUE_DRY_RUN==='true',articleId:process.argv.find(x=>x.startsWith('--article='))?.split('=')[1]??process.env.QUEUE_ARTICLE_ID,commit:!process.argv.includes('--no-commit'),onOutput:values=>{
     if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(values).map(([key,value])=>key+'='+String(value??'').replace(/\r?\n/g,' ')+'\n').join(''));
   }});
 }

@@ -411,7 +411,7 @@ test('R5.3 uses the requested six content sections and character budgets',()=>{
 });
 
 test('R5.3 source id is visibly separated from legacy R1 queue ids',()=>{
-  assert.match(queueSourceId({articleId:'327',keyword:'가지'},'2026-10-08','abc'),/^auto-327-r53-20261008-/);
+  assert.match(queueSourceId({articleId:'327',keyword:'가지'},'2026-10-08','abc'),/^auto-327-r54-20261008-/);
 });
 
 test('R5.3 finds verified internal links before the writer runs',async()=>{
