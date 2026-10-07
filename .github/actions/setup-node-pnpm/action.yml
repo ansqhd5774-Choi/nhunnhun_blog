@@ -1,5 +1,12 @@
 name: Setup Node and pnpm cache
 description: Configure Node 24 and restore pnpm store paths without third-party setup actions.
+inputs:
+  cache-key:
+    description: OS-scoped pnpm store cache key.
+    required: true
+  cache-restore-key:
+    description: OS-scoped pnpm store restore prefix.
+    required: true
 runs:
   using: composite
   steps:
@@ -12,6 +19,6 @@ runs:
           ~/.local/share/pnpm/store
           ~/AppData/Local/pnpm/store
           ~/.pnpm-store
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+        key: ${{ inputs.cache-key }}
         restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+          ${{ inputs.cache-restore-key }}
