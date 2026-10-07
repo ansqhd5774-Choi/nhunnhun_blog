@@ -62,6 +62,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - uses: ./.github/actions/setup-node-pnpm
+      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Unit and regression tests
         run: pnpm test
