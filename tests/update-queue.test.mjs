@@ -66,6 +66,23 @@ test('selector skips a publicly verified current R1 update and chooses the next 
   }finally{await rm(root,{recursive:true,force:true});}
 });
 
+test('selector skips item-level BLOCKED state and continues with the next keyword',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-blocked-skip-'));
+  try{
+    await mkdir(join(root,'authoring','update-queue-state'),{recursive:true});
+    await mkdir(join(root,'updates'),{recursive:true});
+    await mkdir(join(root,'content-reviews','updates'),{recursive:true});
+    await mkdir(join(root,'publishing','update-state'),{recursive:true});
+    await writeFile(join(root,'authoring','update-queue.txt'),'음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 바나나 - https://nhunnhun.tistory.com/328\n');
+    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_DRAFT_VALIDATION'}));
+    const fetcher=async()=>({ok:true,text:async()=>'<meta property="og:title" content="현재 글">'});
+    const selected=await selectNextQueueItem(root,{fetcher});
+    assert.equal(selected.item.articleId,'328');
+    assert.equal(selected.skipped[0].articleId,'327');
+    assert.equal(selected.skipped[0].blockedStatus,'BLOCKED_CONTENT');
+  }finally{await rm(root,{recursive:true,force:true});}
+});
+
 test('generic Ollama rewrite job accepts food and medicine categories but keeps URL locked',()=>{
   const base={id:'rewrite-food',kind:'rewrite',articleId:'327',targetUrl:'https://nhunnhun.tistory.com/327',expectedCurrentTitle:'가지',domain:'food',category:'음식',sources:[{id:'a',url:'https://example.org/a',notes:'충분한 근거 설명입니다.',checkedAt:'2026-10-07'},{id:'b',url:'https://example.org/b',notes:'두 번째 근거 설명입니다.',checkedAt:'2026-10-07'}]};
   assert.equal(validateJob(base).domain,'food');
@@ -136,7 +153,7 @@ test('필수 모듈 누락 목록을 정확히 계산해 재작성 단계가 보
   assert.deepEqual(missingRequiredModules(article,['identity','nutrition','amount','safety','decision']),['amount','decision']);
 });
 
-for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: profiles do not force optional modules, selected extensions still require coverage`,()=>{
+for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: R3 keeps optional extensions out of mandatory core coverage`,()=>{
   const evidence={query:'example',sources:[{id:'direct',topicSpecific:true}]};
   const raw={comparison:{applies:false,reason:'현재 검색 질문에 비교가 필요하지 않아 포함하지 않습니다.',sourceIds:[]}};
   const excluded=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
@@ -145,7 +162,7 @@ for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: pr
   raw.comparison={applies:true,reason:'독자의 선택에 필요한 직접 비교 자료를 확인했습니다.',sourceIds:['direct']};
   const included=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
   assert.equal(included.comparison.applies,true);
-  assert.ok(requiredModules({domain},included).includes('comparison'));
+  assert.deepEqual(requiredModules({domain},included),DOMAIN_RULES[domain].core);
 });
 
 for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: common body obeys existing R4 lead/summary/image contract without fabricated comparisons`,()=>{
@@ -162,19 +179,19 @@ for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: co
   if(domain==='disease')assert.match(html,/data-kind="danger"/);
 });
 
-test('structured draft allows empty optional fields and still fails missing core answers after one repair',async()=>{
+test('R3 draft performs only one repair and fails closed when core answers remain missing',async()=>{
   const item={keyword:'새 주제',domain:'nutrient',category:'영양소',targetUrl:'https://nhunnhun.tistory.com/999'};
-  const evidence={query:'new topic',sources:[{id:'direct',title:'조회한 자료',kind:'official',role:'health',notes:'조회한 본문에서 확인할 수 있는 범위입니다.'}]};
+  const evidence={query:'new topic',sources:[{id:'direct',title:'조회한 자료',kind:'official',role:'health',scopeNote:'현재 자료 범위만 사용합니다.',notes:'조회한 본문에서 확인할 수 있는 범위입니다.'}]};
   let calls=0;
   const fetcher=async(_url,options)=>{
     calls++;
     const request=JSON.parse(options.body);
-    assert.equal(request.format.properties.sections.items.properties.actionPoint.minLength,undefined);
-    assert.equal(request.format.properties.sections.items.properties.contrastPoint.minLength,undefined);
-    const bytes=new TextEncoder().encode(JSON.stringify({done:true,message:{content:JSON.stringify({sections:[{id:'actual-answer',modules:['identity']}]})}})+'\n');
+    assert.equal(request.format.properties.sections.items.properties.highlightPhrase.minLength,2);
+    assert.ok(request.format.properties.claims);
+    const bytes=new TextEncoder().encode(JSON.stringify({done:true,message:{content:JSON.stringify({sections:[{id:'actual-answer',modules:['identity']}],plan:{}})}})+'\n');
     return {ok:true,body:(async function*(){yield bytes;})()};
   };
-  await assert.rejects(draftArticle(item,evidence,{}, {model:'fixture-only',fetcher}),error=>error.message==='E_QUEUE_REQUIRED_MODULE'&&error.details.missing.length>0);
+  await assert.rejects(draftArticle(item,evidence,{}, {model:'fixture-only',fetcher}),error=>error.message==='E_QUEUE_DRAFT_VALIDATION'&&error.details.failures.length>0);
   assert.equal(calls,2);
 });
 
