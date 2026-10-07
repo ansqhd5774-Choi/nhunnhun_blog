@@ -54,10 +54,11 @@ export function renderArticle(article, job) {
   const {tags,...source} = post;
   return {...source, articleId:job.articleId,targetUrl:job.targetUrl,expectedCurrentTitle:job.expectedCurrentTitle};
 }
+function isTimeoutError(error){return ['AbortError','TimeoutError'].includes(error?.name)||/timeout|timed out/i.test(String(error?.message??''));}
 export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) {
   let response;
   try { response=await fetcher('http://127.0.0.1:11434/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(1200000)}); }
-  catch { throw new Error('E_OLLAMA_TRANSPORT_STATE_UNKNOWN'); }
+  catch(error) { if(isTimeoutError(error))throw new Error('E_OLLAMA_TIMEOUT'); throw new Error('E_OLLAMA_TRANSPORT_STATE_UNKNOWN'); }
   if(!response.ok) throw new Error(`E_OLLAMA_HTTP_${response.status}`);
   let data;
   if(body.stream===true) {
@@ -76,7 +77,7 @@ export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) 
           if(count%30===0 || event.done) await onProgress({content,chunks:count});
         }
       }
-    } catch(error) { if(/^E_OLLAMA_/.test(error.message)) throw error; throw new Error('E_OLLAMA_STREAM_STATE_UNKNOWN'); }
+    } catch(error) { if(/^E_OLLAMA_/.test(error.message)) throw error; if(isTimeoutError(error))throw new Error('E_OLLAMA_TIMEOUT'); throw new Error('E_OLLAMA_STREAM_STATE_UNKNOWN'); }
   } else data=await response.json();
   if(data?.done!==true || !data.message?.content) throw new Error('E_OLLAMA_INCOMPLETE');
   if(data.done_reason==='length') throw Object.assign(new Error('E_OLLAMA_LENGTH_LIMIT'),{details:{outputTokens:data.eval_count??null,promptTokens:data.prompt_eval_count??null}});

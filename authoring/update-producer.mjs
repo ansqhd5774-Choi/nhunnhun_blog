@@ -4,7 +4,8 @@ import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources } from './update-queue.mjs';
 import { collectEvidence } from './queue-research.mjs';
-import { draftArticle, reusableImages, renderBody, conservativeExtensions } from './queue-draft.mjs';
+import { writeArticleFromPlan, validateWrittenArticle, patchableSectionIds, repairArticleSections, applySectionPatches, mergePlanAndDraft, buildLengthReport, reusableImages, renderBody, conservativeExtensions } from './queue-draft.mjs';
+import { planArticle, lengthBandForScope } from './queue-plan.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
@@ -54,7 +55,7 @@ function requireNodeFs(){throw new Error('E_QUEUE_INTERNAL_OUTPUT');}
 
 function blockStatus(error){
   const code=String(error?.message??'E_QUEUE_FAILED');
-  if(code==='E_OLLAMA_LENGTH_LIMIT')return 'BLOCKED_GENERATION';
+  if(['E_OLLAMA_LENGTH_LIMIT','E_OLLAMA_TIMEOUT'].includes(code))return 'BLOCKED_GENERATION';
   if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING)/.test(code)||['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT'].includes(code))return 'BLOCKED_SYSTEM';
   if(/IMAGE_REVIEW/.test(code))return 'BLOCKED_IMAGE';
   if(/RESEARCH|AUTHORIZATION|PRIMARY_SOURCE|HEALTH_EVIDENCE/.test(code))return 'BLOCKED_EVIDENCE';
@@ -64,7 +65,7 @@ function blockStatus(error){
 }
 function itemLevelBlock(status){return status!=='BLOCKED_SYSTEM';}
 
-export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,maxBlockedPerRun=Number(process.env.QUEUE_MAX_BLOCKED_PER_RUN||3)}={}){
+export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,batchStartedAt=Date.now(),maxRuntimeMinutes=Number(process.env.QUEUE_MAX_RUNTIME_MINUTES||90)}={}){
   assertLocalOnly(process.env);
   const baseSha=git(['rev-parse','HEAD'],root);
   if(baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
@@ -88,11 +89,38 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const current=await fetchPublic(item,fetcher);
     const evidence=await collectEvidence(item,current.html,{model,fetcher});
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,baseSha});
+
+    const planned=await planArticle(item,evidence,{model,fetcher,currentTitle:current.title});
+    await checkpoint('plan',{scope:planned.scope,required:planned.required,selectedSourceIds:planned.sources.map(s=>s.id),plan:planned.plan});
+    await checkpoint('plan-validation',{failures:planned.failures});
+    if(planned.failures.length)throw Object.assign(new Error('E_QUEUE_PLAN_VALIDATION'),{details:{failures:planned.failures,scope:planned.scope}});
+
     const extensions=conservativeExtensions(item);
-    await checkpoint('scope',{currentTitle:current.title,extensions});
-    const {article,required,lengthReport}=await draftArticle(item,evidence,extensions,{model,fetcher,currentTitle:current.title});
-    await checkpoint('draft',{article,required});
+    await checkpoint('scope',{currentTitle:current.title,scope:planned.scope,lengthBand:lengthBandForScope(planned.scope),extensions});
+
+    let draft=await writeArticleFromPlan(item,planned.plan,planned.scope,{model,fetcher});
+    await checkpoint('draft-v1',draft);
+    let draftFailures=validateWrittenArticle(draft,planned.plan);
+    await checkpoint('validation-v1',{failures:draftFailures});
+
+    if(draftFailures.length){
+      const patchIds=patchableSectionIds(draftFailures,planned.plan);
+      if(!patchIds.length)throw Object.assign(new Error('E_QUEUE_DRAFT_VALIDATION'),{details:{failures:draftFailures,scope:planned.scope}});
+      const patch=await repairArticleSections(item,planned.plan,draft,draftFailures,{model,fetcher});
+      await checkpoint('patch-v1',{sectionIds:patchIds,patch});
+      draft=applySectionPatches(draft,patch);
+      await checkpoint('draft-v2',draft);
+      draftFailures=validateWrittenArticle(draft,planned.plan);
+      await checkpoint('validation-v2',{failures:draftFailures});
+    }
+    if(draftFailures.length)throw Object.assign(new Error('E_QUEUE_DRAFT_VALIDATION'),{details:{failures:draftFailures,scope:planned.scope}});
+
+    const article=mergePlanAndDraft(planned.plan,draft);
+    article.plan.scope=planned.scope;
+    const required=planned.required,lengthReport=buildLengthReport(article,planned.scope);
+    await checkpoint('draft-final',{article,required});
     await checkpoint('length-report',lengthReport);
+
     const images=await reusableImages(root,item);
     const rendered=renderBody(article,evidence,images);
     const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
@@ -133,9 +161,10 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await writeQueueState(root,item.articleId,{...running,status,blockedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false});
     if(commit&&remoteMain(root)===baseSha)await commitPaths(root,item,sourceId,`chore(authoring): block queued rewrite ${item.articleId}`);
     if(itemLevelBlock(status)){
-      console.log('QUEUE_ITEM_BLOCKED_CONTINUE '+JSON.stringify({articleId:item.articleId,status,error:code,blockedCount:blockedCount+1}));
-      if(blockedCount+1<maxBlockedPerRun)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,maxBlockedPerRun});
-      console.log('QUEUE_BATCH_BLOCK_LIMIT '+JSON.stringify({maxBlockedPerRun}));
+      const elapsedMinutes=(Date.now()-batchStartedAt)/60000;
+      console.log('QUEUE_ITEM_BLOCKED_CONTINUE '+JSON.stringify({articleId:item.articleId,status,error:code,blockedCount:blockedCount+1,elapsedMinutes:Number(elapsedMinutes.toFixed(1))}));
+      if(elapsedMinutes<maxRuntimeMinutes)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,batchStartedAt,maxRuntimeMinutes});
+      console.log('QUEUE_BATCH_TIME_LIMIT '+JSON.stringify({maxRuntimeMinutes,blockedCount:blockedCount+1}));
       onOutput?.({complete:'false'});
       return {blocked:true,item,status,error:code};
     }

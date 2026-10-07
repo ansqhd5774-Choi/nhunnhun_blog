@@ -36,7 +36,7 @@ export function buildReview(source,item,evidence,extensions,article,required,det
   review.coverage=required.map(module=>{
     const section=article.sections.find(s=>s.modules.includes(module));
     if(!section)throw Object.assign(new Error('E_QUEUE_REVIEW_COVERAGE'),{details:{module}});
-    return {module,heading:section.heading,answerQuote:section.strongPoint,sourceIds:section.sourceIds};
+    return {module,heading:section.heading,answerQuote:section.strongPhrase,sourceIds:section.sourceIds};
   });
   review.connections=Object.fromEntries(DOMAINS.filter(domain=>domain!==item.domain).map(domain=>[
     domain,{status:'not-applicable',reason:`${item.keyword}의 이번 작성 범위에서는 ${domain} 연결을 필수로 강제하지 않고 직접 근거가 있는 내용만 본문에 남긴다.`}

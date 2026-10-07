@@ -1,8 +1,8 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { ollamaJson } from './queue-ollama.mjs';
-import { DOMAIN_RULES } from '../publishing/content-standards.mjs';
-import { EXTENSIONS, MODULES } from '../publishing/standards/common.mjs';
+import { EXTENSIONS } from '../publishing/standards/common.mjs';
+import { lengthBandForScope } from './queue-plan.mjs';
 
 const GLOSSARY_DEFS=Object.freeze({
   '생체이용률':'섭취한 성분이 몸에서 이용될 수 있는 정도',
@@ -12,27 +12,10 @@ const GLOSSARY_DEFS=Object.freeze({
   '메타분석':'여러 연구 결과를 함께 모아 분석하는 방법',
   '무작위 대조시험':'참가자를 무작위로 나눠 치료나 중재 효과를 비교하는 연구',
 });
-const CLAIM_TYPES=['general','nutrition','benefit','safety','dose','interaction','disease','treatment'];
 const HIGH_RISK_TYPES=new Set(['dose','interaction','disease','treatment']);
-const SCOPE_BANDS=Object.freeze({
-  focused:[1200,2200],
-  standard:[2200,3800],
-  comprehensive:[3500,5200],
-  deep:[4500,6500],
-});
+const HIGH_RISK_TEXT=/(질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u;
 const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const norm=v=>String(v??'').normalize('NFC').replace(/\s+/g,' ').trim();
-
-export function inferWritingScope(item,currentTitle=''){
-  const haystack=norm(`${item?.keyword??''} ${currentTitle}`);
-  const terms=['효능','영양','칼로리','보관','고르는','선택','조리','먹는','섭취','주의','부작용','알레르기','혈당','다이어트','제철','손질','활용','복용','용량','상호작용','증상','원인','진단','치료','예방','비교','권장','결핍','검사','금기'];
-  const count=terms.filter(term=>haystack.includes(term)).length;
-  if(['medicine','disease'].includes(item?.domain)&&count>=7)return 'deep';
-  if(count>=6)return 'comprehensive';
-  if(count>=3)return 'standard';
-  return currentTitle?'focused':'standard';
-}
-export const lengthBandForScope=scope=>SCOPE_BANDS[scope]??SCOPE_BANDS.standard;
 
 export function conservativeExtensions(item){
   return Object.fromEntries(Object.keys(EXTENSIONS).map(key=>[key,{
@@ -41,159 +24,152 @@ export function conservativeExtensions(item){
   }]));
 }
 
-export function requiredModules(item,_extensions={}){
-  return [...DOMAIN_RULES[item.domain].core];
-}
-
-function schema(required,sources){
-  const moduleNames=Object.keys(MODULES),sourceIds=sources.map(s=>s.id);
-  return {type:'object',additionalProperties:false,required:['title','lead','summary','plan','sections','claims'],properties:{
+function writerSchema(plan){
+  const ids=plan.sections.map(s=>s.id);
+  return {type:'object',additionalProperties:false,required:['title','lead','summary','sections'],properties:{
     title:{type:'string',minLength:8,maxLength:150},
-    lead:{type:'string',minLength:30,maxLength:240},
-    summary:{type:'string',minLength:30,maxLength:240},
-    plan:{type:'object',additionalProperties:false,required:['scope','primaryQuestion','readerSituation','nextActions'],properties:{
-      scope:{type:'string',enum:Object.keys(SCOPE_BANDS)},
-      primaryQuestion:{type:'string',minLength:12,maxLength:220},
-      readerSituation:{type:'string',minLength:12,maxLength:220},
-      nextActions:{type:'array',minItems:1,maxItems:4,items:{type:'string',minLength:10,maxLength:140}}
-    }},
-    sections:{type:'array',minItems:4,maxItems:12,items:{type:'object',additionalProperties:false,required:['id','heading','strongPoint','paragraphs','highlightPhrase','underlinePhrase','modules','sourceIds'],properties:{
-      id:{type:'string',pattern:'^[a-z][a-z0-9-]{1,40}$'},
-      heading:{type:'string',minLength:6,maxLength:90},
-      strongPoint:{type:'string',minLength:12,maxLength:90},
-      paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:25,maxLength:220}},
+    lead:{type:'string',minLength:30,maxLength:220},
+    summary:{type:'string',minLength:30,maxLength:220},
+    sections:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','paragraphs','strongPhrase','highlightPhrase','underlinePhrase'],properties:{
+      id:{type:'string',enum:ids},
+      paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:30,maxLength:190}},
+      strongPhrase:{type:'string',minLength:2,maxLength:70},
       highlightPhrase:{type:'string',minLength:2,maxLength:70},
-      underlinePhrase:{type:'string',maxLength:60},
-      modules:{type:'array',minItems:1,items:{type:'string',enum:moduleNames}},
-      sourceIds:{type:'array',minItems:1,items:{type:'string',enum:sourceIds}}
-    }}},
-    claims:{type:'array',minItems:1,maxItems:12,items:{type:'object',additionalProperties:false,required:['id','sectionId','text','type','risk','sourceIds'],properties:{
-      id:{type:'string',pattern:'^c[0-9]{1,2}$'},
-      sectionId:{type:'string',pattern:'^[a-z][a-z0-9-]{1,40}$'},
-      text:{type:'string',minLength:8,maxLength:220},
-      type:{type:'string',enum:CLAIM_TYPES},
-      risk:{type:'string',enum:['low','high']},
-      sourceIds:{type:'array',minItems:1,items:{type:'string',enum:sourceIds}}
+      underlinePhrase:{type:'string',maxLength:60}
     }}}
   }};
 }
-
-function sourcePriority(source){
-  let score=0;
-  if(source.topicSpecific===true)score+=8;
-  if(['official','guideline','nutrition-database'].includes(source.kind))score+=7;
-  else if(['systematic-review','trial'].includes(source.kind))score+=5;
-  if(['nutrition','safety','authorization','health'].includes(source.role))score+=3;
-  return score;
+function patchSchema(ids){
+  return {type:'object',additionalProperties:false,required:['sections'],properties:{
+    sections:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,required:['id','paragraphs','strongPhrase','highlightPhrase','underlinePhrase'],properties:{
+      id:{type:'string',enum:ids},
+      paragraphs:{type:'array',minItems:1,maxItems:2,items:{type:'string',minLength:30,maxLength:190}},
+      strongPhrase:{type:'string',minLength:2,maxLength:70},
+      highlightPhrase:{type:'string',minLength:2,maxLength:70},
+      underlinePhrase:{type:'string',maxLength:60}
+    }}}
+  }};
 }
-export function selectDraftSources(evidence,max=7){
-  return [...evidence.sources].sort((a,b)=>sourcePriority(b)-sourcePriority(a)).slice(0,max);
+function writerBudget(scope){
+  return ({focused:2800,standard:4000,comprehensive:5500,deep:6500})[scope]??4000;
 }
-function sourceBundle(evidence){
-  return selectDraftSources(evidence).map(s=>({
-    id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific===true,
-    scopeNote:s.scopeNote,notes:s.notes.slice(0,1400)
+function claimBundle(plan){
+  return plan.sections.map(section=>({
+    id:section.id,heading:section.heading,question:section.question,modules:section.modules,
+    approvedClaims:section.claims.map(({id,text,type,risk})=>({id,text,type,risk}))
   }));
 }
-export function outputBudget(scope){
-  return ({focused:3000,standard:4500,comprehensive:6000,deep:7500})[scope]??4500;
+export async function writeArticleFromPlan(item,plan,scope,{model,fetcher=fetch}={}){
+  const [min,max]=lengthBandForScope(scope);
+  return ollamaJson([
+    {role:'system',content:`한국어 건강정보 글 작성자다. 이미 코드 검증을 통과한 Evidence Plan만 자연스러운 본문으로 변환한다. canonicalSubject는 "${item.keyword}"이며 다른 대상으로 바꾸지 않는다. 새로운 사실·수치·효능·용량·상호작용·질병효과를 추가하지 않는다. 각 section의 approvedClaims만 설명하고, 그 범위 안에서 연결문장·쉬운 풀이만 덧붙인다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이지만 글자수를 채우려고 반복하지 않는다. 답이 끝나면 즉시 완전한 JSON을 닫는다. section id는 plan과 정확히 일치해야 한다. strongPhrase, highlightPhrase는 paragraphs 안에 실제 존재하는 서로 다른 짧은 구절을 그대로 복사한다. underlinePhrase도 필요한 경우 paragraphs의 실제 구절을 복사하고 필요 없으면 빈 문자열이다. 강조를 위해 새로운 문장을 만들지 않는다. 같은 내용을 표현만 바꿔 반복하지 않는다. JSON만 출력한다.`},
+    {role:'user',content:JSON.stringify({keyword:item.keyword,scope,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,sections:claimBundle(plan)})}
+  ],writerSchema(plan),{model,fetcher,numPredict:writerBudget(scope),numCtx:12288});
 }
-function allSectionText(section){return [section.strongPoint,...(section.paragraphs??[])].map(norm).filter(Boolean);}
+
+function numericTokens(text){
+  const out=[];
+  for(const match of String(text??'').matchAll(/\b\d+(?:[.,]\d+)?(?:\s*(?:kcal|mg|mcg|μg|µg|g|kg|ml|mL|l|L|%|회|일|주|개월|년|℃|°C))?/g)){
+    const raw=match[0].replace(/,/g,'').replace(/\s+/g,'').replace(/µg|μg/g,'mcg').toLowerCase();
+    const n=Number(raw.match(/^\d+(?:\.\d+)?/)?.[0]);
+    if(Number.isInteger(n)&&n>=1900&&n<=2100&&!/[a-z%℃°가-힣]/i.test(raw.replace(/^\d+(?:\.\d+)?/,'')))continue;
+    out.push(raw);
+  }
+  return [...new Set(out)];
+}
+function sectionPlanMap(plan){return new Map(plan.sections.map(section=>[section.id,section]));}
+function highRiskPlan(section){return section.claims.some(claim=>claim.risk==='high'||HIGH_RISK_TYPES.has(claim.type)||HIGH_RISK_TEXT.test(claim.text));}
+function phraseOverlap(a,b){
+  a=norm(a);b=norm(b);if(!a||!b)return false;
+  return a===b||a.includes(b)||b.includes(a);
+}
+function sectionText(section){return norm((section.paragraphs??[]).join(' '));}
 function duplicateFailures(article){
   const failures=[];
   for(const section of article?.sections??[]){
-    const values=allSectionText(section);
-    for(let i=0;i<values.length;i++)for(let j=i+1;j<values.length;j++){
-      const a=values[i],b=values[j];
-      if(a===b || (Math.min(a.length,b.length)>=30 && (a.includes(b)||b.includes(a)))) failures.push({code:'DUPLICATE_SECTION_TEXT',sectionId:section.id});
+    const paragraphs=(section.paragraphs??[]).map(norm).filter(Boolean);
+    for(let i=0;i<paragraphs.length;i++)for(let j=i+1;j<paragraphs.length;j++){
+      if(paragraphs[i]===paragraphs[j]||(Math.min(paragraphs[i].length,paragraphs[j].length)>=40&&(paragraphs[i].includes(paragraphs[j])||paragraphs[j].includes(paragraphs[i])))){
+        failures.push({code:'DUPLICATE_SECTION_TEXT',sectionId:section.id});
+      }
     }
   }
   return failures;
 }
-function claimSourceCompatible(claim,source){
-  if(claim.type==='nutrition')return ['nutrition','health'].includes(source.role);
-  if(claim.type==='safety')return ['safety','authorization','health'].includes(source.role);
-  if(claim.type==='dose'||claim.type==='interaction')return ['authorization','safety','health'].includes(source.role);
-  if(claim.type==='benefit'||claim.type==='disease'||claim.type==='treatment')return ['health','nutrition','authorization'].includes(source.role);
-  return true;
-}
-function inferredHighRisk(claim){
-  return claim.risk==='high'||HIGH_RISK_TYPES.has(claim.type)||/(질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u.test(claim.text??'');
-}
-function claimFailures(article,evidence){
-  const failures=[],sourceById=new Map(evidence.sources.map(s=>[s.id,s])),sectionIds=new Set((article?.sections??[]).map(s=>s.id));
-  for(const claim of article?.claims??[]){
-    if(!sectionIds.has(claim.sectionId)){failures.push({code:'CLAIM_SECTION',claimId:claim.id});continue;}
-    const sources=(claim.sourceIds??[]).map(id=>sourceById.get(id)).filter(Boolean);
-    if(sources.length!==(claim.sourceIds??[]).length||!sources.length){failures.push({code:'CLAIM_SOURCE',claimId:claim.id});continue;}
-    if(!sources.some(source=>claimSourceCompatible(claim,source)))failures.push({code:'CLAIM_SCOPE',claimId:claim.id,type:claim.type});
-    if(inferredHighRisk(claim)&&!sources.some(source=>['official','guideline','systematic-review','trial','nutrition-database'].includes(source.kind))){
-      failures.push({code:'CLAIM_HIGH_RISK_SOURCE',claimId:claim.id,type:claim.type});
+export function validateWrittenArticle(draft,plan){
+  const failures=[],planById=sectionPlanMap(plan),draftIds=(draft?.sections??[]).map(s=>s.id);
+  const expected=plan.sections.map(s=>s.id);
+  if(draftIds.length!==expected.length||new Set(draftIds).size!==expected.length||expected.some(id=>!draftIds.includes(id)))failures.push({code:'ARTICLE_SECTION_SET'});
+  const allowedNumbers=new Set(plan.sections.flatMap(section=>section.claims.flatMap(claim=>numericTokens(claim.text))));
+  for(const token of numericTokens(`${draft?.title??''} ${draft?.lead??''} ${draft?.summary??''}`))if(!allowedNumbers.has(token))failures.push({code:'ARTICLE_UNDECLARED_NUMBER',token});
+  for(const section of draft?.sections??[]){
+    const planned=planById.get(section.id);
+    if(!planned){failures.push({code:'ARTICLE_SECTION_UNKNOWN',sectionId:section.id});continue;}
+    const text=sectionText(section);
+    for(const [field,value] of [['strongPhrase',section.strongPhrase],['highlightPhrase',section.highlightPhrase],['underlinePhrase',section.underlinePhrase]]){
+      if(field==='underlinePhrase'&&!norm(value))continue;
+      if(!text.includes(norm(value)))failures.push({code:'ARTICLE_EMPHASIS_NOT_IN_BODY',sectionId:section.id,field});
     }
+    if(phraseOverlap(section.strongPhrase,section.highlightPhrase)||phraseOverlap(section.strongPhrase,section.underlinePhrase)||phraseOverlap(section.highlightPhrase,section.underlinePhrase)){
+      failures.push({code:'ARTICLE_EMPHASIS_OVERLAP',sectionId:section.id});
+    }
+    const charCount=Array.from(text).length;
+    if(charCount>=250&&!norm(section.underlinePhrase))failures.push({code:'ARTICLE_SCAN_ANCHOR',sectionId:section.id});
+    const allowedSectionNumbers=new Set(planned.claims.flatMap(claim=>numericTokens(claim.text)));
+    for(const token of numericTokens(text))if(!allowedSectionNumbers.has(token))failures.push({code:'ARTICLE_UNDECLARED_NUMBER',sectionId:section.id,token});
+    if(HIGH_RISK_TEXT.test(text)&&!highRiskPlan(planned))failures.push({code:'ARTICLE_UNDECLARED_HIGH_RISK',sectionId:section.id});
   }
+  failures.push(...duplicateFailures(draft));
   return failures;
 }
-export function missingRequiredModules(article,required){
-  const covered=new Set((article?.sections??[]).flatMap(s=>s.modules??[]));
-  return required.filter(module=>!covered.has(module));
+export function patchableSectionIds(failures,plan){
+  const allowed=new Set(plan.sections.map(s=>s.id));
+  return [...new Set((failures??[]).map(f=>f.sectionId).filter(id=>allowed.has(id)))];
 }
-export function validateDraftArticle(article,required,evidence){
-  const failures=[];
-  if(!article?.plan?.primaryQuestion||!article?.plan?.readerSituation||!Array.isArray(article?.plan?.nextActions)||!article.plan.nextActions.length)failures.push({code:'PLAN_REQUIRED'});
-  const ids=new Set();
-  for(const section of article?.sections??[]){
-    if(ids.has(section.id))failures.push({code:'SECTION_ID',sectionId:section.id});ids.add(section.id);
-    const body=norm((section.paragraphs??[]).join(' '));
-    if(!body.includes(norm(section.highlightPhrase)))failures.push({code:'HIGHLIGHT_NOT_IN_BODY',sectionId:section.id});
-    if(section.underlinePhrase?.trim()&&!body.includes(norm(section.underlinePhrase)))failures.push({code:'UNDERLINE_NOT_IN_BODY',sectionId:section.id});
-    if(norm(section.highlightPhrase)===norm(section.underlinePhrase)&&section.underlinePhrase?.trim())failures.push({code:'EMPHASIS_DUPLICATE',sectionId:section.id});
-  }
-  for(const module of missingRequiredModules(article,required))failures.push({code:'MISSING_CORE_MODULE',module});
-  failures.push(...duplicateFailures(article),...claimFailures(article,evidence));
-  return failures;
+export async function repairArticleSections(item,plan,draft,failures,{model,fetcher=fetch}={}){
+  const ids=patchableSectionIds(failures,plan);
+  if(!ids.length)throw Object.assign(new Error('E_QUEUE_DRAFT_UNPATCHABLE'),{details:failures});
+  const planById=sectionPlanMap(plan),draftById=new Map(draft.sections.map(s=>[s.id,s]));
+  const sections=ids.map(id=>({
+    plan:{id,heading:planById.get(id).heading,question:planById.get(id).question,approvedClaims:planById.get(id).claims.map(({id,text,type,risk})=>({id,text,type,risk}))},
+    current:draftById.get(id),
+    failures:failures.filter(f=>f.sectionId===id)
+  }));
+  return ollamaJson([
+    {role:'system',content:`한국어 건강정보 원고의 실패한 섹션만 한 번 교정한다. 전체 글을 다시 쓰지 않는다. canonicalSubject는 "${item.keyword}"이다. 각 patch는 제공된 approvedClaims만 설명하고 새로운 사실·수치·효능을 추가하지 않는다. 실패 코드만 해결하고 다른 섹션은 건드리지 않는다. strongPhrase, highlightPhrase, underlinePhrase는 paragraphs 안의 실제 서로 다른 구절이어야 한다. 같은 설명을 반복하지 않는다. JSON만 출력한다.`},
+    {role:'user',content:JSON.stringify({sections})}
+  ],patchSchema(ids),{model,fetcher,numPredict:Math.min(1800,600+ids.length*350),numCtx:8192});
+}
+export function applySectionPatches(draft,patch){
+  const patchById=new Map((patch?.sections??[]).map(s=>[s.id,s]));
+  return {...draft,sections:draft.sections.map(section=>patchById.has(section.id)?patchById.get(section.id):section)};
+}
+export function mergePlanAndDraft(plan,draft){
+  const draftById=new Map(draft.sections.map(s=>[s.id,s]));
+  const sections=plan.sections.map(planned=>{
+    const written=draftById.get(planned.id);
+    if(!written)throw new Error('E_QUEUE_DRAFT_SECTION_MISSING');
+    return {
+      id:planned.id,heading:planned.heading,question:planned.question,modules:planned.modules,
+      sourceIds:[...new Set(planned.claims.flatMap(claim=>claim.sourceIds))],claims:planned.claims,
+      paragraphs:written.paragraphs,strongPhrase:written.strongPhrase,highlightPhrase:written.highlightPhrase,underlinePhrase:written.underlinePhrase
+    };
+  });
+  return {title:draft.title,lead:draft.lead,summary:draft.summary,plan:{scope:null,primaryQuestion:plan.primaryQuestion,readerSituation:plan.readerSituation,nextActions:plan.nextActions},sections,claims:plan.sections.flatMap(s=>s.claims)};
 }
 export function visibleCharacterCount(article){
-  const parts=[article?.lead,article?.summary,...(article?.sections??[]).flatMap(s=>[s.heading,s.strongPoint,...(s.paragraphs??[])])];
+  const parts=[article?.title,article?.lead,article?.summary,...(article?.sections??[]).flatMap(s=>[s.heading,...(s.paragraphs??[])])];
   return Array.from(parts.map(norm).filter(Boolean).join(' ')).length;
 }
 export function buildLengthReport(article,scope){
   const [min,max]=lengthBandForScope(scope),visibleCharacters=visibleCharacterCount(article);
-  const status=visibleCharacters<min?'low':visibleCharacters>max?'high':'in-band';
   return {
-    scope,recommendedBand:[min,max],visibleCharacters,status,
+    scope,recommendedBand:[min,max],visibleCharacters,
+    status:visibleCharacters<min?'low':visibleCharacters>max?'high':'in-band',
     sectionCount:article?.sections?.length??0,
     duplicateCandidates:duplicateFailures(article),
-    includedModules:[...new Set((article?.sections??[]).flatMap(s=>s.modules??[]))],
+    includedModules:[...new Set((article?.sections??[]).flatMap(s=>s.modules??[]))]
   };
-}
-
-async function generateArticle(item,evidence,extensions,required,scope,currentTitle,{model,fetcher}){
-  const [min,max]=lengthBandForScope(scope);
-  return ollamaJson([
-    {role:'system',content:`한국어 건강정보 블로그 작성자다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 표시 본문은 ${min}~${max}자지만 글자 수를 채우려고 문장을 늘리지 않는다. 핵심 질문에 필요한 만큼만 쓰고 충분히 답했으면 끝낸다. 필수 core 모듈은 ${required.join(', ')}이며 반드시 자연스럽게 답한다. 그 밖의 모듈은 검색 의도·직접 근거·새로운 판단 가치가 모두 있을 때만 선택한다. 제공 자료 밖에서 수치·효능·용량·상호작용을 만들지 않는다. 농약·농업·유전학 자료는 그 연구가 실제로 다루는 안전·재배 범위에서만 사용하고 사람의 건강 효능으로 확대하지 않는다. 사람 연구도 대상·형태·용량·기간·평가 결과가 실제 주장과 맞을 때만 사용한다. plan과 article을 한 번에 만든다. claims에는 수치·영양성분·효능·안전·용량·상호작용·질병 관련 검증 가치가 큰 핵심 주장만 최대 12개 기록하고 sourceIds로 근거를 연결한다. 일반 설명은 claims에 반복 기록하지 않는다. strongPoint는 섹션의 짧은 결론이고 paragraphs는 새로운 설명이다. highlightPhrase와 underlinePhrase는 paragraphs 안에 실제로 존재하는 짧은 구절을 그대로 복사한다. underlinePhrase가 필요 없으면 빈 문자열이다. 같은 의미를 strongPoint·paragraph에서 반복하지 않는다. 요약과 마지막 핵심정리의 재언급은 허용한다. 권장 분량을 채우지 말고 답이 끝나면 즉시 완전한 JSON을 닫아 종료한다. 분야 안내: ${DOMAIN_RULES[item.domain].guidance}`},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,category:item.category,currentUrl:item.targetUrl,currentTitle,scope,lengthBand:[min,max],requiredCoreModules:required,optionalExtensions:extensions,sources:sourceBundle(evidence)})}
-  ],schema(required,selectDraftSources(evidence)),{model,fetcher,numPredict:outputBudget(scope)});
-}
-async function repairArticle(item,evidence,extensions,required,scope,currentTitle,article,failures,{model,fetcher}){
-  const [min,max]=lengthBandForScope(scope);
-  return ollamaJson([
-    {role:'system',content:`기존 초안을 한 번만 교정한다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이다. 실패 항목만 고치되 전체 글을 불필요하게 늘리지 않는다. core 모듈 누락은 실제 근거로 답하고, 근거가 부족하면 확인 가능한 한계를 정확히 설명한다. 선택 모듈은 삭제해도 된다. claims의 sourceIds와 주장 범위를 맞춘다. highlightPhrase·underlinePhrase는 반드시 해당 paragraphs의 실제 구절이어야 한다. 권장 분량 ${min}~${max}자는 경고 범위이지 강제 목표가 아니다. 같은 설명을 반복해서 통과시키지 않는다.`},
-    {role:'user',content:JSON.stringify({failures,existingArticle:article,requiredCoreModules:required,scope,currentTitle,extensions,sources:sourceBundle(evidence)})}
-  ],schema(required,selectDraftSources(evidence)),{model,fetcher,numPredict:outputBudget(scope)});
-}
-
-export async function draftArticle(item,evidence,extensions=conservativeExtensions(item),{model,fetcher=fetch,currentTitle=''}={}){
-  const required=requiredModules(item,extensions),scope=inferWritingScope(item,currentTitle);
-  let article=await generateArticle(item,evidence,extensions,required,scope,currentTitle,{model,fetcher});
-  article.plan={...(article.plan??{}),scope};
-  let failures=validateDraftArticle(article,required,evidence);
-  if(failures.length){
-    article=await repairArticle(item,evidence,extensions,required,scope,currentTitle,article,failures,{model,fetcher});
-    article.plan={...(article.plan??{}),scope};
-    failures=validateDraftArticle(article,required,evidence);
-  }
-  if(failures.length)throw Object.assign(new Error('E_QUEUE_DRAFT_VALIDATION'),{details:{failures,required,scope,lengthReport:buildLengthReport(article,scope)}});
-  return {article,required,extensions,lengthReport:buildLengthReport(article,scope)};
 }
 
 export async function reusableImages(root,item){
@@ -217,10 +193,19 @@ function glossaryPass(html){
   }
   return {html:out,glossary};
 }
-function emphasizeParagraph(text,highlightPhrase,underlinePhrase){
-  let out=esc(text),highlight=esc(highlightPhrase),underline=esc(underlinePhrase);
-  if(highlight&&out.includes(highlight))out=out.replace(highlight,`<mark data-tone="key">${highlight}</mark>`);
-  if(underline&&out.includes(underline)&&!underline.includes(highlight)&&!highlight.includes(underline))out=out.replace(underline,`<u>${underline}</u>`);
+function emphasize(text,section){
+  let out=esc(text);
+  const replacements=[
+    ['strongPhrase','strong'],
+    ['highlightPhrase','mark'],
+    ['underlinePhrase','u'],
+  ];
+  for(const [field,tag] of replacements){
+    const phrase=esc(section[field]);
+    if(!phrase||!out.includes(phrase))continue;
+    const open=tag==='mark'?'<mark data-tone="key">':`<${tag}>`;
+    out=out.replace(phrase,`${open}${phrase}</${tag}>`);
+  }
   return out;
 }
 export function renderBody(article,evidence,images){
@@ -230,16 +215,17 @@ export function renderBody(article,evidence,images){
   const p2=Math.max(p1+1,Math.floor(article.sections.length*2/3));
   article.sections.forEach((section,index)=>{
     html+=`\n<h2>${esc(section.heading)}</h2>`;
-    const first=emphasizeParagraph(section.paragraphs[0],section.highlightPhrase,section.underlinePhrase);
     const safetyKind=section.modules.includes('red_flags')?'danger':section.modules.includes('contraindications')?'caution':null;
-    if(safetyKind)html+=`\n<blockquote data-kind="${safetyKind}"><p><strong>${esc(section.strongPoint)}</strong> ${first}</p></blockquote>`;
-    else html+=`\n<p><strong>${esc(section.strongPoint)}</strong> ${first}</p>`;
-    for(const p of section.paragraphs.slice(1))html+=`\n<p>${esc(p)}</p>`;
+    section.paragraphs.forEach((paragraph,pIndex)=>{
+      const body=emphasize(paragraph,section);
+      if(safetyKind&&pIndex===0)html+=`\n<blockquote data-kind="${safetyKind}"><p>${body}</p></blockquote>`;
+      else html+=`\n<p>${body}</p>`;
+    });
     html+=`\n<p>${section.sourceIds.map(id=>{const s=evidence.sources.find(x=>x.id===id);return `<a href="${esc(s.url)}">${esc(s.title)}</a>`;}).join(' · ')}</p>`;
     if(index===p1-1)html+=`\n${imageTags[1]}`;
     if(index===p2-1)html+=`\n${imageTags[2]}`;
   });
-  html+=`\n<h2>핵심 정리</h2><ul>${article.sections.slice(0,7).map(s=>`<li>${esc(s.strongPoint)}</li>`).join('')}</ul>`;
+  html+=`\n<h2>핵심 정리</h2><ul>${article.sections.slice(0,7).map(s=>`<li>${esc(s.strongPhrase)}</li>`).join('')}</ul>`;
   html+=`\n<h2>자료 출처</h2><ul>${evidence.sources.map(s=>`<li><a href="${esc(s.url)}">${esc(s.title)}</a> — 자료 확인일 ${s.checkedAt}</li>`).join('')}${attribution(images)}</ul>`;
   return glossaryPass(html);
 }
