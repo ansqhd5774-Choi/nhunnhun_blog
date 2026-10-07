@@ -1,5 +1,5 @@
 {
-  "status": "READY_FOR_UPDATE",
+  "status": "PENDING_RETRY",
   "policyVersion": "R5.3",
   "runId": "37673681029",
   "item": {
@@ -17,8 +17,8 @@
   "heartbeatAt": "2026-10-07T19:24:32.667Z",
   "recovered": true,
   "skippedCurrent": [],
-  "preparedAt": "2026-10-07T19:24:33.719Z",
   "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
-  "fingerprint": "eec0fec62e6cf92a990dd78b5c204ffa2a541c33d0bcb63ba93274658759a0be",
-  "validationWarnings": []
+  "rejectedSourceId": "auto-327-r53-20261008-7034c152",
+  "rejectionReason": "R5.3 baseline rejected before Tistory mutation: irrelevant agricultural evidence and unsupported food-health claims.",
+  "publicMutation": false
 }
