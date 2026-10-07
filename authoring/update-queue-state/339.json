@@ -1,0 +1,138 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-339",
+    "order": 27,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "배",
+    "articleId": "339",
+    "targetUrl": "https://nhunnhun.tistory.com/339"
+  },
+  "sourceId": "auto-339-r1-20261007-b1456ec0",
+  "baseSha": "f9bda3e4a45a85f84eed4158d474be25684c98b4",
+  "startedAt": "2026-10-07T05:54:37.834Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:55:37.741Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "1일"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "1회"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "2주"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "6개월"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "1개월"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "standard"
+  },
+  "publicMutation": false
+}
