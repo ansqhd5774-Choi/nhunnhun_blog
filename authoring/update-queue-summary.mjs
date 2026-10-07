@@ -16,7 +16,7 @@ export async function buildQueueSummary(root=process.cwd()){
       if(state)states.set(name.replace(/\.json$/,''),state);
     }
   }catch(error){if(error?.code!=='ENOENT')throw error;}
-  const counts={DONE:0,READY_FOR_UPDATE:0,RUNNING:0,BLOCKED:0,RETRYABLE_LEGACY:0,PENDING:0};
+  const counts={DONE:0,READY_FOR_UPDATE:0,RUNNING:0,SKIPPED:0,ERROR_SYSTEM:0,RETRYABLE_LEGACY:0,PENDING:0};
   const failed=[];
   for(const item of items){
     const state=states.get(item.articleId);
@@ -24,15 +24,16 @@ export async function buildQueueSummary(root=process.cwd()){
     if(state.status==='DONE'){counts.DONE++;continue;}
     if(state.status==='READY_FOR_UPDATE'){counts.READY_FOR_UPDATE++;continue;}
     if(state.status==='RUNNING'){counts.RUNNING++;continue;}
+    if(state.status==='SKIPPED'){counts.SKIPPED++;failed.push({articleId:item.articleId,keyword:item.keyword,status:state.status,error:state.error??null,policyVersion:state.policyVersion??null});continue;}
+    if(state.status==='ERROR_SYSTEM'){counts.ERROR_SYSTEM++;failed.push({articleId:item.articleId,keyword:item.keyword,status:state.status,error:state.error??null,policyVersion:state.policyVersion??null});continue;}
     if(String(state.status??'').startsWith('BLOCKED')){
       if(shouldRetryState(state))counts.RETRYABLE_LEGACY++;
-      else counts.BLOCKED++;
-      failed.push({articleId:item.articleId,keyword:item.keyword,status:state.status,error:state.error??null,policyVersion:state.policyVersion??null});
+      else counts.SKIPPED++;
       continue;
     }
     counts.PENDING++;
   }
-  return {policyVersion:QUEUE_POLICY_VERSION,total:items.length,counts,remaining:items.length-counts.DONE-counts.BLOCKED,failed};
+  return {policyVersion:QUEUE_POLICY_VERSION,total:items.length,counts,remaining:items.length-counts.DONE-counts.SKIPPED,failed};
 }
 export function summaryMarkdown(summary){
   const c=summary.counts;
@@ -45,13 +46,14 @@ export function summaryMarkdown(summary){
     `| DONE | ${c.DONE} |`,
     `| READY | ${c.READY_FOR_UPDATE} |`,
     `| RUNNING | ${c.RUNNING} |`,
-    `| BLOCKED | ${c.BLOCKED} |`,
+    `| SKIPPED | ${c.SKIPPED} |`,
+    `| ERROR_SYSTEM | ${c.ERROR_SYSTEM} |`,
     `| 구버전 재시도 대상 | ${c.RETRYABLE_LEGACY} |`,
     `| 미시작/대기 | ${c.PENDING} |`,
     `| 남은 미완료 | ${summary.remaining} |`,
   ];
   if(summary.failed.length){
-    lines.push('','### 실패/재시도 항목','', '| 글 | 상태 | 오류 |','|---|---|---|');
+    lines.push('','### 건너뜀/시스템 오류','', '| 글 | 상태 | 오류 |','|---|---|---|');
     for(const x of summary.failed.slice(0,30))lines.push(`| ${x.keyword} / ${x.articleId} | ${x.status} | ${x.error??''} |`);
     if(summary.failed.length>30)lines.push(`| … | … | 외 ${summary.failed.length-30}건 |`);
   }
