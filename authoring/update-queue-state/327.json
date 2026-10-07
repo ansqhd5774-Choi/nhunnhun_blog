@@ -1,7 +1,7 @@
 {
-  "status": "PENDING_RETRY",
+  "status": "READY_FOR_UPDATE",
   "policyVersion": "R5.3",
-  "runId": "37675087533",
+  "runId": "37676335167",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -11,12 +11,14 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r53-20261008-62200bf4",
-  "baseSha": "71e0a217b52cb417ab448a4c43cd3b808b6fbcff",
-  "startedAt": "2026-10-07T19:34:17.769Z",
-  "heartbeatAt": "2026-10-07T19:34:53.894Z",
+  "sourceId": "auto-327-r53-20261008-e1ff762a",
+  "baseSha": "9810a306f70a1e26cdce06ca8628e315b77a918c",
+  "startedAt": "2026-10-07T19:44:16.042Z",
+  "heartbeatAt": "2026-10-07T19:44:38.070Z",
   "recovered": false,
   "skippedCurrent": [],
-  "publicMutation": false,
-  "retryReason": "R5.3 baseline 3: curated section evidence + confirmed internal links"
+  "preparedAt": "2026-10-07T19:44:39.311Z",
+  "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
+  "fingerprint": "e1a15be6d3601f3c39dfad01bd3a314549901b219f1fce82aa6febbc4f660e26",
+  "validationWarnings": []
 }
