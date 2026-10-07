@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED",
+  "status": "RETRY_READY",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -9,12 +9,15 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r1-20261007-b972476b",
-  "baseSha": "e55cbfc32036b66144126178b037accd7389c107",
-  "startedAt": "2026-10-07T02:03:23.068Z",
-  "skippedCurrent": [],
-  "blockedAt": "2026-10-07T02:16:37.703Z",
-  "error": "E_QUEUE_REQUIRED_MODULE",
-  "details": null,
-  "publicMutation": false
+  "publicMutation": false,
+  "retryPreparedAt": "2026-10-07T02:25:28.385Z",
+  "retryReason": "E_QUEUE_REQUIRED_MODULE 재발 방지: canonical eggplant 정체 고정, 주제 비특이 확장 차단, 누락 모듈 1회 보완 후 재검증",
+  "previousFailure": {
+    "sourceId": "auto-327-r1-20261007-b972476b",
+    "baseSha": "e55cbfc32036b66144126178b037accd7389c107",
+    "startedAt": "2026-10-07T02:03:23.068Z",
+    "blockedAt": "2026-10-07T02:16:37.703Z",
+    "error": "E_QUEUE_REQUIRED_MODULE",
+    "publicMutation": false
+  }
 }

@@ -8,13 +8,13 @@ import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
-import {classifyWebSource,sourceMainText,externalLinks} from '../authoring/queue-research.mjs';
+import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions} from '../authoring/queue-research.mjs';
 import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import '../authoring/queue-draft.mjs';
+import {missingRequiredModules} from '../authoring/queue-draft.mjs';
 import '../authoring/queue-review.mjs';
 import '../authoring/update-producer.mjs';
 import '../authoring/update-queue-finalize.mjs';
@@ -109,6 +109,31 @@ test('가지는 eggplant로 조사하고 색인·저작권 페이지를 공식 �
   assert.deepEqual(externalLinks('<a href="https://pubmed.ncbi.nlm.nih.gov/30064803/">초록</a><a href="https://creativecommons.org/licenses/by/4.0/">허가</a>'),[]);
   assert.equal(sourceMainText('<body><nav>메뉴</nav><main><script>hidden()</script><p>조회한 실제 본문</p></main></body>'),'조회한 실제 본문');
 });
+test('가지 확장 판단은 eggplant 정체를 고정하고 일반 채소 자료만으로 확장을 켜지 않음',()=>{
+  const item={keyword:'가지',domain:'food'};
+  const evidence={query:'eggplant',sources:[
+    {id:'generic',title:'Selecting and Serving Produce Safely',notes:'general fresh produce safety',topicSpecific:false},
+    {id:'eggplant',title:'Eggplant nutrition data',notes:'eggplant Solanum melongena nutrition and selection',topicSpecific:true},
+  ]};
+  assert.equal(isTopicSpecificSource(evidence.sources[0],evidence.query),false);
+  assert.equal(isTopicSpecificSource(evidence.sources[1],evidence.query),true);
+  const keys=['longTerm','comparison','combinations','products','foodReplacement','essentialNutrient','cultivars','origins','seasonality','cost','folkRemedies','selfCheck','exercise','diet','vulnerableGroups','discontinuation','missedDose','myths','latest'];
+  const raw=Object.fromEntries(keys.map(key=>[key,{applies:false,reason:'이번 근거에서는 직접 적용할 이유가 충분하지 않습니다.',sourceIds:[]}]));
+  raw.selfCheck={applies:true,reason:'일반 채소 안전 자료에서 스스로 상태를 확인할 수 있습니다.',sourceIds:['generic']};
+  raw.products={applies:true,reason:'가지 제품 선택을 직접 다루는 근거입니다.',sourceIds:['eggplant']};
+  const out=normalizeExtensionDecisions(item,evidence,raw,[]);
+  assert.equal(out.selfCheck.applies,false);
+  assert.equal(out.products.applies,true);
+  const drift=structuredClone(raw);
+  drift.comparison={applies:true,reason:'Chinese cabbage와 비교합니다.',sourceIds:['eggplant']};
+  assert.throws(()=>normalizeExtensionDecisions(item,evidence,drift,[]),/E_QUEUE_IDENTITY_DRIFT/);
+});
+
+test('필수 모듈 누락 목록을 정확히 계산해 재작성 단계가 보완 대상을 알 수 있음',()=>{
+  const article={sections:[{modules:['identity','nutrition']},{modules:['safety']}]};
+  assert.deepEqual(missingRequiredModules(article,['identity','nutrition','amount','safety','decision']),['amount','decision']);
+});
+
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{
   const root=await mkdtemp(join(tmpdir(),'queue-archive-'));
   try {
