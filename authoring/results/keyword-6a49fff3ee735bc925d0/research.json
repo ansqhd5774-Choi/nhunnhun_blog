@@ -1,0 +1,30 @@
+{
+  "keyword": "카르노산",
+  "sources": [
+    {
+      "id": "identity",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/65126",
+      "title": "PubChem — Carnosic Acid",
+      "checkedAt": "2026-10-07",
+      "kind": "official",
+      "notes": "PubChem 검색 결과에서 분자식 C20H28O4와 페놀성 디테르펜 구조를 확인했다. 탄산 H2CO3와 다른 화합물이다. 상세 화면은 JavaScript 요구로 직접 본문 열람 제한이 있었다. 화학적 정체 확인용이며 임상 효능 근거가 아니다."
+    },
+    {
+      "id": "jecfa-2025",
+      "url": "https://apps.who.int/food-additives-contaminants-jecfa-database/Home/Chemical/6311",
+      "title": "WHO JECFA — Rosemary extract, 2025 evaluation",
+      "checkedAt": "2026-10-07",
+      "kind": "official",
+      "notes": "로즈마리 추출물은 식품첨가물 항산화제로 평가된다. 2025 평가에서 카르노산과 카르노솔 합으로 표시한 ADI 0–0.6 mg/kg 체중/일을 설정하고 이전 임시 0–0.3 값을 철회했다. 식품첨가물 노출 안전 평가이며 건강증진을 위해 먹으라는 권장량이나 카르노산 단독 치료 용량이 아니다. 이 평가를 모든 보충제·정유의 무조건 안전 근거로 확대하지 않는다."
+    },
+    {
+      "id": "human-pilot",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6769991/",
+      "title": "2019 로즈마리 복합 보충제 건강한 성인 무작위 예비시험",
+      "checkedAt": "2026-10-07",
+      "kind": "trial",
+      "notes": "6주 이중눈가림 평행 예비시험. 건강한 지원자 60명 무작위 배정, 58명 시작·57명 완료. 로즈마리 초임계 추출물의 디테르펜 페놀 11.25mg과 알킬글리세롤이 풍부한 상어간유 150mg 복합 캡슐을 연구했다. 내약성·간 수치·면역/산화 지표 등을 평가했다. 이 짧은 복합제 시험은 순수 카르노산의 체중 감량, 대사 촉진, 암 예방·치료를 입증하지 않는다. 임신·수유 등과 여러 약 복용자는 제외되어 해당 집단으로 안전성을 일반화하지 않는다. 연구량은 독자 권장량이 아니다."
+    }
+  ],
+  "scope": "기존 출처 확인 근거 팩. 원고 문장은 자유 생성하지 않음. 최신성 재검토·이미지·최종 R1/R4 검토 미완료."
+}

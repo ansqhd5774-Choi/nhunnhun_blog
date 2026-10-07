@@ -1,0 +1,21 @@
+{
+  "id": "keyword-6a49fff3ee735bc925d0",
+  "keyword": "카르노산",
+  "provider": "ollama-local",
+  "model": "qwen3:4b",
+  "state": "draft-needs-review",
+  "sourceCommit": "d75ecb45ffcde6881d796fe019125382b3ed9661",
+  "startedAt": "2026-10-07T00:35:49.209Z",
+  "publicMutation": false,
+  "domain": "nutrient",
+  "englishQuery": "carnosic acid",
+  "translationStatus": "verified-alias",
+  "generationMode": "evidence-bound-outline",
+  "completedAt": "2026-10-07T00:35:50.244Z",
+  "remaining": [
+    "최신 근거 재검토",
+    "이미지 시각 검토",
+    "R1/R4 검토",
+    "기존 승인 발행 경로 제출"
+  ]
+}
