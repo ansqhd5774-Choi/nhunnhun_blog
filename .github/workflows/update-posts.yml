@@ -61,10 +61,7 @@ jobs:
         run: node publishing/mutation-gate.mjs updates
         env:
           MUTATION_REQUESTED: ${{ inputs.update }}
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-      - run: npm install --global pnpm@11.19.0
+      - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
         run: node publishing/runner-gate.mjs --queue
