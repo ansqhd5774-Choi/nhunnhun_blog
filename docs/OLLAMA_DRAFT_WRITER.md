@@ -16,6 +16,8 @@ GitHub에는 `authoring/jobs/carnosic-acid-232-rewrite.json`에 대상 URL·기�
 
 각 실행은 별도 폴더를 사용한다. 산출물은 자동 덮어쓰기·커밋·티스토리 제출되지 않는다. GitHub에 결과를 보관하려면 `authoring/drafts/` 등 비운영 경로에 별도 저장한다. generated-drafts는 로컬 작업용으로 Git에서 제외한다.
 
+응답은 스트리밍으로 받는다. checkpoint의 receivedChunks·receivedCharacters·lastProgressAt과 partial-response.txt에 진행 내용을 저장하며, 미완료 응답은 완성 원고로 처리하지 않는다. 추론 단계에서는 글자 수가 0이어도 청크가 증가할 수 있다. `E_OLLAMA_CLAIM_REVIEW`는 확인된 카르노산 오류 표현 재생산을 발견한 경우이며 원고·근거를 편집 검토해야 한다. 이 제한된 오류 패턴 검사는 전체 의학적 의미 검증을 대신하지 않는다.
+
 ## 검토와 실제 수정은 별도
 
 산출물은 /232 수정 후보이며 `draft/approved:false`, review `pending`이다. 운영 `updates/`는 ready/approved와 실제 이미지 검토를 요구하므로 초안을 그대로 운영 경로에 복사하지 않는다. 최종 의미 검토·출처 재확인·이미지 3개·대표 이미지·사용권한·R4 강조/렌더·검토 해시를 완성한 뒤 사용자가 실제 수정 요청한 경우에만 기존 update-posts 경로로 넘긴다. 이 생성기는 수정 원장·발행 브라우저에 접근하지 않는다. 자동 HTML/링크 PASS가 의학적 정확성이나 R1 전체 검토 완료를 뜻하지 않는다.
