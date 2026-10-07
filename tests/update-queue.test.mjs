@@ -18,6 +18,7 @@ import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatche
 import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton,deterministicClaimType,deterministicClaimRisk} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
+import {R53_SECTION_SPECS,R53_REQUIRED_MODULES,collectInternalLinks} from '../authoring/queue-r53.mjs';
 import '../authoring/queue-review.mjs';
 import '../authoring/update-producer.mjs';
 import '../authoring/update-queue-finalize.mjs';
@@ -388,4 +389,44 @@ test('실제 Git porcelain 첫 줄의 선행 공백을 보존해 삭제 경로�
     await writeFile(join(root,'new-source.json'),'{}');
     assert.deepEqual(changedPaths(root),['prior-source.json','new-source.json']);
   } finally {await rm(root,{recursive:true,force:true});}
+});
+
+
+test('R5.3 uses the requested six content sections and character budgets',()=>{
+  assert.deepEqual(R53_SECTION_SPECS.food.map(x=>[x.heading,x.targetChars]),[
+    ['음식(식품) 소개',260],
+    ['영양소와 핵심 성분',320],
+    ['꾸준히 섭취시 신체 변화',300],
+    ['궁합이 잘맞는 음식과 시너지 효과',230],
+    ['섭취시 주의사항',230],
+    ['좋은 제품을 고르는 방법',160],
+  ]);
+  assert.deepEqual(R53_SECTION_SPECS.nutrient.map(x=>x.targetChars),[250,260,240,300,230,220]);
+  assert.deepEqual(R53_SECTION_SPECS.medicine.map(x=>x.targetChars),[260,300,260,230,270,180]);
+  assert.deepEqual(R53_SECTION_SPECS.disease.map(x=>x.targetChars),[260,240,300,230,320,150]);
+  for(const domain of ['food','nutrient','medicine','disease']){
+    assert.equal(R53_SECTION_SPECS[domain].length,6);
+    assert.equal(R53_REQUIRED_MODULES[domain].length,6);
+  }
+});
+
+test('R5.3 source id is visibly separated from legacy R1 queue ids',()=>{
+  assert.match(queueSourceId({articleId:'327',keyword:'가지'},'2026-10-08','abc'),/^auto-327-r53-20261008-/);
+});
+
+test('R5.3 finds verified internal links before the writer runs',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-r53-links-'));
+  try{
+    await mkdir(join(root,'authoring'),{recursive:true});
+    await mkdir(join(root,'posts'),{recursive:true});
+    await mkdir(join(root,'updates'),{recursive:true});
+    await writeFile(join(root,'authoring','update-queue.txt'),'영양소 - 비타민 C - https://nhunnhun.tistory.com/93\n음식 - 가지 - https://nhunnhun.tistory.com/327\n');
+    const links=await collectInternalLinks(
+      root,
+      {articleId:'327',keyword:'가지'},
+      '<p>가지에는 비타민 C가 포함됩니다.</p>',
+      {sources:[]}
+    );
+    assert.ok(links.some(x=>x.url==='https://nhunnhun.tistory.com/93'&&x.label==='비타민 C'));
+  }finally{await rm(root,{recursive:true,force:true});}
 });
