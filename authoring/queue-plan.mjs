@@ -150,7 +150,7 @@ const SECTION_CLAIM_TYPES=Object.freeze({
     decision:['general'],
   },
 });
-function deterministicClaimType(item,section,text){
+export function deterministicClaimType(item,section,text){
   const value=norm(text);
   const uncertainty=/(?:단정하지|확인되지|근거가 부족|근거가 충분하지|자료가 없|자료만으로는|알 수 없)/u.test(value);
   if(uncertainty)return 'general';
@@ -164,7 +164,7 @@ function deterministicClaimType(item,section,text){
   if(allowed.includes('benefit')&&/(?:도움|효과|기대|관련|개선|유지|지원)/u.test(value))return 'benefit';
   return allowed[0]??'general';
 }
-function deterministicClaimRisk(type,text){
+export function deterministicClaimRisk(type,text){
   return HIGH_RISK_TYPES.has(type)||/(?:질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u.test(text??'')?'high':'low';
 }
 function sourceScoreForClaim(source,claim,item){
