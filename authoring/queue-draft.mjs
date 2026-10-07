@@ -225,7 +225,7 @@ export function renderBody(article,evidence,images){
     if(index===p1-1)html+=`\n${imageTags[1]}`;
     if(index===p2-1)html+=`\n${imageTags[2]}`;
   });
-  html+=`\n<h2>핵심 정리</h2><ul>${article.sections.slice(0,7).map(s=>`<li>${esc(s.paragraphs[0])}</li>`).join('')}</ul>`;
+  html+=`\n<h2>핵심 정리</h2><ul>${article.sections.slice(0,7).map(s=>`<li>${esc(s.strongPhrase)}</li>`).join('')}</ul>`;
   html+=`\n<h2>자료 출처</h2><ul>${evidence.sources.map(s=>`<li><a href="${esc(s.url)}">${esc(s.title)}</a> — 자료 확인일 ${s.checkedAt}</li>`).join('')}${attribution(images)}</ul>`;
   return glossaryPass(html);
 }
