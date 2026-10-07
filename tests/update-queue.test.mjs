@@ -14,7 +14,7 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan} from '../authoring/queue-draft.mjs';
+import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan,reusableImages} from '../authoring/queue-draft.mjs';
 import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton,deterministicClaimType,deterministicClaimRisk} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
@@ -332,6 +332,27 @@ test('R5 writer splits one keyword into two concurrent section-generation reques
   assert.equal(calls,2);
   assert.equal(maxActive,2);
   assert.deepEqual(article.sections.map(s=>s.id),['s1','s2','s3','s4']);
+});
+
+test('R5.2 reuses only previously visual-checked image sets for the same subject',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-images-'));
+  try{
+    await mkdir(join(root,'updates'),{recursive:true});
+    await mkdir(join(root,'posts'),{recursive:true});
+    const imageReview=[0,1,2].map(i=>({
+      src:`https://commons.wikimedia.org/wiki/Special:Redirect/file/Test_${i}.jpg?width=960`,
+      alt:`표고버섯 테스트 이미지 ${i}`,
+      role:i===0?'hero':i===1?'detail':'context',
+      composition:i===0?'closeup':i===1?'cross-section':'context',
+      sourcePage:`https://commons.wikimedia.org/wiki/File:Test_${i}.jpg`,
+      author:'fixture',license:'CC BY 2.0',visualChecked:true
+    }));
+    await writeFile(join(root,'posts','shiitake.json'),JSON.stringify({id:'shiitake',title:'표고버섯 영양과 보관법',imageReview}));
+    const images=await reusableImages(root,{articleId:'393',keyword:'표고버섯'});
+    assert.equal(images.length,3);
+    assert.equal(images[0].role,'hero');
+    await assert.rejects(reusableImages(root,{articleId:'999',keyword:'배'}),/E_QUEUE_IMAGE_REVIEW_REQUIRED/);
+  }finally{await rm(root,{recursive:true,force:true});}
 });
 
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{
