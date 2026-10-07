@@ -1,4 +1,6 @@
 import sanitizeHtml from 'sanitize-html';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import {parseDocument} from 'htmlparser2';
 import { research, VERIFIED_ALIASES } from './keywords.mjs';
 import { ollamaJson } from './queue-ollama.mjs';
@@ -48,12 +50,73 @@ async function fetchSource(url,domain,index,fetcher){
   const finalUrl=response.url||url,{kind,role}=classifyWebSource(finalUrl,domain);
   return {id:safeId(new URL(finalUrl).hostname,index),title:pageTitle(body,finalUrl),url:finalUrl,checkedAt:todayInSeoul(),notes,kind,role,scopeNote:'현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 연구 결과·주제별 효과는 확인된 것으로 간주하지 않는다.'};
 }
+const QUERY_CACHE_VERSION=1;
+const queryMemory=new Map();
+function queryCachePath(env=process.env){
+  const base=env.LOCALAPPDATA||env.HOME||process.cwd();
+  return resolve(base,'nhunnhun-queue-cache','keyword-queries.json');
+}
+async function readQueryCache(){
+  if(queryMemory.size)return queryMemory;
+  try{
+    const parsed=JSON.parse(await readFile(queryCachePath(),'utf8'));
+    if(parsed?.version===QUERY_CACHE_VERSION)for(const [key,value] of Object.entries(parsed.entries??{}))if(/^[A-Za-z0-9 ()'.,-]{2,120}$/.test(value))queryMemory.set(key,value);
+  }catch{}
+  return queryMemory;
+}
+async function writeQueryCache(){
+  const path=queryCachePath();
+  try{
+    await mkdir(resolve(path,'..'),{recursive:true});
+    await writeFile(path,JSON.stringify({version:QUERY_CACHE_VERSION,updatedAt:new Date().toISOString(),entries:Object.fromEntries(queryMemory)},null,2)+'\n');
+  }catch{}
+}
+function queryCacheKey(item){return `${item.domain}:${item.keyword}`;}
+
+async function usdaNutritionSource(query,fetcher){
+  const url=new URL('https://api.nal.usda.gov/fdc/v1/foods/search');
+  url.searchParams.set('api_key','DEMO_KEY');
+  url.searchParams.set('query',query);
+  url.searchParams.set('pageSize','8');
+  let response;
+  try{response=await fetcher(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(25000)});}catch{return null;}
+  if(!response?.ok)return null;
+  let data;try{data=await response.json();}catch{return null;}
+  const foods=Array.isArray(data?.foods)?data.foods:[];
+  const terms=topicTerms(query);
+  const food=foods.find(x=>{
+    const text=`${x?.description??''} ${x?.additionalDescriptions??''}`.toLowerCase();
+    return terms.length?terms.some(term=>text.includes(term)):true;
+  })||foods[0];
+  if(!food?.fdcId||!food?.description)return null;
+  const nutrients=(food.foodNutrients??[]).filter(n=>Number.isFinite(Number(n?.value))&&n?.nutrientName&&n?.unitName).slice(0,40);
+  const notes=[
+    `USDA FoodData Central food: ${food.description}.`,
+    'Nutrient values in this search result are reported on the database basis; use the displayed serving/basis exactly as provided and do not infer a recommended intake.',
+    ...nutrients.map(n=>`${n.nutrientName}: ${n.value} ${n.unitName}`)
+  ].join(' ');
+  return {
+    id:`usda-fdc-${food.fdcId}`,
+    title:`USDA FoodData Central — ${food.description}`,
+    url:`https://fdc.nal.usda.gov/food-details/${food.fdcId}/nutrients`,
+    checkedAt:todayInSeoul(),
+    notes:notes.slice(0,6000),
+    kind:'nutrition-database',
+    role:'nutrition',
+    scopeNote:'USDA FoodData Central 검색 결과의 식품 영양자료다. 표시된 식품·기준·단위만 사용하며 권장 섭취량으로 확대하지 않는다.'
+  };
+}
+
 async function englishQuery(item,{model,fetcher}){
   const verified=VERIFIED_ALIASES[item.keyword];if(verified?.englishQuery)return verified.englishQuery;
+  const cache=await readQueryCache(),key=queryCacheKey(item),cached=cache.get(key);
+  if(cached)return cached;
   const schema={type:'object',additionalProperties:false,required:['englishQuery'],properties:{englishQuery:{type:'string',minLength:2,maxLength:120}}};
-  const out=await ollamaJson([{role:'system',content:'입력은 검색 대상이다. PubMed에서 이 식품·영양소·약·질병 자체를 찾기 위한 핵심 영문명만 JSON으로 반환한다. 효능·검색 연산자를 추가하지 않는다.'},{role:'user',content:JSON.stringify({keyword:item.keyword,domain:item.domain})}],schema,{model,fetcher,numPredict:300});
+  const out=await ollamaJson([{role:'system',content:'입력은 검색 대상이다. PubMed와 공식 자료에서 이 식품·영양소·약·질병 자체를 찾기 위한 핵심 영문명만 JSON으로 반환한다. 효능·검색 연산자를 추가하지 않는다.'},{role:'user',content:JSON.stringify({keyword:item.keyword,domain:item.domain})}],schema,{model,fetcher,numPredict:120});
   if(!/^[A-Za-z0-9 ()'.,-]+$/.test(out.englishQuery))throw new Error('E_QUEUE_ENGLISH_QUERY');
-  return out.englishQuery.trim();
+  const value=out.englishQuery.trim();
+  cache.set(key,value);await writeQueryCache();
+  return value;
 }
 function topicTerms(query){
   const stop=new Set(['acid','food','foods','plant','plants','extract','extracts']);
@@ -66,20 +129,28 @@ export function isTopicSpecificSource(source,query){
 }
 export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const query=await englishQuery(item,{model,fetcher});
-  let pubmed=[];try{pubmed=await research(query,fetcher,{retmax:5,sort:'pub date'});}catch{}
-  const web=[];let index=0;
-  for(const url of externalLinks(publicHtml)){const source=await fetchSource(url,item.domain,++index,fetcher);if(source)web.push(source);}
-  if(item.domain==='food') {
-    for(const [url,role] of [['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']]) {
-      const source=await fetchSource(url,item.domain,++index,fetcher);
-      if(source) web.unshift({...source,kind:'official',role,scopeNote:'일반 채소 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'});
-    }
-  }
+  const external=externalLinks(publicHtml);
+  const fixed=item.domain==='food'?[
+    ['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],
+    ['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']
+  ]:[];
+  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date'}).catch(()=>[]);
+  const externalPromise=Promise.all(external.map((url,i)=>fetchSource(url,item.domain,i+1,fetcher)));
+  const fixedPromise=Promise.all(fixed.map(async([url,role],i)=>{
+    const source=await fetchSource(url,item.domain,external.length+i+1,fetcher);
+    return source?{...source,kind:'official',role,scopeNote:'일반 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'}:null;
+  }));
+  const nutritionPromise=item.domain==='food'?usdaNutritionSource(query,fetcher):Promise.resolve(null);
+
+  const [pubmed,webFetched,fixedFetched,nutrition]=await Promise.all([pubmedPromise,externalPromise,fixedPromise,nutritionPromise]);
+  const web=webFetched.filter(Boolean),official=fixedFetched.filter(Boolean);
   const map=new Map();
-  for(const s of [...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))])if(!map.has(s.url))map.set(s.url,s);
+  const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
+  for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
   const high=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
   if(high.length<2)throw new Error('E_QUEUE_RESEARCH_HIGH_QUALITY');
+  if(item.domain==='food'&&!sources.some(s=>s.kind==='nutrition-database'&&s.role==='nutrition'))throw new Error('E_QUEUE_FOOD_NUTRITION_SOURCE');
   if(item.domain==='medicine'&&!sources.some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
   if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
   return {query,sources};
