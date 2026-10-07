@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { ollamaJson } from './queue-ollama.mjs';
 import { glossaryPass } from './queue-draft.mjs';
 import { fetchSource, isTopicSpecificSource } from './queue-research.mjs';
+import { renderFoodMarkdown } from './queue-food-sections.mjs';
 
 const BLOG='https://nhunnhun.tistory.com';
 
@@ -288,6 +289,8 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
   let html=imageTags[0]+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
+    if(article.plan?.scope==='food-sections')html+='\n'+renderFoodMarkdown(section.markdown);
+    else {
     section.paragraphs.forEach((paragraph,pIndex)=>{
       let body=linkify(paragraph,internalLinks,usedLinks);
       const safetyKind=section.modules.includes('red_flags')?'danger':section.modules.includes('contraindications')?'caution':null;
@@ -301,17 +304,18 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
       }
       html+=strict&&safetyKind&&pIndex===0?'\n<blockquote data-kind="'+safetyKind+'"><p>'+body+'</p></blockquote>':'\n<p>'+body+'</p>';
     });
+    }
     const citations=sourceLinks(evidence,section.sourceIds);
     if(citations.length)html+='\n<p>근거: '+citations.map(s=>'<a href="'+esc(s.url)+'">'+esc(s.title)+'</a>').join(' · ')+'</p>';
     if(index===1)html+='\n'+imageTags[1];
     if(index===3)html+='\n'+imageTags[2];
   });
-  html+='\n<h2>핵심 정리</h2><ul>'+article.sections.map(s=>'<li>'+esc(shortQuote(s.paragraphs[0]))+'</li>').join('')+'</ul>';
+  if(article.plan?.scope!=='food-sections')html+='\n<h2>핵심 정리</h2><ul>'+article.sections.map(s=>'<li>'+esc(shortQuote(s.paragraphs[0]))+'</li>').join('')+'</ul>';
   const related=internalLinks.filter(link=>usedLinks.has(link.url)).slice(0,5);
   if(related.length){
     html+='\n<h2>함께 보면 좋은 글</h2>';
     for(const link of related)html+='\n<p><a href="'+esc(link.url)+'"><strong>'+esc(link.label)+'</strong></a></p>';
   }
-  html+='\n<h2>자료 출처</h2><ul>'+(evidence?.sources??[]).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
+  html+='\n<h2>자료 출처</h2><ul>'+(article.plan?.scope==='food-sections'?[]:(evidence?.sources??[])).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
   return strict?glossaryPass(html):{html,glossary:[]};
 }

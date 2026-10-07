@@ -1,6 +1,7 @@
 import { ollamaJson } from './queue-ollama.mjs';
 import { R53_SECTION_SPECS } from './queue-r53.mjs';
 import { contentDigest, todayInSeoul } from '../publishing/content-standards.mjs';
+import { foodSectionInstructions, writeFoodSections } from './queue-food-sections.mjs';
 
 export const SINGLE_PASS_STANDARD='SP1';
 const DETAILS={
@@ -38,6 +39,7 @@ const DETAILS={
   ]
 };
 export function writingInstructions(domain) {
+  if(domain==='food')return foodSectionInstructions();
   const specs=R53_SECTION_SPECS[domain];
   if(!specs)throw Error('E_QUEUE_PLAN_DOMAIN');
   const sizes=[400,500,450,350,350,250];
@@ -46,12 +48,13 @@ export function writingInstructions(domain) {
   return out;
 }
 export async function writeSinglePassArticle(item,evidence,{cached=(_stage,_input,action)=>action(),onCacheHit,...options}={}) {
+  if(item.domain==='food')return writeFoodSections(item,evidence,{cached,onCacheHit,...options});
   const instructions=writingInstructions(item.domain);
   const format={type:'object',additionalProperties:false,required:['title','lead','summary','sections'],properties:{
     title:{type:'string'},lead:{type:'string'},summary:{type:'string'},
     sections:{type:'array',items:{type:'object',additionalProperties:false,required:['heading','text'],properties:{heading:{type:'string'},text:{type:'string'}}}}
   }};
-  const messages=[{role:'system',content:'한국어 블로그 글을 전체 1회 작성한다. 본문 6개 항목 합계 약 2300자, 도입·핵심 요약 포함 약 2500자를 목표로 한다. 제시된 질문 순서와 항목별 목표 글자수는 정보량 안내이며 문장·문단 수는 자유다. 각 include의 구체적인 내용을 충분히 설명한다. 자료에 있는 수치·단위·기준량·대상·기간·조리 상태를 함께 제시하고 독자가 실행할 수 있는 예시와 판단 기준을 쓴다. 일반적인 효능 문장이나 같은 설명을 반복해 분량을 채우지 않는다. 확인되지 않은 수치·효과·순위는 만들어내지 말고 확인 한계를 설명한다. 자료가 부족한 항목은 숫자를 억지로 채우지 않는다. 전문용어는 쉽게 설명한다. 제목, 도입, 핵심 요약, 절별 heading과 text만 JSON으로 반환한다.'},
+  const messages=[{role:'system',content:'한국어 블로그 글을 전체 1회 작성한다. 본문 6개 항목 합계 약 2300자, 도입·핵심 요약 포함 약 2500자를 목표로 한다. 제시된 질문 순서와 항목별 목표 글자수는 정보량 안내이며 문장·문단 수는 자유다. 각 include의 구체적인 내용을 충분히 설명한다. 자료에 있는 수치·단위·기준량·대상·기간·조리 상태를 함께 제시하고 독자가 실행할 수 있는 예시와 판단 기준을 쓴다. 일반적인 효능 문장이나 같은 설명을 반복해 분량을 채우지 않는다. 확인되지 않은 수치·효과·순위는 만들어내지 않는다. 자료가 부족한 항목은 숫자를 억지로 채우지 않는다. 전문용어는 쉽게 설명한다. 제목, 도입, 핵심 요약, 절별 heading과 text만 JSON으로 반환한다.'},
     {role:'user',content:JSON.stringify({keyword:item.keyword,canonicalSubject:evidence.query,domain:item.domain,instructions,sources:evidence.sources.slice(0,8).map(s=>({title:s.title,url:s.url,text:String(s.notes??'').slice(0,1400)}))})}];
   const raw=await cached('single-draft',{messages,format,model:options.model},()=>ollamaJson(messages,format,{...options,purpose:'draft',numCtx:12288,numPredict:5200}),onCacheHit);
   if(![raw.title,raw.lead,raw.summary].every(x=>typeof x==='string'&&x.trim())||!Array.isArray(raw.sections)||raw.sections.length<4

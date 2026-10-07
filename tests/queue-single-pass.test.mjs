@@ -5,10 +5,10 @@ import { writingInstructions,writeSinglePassArticle,singlePassReceipt } from '..
 import { assertContentStandard } from '../publishing/content-standards.mjs';
 import { checkUpdateSource } from '../publishing/update-core.mjs';
 
-for(const [domain,sizes] of Object.entries({food:[400,500,450,350,350,250],nutrient:[400,500,450,350,350,250],medicine:[400,500,450,350,350,250],disease:[400,500,450,350,350,250]}))
+for(const [domain,sizes] of Object.entries({food:[250,400,400,400,400,400],nutrient:[400,500,450,350,350,250],medicine:[400,500,450,350,350,250],disease:[400,500,450,350,350,250]}))
   test(`${domain}: exact six question budgets`,()=>assert.deepEqual(writingInstructions(domain).map(s=>s.targetChars),sizes));
 const raw={title:'시험 식품 정보',lead:'식품 소개입니다.',summary:'핵심 요약입니다.',sections:Array.from({length:6},(_,i)=>({heading:`자유 제목 ${i}`,text:'독자가 읽을 본문입니다.\n\n다른 문단입니다.'}))};
-const item={domain:'food',keyword:'시험',articleId:'999'};
+const item={domain:'nutrient',keyword:'시험',articleId:'999'};
 test('one writer call without plan, claim labels, emphasis or repair',async()=>{
   let calls=0;
   const article=await writeSinglePassArticle(item,{query:'test',sources:[]},{model:'fixture',fetcher:async(_url,request)=>{
