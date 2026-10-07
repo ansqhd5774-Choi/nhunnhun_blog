@@ -149,7 +149,7 @@ export async function archiveCompletedSources(root,item) {
     const source=JSON.parse(await readFile(resolve(root,'updates',name),'utf8'));
     if(source.articleId!==item.articleId) continue;
     const ledger=await jsonIfExists(resolve(root,'publishing/update-state',`${source.id}.json`));
-    if(source.targetUrl!==item.targetUrl || ledger?.phase!=='updated' || ledger.url!==item.targetUrl || ledger.fingerprint!==updateFingerprint(source)) throw Error('E_QUEUE_EXISTING_UPDATE_PENDING');
+    if(!rejected.has(source.id) && (source.targetUrl!==item.targetUrl || ledger?.phase!=='updated' || ledger.url!==item.targetUrl || ledger.fingerprint!==updateFingerprint(source))) throw Error('E_QUEUE_EXISTING_UPDATE_PENDING');
     for(const kind of ['source','review']) {
       if(await jsonIfExists(resolve(root,`authoring/update-${kind}-archive`,`${source.id}.json`))) throw Error('E_QUEUE_ARCHIVE_EXISTS');
     }
