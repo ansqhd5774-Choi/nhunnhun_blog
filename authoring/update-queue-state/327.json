@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED",
+  "item": {
+    "id": "q-327",
+    "order": 1,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "가지",
+    "articleId": "327",
+    "targetUrl": "https://nhunnhun.tistory.com/327"
+  },
+  "sourceId": "auto-327-r1-20261007-b972476b",
+  "baseSha": "e55cbfc32036b66144126178b037accd7389c107",
+  "startedAt": "2026-10-07T02:03:23.068Z",
+  "skippedCurrent": [],
+  "blockedAt": "2026-10-07T02:16:37.703Z",
+  "error": "E_QUEUE_REQUIRED_MODULE",
+  "details": null,
+  "publicMutation": false
+}
