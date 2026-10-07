@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: nhunnhun-ollama-keywords-${{ github.ref }}
+  group: nhunnhun-ollama-keywords
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   test:
