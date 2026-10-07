@@ -1,0 +1,109 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-179",
+    "order": 4,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "감자",
+    "articleId": "179",
+    "targetUrl": "https://nhunnhun.tistory.com/179"
+  },
+  "sourceId": "auto-179-r1-20261007-f026733c",
+  "baseSha": "049a397db8087c3d2b9962e69ad6fff3c3559416",
+  "startedAt": "2026-10-07T05:31:53.381Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:32:48.895Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "16"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c3",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c3",
+        "token": "77kcal"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c3",
+        "token": "20g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c3",
+        "token": "14mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "14mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "10%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "150g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c8",
+        "token": "1회"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "preparation"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "storage"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "selection"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "safety"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
