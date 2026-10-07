@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseKeywords,keywordId,readPubmed,research,VERIFIED_ALIASES} from '../authoring/keywords.mjs';
+import {parseKeywords,keywordId,readPubmed,research,VERIFIED_ALIASES,keywordArticleSchema} from '../authoring/keywords.mjs';
+test('모델의 출처 ID를 실제 조회 자료로 제한한다',()=>{
+  const schema=keywordArticleSchema([{id:'pmid-123'},{id:'pmid-456'}]);
+  assert.deepEqual(schema.properties.sections.items.properties.sourceIds.items.enum,['pmid-123','pmid-456']);
+});
 test('카르노산을 카르노신으로 오역한 실제 오류의 재발을 막는다',()=>{
   assert.deepEqual(VERIFIED_ALIASES['카르노산'],{domain:'nutrient',englishQuery:'carnosic acid'});
 });
