@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: authoring-regression-tests-${{ github.ref }}
+  group: authoring-regression-tests
   cancel-in-progress: true
 jobs:
   test:
