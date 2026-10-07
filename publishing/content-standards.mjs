@@ -55,8 +55,9 @@ export function evaluateContent(source, manifest, { today = todayInSeoul(), enfo
   const topicEntity = TOPIC_ENTITIES[normTopic(c?.topic)] ?? c?.entityId;
   if (TOPIC_ENTITIES[normTopic(c?.topic)] && c?.entityId !== topicEntity) add('E_CONTENT_ENTITY_CANONICAL', topicEntity);
   for (const key of TOPIC_EXTENSIONS[topicEntity] ?? []) {
-    if (manifest.extensions?.[key]?.applies !== true) add('E_CONTENT_TOPIC_EXTENSION', key);
-    for (const module of EXTENSIONS[key]) required.add(module);
+    // Profiles suggest questions; the explicit, reasoned decision owns applicability.
+    // Applicable extensions are already added above. Do not force unsupported content.
+    if (manifest.extensions?.[key]?.applies === false) warn('W_CONTENT_TOPIC_EXTENSION_OMITTED', key);
   }
   const document = inspectHtml(source.bodyHtml ?? '');
   const sources = new Map();

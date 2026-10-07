@@ -9,7 +9,7 @@ import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
-import { renderEditorialPost } from '../publishing/editorial.mjs';
+import { assertEditorialSource, renderEditorialPost } from '../publishing/editorial.mjs';
 
 function git(args,root,{allowFailure=false,trimOutput=true}={}){
   const r=spawnSync('git',args,{cwd:root,encoding:'utf8'});
@@ -82,9 +82,15 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await checkpoint('draft',{article,required});
     const images=await reusableImages(root,item);
     const rendered=renderBody(article,evidence,images);
+    const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
+    // Structural checks do not require an AI approval; catch assembly errors early.
+    assertEditorialSource(source);
+    assertImageReview(source);
+    checkUpdateSource(source,`${sourceId}.json`);
+    renderEditorialPost(source);
+    await checkpoint('assembled',{source});
     const details=await reviewDetails(item,article,evidence,extensions,{model,fetcher});
     await checkpoint('details',details);
-    const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
     const {review,report}=await finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,{model,fetcher});
     await checkpoint('reviewed',{source,review,report});
     assertImageReview(source);

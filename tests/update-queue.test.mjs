@@ -14,7 +14,9 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {missingRequiredModules} from '../authoring/queue-draft.mjs';
+import {missingRequiredModules,requiredModules,renderBody,draftArticle} from '../authoring/queue-draft.mjs';
+import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
+import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
 import '../authoring/update-producer.mjs';
 import '../authoring/update-queue-finalize.mjs';
@@ -132,6 +134,48 @@ test('가지 확장 판단은 eggplant 정체를 고정하고 일반 채소 자�
 test('필수 모듈 누락 목록을 정확히 계산해 재작성 단계가 보완 대상을 알 수 있음',()=>{
   const article={sections:[{modules:['identity','nutrition']},{modules:['safety']}]};
   assert.deepEqual(missingRequiredModules(article,['identity','nutrition','amount','safety','decision']),['amount','decision']);
+});
+
+for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: profiles do not force optional modules, selected extensions still require coverage`,()=>{
+  const evidence={query:'example',sources:[{id:'direct',topicSpecific:true}]};
+  const raw={comparison:{applies:false,reason:'현재 검색 질문에 비교가 필요하지 않아 포함하지 않습니다.',sourceIds:[]}};
+  const excluded=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
+  assert.equal(excluded.comparison.applies,false);
+  assert.deepEqual(requiredModules({domain},excluded),DOMAIN_RULES[domain].core);
+  raw.comparison={applies:true,reason:'독자의 선택에 필요한 직접 비교 자료를 확인했습니다.',sourceIds:['direct']};
+  const included=normalizeExtensionDecisions({keyword:'새 주제',domain},evidence,raw,['comparison']);
+  assert.equal(included.comparison.applies,true);
+  assert.ok(requiredModules({domain},included).includes('comparison'));
+});
+
+for(const domain of ['food','nutrient','medicine','disease'])test(`${domain}: common body obeys existing R4 lead/summary/image contract without fabricated comparisons`,()=>{
+  const images=[1,2,3].map(i=>({src:`https://example.org/image-${i}.jpg`,alt:`테스트 이미지 ${i}`,sourcePage:`https://example.org/image-${i}`,author:'fixture',license:'fixture-only'}));
+  const evidence={sources:[1,2].map(i=>({id:`ref-${i}`,url:`https://example.org/source-${i}`,title:`자료 ${i}`,checkedAt:'2026-10-07'}))};
+  const article={title:'테스트 주제 안내',lead:'이 글은 독자의 현재 질문과 자료를 확인한 범위를 설명하는 도입문입니다.',summary:'확인된 자료 안에서 판단하고 확인되지 않은 수치나 효과는 단정하지 않습니다.',sections:[1,2,3,4].map(i=>({heading:`독자가 확인할 질문 ${i}`,strongPoint:'확인한 대상과 형태를 먼저 구분합니다.',paragraphs:['출처에 제시된 조건을 확인하고 해당하지 않는 상황으로 결과를 확대하지 않습니다.'],keyPoint:'확인된 자료의 적용 범위를 살펴봅니다.',actionPoint:'',contrastPoint:'',sourceIds:['ref-1'],modules:[i===1&&domain==='medicine'?'contraindications':i===1&&domain==='disease'?'red_flags':'identity']}))};
+  const {html}=renderBody(article,evidence,images);
+  const source={title:article.title,bodyHtml:html,contentStandard:'R1',representativeImageUrl:images[0].src};
+  assert.equal(assertEditorialSource(source),source);
+  assert.doesNotThrow(()=>renderEditorialPost(source));
+  assert.doesNotMatch(html,/<u>|비교해서 볼 부분은/);
+  assert.match(html,/<blockquote><strong>핵심만 먼저:<\/strong>/);
+  if(domain==='medicine')assert.match(html,/data-kind="caution"/);
+  if(domain==='disease')assert.match(html,/data-kind="danger"/);
+});
+
+test('structured draft allows empty optional fields and still fails missing core answers after one repair',async()=>{
+  const item={keyword:'새 주제',domain:'nutrient',category:'영양소',targetUrl:'https://nhunnhun.tistory.com/999'};
+  const evidence={query:'new topic',sources:[{id:'direct',title:'조회한 자료',kind:'official',role:'health',notes:'조회한 본문에서 확인할 수 있는 범위입니다.'}]};
+  let calls=0;
+  const fetcher=async(_url,options)=>{
+    calls++;
+    const request=JSON.parse(options.body);
+    assert.equal(request.format.properties.sections.items.properties.actionPoint.minLength,undefined);
+    assert.equal(request.format.properties.sections.items.properties.contrastPoint.minLength,undefined);
+    const bytes=new TextEncoder().encode(JSON.stringify({done:true,message:{content:JSON.stringify({sections:[{id:'actual-answer',modules:['identity']}]})}})+'\n');
+    return {ok:true,body:(async function*(){yield bytes;})()};
+  };
+  await assert.rejects(draftArticle(item,evidence,{}, {model:'fixture-only',fetcher}),error=>error.message==='E_QUEUE_REQUIRED_MODULE'&&error.details.missing.length>0);
+  assert.equal(calls,2);
 });
 
 test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복구',async()=>{

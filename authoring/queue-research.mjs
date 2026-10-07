@@ -105,7 +105,7 @@ function identityDrift(item,result,evidence){
     throw Object.assign(new Error('E_QUEUE_IDENTITY_DRIFT'),{details:{keyword:item.keyword,canonicalQuery:evidence.query}});
   }
 }
-export function normalizeExtensionDecisions(item,evidence,result,forced=[]){
+export function normalizeExtensionDecisions(item,evidence,result){
   identityDrift(item,result,evidence);
   const allowed=DOMAIN_EXTENSION_ALLOW[item.domain]??new Set();
   const sourceById=new Map(evidence.sources.map(s=>[s.id,s]));
@@ -124,15 +124,15 @@ export function normalizeExtensionDecisions(item,evidence,result,forced=[]){
     }
     out[key]={applies:entry.applies===true,reason:entry.reason};
   }
-  for(const key of forced)out[key]={applies:true,reason:`현재 R1의 ${item.keyword} 주제 프로필에서 필수로 검토하도록 지정된 확장 질문이므로 실제 근거 범위 안에서 포함한다.`};
+  // Known-topic profiles are review suggestions, never evidence or forced coverage.
   return out;
 }
 export async function decideExtensions(item,evidence,{model,fetcher=fetch}={}){
-  const forced=TOPIC_EXTENSIONS[TOPIC_ENTITIES[normTopic(item.keyword)]]||[];
+  const recommended=TOPIC_EXTENSIONS[TOPIC_ENTITIES[normTopic(item.keyword)]]||[];
   const canonical=`${item.keyword} = ${evidence.query}`;
   const result=await ollamaJson([
-    {role:'system',content:'건강정보 편집자다. canonicalSubject는 확정된 대상이며 절대 다른 식품·성분·질병으로 재해석하지 않는다. 각 확장 질문은 해당 주제 자체를 직접 다루는 근거가 있을 때만 true다. 일반 채소 안전, 일반 식단, 데이터베이스 소개처럼 주제 비특이 자료만으로는 true로 만들지 않는다. true인 항목은 실제 근거 sourceIds를 반드시 넣는다. forced는 반드시 true다. 이유는 한국어로 쓴다.'},
-    {role:'user',content:JSON.stringify({canonicalSubject:canonical,keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,forced,extensions:EXTENSIONS,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific,notes:s.notes.slice(0,2200)}))})}
+    {role:'system',content:'건강정보 편집자다. canonicalSubject는 확정된 대상이며 다른 식품·성분·질병으로 재해석하지 않는다. 확장 질문은 독자의 현재 질문에 필요하고 실제 자료로 답할 수 있을 때만 true다. recommended는 검토할 후보이며 필수가 아니다. 근거 부족·범위 밖인 항목은 구체적 이유와 함께 false로 두고 다른 내용을 계속 작성한다. 일반 식단 자료를 개별 식품의 효능·용량으로 확대하지 않는다. 주제 이름이 등장하는 논문이라도 농업·유전학 연구를 사람의 건강 효과 근거로 쓰지 않는다. true인 항목은 실제 근거 sourceIds를 넣는다. 이유는 한국어로 쓴다.'},
+    {role:'user',content:JSON.stringify({canonicalSubject:canonical,keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,recommended,extensions:EXTENSIONS,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific,scopeNote:s.scopeNote,notes:s.notes.slice(0,2200)}))})}
   ],extensionSchema(evidence.sources),{model,fetcher,numPredict:5000});
-  return normalizeExtensionDecisions(item,evidence,result,forced);
+  return normalizeExtensionDecisions(item,evidence,result);
 }
