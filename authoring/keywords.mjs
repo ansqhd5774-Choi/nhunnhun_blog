@@ -27,8 +27,11 @@ export function readPubmed(xml) {
   return find(doc,'PubmedArticle').map(article=>{
     const id=text(find(article,'PMID')[0]),title=text(find(article,'ArticleTitle')[0]);
     const abstracts=find(article,'AbstractText').map(text).filter(Boolean);
+    const publicationTypes=find(article,'PublicationType').map(text).filter(Boolean);
     if(!/^\d+$/.test(id) || !title || !abstracts.length) return null;
-    return {id:`pmid-${id}`,title,url:`https://pubmed.ncbi.nlm.nih.gov/${id}/`,checkedAt:todayInSeoul(),notes:abstracts.join('\n'),evidenceScope:'indexed-abstract-only'};
+    const joined=publicationTypes.join(' ');
+    const kind=/systematic review|meta-analysis/i.test(joined)?'systematic-review':/randomized controlled trial|clinical trial/i.test(joined)?'trial':'article';
+    return {id:`pmid-${id}`,title,url:`https://pubmed.ncbi.nlm.nih.gov/${id}/`,checkedAt:todayInSeoul(),notes:abstracts.join('\n'),publicationTypes,kind,role:'health',evidenceScope:'indexed-abstract-only'};
   }).filter(Boolean);
 }
 async function ncbi(path,parameters,fetcher) {
@@ -38,9 +41,10 @@ async function ncbi(path,parameters,fetcher) {
   if(!response.ok) throw new Error(`E_RESEARCH_HTTP_${response.status}`);
   return response;
 }
-export async function research(query,fetcher=fetch) {
+export async function research(query,fetcher=fetch,{retmax=4,sort='pub date'}={}) {
   if(typeof query!=='string' || query.length>160 || !/^[A-Za-z0-9 ()'.,-]+$/.test(query)) throw new Error('E_RESEARCH_QUERY');
-  const response=await ncbi('esearch.fcgi',{db:'pubmed',term:`(${query}) AND hasabstract`,retmode:'json',retmax:'3',sort:'relevance'},fetcher);
+  if(!Number.isInteger(retmax)||retmax<2||retmax>8||!['relevance','pub date'].includes(sort)) throw new Error('E_RESEARCH_QUERY');
+  const response=await ncbi('esearch.fcgi',{db:'pubmed',term:`(${query}) AND hasabstract`,retmode:'json',retmax:String(retmax),sort},fetcher);
   const ids=(await response.json()).esearchresult?.idlist;
   if(!Array.isArray(ids) || ids.length<2 || ids.some(id=>!/^\d+$/.test(id))) throw new Error('E_RESEARCH_INSUFFICIENT');
   // No-key E-utilities limit: at most 3 requests per second.
