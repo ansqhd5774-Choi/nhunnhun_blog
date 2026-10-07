@@ -134,7 +134,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const extensions=conservativeExtensions(item);
     await checkpoint('scope',{currentTitle:current.title,scope:planned.scope,lengthBand:lengthBandForScope(planned.scope),extensions});
 
-    const [draft,images]=await Promise.all([
+    let [draft,images]=await Promise.all([
       timed('writerMs',()=>writeArticleFromPlan(item,planned.plan,planned.scope,{model,fetcher})),
       timed('imageLookupMs',()=>reusableImages(root,item))
     ]);
