@@ -14,7 +14,7 @@ import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
-import {missingRequiredModules,requiredModules,renderBody,draftArticle} from '../authoring/queue-draft.mjs';
+import {missingRequiredModules,requiredModules,renderBody,draftArticle,outputBudget,selectDraftSources} from '../authoring/queue-draft.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -146,6 +146,20 @@ test('가지 확장 판단은 eggplant 정체를 고정하고 일반 채소 자�
   const drift=structuredClone(raw);
   drift.comparison={applies:true,reason:'Chinese cabbage와 비교합니다.',sourceIds:['eggplant']};
   assert.throws(()=>normalizeExtensionDecisions(item,evidence,drift,[]),/E_QUEUE_IDENTITY_DRIFT/);
+});
+
+test('R3 output budget leaves JSON completion headroom without changing visible-length guidance',()=>{
+  assert.deepEqual(['focused','standard','comprehensive','deep'].map(outputBudget),[3000,4500,6000,7500]);
+});
+
+test('draft source bundle is capped and prioritizes topic-specific authoritative evidence',()=>{
+  const sources=Array.from({length:9},(_,i)=>({id:`s${i}`,kind:'article',role:'context',topicSpecific:false}));
+  sources[8]={id:'official-topic',kind:'official',role:'nutrition',topicSpecific:true};
+  sources[7]={id:'trial-topic',kind:'trial',role:'health',topicSpecific:true};
+  const selected=selectDraftSources({sources});
+  assert.equal(selected.length,7);
+  assert.equal(selected[0].id,'official-topic');
+  assert.equal(selected[1].id,'trial-topic');
 });
 
 test('필수 모듈 누락 목록을 정확히 계산해 재작성 단계가 보완 대상을 알 수 있음',()=>{
