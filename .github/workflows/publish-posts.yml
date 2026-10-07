@@ -40,7 +40,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    defaults:
+      run:
+        shell: cmd
     outputs:
       should_publish: ${{ steps.mutation-gate.outputs.should_mutate }}
     steps:
@@ -58,7 +61,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
         run: node publishing/runner-gate.mjs --queue
@@ -98,7 +100,6 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: npm install --global pnpm@11.19.0
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
