@@ -8,7 +8,7 @@ import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources,shouldRetryState,QUEUE_POLICY_VERSION } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
-import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions} from '../authoring/queue-research.mjs';
+import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource} from '../authoring/queue-research.mjs';
 import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
@@ -84,9 +84,19 @@ test('selector skips item-level BLOCKED state and continues with the next keywor
   }finally{await rm(root,{recursive:true,force:true});}
 });
 
+test('USDA nutrition rate limit is evidence degradation, not a content failure',async()=>{
+  let calls=0;
+  const result=await usdaNutritionSource('eggplant',async()=>{calls++;return {ok:false,status:429};},{apiKey:'DEMO_KEY',useCache:false});
+  assert.equal(calls,1);
+  assert.equal(result.source,null);
+  assert.equal(result.status,'rate-limited');
+});
+
 test('R5 automatically retries legacy plan-validation blocks but skips current-policy blocks',async()=>{
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:'R5'}),true);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}),false);
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:QUEUE_POLICY_VERSION}),false);
   const root=await mkdtemp(join(tmpdir(),'queue-r5-retry-'));
   try{
     await mkdir(join(root,'authoring','update-queue-state'),{recursive:true});
