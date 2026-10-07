@@ -3,8 +3,8 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources } from './update-queue.mjs';
-import { collectEvidence, decideExtensions } from './queue-research.mjs';
-import { draftArticle, reusableImages, renderBody } from './queue-draft.mjs';
+import { collectEvidence } from './queue-research.mjs';
+import { draftArticle, reusableImages, renderBody, conservativeExtensions } from './queue-draft.mjs';
 import { reviewDetails, finalizeReview } from './queue-review.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
@@ -52,7 +52,18 @@ function writeOutput(values){
 }
 function requireNodeFs(){throw new Error('E_QUEUE_INTERNAL_OUTPUT');}
 
-export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null}={}){
+function blockStatus(error){
+  const code=String(error?.message??'E_QUEUE_FAILED');
+  if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING)/.test(code)||['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT'].includes(code))return 'BLOCKED_SYSTEM';
+  if(/IMAGE_REVIEW/.test(code))return 'BLOCKED_IMAGE';
+  if(/RESEARCH|AUTHORIZATION|PRIMARY_SOURCE|HEALTH_EVIDENCE/.test(code))return 'BLOCKED_EVIDENCE';
+  if(/IDENTITY|ENGLISH_QUERY|CLASSIFICATION/.test(code))return 'BLOCKED_ENTITY';
+  if(/REVIEW|CONTENT_/.test(code))return 'BLOCKED_REVIEW';
+  return 'BLOCKED_CONTENT';
+}
+function itemLevelBlock(status){return status!=='BLOCKED_SYSTEM';}
+
+export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,blockedCount=0,maxBlockedPerRun=Number(process.env.QUEUE_MAX_BLOCKED_PER_RUN||3)}={}){
   assertLocalOnly(process.env);
   const baseSha=git(['rev-parse','HEAD'],root);
   if(baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
@@ -76,10 +87,11 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const current=await fetchPublic(item,fetcher);
     const evidence=await collectEvidence(item,current.html,{model,fetcher});
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,baseSha});
-    const extensions=await decideExtensions(item,evidence,{model,fetcher});
-    await checkpoint('extensions',extensions);
-    const {article,required}=await draftArticle(item,evidence,extensions,{model,fetcher});
+    const extensions=conservativeExtensions(item);
+    await checkpoint('scope',{currentTitle:current.title,extensions});
+    const {article,required,lengthReport}=await draftArticle(item,evidence,extensions,{model,fetcher,currentTitle:current.title});
     await checkpoint('draft',{article,required});
+    await checkpoint('length-report',lengthReport);
     const images=await reusableImages(root,item);
     const rendered=renderBody(article,evidence,images);
     const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
@@ -91,8 +103,8 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await checkpoint('assembled',{source});
     const details=await reviewDetails(item,article,evidence,extensions,{model,fetcher});
     await checkpoint('details',details);
-    const {review,report}=await finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,{model,fetcher});
-    await checkpoint('reviewed',{source,review,report});
+    const {review,report,targetedAudit}=await finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,{model,fetcher});
+    await checkpoint('reviewed',{source,review,report,targetedAudit});
     assertImageReview(source);
     checkUpdateSource(source,`${sourceId}.json`);
     renderEditorialPost(source);
@@ -116,8 +128,16 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
       await rm(resolve(root,'content-reviews','updates',`${sourceId}.json`),{force:true});
     }
     if(archivedIds.length) await restoreArchivedSources(root,archivedIds);
-    await writeQueueState(root,item.articleId,{...running,status:'BLOCKED',blockedAt:new Date().toISOString(),error:/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED',details:error.details??error.failed??null,publicMutation:false});
-    if(commit&&remoteMain(root)===baseSha){try{await commitPaths(root,item,sourceId,`chore(authoring): block queued rewrite ${item.articleId}`);}catch{}}
+    const status=blockStatus(error),code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED';
+    await writeQueueState(root,item.articleId,{...running,status,blockedAt:new Date().toISOString(),error:code,details:error.details??error.failed??null,publicMutation:false});
+    if(commit&&remoteMain(root)===baseSha)await commitPaths(root,item,sourceId,`chore(authoring): block queued rewrite ${item.articleId}`);
+    if(itemLevelBlock(status)){
+      console.log('QUEUE_ITEM_BLOCKED_CONTINUE '+JSON.stringify({articleId:item.articleId,status,error:code,blockedCount:blockedCount+1}));
+      if(blockedCount+1<maxBlockedPerRun)return runQueueProducer({root,model,fetcher,commit,onOutput,blockedCount:blockedCount+1,maxBlockedPerRun});
+      console.log('QUEUE_BATCH_BLOCK_LIMIT '+JSON.stringify({maxBlockedPerRun}));
+      onOutput?.({complete:'false'});
+      return {blocked:true,item,status,error:code};
+    }
     throw error;
   }
 }
