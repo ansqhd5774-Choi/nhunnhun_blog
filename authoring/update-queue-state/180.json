@@ -1,0 +1,69 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-180",
+    "order": 5,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "계란",
+    "articleId": "180",
+    "targetUrl": "https://nhunnhun.tistory.com/180"
+  },
+  "sourceId": "auto-180-r1-20261007-368f7964",
+  "baseSha": "60da2196ef5686926dd208dcc4f608df463f26f4",
+  "startedAt": "2026-10-07T05:32:56.007Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:34:02.486Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_CLAIM_ID",
+        "claimId": "c1"
+      },
+      {
+        "code": "PLAN_CLAIM_ID",
+        "claimId": "c1"
+      },
+      {
+        "code": "PLAN_CLAIM_ID",
+        "claimId": "c1"
+      },
+      {
+        "code": "PLAN_CLAIM_ID",
+        "claimId": "c1"
+      },
+      {
+        "code": "PLAN_CLAIM_ID",
+        "claimId": "c1"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "identity"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "storage"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "focused"
+  },
+  "publicMutation": false
+}
