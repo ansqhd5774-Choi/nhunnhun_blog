@@ -47,6 +47,17 @@ const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replac
 const norm=v=>String(v??'').normalize('NFC').replace(/\s+/g,' ').trim();
 const plain=html=>norm(String(html??'').replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' '));
 
+function unsuitableFoodEvidence(source){
+  const text=(String(source?.title??'')+' '+String(source?.notes??'')).toLowerCase();
+  return /(insecticide|pesticide|whitefly|aphid|yield response|field conditions|crop|crispr|genome|genomic|gene expression|salt stress|breeding|cultivar|agronom|dissipation|residue)/i.test(text);
+}
+
+function writerSources(item,evidence){
+  const sources=[...(evidence?.sources??[])];
+  if(item?.domain!=='food')return sources;
+  return sources.filter(source=>!unsuitableFoodEvidence(source));
+}
+
 function writerSchema(specs){
   return {
     type:'object',additionalProperties:false,
@@ -161,11 +172,11 @@ function medicalClaims(domain,sections){
 export async function writeR53Article(item,evidence,{model,fetcher=fetch,currentTitle='',internalLinks=[]}={}){
   const specs=R53_SECTION_SPECS[item.domain];
   if(!specs)throw new Error('E_R53_DOMAIN');
-  const sourcePack=(evidence?.sources??[]).map(s=>({
+  const sourcePack=writerSources(item,evidence).map(s=>({
     id:s.id,title:s.title,kind:s.kind,role:s.role,url:s.url,
     facts:String(s.notes??'').slice(0,1800)
   }));
-  const system='한국어 블로그 글 작성자다. 주제는 "'+item.keyword+'"이다. 제공된 6개 항목을 빠짐없이 같은 순서로 작성한다. 각 항목은 targetChars에 가까운 정보량으로 충분히 쓴다. 독자가 흥미를 느끼도록 표현은 강하고 인상적으로 쓰되, 사실·수치·효능 자체는 제공된 자료 범위를 벗어나 과장하지 않는다. 제공된 자료를 자연스럽게 활용해 읽기 쉬운 글을 만든다. internalLinks는 이미 확인된 우리 블로그 링크다. 해당 내용이 실제로 관련될 때 label을 본문에 자연스럽게 한 번 언급한다. 링크 URL을 새로 만들거나 검색하지 않는다. JSON만 출력한다.';
+  const system='한국어 블로그 글 작성자다. 주제는 "'+item.keyword+'"이다. 제공된 6개 항목을 빠짐없이 같은 순서로 작성한다. 각 항목은 targetChars에 가까운 정보량으로 충분히 쓴다. 독자가 흥미를 느끼도록 표현은 강하고 인상적으로 쓴다. 각 항목의 사실·수치·효능은 evidence에서 직접 확인되는 내용을 바탕으로 작성한다. 자료가 충분하지 않은 항목은 같은 일반 문장을 반복하지 말고 확인 가능한 범위에서 실용적으로 설명한다. internalLinks는 이미 확인된 우리 블로그 링크다. 해당 내용이 실제로 관련될 때 label을 본문에 자연스럽게 한 번 언급한다. 링크 URL을 새로 만들거나 검색하지 않는다. JSON만 출력한다.';
   const raw=await ollamaJson([
     {role:'system',content:system},
     {role:'user',content:JSON.stringify({
