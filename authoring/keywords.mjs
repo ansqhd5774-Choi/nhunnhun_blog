@@ -42,17 +42,17 @@ async function ncbi(path,parameters,fetcher) {
   if(!response.ok) throw new Error(`E_RESEARCH_HTTP_${response.status}`);
   return response;
 }
-export async function research(query,fetcher=fetch,{retmax=4,sort='pub date'}={}) {
+export async function research(query,fetcher=fetch,{retmax=4,sort='pub date',minResults=2}={}) {
   if(typeof query!=='string' || query.length>160 || !/^[A-Za-z0-9 ()'.,-]+$/.test(query)) throw new Error('E_RESEARCH_QUERY');
-  if(!Number.isInteger(retmax)||retmax<2||retmax>8||!['relevance','pub date'].includes(sort)) throw new Error('E_RESEARCH_QUERY');
+  if(!Number.isInteger(retmax)||retmax<2||retmax>8||!['relevance','pub date'].includes(sort)||!Number.isInteger(minResults)||minResults<1||minResults>retmax) throw new Error('E_RESEARCH_QUERY');
   const response=await ncbi('esearch.fcgi',{db:'pubmed',term:`(${query}) AND hasabstract`,retmode:'json',retmax:String(retmax),sort},fetcher);
   const ids=(await response.json()).esearchresult?.idlist;
-  if(!Array.isArray(ids) || ids.length<2 || ids.some(id=>!/^\d+$/.test(id))) throw new Error('E_RESEARCH_INSUFFICIENT');
+  if(!Array.isArray(ids) || ids.length<minResults || ids.some(id=>!/^[0-9]+$/.test(id))) throw new Error('E_RESEARCH_INSUFFICIENT');
   // No-key E-utilities limit: at most 3 requests per second.
   await new Promise(done=>setTimeout(done,400));
   const xml=await (await ncbi('efetch.fcgi',{db:'pubmed',id:ids.join(','),retmode:'xml'},fetcher)).text();
   const sources=readPubmed(xml);
-  if(sources.length<2 || sources.some(s=>s.notes.length>16000)) throw new Error('E_RESEARCH_INSUFFICIENT');
+  if(sources.length<minResults || sources.some(s=>s.notes.length>16000)) throw new Error('E_RESEARCH_INSUFFICIENT');
   return sources;
 }
 async function ask(messages,format,{model,fetcher,onProgress=async()=>{}}) {
