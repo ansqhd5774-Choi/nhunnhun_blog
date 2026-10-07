@@ -8,14 +8,14 @@ import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources,shouldRetryState,QUEUE_POLICY_VERSION } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
-import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource} from '../authoring/queue-research.mjs';
+import {classifyWebSource,sourceMainText,externalLinks,isTopicSpecificSource,normalizeExtensionDecisions,usdaNutritionSource,classifyEvidenceSufficiency} from '../authoring/queue-research.mjs';
 import {VERIFIED_ALIASES} from '../authoring/keywords.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import { updateFingerprint } from '../publishing/update-core.mjs';
 import { validateJob } from '../authoring/ollama.mjs';
 import '../authoring/queue-research.mjs';
 import {renderBody,validateWrittenArticle,patchableSectionIds,applySectionPatches,mergePlanAndDraft,buildLengthReport,writeArticleFromPlan} from '../authoring/queue-draft.mjs';
-import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton} from '../authoring/queue-plan.mjs';
+import {inferWritingScope,lengthBandForScope,sectionLimitsForScope,selectPlanSources,validateEvidencePlan,buildCoreSkeleton,deterministicClaimType,deterministicClaimRisk} from '../authoring/queue-plan.mjs';
 import {assertEditorialSource,renderEditorialPost} from '../publishing/editorial.mjs';
 import {DOMAIN_RULES} from '../publishing/content-standards.mjs';
 import '../authoring/queue-review.mjs';
@@ -92,9 +92,11 @@ test('USDA nutrition rate limit is evidence degradation, not a content failure',
   assert.equal(result.status,'rate-limited');
 });
 
-test('R5 automatically retries legacy plan-validation blocks but skips current-policy blocks',async()=>{
+test('R5.2 retries repairable legacy blocks but skips current-policy blocks',async()=>{
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),true);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:'R5'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_EVIDENCE',error:'E_QUEUE_RESEARCH_HIGH_QUALITY',policyVersion:'R5.1'}),true);
+  assert.equal(shouldRetryState({status:'BLOCKED_GENERATION',error:'E_OLLAMA_LENGTH_LIMIT',policyVersion:'R5.1'}),true);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}),false);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:QUEUE_POLICY_VERSION}),false);
   const root=await mkdtemp(join(tmpdir(),'queue-r5-retry-'));
@@ -109,6 +111,26 @@ test('R5 automatically retries legacy plan-validation blocks but skips current-p
     assert.equal(selected.item.articleId,'327');
     assert.equal(selected.recovered,true);
   }finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('R5.2 derives claim type and risk in code instead of trusting model labels',()=>{
+  const food={domain:'food'};
+  const benefitSection={id:'benefits-amount'};
+  assert.equal(deterministicClaimType(food,benefitSection,'이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'benefit');
+  assert.equal(deterministicClaimRisk('benefit','이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'low');
+  assert.equal(deterministicClaimType({domain:'nutrient'},{id:'safety-interactions'},'확인되지 않은 상호작용은 단정하지 않습니다.'),'general');
+  assert.equal(deterministicClaimRisk('general','확인되지 않은 상호작용은 단정하지 않습니다.'),'low');
+  assert.equal(deterministicClaimType({domain:'medicine'},{id:'audience-amount-use'},'1회 500 mg을 복용합니다.'),'dose');
+  assert.equal(deterministicClaimRisk('dose','1회 500 mg을 복용합니다.'),'high');
+});
+
+test('R5.2 evidence sufficiency is domain-specific instead of requiring two strong sources everywhere',()=>{
+  const nutrientSources=[{id:'pmid-1',kind:'article',role:'health',topicSpecific:true,title:'Niacin review',notes:'niacin evidence'}];
+  assert.deepEqual(classifyEvidenceSufficiency({domain:'nutrient'},nutrientSources),{directCount:1,strongCount:0,claimMode:'conservative'});
+  assert.throws(()=>classifyEvidenceSufficiency({domain:'nutrient'},[{id:'x',kind:'article',role:'health',topicSpecific:false}]),/E_QUEUE_RESEARCH_TOPIC_SPECIFIC/);
+  assert.throws(()=>classifyEvidenceSufficiency({domain:'medicine'},nutrientSources),/E_QUEUE_KR_AUTHORIZATION_MISSING/);
+  const medicineSources=[{id:'mfds',kind:'official',role:'authorization',topicSpecific:true}];
+  assert.equal(classifyEvidenceSufficiency({domain:'medicine'},medicineSources).directCount,1);
 });
 
 test('protected diff permits batched queue-state checkpoints without allowing unrelated files',()=>{
