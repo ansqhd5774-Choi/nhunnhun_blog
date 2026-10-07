@@ -24,7 +24,7 @@ test('카르노산 원고의 확인된 오해를 재생산하면 승인 대신 �
 });
 test('로컬 API만 호출하고 출력 한도 종료와 전송 불확실은 재시도하지 않음',async()=>{
   let calls=0;
-  await assert.rejects(localRequest({},async(url)=>{calls++;assert.equal(url,'http://127.0.0.1:11434/api/chat');return {ok:true,json:async()=>({done:true,done_reason:'length',message:{content:'{}'}})};}),/E_OLLAMA_INCOMPLETE/);
+  await assert.rejects(localRequest({},async(url)=>{calls++;assert.equal(url,'http://127.0.0.1:11434/api/chat');return {ok:true,json:async()=>({done:true,done_reason:'length',eval_count:3539,message:{content:'{}'}})};}),error=>error.message==='E_OLLAMA_LENGTH_LIMIT'&&error.details.outputTokens===3539);
   assert.equal(calls,1);
   await assert.rejects(localRequest({},async()=>{throw new Error('private detail')}),/^Error: E_OLLAMA_TRANSPORT_STATE_UNKNOWN$/);
 });
