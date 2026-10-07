@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_SYSTEM",
+  "status": "RETRY_READY",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -9,12 +9,14 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r1-20261007-dba75756",
-  "baseSha": "ce14da9479a6e5124ab172f96d1605c9a581226b",
-  "startedAt": "2026-10-07T04:12:59.580Z",
-  "skippedCurrent": [],
-  "blockedAt": "2026-10-07T04:23:56.389Z",
-  "error": "E_OLLAMA_INCOMPLETE",
-  "details": null,
-  "publicMutation": false
+  "publicMutation": false,
+  "retryPreparedAt": "2026-10-07T04:35:29.895Z",
+  "retryReason": "Queue R3 출력 예산 확대·JSON 압축·길이 오류 분리 반영 후 재실행",
+  "previousFailure": {
+    "sourceId": "auto-327-r1-20261007-dba75756",
+    "baseSha": "ce14da9479a6e5124ab172f96d1605c9a581226b",
+    "blockedAt": "2026-10-07T04:23:56.389Z",
+    "error": "E_OLLAMA_INCOMPLETE",
+    "details": null
+  }
 }
