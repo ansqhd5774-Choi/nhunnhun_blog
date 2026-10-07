@@ -78,7 +78,8 @@ export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) 
       }
     } catch(error) { if(/^E_OLLAMA_/.test(error.message)) throw error; throw new Error('E_OLLAMA_STREAM_STATE_UNKNOWN'); }
   } else data=await response.json();
-  if(data?.done!==true || data.done_reason==='length' || !data.message?.content) throw new Error('E_OLLAMA_INCOMPLETE');
+  if(data?.done!==true || !data.message?.content) throw new Error('E_OLLAMA_INCOMPLETE');
+  if(data.done_reason==='length') throw Object.assign(new Error('E_OLLAMA_LENGTH_LIMIT'),{details:{outputTokens:data.eval_count??null,promptTokens:data.prompt_eval_count??null}});
   return data;
 }
 export async function runOllama(jobId,{root=process.cwd(),fetcher=fetch,model='qwen3:4b'}={}) {

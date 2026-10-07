@@ -54,6 +54,7 @@ function requireNodeFs(){throw new Error('E_QUEUE_INTERNAL_OUTPUT');}
 
 function blockStatus(error){
   const code=String(error?.message??'E_QUEUE_FAILED');
+  if(code==='E_OLLAMA_LENGTH_LIMIT')return 'BLOCKED_GENERATION';
   if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING)/.test(code)||['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT'].includes(code))return 'BLOCKED_SYSTEM';
   if(/IMAGE_REVIEW/.test(code))return 'BLOCKED_IMAGE';
   if(/RESEARCH|AUTHORIZATION|PRIMARY_SOURCE|HEALTH_EVIDENCE/.test(code))return 'BLOCKED_EVIDENCE';

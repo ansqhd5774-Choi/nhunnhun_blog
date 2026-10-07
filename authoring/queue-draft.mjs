@@ -47,11 +47,10 @@ export function requiredModules(item,_extensions={}){
 
 function schema(required,sources){
   const moduleNames=Object.keys(MODULES),sourceIds=sources.map(s=>s.id);
-  return {type:'object',additionalProperties:false,required:['title','lead','summary','plan','sections','claims','reviewNotes'],properties:{
+  return {type:'object',additionalProperties:false,required:['title','lead','summary','plan','sections','claims'],properties:{
     title:{type:'string',minLength:8,maxLength:150},
     lead:{type:'string',minLength:30,maxLength:240},
     summary:{type:'string',minLength:30,maxLength:240},
-    reviewNotes:{type:'string',minLength:20,maxLength:1000},
     plan:{type:'object',additionalProperties:false,required:['scope','primaryQuestion','readerSituation','nextActions'],properties:{
       scope:{type:'string',enum:Object.keys(SCOPE_BANDS)},
       primaryQuestion:{type:'string',minLength:12,maxLength:220},
@@ -68,7 +67,7 @@ function schema(required,sources){
       modules:{type:'array',minItems:1,items:{type:'string',enum:moduleNames}},
       sourceIds:{type:'array',minItems:1,items:{type:'string',enum:sourceIds}}
     }}},
-    claims:{type:'array',minItems:1,maxItems:24,items:{type:'object',additionalProperties:false,required:['id','sectionId','text','type','risk','sourceIds'],properties:{
+    claims:{type:'array',minItems:1,maxItems:12,items:{type:'object',additionalProperties:false,required:['id','sectionId','text','type','risk','sourceIds'],properties:{
       id:{type:'string',pattern:'^c[0-9]{1,2}$'},
       sectionId:{type:'string',pattern:'^[a-z][a-z0-9-]{1,40}$'},
       text:{type:'string',minLength:8,maxLength:220},
@@ -79,15 +78,25 @@ function schema(required,sources){
   }};
 }
 
+function sourcePriority(source){
+  let score=0;
+  if(source.topicSpecific===true)score+=8;
+  if(['official','guideline','nutrition-database'].includes(source.kind))score+=7;
+  else if(['systematic-review','trial'].includes(source.kind))score+=5;
+  if(['nutrition','safety','authorization','health'].includes(source.role))score+=3;
+  return score;
+}
+export function selectDraftSources(evidence,max=7){
+  return [...evidence.sources].sort((a,b)=>sourcePriority(b)-sourcePriority(a)).slice(0,max);
+}
 function sourceBundle(evidence){
-  return evidence.sources.map(s=>({
+  return selectDraftSources(evidence).map(s=>({
     id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific===true,
-    scopeNote:s.scopeNote,notes:s.notes.slice(0,2200)
+    scopeNote:s.scopeNote,notes:s.notes.slice(0,1400)
   }));
 }
-function outputBudget(scope){
-  const upper=lengthBandForScope(scope)[1];
-  return Math.min(4200,Math.max(2200,Math.ceil(upper/1.8)+650));
+export function outputBudget(scope){
+  return ({focused:3000,standard:4500,comprehensive:6000,deep:7500})[scope]??4500;
 }
 function allSectionText(section){return [section.strongPoint,...(section.paragraphs??[])].map(norm).filter(Boolean);}
 function duplicateFailures(article){
@@ -161,16 +170,16 @@ export function buildLengthReport(article,scope){
 async function generateArticle(item,evidence,extensions,required,scope,currentTitle,{model,fetcher}){
   const [min,max]=lengthBandForScope(scope);
   return ollamaJson([
-    {role:'system',content:`한국어 건강정보 블로그 작성자다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 표시 본문은 ${min}~${max}자지만 글자 수를 채우려고 문장을 늘리지 않는다. 핵심 질문에 필요한 만큼만 쓰고 충분히 답했으면 끝낸다. 필수 core 모듈은 ${required.join(', ')}이며 반드시 자연스럽게 답한다. 그 밖의 모듈은 검색 의도·직접 근거·새로운 판단 가치가 모두 있을 때만 선택한다. 제공 자료 밖에서 수치·효능·용량·상호작용을 만들지 않는다. 농약·농업·유전학 자료는 그 연구가 실제로 다루는 안전·재배 범위에서만 사용하고 사람의 건강 효능으로 확대하지 않는다. 사람 연구도 대상·형태·용량·기간·평가 결과가 실제 주장과 맞을 때만 사용한다. plan과 article을 한 번에 만든다. claims에는 수치·효능·안전·용량·상호작용·질병 관련 핵심 주장만 기록하고 sourceIds로 근거를 연결한다. strongPoint는 섹션의 짧은 결론이고 paragraphs는 새로운 설명이다. highlightPhrase와 underlinePhrase는 paragraphs 안에 실제로 존재하는 짧은 구절을 그대로 복사한다. underlinePhrase가 필요 없으면 빈 문자열이다. 같은 의미를 strongPoint·paragraph에서 반복하지 않는다. 요약과 마지막 핵심정리의 재언급은 허용한다. 분야 안내: ${DOMAIN_RULES[item.domain].guidance}`},
+    {role:'system',content:`한국어 건강정보 블로그 작성자다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 표시 본문은 ${min}~${max}자지만 글자 수를 채우려고 문장을 늘리지 않는다. 핵심 질문에 필요한 만큼만 쓰고 충분히 답했으면 끝낸다. 필수 core 모듈은 ${required.join(', ')}이며 반드시 자연스럽게 답한다. 그 밖의 모듈은 검색 의도·직접 근거·새로운 판단 가치가 모두 있을 때만 선택한다. 제공 자료 밖에서 수치·효능·용량·상호작용을 만들지 않는다. 농약·농업·유전학 자료는 그 연구가 실제로 다루는 안전·재배 범위에서만 사용하고 사람의 건강 효능으로 확대하지 않는다. 사람 연구도 대상·형태·용량·기간·평가 결과가 실제 주장과 맞을 때만 사용한다. plan과 article을 한 번에 만든다. claims에는 수치·영양성분·효능·안전·용량·상호작용·질병 관련 검증 가치가 큰 핵심 주장만 최대 12개 기록하고 sourceIds로 근거를 연결한다. 일반 설명은 claims에 반복 기록하지 않는다. strongPoint는 섹션의 짧은 결론이고 paragraphs는 새로운 설명이다. highlightPhrase와 underlinePhrase는 paragraphs 안에 실제로 존재하는 짧은 구절을 그대로 복사한다. underlinePhrase가 필요 없으면 빈 문자열이다. 같은 의미를 strongPoint·paragraph에서 반복하지 않는다. 요약과 마지막 핵심정리의 재언급은 허용한다. 권장 분량을 채우지 말고 답이 끝나면 즉시 완전한 JSON을 닫아 종료한다. 분야 안내: ${DOMAIN_RULES[item.domain].guidance}`},
     {role:'user',content:JSON.stringify({keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,category:item.category,currentUrl:item.targetUrl,currentTitle,scope,lengthBand:[min,max],requiredCoreModules:required,optionalExtensions:extensions,sources:sourceBundle(evidence)})}
-  ],schema(required,evidence.sources),{model,fetcher,numPredict:outputBudget(scope)});
+  ],schema(required,selectDraftSources(evidence)),{model,fetcher,numPredict:outputBudget(scope)});
 }
 async function repairArticle(item,evidence,extensions,required,scope,currentTitle,article,failures,{model,fetcher}){
   const [min,max]=lengthBandForScope(scope);
   return ollamaJson([
     {role:'system',content:`기존 초안을 한 번만 교정한다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이다. 실패 항목만 고치되 전체 글을 불필요하게 늘리지 않는다. core 모듈 누락은 실제 근거로 답하고, 근거가 부족하면 확인 가능한 한계를 정확히 설명한다. 선택 모듈은 삭제해도 된다. claims의 sourceIds와 주장 범위를 맞춘다. highlightPhrase·underlinePhrase는 반드시 해당 paragraphs의 실제 구절이어야 한다. 권장 분량 ${min}~${max}자는 경고 범위이지 강제 목표가 아니다. 같은 설명을 반복해서 통과시키지 않는다.`},
     {role:'user',content:JSON.stringify({failures,existingArticle:article,requiredCoreModules:required,scope,currentTitle,extensions,sources:sourceBundle(evidence)})}
-  ],schema(required,evidence.sources),{model,fetcher,numPredict:outputBudget(scope)});
+  ],schema(required,selectDraftSources(evidence)),{model,fetcher,numPredict:outputBudget(scope)});
 }
 
 export async function draftArticle(item,evidence,extensions=conservativeExtensions(item),{model,fetcher=fetch,currentTitle=''}={}){
