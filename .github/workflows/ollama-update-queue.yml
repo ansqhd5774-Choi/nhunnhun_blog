@@ -29,8 +29,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: nhunnhun-ollama-update-queue
-  cancel-in-progress: false
+  group: nhunnhun-ollama-update-queue-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
