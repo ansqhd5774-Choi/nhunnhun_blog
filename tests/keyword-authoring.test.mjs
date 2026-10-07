@@ -24,3 +24,12 @@ test('조사 부족·검색식 오염 시 모델 본문 단계에 진입하지 �
   await assert.rejects(research('carno AND [key]',()=>{throw Error('should not call');}),/E_RESEARCH_QUERY/);
   await assert.rejects(research('carnosic acid',async()=>({ok:true,json:async()=>({esearchresult:{idlist:['123']}})})),/E_RESEARCH_INSUFFICIENT/);
 });
+test('Queue 근거 수집은 직접 PubMed 초록 1건도 보수적 근거로 유지할 수 있다',async()=>{
+  const xml='<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>123</PMID><Article><ArticleTitle>Niacin evidence</ArticleTitle><Abstract><AbstractText>Direct evidence for niacin.</AbstractText></Abstract></Article></MedlineCitation></PubmedArticle></PubmedArticleSet>';
+  const fetcher=async url=>String(url).includes('esearch.fcgi')
+    ?{ok:true,json:async()=>({esearchresult:{idlist:['123']}})}
+    :{ok:true,text:async()=>xml};
+  const sources=await research('niacin',fetcher,{retmax:5,sort:'pub date',minResults:1});
+  assert.equal(sources.length,1);
+  assert.equal(sources[0].id,'pmid-123');
+});
