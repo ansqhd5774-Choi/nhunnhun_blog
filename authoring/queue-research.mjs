@@ -193,11 +193,18 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
   for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
-  const high=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
-  if(high.length<2)throw new Error('E_QUEUE_RESEARCH_HIGH_QUALITY');
+  const strong=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
+  const direct=sources.filter(s=>s.topicSpecific===true&&(s.role==='health'||s.role==='nutrition'||s.role==='authorization'));
+  // Evidence sufficiency is domain-specific. Missing evidence narrows claims; it should not block an otherwise supportable article.
+  if(item.domain==='food'&&!nutrition&&!direct.length)throw new Error('E_QUEUE_RESEARCH_TOPIC_SPECIFIC');
+  if(item.domain==='nutrient'&&!direct.length)throw new Error('E_QUEUE_RESEARCH_TOPIC_SPECIFIC');
   if(item.domain==='medicine'&&!sources.some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
-  if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
-  return {query,sources,nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}};
+  if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)&&s.role==='health'))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
+  return {
+    query,sources,
+    evidenceProfile:{directCount:direct.length,strongCount:strong.length,claimMode:strong.length>=2?'full':'conservative'},
+    nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}
+  };
 }
 
 export const DOMAIN_EXTENSION_ALLOW=Object.freeze({
