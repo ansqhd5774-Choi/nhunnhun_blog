@@ -10,8 +10,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: authoring-regression-tests
-  cancel-in-progress: false
+  group: authoring-regression-tests-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
