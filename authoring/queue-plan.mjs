@@ -152,6 +152,8 @@ const SECTION_CLAIM_TYPES=Object.freeze({
 });
 function deterministicClaimType(item,section,text){
   const value=norm(text);
+  const uncertainty=/(?:단정하지|확인되지|근거가 부족|근거가 충분하지|자료가 없|자료만으로는|알 수 없)/u.test(value);
+  if(uncertainty)return 'general';
   if(/(?:상호작용|병용|함께 복용|동시 복용)/u.test(value))return 'interaction';
   if(['medicine','nutrient'].includes(item?.domain)&&/(?:복용량|용량|투여량|1회|하루\s*\d+|\d+(?:[.,]\d+)?\s*(?:mg|mcg|μg|µg|ml|mL))/iu.test(value))return 'dose';
   if(['medicine','disease'].includes(item?.domain)&&/(?:치료|치료법|완치)/u.test(value))return 'treatment';
@@ -186,14 +188,14 @@ function fallbackClaimText(item,section){
   const subject=item?.keyword??'이 항목';
   const map={
     'identity-nutrition':`${subject}의 영양 정보는 확인된 자료의 범위와 식품 형태를 구분해 살펴봅니다.`,
-    'benefits-amount':`${subject}의 기대효과와 섭취 판단은 확인된 근거 범위 안에서 과장 없이 설명합니다.`,
-    'preparation-storage':`${subject}의 조리와 보관은 확인된 안전 자료의 범위에서 판단합니다.`,
-    'selection-safety':`${subject}의 선택과 안전성은 확인된 자료의 적용 조건을 기준으로 살펴봅니다.`,
+    'benefits-amount':`${subject}의 섭취 관련 판단은 확인된 자료 범위 안에서만 설명합니다.`,
+    'preparation-storage':`${subject}의 조리와 보관은 확인된 자료의 적용 조건을 기준으로 살펴봅니다.`,
+    'selection-safety':`${subject}의 선택과 주의사항은 확인된 자료 범위만 설명하고 확인되지 않은 내용은 단정하지 않습니다.`,
     'decision':`${subject}은 확인된 근거와 개인 상황을 구분해 선택합니다.`,
     'identity-role':`${subject}의 정체와 역할은 확인된 자료의 적용 범위 안에서 설명합니다.`,
-    'benefits-expectations':`${subject}의 기대효과는 확인된 연구 범위를 넘어서 단정하지 않습니다.`,
+    'benefits-expectations':`${subject}의 연구 결과는 확인된 범위를 넘어서 단정하지 않습니다.`,
     'audience-amount-use':`${subject}의 대상과 사용법은 확인된 자료가 있는 범위에서만 설명합니다.`,
-    'safety-interactions':`${subject}의 안전성과 상호작용은 확인된 근거가 있는 내용만 설명합니다.`,
+    'safety-interactions':`${subject}의 주의사항은 확인된 자료 범위만 설명하고 확인되지 않은 상호작용은 단정하지 않습니다.`,
     'selection-decision':`${subject}은 확인된 자료와 개인 상황을 함께 구분해 판단합니다.`,
   };
   return map[section.id]??`${subject}은 확인된 근거 범위 안에서만 설명합니다.`;
@@ -314,7 +316,10 @@ async function requestPlan(item,evidence,scope,required,sources,skeleton,{model,
   const nutritionInstruction=nutritionAvailable
     ?'공식 영양 DB가 포함된 경우에만 그 source의 실제 수치와 단위를 사용할 수 있다.'
     :'이번 근거 묶음에는 공식 영양 DB가 없다. identity-nutrition 섹션은 숫자형 영양성분을 만들지 말고, 확인 가능한 정성 정보와 근거 한계를 설명한다. nutrition 타입의 수치 주장을 만들지 않는다.';
-  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
+  const evidenceInstruction=evidence?.evidenceProfile?.claimMode==='conservative'
+    ?'현재 근거 강도가 제한적이므로 효능·권장량·안전성·상호작용을 새로 주장하지 말고, 확인된 연구 범위와 불확실성을 설명하는 정성 claim을 우선한다.'
+    :'직접 근거가 있는 claim만 작성한다.';
+  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} ${evidenceInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
   return ollamaJson([
     {role:'system',content:baseSystem},
     {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,nutritionEvidence:evidence?.nutrition??null,sources:sourceBundle(sources)})}
