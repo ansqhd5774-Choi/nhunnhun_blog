@@ -101,11 +101,11 @@ test('USDA nutrition rate limit is evidence degradation, not a content failure',
   assert.equal(result.status,'rate-limited');
 });
 
-test('R5.2 retries repairable legacy blocks but skips current-policy blocks',async()=>{
-  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),true);
-  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:'R5'}),true);
-  assert.equal(shouldRetryState({status:'BLOCKED_EVIDENCE',error:'E_QUEUE_RESEARCH_HIGH_QUALITY',policyVersion:'R5.1'}),true);
-  assert.equal(shouldRetryState({status:'BLOCKED_GENERATION',error:'E_OLLAMA_LENGTH_LIMIT',policyVersion:'R5.1'}),true);
+test('R5.2 does not automatically retry legacy or current-policy blocks',async()=>{
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}),false);
+  assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:'R5'}),false);
+  assert.equal(shouldRetryState({status:'BLOCKED_EVIDENCE',error:'E_QUEUE_RESEARCH_HIGH_QUALITY',policyVersion:'R5.1'}),false);
+  assert.equal(shouldRetryState({status:'BLOCKED_GENERATION',error:'E_OLLAMA_LENGTH_LIMIT',policyVersion:'R5.1'}),false);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}),false);
   assert.equal(shouldRetryState({status:'BLOCKED_CONTENT',error:'E_QUEUE_FOOD_NUTRITION_SOURCE',policyVersion:QUEUE_POLICY_VERSION}),false);
   const root=await mkdtemp(join(tmpdir(),'queue-r5-retry-'));
@@ -117,8 +117,8 @@ test('R5.2 retries repairable legacy blocks but skips current-policy blocks',asy
     await writeFile(join(root,'authoring','update-queue.txt'),'음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 바나나 - https://nhunnhun.tistory.com/328\n');
     await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_PLAN_VALIDATION'}));
     const selected=await selectNextQueueItem(root,{fetcher:async()=>({ok:true,text:async()=>'<meta property="og:title" content="현재 글">'})});
-    assert.equal(selected.item.articleId,'327');
-    assert.equal(selected.recovered,true);
+    assert.equal(selected.item.articleId,'328');
+    assert.equal(selected.recovered,false);
   }finally{await rm(root,{recursive:true,force:true});}
 });
 
@@ -411,7 +411,7 @@ test('R5.3 uses the requested six content sections and character budgets',()=>{
 });
 
 test('R5.3 source id is visibly separated from legacy R1 queue ids',()=>{
-  assert.match(queueSourceId({articleId:'327',keyword:'가지'},'2026-10-08','abc'),/^auto-327-r54-20261008-/);
+  assert.match(queueSourceId({articleId:'327',keyword:'가지'},'2026-10-08','abc'),/^auto-327-r55-20261008-/);
 });
 
 test('R5.3 finds verified internal links before the writer runs',async()=>{

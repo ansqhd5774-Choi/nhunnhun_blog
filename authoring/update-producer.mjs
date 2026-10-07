@@ -4,12 +4,12 @@ import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, parseUpdateQueue, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
 import { collectEvidence, sourceMainText } from './queue-research.mjs';
-import { reusableImages, conservativeExtensions } from './queue-draft.mjs';
+import { reusableImages } from './queue-draft.mjs';
 import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './queue-r53.mjs';
-import { buildWritingContract, writeEfficientArticle, patchDraft, assembleDraft } from './queue-efficient.mjs';
+import { writeSinglePassArticle, singlePassReceipt } from './queue-single-pass.mjs';
 import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
-import { reviewDetails, finalizeReview } from './queue-review.mjs';
-import { todayInSeoul } from '../publishing/content-standards.mjs';
+
+import { todayInSeoul, assertContentStandard } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
 import { assertEditorialSource, renderEditorialPost } from '../publishing/editorial.mjs';
@@ -31,7 +31,7 @@ function makeSource(item,currentTitle,sourceId,article,body,images){
   return {
     id:sourceId,articleId:item.articleId,targetUrl:item.targetUrl,expectedCurrentTitle:currentTitle,title:article.title,
     representativeImageUrl:images[0].src,imageReview:images,bodyHtml:body,status:'ready',approved:true,
-    category:item.category,contentStandard:'R1'
+    category:item.category,contentStandard:'SP1'
   };
 }
 export function changedPaths(root){
@@ -48,12 +48,7 @@ async function commitPaths(root,item,sourceId,message,archivedIds=[]){
   git(['push','origin','HEAD:main'],root);
   return git(['rev-parse','HEAD'],root);
 }
-function failureState(error){
-  const code=String(error?.message??'E_QUEUE_FAILED');
-  if(/^E_OLLAMA_(TRANSPORT|HTTP_|STREAM|STREAM_STATE_UNKNOWN|INCOMPLETE|NOT_RUNNING|MODEL_MISSING|TIMEOUT)/.test(code))return 'ERROR_SYSTEM';
-  if(['E_QUEUE_GIT','E_QUEUE_SOURCE_DRIFT','E_QUEUE_ACTIVE','E_QUEUE_SYSTEM_REQUIRES_REVIEW'].includes(code))return 'ERROR_SYSTEM';
-  return 'SKIPPED';
-}
+function failureState(){return 'ERROR_SYSTEM';}
 
 export async function runQueueProducer({root=process.cwd(),model=process.env.OLLAMA_MODEL||'qwen3:4b',fetcher=fetch,commit=true,onOutput=null,dryRun=false,articleId=null,cacheDir=null}={}){
   assertLocalOnly(process.env);
@@ -113,16 +108,13 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
       metrics.modelPlacement=(ps.models??[]).filter(m=>m.name===model).map(({name,size,size_vram,context_length})=>({name,size,size_vram,context_length}));
     }catch{metrics.modelPlacement=null;}
     const current=await timed('publicFetchMs',()=>fetchPublic(item,fetcher));
-    let evidence=await timed('evidenceMs',()=>cached('evidence',{publicHash:digest(sourceMainText(current.html,{article:true})),day:todayInSeoul()},()=>collectEvidence(item,current.html,{model,fetcher}),onCacheHit));
+    let evidence=await timed('evidenceMs',()=>cached('evidence',{publicHash:digest(sourceMainText(current.html,{article:true})),day:todayInSeoul()},()=>collectEvidence(item,current.html,{model,fetcher,advisory:true}),onCacheHit));
     evidence=await timed('curatedEvidenceMs',()=>applyCuratedEvidence(root,item,evidence,options));
     const internalLinks=await timed('internalLinkMs',()=>collectInternalLinks(root,item,current.html,evidence));
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,internalLinks,baseSha});
 
-    const contract=buildWritingContract(item,evidence);
-    await checkpoint('contract',contract);
-    // Missing image approval should be detected before spending time on generation.
     const images=await timed('imageLookupMs',()=>reusableImages(root,item));
-    let {article,raw,repaired}=await timed('writerMs',()=>writeEfficientArticle(contract,{...options,currentTitle:current.title,internalLinks}));
+    const article=await timed('writerMs',()=>writeSinglePassArticle(item,evidence,options));
     try{const ps=await fetcher('http://127.0.0.1:11434/api/ps',{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
       metrics.modelPlacementAfterWriter=(ps.models??[]).filter(m=>m.name===model).map(({name,size,size_vram,context_length})=>({name,size,size_vram,context_length}));
     }catch{metrics.modelPlacementAfterWriter=null;}
@@ -135,23 +127,9 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     checkUpdateSource(source,sourceId+'.json');
     renderEditorialPost(source);
 
-    const required=contract.required;
-    const extensions=conservativeExtensions(item);
-    let details=await reviewDetails(item,article,evidence,extensions,options);
-    let reviewed;
-    try{reviewed=await timed('reviewMs',()=>finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,options));}
-    catch(error){
-      const issues=error.details?.issues??[];
-      if(repaired||error.message!=='E_QUEUE_SEMANTIC_REVIEW_FAILED'||!issues.length||issues.some(i=>!contract.sections.some(s=>s.id===i.sectionId)))throw error;
-      raw=await timed('repairMs',()=>patchDraft(raw,contract,issues,options));repaired=true;
-      article=assembleDraft(raw,contract);rendered=renderR53Body(article,evidence,images,internalLinks);
-      source=makeSource(item,current.title,sourceId,article,rendered.html,images);
-      assertEditorialSource(source);assertImageReview(source);checkUpdateSource(source,sourceId+'.json');renderEditorialPost(source);
-      details=await reviewDetails(item,article,evidence,extensions,options);
-      reviewed=await timed('reviewMs',()=>finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,options));
-    }
-    const {review,report,targetedAudit}=reviewed;
-    await checkpoint('reviewed',{source,review,report,targetedAudit});
+    const review=singlePassReceipt(source,item,evidence);
+    const report=assertContentStandard(source,{manifest:review});
+    await checkpoint('generated',{source,review});
 
     assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
@@ -173,7 +151,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
 
     await writeMetrics('READY_FOR_UPDATE');
-    const commitSha=commit?await commitPaths(root,item,sourceId,'feat(authoring): prepare R5.4 queued rewrite '+item.articleId,archivedIds):null;
+    const commitSha=commit?await commitPaths(root,item,sourceId,'feat(authoring): prepare R5.5 queued rewrite '+item.articleId,archivedIds):null;
     const output={complete:'false',article_id:item.articleId,source_id:sourceId,target_url:item.targetUrl,source_title:source.title,commit_sha:commitSha||''};
     onOutput?.(output);
     console.log('QUEUE_PREPARED '+JSON.stringify({item,sourceId,commitSha,title:source.title,internalLinks:internalLinks.length,writerCalls:metrics.ollamaWriterCalls,auditCalls:metrics.ollamaAuditCalls}));

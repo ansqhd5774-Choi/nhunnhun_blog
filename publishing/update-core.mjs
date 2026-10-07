@@ -6,8 +6,8 @@ const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','repr
 
 export function checkUpdateSource(update, filename){
   if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');
-  if(update.contentStandard!==undefined&&update.contentStandard!=='R1') throw new Error('E_CONTENT_STANDARD_VERSION');
-  if(update.contentStandard==='R1'&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
+  if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
+  if(update.contentStandard!==undefined&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(update.id) || filename!==`${update.id}.json`) throw new Error('E_UPDATE_ID');
   if(!/^\d+$/.test(update.articleId||'')) throw new Error('E_UPDATE_ARTICLE');
   if(update.targetUrl!==`${BLOG}/${update.articleId}`) throw new Error('E_UPDATE_URL');
