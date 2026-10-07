@@ -213,7 +213,7 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
     ['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],
     ['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']
   ]:[];
-  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date'}).catch(()=>[]);
+  const pubmedPromise=research(query,fetcher,{retmax:5,sort:'pub date',minResults:1}).catch(()=>[]);
   const externalPromise=Promise.all(external.map((url,i)=>fetchSource(url,item.domain,i+1,fetcher)));
   const fixedPromise=Promise.all(fixed.map(async([url,role],i)=>{
     const source=await fetchSource(url,item.domain,external.length+i+1,fetcher);
