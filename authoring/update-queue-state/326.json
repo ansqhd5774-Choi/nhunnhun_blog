@@ -1,0 +1,167 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-326",
+    "order": 35,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "수박",
+    "articleId": "326",
+    "targetUrl": "https://nhunnhun.tistory.com/326"
+  },
+  "sourceId": "auto-326-r1-20261007-6ebca1bb",
+  "baseSha": "d0afcab7598a5f22f7924d6d647b08a243db4cb0",
+  "startedAt": "2026-10-07T06:03:45.259Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    },
+    {
+      "articleId": "339"
+    },
+    {
+      "articleId": "312"
+    },
+    {
+      "articleId": "330"
+    },
+    {
+      "articleId": "296"
+    },
+    {
+      "articleId": "120"
+    },
+    {
+      "articleId": "240"
+    },
+    {
+      "articleId": "196"
+    },
+    {
+      "articleId": "130"
+    }
+  ],
+  "blockedAt": "2026-10-07T06:04:42.857Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "92%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "110mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "10mg"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "7"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "10일"
+      },
+      {
+        "code": "PLAN_CORE_MODULE",
+        "module": "decision"
+      }
+    ],
+    "scope": "standard"
+  },
+  "publicMutation": false
+}
