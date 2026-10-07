@@ -1,0 +1,148 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "item": {
+    "id": "q-333",
+    "order": 15,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "땅콩버터",
+    "articleId": "333",
+    "targetUrl": "https://nhunnhun.tistory.com/333"
+  },
+  "sourceId": "auto-333-r1-20261007-d2783311",
+  "baseSha": "713ba79c5543e1a1c1a69af248e8011250308526",
+  "startedAt": "2026-10-07T05:42:27.059Z",
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310",
+      "sourceId": "update-310-granola-r1-rewrite-20261007"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    }
+  ],
+  "blockedAt": "2026-10-07T05:43:36.753Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c1",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "50"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "60%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "15%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "20"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c2",
+        "token": "25%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "1.5"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "25g"
+      },
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c6",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "10%"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c9",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c9",
+        "token": "20°c"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c10",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c10",
+        "token": "60%"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c11",
+        "token": "50%"
+      },
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c16",
+        "type": "benefit"
+      }
+    ],
+    "scope": "standard"
+  },
+  "publicMutation": false
+}
