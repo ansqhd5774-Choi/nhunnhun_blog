@@ -130,8 +130,20 @@ export function assertProtectedDiff(paths,articleId,sourceId,archivedIds=[],stat
   return true;
 }
 
+async function rejectedSourceIds(root){
+  const ids=new Set();
+  try{
+    for(const name of await readdir(resolve(root,'authoring/rejected'))){
+      if(!name.endsWith('.txt'))continue;
+      const text=await readFile(resolve(root,'authoring/rejected',name),'utf8');
+      for(const match of text.matchAll(/^Source:\s*([a-z0-9][a-z0-9-]{2,79})\s*$/gmi))ids.add(match[1]);
+    }
+  }catch(error){if(error?.code!=='ENOENT')throw error;}
+  return ids;
+}
+
 export async function archiveCompletedSources(root,item) {
-  const matches=[];
+  const matches=[],rejected=await rejectedSourceIds(root);
   for(const name of (await readdir(resolve(root,'updates'))).filter(name=>name.endsWith('.json'))) {
     const source=JSON.parse(await readFile(resolve(root,'updates',name),'utf8'));
     if(source.articleId!==item.articleId) continue;
