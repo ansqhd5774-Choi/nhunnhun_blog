@@ -25,6 +25,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/publish-posts.yml'
+      - '.github/actions/setup-node-pnpm/**'
   workflow_dispatch:
     inputs:
       publish:
@@ -52,9 +53,11 @@ jobs:
         run: node publishing/mutation-gate.mjs posts
         env:
           MUTATION_REQUESTED: ${{ inputs.publish }}
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Diagnose self-hosted allocation
@@ -90,9 +93,11 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '24'
+          enable-cache: ${{ runner.environment == 'github-hosted' }}
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: npm install --global pnpm@11.19.0
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
