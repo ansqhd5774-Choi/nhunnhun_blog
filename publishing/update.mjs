@@ -107,7 +107,6 @@ async function uploadImage(page,sourceUrl,index,tempDir){
     }
     step='response-url';
     if(!data?.url || !data.url.includes('kakaocdn.net')) throw new Error('E_UPDATE_IMAGE_UPLOAD');
-    await page.waitForTimeout(400);
     return data.url;
   }catch(error){
     if(/^E_UPDATE_IMAGE_/.test(String(error?.message||''))) throw error;
