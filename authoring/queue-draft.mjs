@@ -75,7 +75,7 @@ function schema(required,sources){
       type:{type:'string',enum:CLAIM_TYPES},
       risk:{type:'string',enum:['low','high']},
       sourceIds:{type:'array',minItems:1,items:{type:'string',enum:sourceIds}}
-    }}
+    }}}
   }};
 }
 
