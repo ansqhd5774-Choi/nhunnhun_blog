@@ -29,3 +29,6 @@ runs:
         key: ${{ inputs.cache-key }}
         restore-keys: |
           ${{ inputs.cache-restore-key }}
+    - name: Ensure pnpm 11.19.0
+      shell: cmd
+      run: pnpm --version 2>nul | findstr /x "11.19.0" >nul || npm install --global pnpm@11.19.0
