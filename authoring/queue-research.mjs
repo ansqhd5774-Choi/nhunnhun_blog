@@ -73,29 +73,70 @@ async function writeQueryCache(){
 }
 function queryCacheKey(item){return `${item.domain}:${item.keyword}`;}
 
-async function usdaNutritionSource(query,fetcher){
+const NUTRITION_CACHE_VERSION=1;
+const nutritionMemory=new Map();
+let demoUsdaCalls=0;
+let demoUsdaCircuitOpenUntil=0;
+const DEMO_USDA_SAFE_CALLS=20;
+function nutritionCachePath(env=process.env){
+  const base=env.LOCALAPPDATA||env.HOME||process.cwd();
+  return resolve(base,'nhunnhun-queue-cache','nutrition-sources.json');
+}
+async function readNutritionCache(){
+  if(nutritionMemory.size)return nutritionMemory;
+  try{
+    const parsed=JSON.parse(await readFile(nutritionCachePath(),'utf8'));
+    if(parsed?.version===NUTRITION_CACHE_VERSION)for(const [key,value] of Object.entries(parsed.entries??{}))if(value?.source?.id)nutritionMemory.set(key,value);
+  }catch{}
+  return nutritionMemory;
+}
+async function writeNutritionCache(){
+  const path=nutritionCachePath();
+  try{
+    await mkdir(resolve(path,'..'),{recursive:true});
+    await writeFile(path,JSON.stringify({version:NUTRITION_CACHE_VERSION,updatedAt:new Date().toISOString(),entries:Object.fromEntries(nutritionMemory)},null,2)+'\n');
+  }catch{}
+}
+const nutritionCacheKey=query=>String(query).trim().toLowerCase();
+
+export async function usdaNutritionSource(query,fetcher,{apiKey=process.env.USDA_API_KEY||'DEMO_KEY',useCache=true}={}){
+  const key=nutritionCacheKey(query);
+  if(useCache){
+    const cache=await readNutritionCache(),cached=cache.get(key);
+    if(cached?.source)return {...cached,status:'cache-hit'};
+  }
+  const isDemo=apiKey==='DEMO_KEY';
+  if(isDemo&&(Date.now()<demoUsdaCircuitOpenUntil||demoUsdaCalls>=DEMO_USDA_SAFE_CALLS)){
+    return {source:null,status:'demo-budget-exhausted',provider:'usda'};
+  }
   const url=new URL('https://api.nal.usda.gov/fdc/v1/foods/search');
-  url.searchParams.set('api_key','DEMO_KEY');
+  url.searchParams.set('api_key',apiKey);
   url.searchParams.set('query',query);
   url.searchParams.set('pageSize','8');
+  if(isDemo)demoUsdaCalls++;
   let response;
-  try{response=await fetcher(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(25000)});}catch{return null;}
-  if(!response?.ok)return null;
-  let data;try{data=await response.json();}catch{return null;}
+  try{response=await fetcher(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(25000)});}
+  catch{return {source:null,status:'transport-error',provider:'usda'};}
+  if(response?.status===429){
+    if(isDemo)demoUsdaCircuitOpenUntil=Date.now()+65*60*1000;
+    return {source:null,status:'rate-limited',provider:'usda'};
+  }
+  if(!response?.ok)return {source:null,status:`http-${response?.status??'unknown'}`,provider:'usda'};
+  let data;try{data=await response.json();}catch{return {source:null,status:'invalid-json',provider:'usda'};}
   const foods=Array.isArray(data?.foods)?data.foods:[];
   const terms=topicTerms(query);
   const food=foods.find(x=>{
     const text=`${x?.description??''} ${x?.additionalDescriptions??''}`.toLowerCase();
     return terms.length?terms.some(term=>text.includes(term)):true;
   })||foods[0];
-  if(!food?.fdcId||!food?.description)return null;
+  if(!food?.fdcId||!food?.description)return {source:null,status:'not-found',provider:'usda'};
   const nutrients=(food.foodNutrients??[]).filter(n=>Number.isFinite(Number(n?.value))&&n?.nutrientName&&n?.unitName).slice(0,40);
   const notes=[
     `USDA FoodData Central food: ${food.description}.`,
     'FoodData Central nutrient amounts are expressed per 100 g of food for the database nutrient record. These values are composition data, not a recommended intake.',
     ...nutrients.map(n=>`${n.nutrientName}: ${n.value} ${n.unitName}`)
   ].join(' ');
-  return {
+  const source={
     id:`usda-fdc-${food.fdcId}`,
     title:`USDA FoodData Central — ${food.description}`,
     url:`https://fdc.nal.usda.gov/food-details/${food.fdcId}/nutrients`,
@@ -105,6 +146,9 @@ async function usdaNutritionSource(query,fetcher){
     role:'nutrition',
     scopeNote:'USDA FoodData Central 식품 영양자료다. 영양소 amount는 식품 100 g 기준으로 해석하며 권장 섭취량으로 확대하지 않는다.'
   };
+  const entry={source,provider:'usda',status:'ok',cachedAt:new Date().toISOString()};
+  if(useCache){nutritionMemory.set(key,entry);await writeNutritionCache();}
+  return entry;
 }
 
 async function englishQuery(item,{model,fetcher}){
@@ -140,9 +184,10 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
     const source=await fetchSource(url,item.domain,external.length+i+1,fetcher);
     return source?{...source,kind:'official',role,scopeNote:'일반 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'}:null;
   }));
-  const nutritionPromise=item.domain==='food'?usdaNutritionSource(query,fetcher):Promise.resolve(null);
+  const nutritionPromise=item.domain==='food'?usdaNutritionSource(query,fetcher):Promise.resolve({source:null,status:'not-applicable',provider:null});
 
-  const [pubmed,webFetched,fixedFetched,nutrition]=await Promise.all([pubmedPromise,externalPromise,fixedPromise,nutritionPromise]);
+  const [pubmed,webFetched,fixedFetched,nutritionResult]=await Promise.all([pubmedPromise,externalPromise,fixedPromise,nutritionPromise]);
+  const nutrition=nutritionResult?.source??null;
   const web=webFetched.filter(Boolean),official=fixedFetched.filter(Boolean);
   const map=new Map();
   const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
@@ -150,10 +195,9 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
   const high=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
   if(high.length<2)throw new Error('E_QUEUE_RESEARCH_HIGH_QUALITY');
-  if(item.domain==='food'&&!sources.some(s=>s.kind==='nutrition-database'&&s.role==='nutrition'))throw new Error('E_QUEUE_FOOD_NUTRITION_SOURCE');
   if(item.domain==='medicine'&&!sources.some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
   if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
-  return {query,sources};
+  return {query,sources,nutrition:{available:!!nutrition,status:nutritionResult?.status??'unknown',provider:nutritionResult?.provider??null}};
 }
 
 export const DOMAIN_EXTENSION_ALLOW=Object.freeze({
