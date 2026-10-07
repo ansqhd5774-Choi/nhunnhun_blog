@@ -11,7 +11,7 @@ import { SITE_CATEGORIES } from '../publishing/standards/common.mjs';
 
 export function parseKeywords(text) {
   const rows = text.replace(/^\uFEFF/,'').split(/\r?\n/).map(s=>s.trim()).filter(s=>s && !s.startsWith('#'));
-  if(rows.length>15 || rows.some(s=>s.length>120 || /[\u0000-\u001f]/.test(s))) throw new Error('E_KEYWORD_INPUT');
+  if(rows.some(s=>s.length>120 || /[\u0000-\u001f]/.test(s))) throw new Error('E_KEYWORD_INPUT');
   return [...new Set(rows.map(s=>s.normalize('NFKC').replace(/\s+/g,' ')))];
 }
 export const keywordId = keyword => `keyword-${createHash('sha256').update(keyword).digest('hex').slice(0,20)}`;

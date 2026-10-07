@@ -1,6 +1,8 @@
 # GitHub 키워드 → 로컬 Ollama 자동 실행
 
-GitHub 저장소의 **authoring/keywords.txt**를 열어 연필(Edit)을 누르고 한 줄에 키워드 하나를 입력한 뒤 **Commit changes → main에 저장**합니다. 최대 15개, 순차 실행입니다. 별도 CMD를 실행할 필요는 없습니다. PC·기존 GitHub 로컬 러너·Ollama 서버가 켜져 있어야 합니다.
+GitHub 저장소의 **authoring/keywords.txt**를 열어 연필(Edit)을 누르고 한 줄에 키워드 하나를 입력한 뒤 **Commit changes → main에 저장**합니다. 생성할 키워드 개수 제한 없이 순차 실행합니다. 별도 CMD를 실행할 필요는 없습니다. PC·기존 GitHub 로컬 러너·Ollama 서버가 켜져 있어야 합니다.
+
+사용자가 정한 하루 15개 기준은 **신규 발행에만** 적용합니다. **기존 글 수정에는 일일 개수 제한을 두지 않습니다.** 초안 생성 개수와 실제 발행 개수는 별개입니다. 기존 발행 러너의 한 건씩 처리·공통 mutex·검토 조건은 유지합니다. 개수 제한이 없어도 워크플로의 실행 시간 제한은 120분이며, 완료된 결과 브랜치는 보존됩니다. 시간 제한으로 중단된 경우 실제 결과를 확인하고 다시 실행하면 이미 저장된 키워드는 건너뜁니다.
 
 Actions의 **키워드 로컬 Ollama 자동 작성**에서 진행 상태를 확인합니다. 완료된 글은 **codex/ollama-result-…** 브랜치의 **authoring/results/keyword-…/**에 저장됩니다. draft.json이 글 원문, article.html이 검토용 본문, research.json이 조회한 자료, checkpoint.json이 실제 진행 상태입니다. 동일 키워드의 결과 브랜치가 이미 있으면 재생성하지 않습니다. 실패하면 다음 키워드를 처리하지 않고 중단하며 artifact에 checkpoint를 보존합니다. 성공 결과를 지우지 말고 오류 원인을 해결한 뒤 Actions의 workflow_dispatch로 재개하세요.
 
