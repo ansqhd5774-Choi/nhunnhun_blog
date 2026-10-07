@@ -55,6 +55,15 @@ async function englishQuery(item,{model,fetcher}){
   if(!/^[A-Za-z0-9 ()'.,-]+$/.test(out.englishQuery))throw new Error('E_QUEUE_ENGLISH_QUERY');
   return out.englishQuery.trim();
 }
+function topicTerms(query){
+  const stop=new Set(['acid','food','foods','plant','plants','extract','extracts']);
+  return String(query).toLowerCase().split(/[^a-z0-9]+/).filter(term=>term.length>=4&&!stop.has(term));
+}
+export function isTopicSpecificSource(source,query){
+  const terms=topicTerms(query);if(!terms.length)return false;
+  const haystack=`${source?.title??''} ${source?.notes??''}`.toLowerCase();
+  return terms.some(term=>haystack.includes(term));
+}
 export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   const query=await englishQuery(item,{model,fetcher});
   let pubmed=[];try{pubmed=await research(query,fetcher,{retmax:5,sort:'pub date'});}catch{}
@@ -68,21 +77,62 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch}={}){
   }
   const map=new Map();
   for(const s of [...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))])if(!map.has(s.url))map.set(s.url,s);
-  const sources=[...map.values()].slice(0,10);
+  const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
   const high=sources.filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
   if(high.length<2)throw new Error('E_QUEUE_RESEARCH_HIGH_QUALITY');
   if(item.domain==='medicine'&&!sources.some(s=>s.kind==='official'&&s.role==='authorization'))throw new Error('E_QUEUE_KR_AUTHORIZATION_MISSING');
   if(item.domain==='disease'&&!sources.some(s=>['official','guideline'].includes(s.kind)))throw new Error('E_QUEUE_DISEASE_PRIMARY_SOURCE');
   return {query,sources};
 }
-function extensionSchema(){
-  const properties={};
-  for(const key of Object.keys(EXTENSIONS))properties[key]={type:'object',additionalProperties:false,required:['applies','reason'],properties:{applies:{type:'boolean'},reason:{type:'string',minLength:12,maxLength:240}}};
+
+export const DOMAIN_EXTENSION_ALLOW=Object.freeze({
+  food:new Set(['longTerm','comparison','combinations','products','cultivars','origins','seasonality','cost','folkRemedies','exercise','diet','vulnerableGroups','myths','latest']),
+  nutrient:new Set(['longTerm','comparison','combinations','products','foodReplacement','essentialNutrient','origins','cost','exercise','diet','vulnerableGroups','discontinuation','missedDose','myths','latest']),
+  medicine:new Set(['longTerm','comparison','combinations','products','cost','folkRemedies','diet','vulnerableGroups','discontinuation','missedDose','myths','latest']),
+  disease:new Set(['longTerm','comparison','folkRemedies','selfCheck','exercise','diet','vulnerableGroups','myths','latest']),
+});
+function extensionSchema(sources){
+  const sourceIds=sources.map(s=>s.id),properties={};
+  for(const key of Object.keys(EXTENSIONS))properties[key]={type:'object',additionalProperties:false,required:['applies','reason','sourceIds'],properties:{
+    applies:{type:'boolean'},reason:{type:'string',minLength:12,maxLength:240},
+    sourceIds:{type:'array',maxItems:4,items:{type:'string',enum:sourceIds}}
+  }};
   return {type:'object',additionalProperties:false,required:Object.keys(EXTENSIONS),properties};
+}
+function identityDrift(item,result,evidence){
+  const text=JSON.stringify(result);
+  if(item.keyword==='가지'&&/(bok\s*choy|chinese\s*cabbage|청경채|배추)/iu.test(text)){
+    throw Object.assign(new Error('E_QUEUE_IDENTITY_DRIFT'),{details:{keyword:item.keyword,canonicalQuery:evidence.query}});
+  }
+}
+export function normalizeExtensionDecisions(item,evidence,result,forced=[]){
+  identityDrift(item,result,evidence);
+  const allowed=DOMAIN_EXTENSION_ALLOW[item.domain]??new Set();
+  const sourceById=new Map(evidence.sources.map(s=>[s.id,s]));
+  const topicSpecificIds=new Set(evidence.sources.filter(s=>s.topicSpecific).map(s=>s.id));
+  const out={};
+  for(const key of Object.keys(EXTENSIONS)){
+    const entry=result[key]??{applies:false,reason:'근거가 없어 적용하지 않는다.',sourceIds:[]};
+    const validIds=[...new Set((entry.sourceIds??[]).filter(id=>sourceById.has(id)))];
+    if(!allowed.has(key)){
+      out[key]={applies:false,reason:`${item.domain} 분야에서 이 확장 질문은 이번 글의 직접 범위가 아니므로 적용하지 않는다.`};
+      continue;
+    }
+    if(entry.applies&&!validIds.some(id=>topicSpecificIds.has(id))){
+      out[key]={applies:false,reason:`${item.keyword} 자체를 직접 다루는 주제 특이 근거가 없어 이번 글에서는 이 확장 질문을 적용하지 않는다.`};
+      continue;
+    }
+    out[key]={applies:entry.applies===true,reason:entry.reason};
+  }
+  for(const key of forced)out[key]={applies:true,reason:`현재 R1의 ${item.keyword} 주제 프로필에서 필수로 검토하도록 지정된 확장 질문이므로 실제 근거 범위 안에서 포함한다.`};
+  return out;
 }
 export async function decideExtensions(item,evidence,{model,fetcher=fetch}={}){
   const forced=TOPIC_EXTENSIONS[TOPIC_ENTITIES[normTopic(item.keyword)]]||[];
-  const result=await ollamaJson([{role:'system',content:'건강정보 편집자다. 각 확장 질문이 독자의 검색의도와 제공 근거에서 실제로 필요한지 판단한다. 근거가 부족하면 false다. 모든 항목에 구체적 이유를 적는다. forced는 반드시 true다.'},{role:'user',content:JSON.stringify({keyword:item.keyword,domain:item.domain,forced,extensions:EXTENSIONS,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,notes:s.notes.slice(0,2200)}))})}],extensionSchema(),{model,fetcher,numPredict:5000});
-  for(const key of forced)result[key]={applies:true,reason:`현재 R1의 ${item.keyword} 주제 프로필에서 필수로 검토하도록 지정된 확장 질문이므로 실제 근거 범위 안에서 포함한다.`};
-  return result;
+  const canonical=`${item.keyword} = ${evidence.query}`;
+  const result=await ollamaJson([
+    {role:'system',content:'건강정보 편집자다. canonicalSubject는 확정된 대상이며 절대 다른 식품·성분·질병으로 재해석하지 않는다. 각 확장 질문은 해당 주제 자체를 직접 다루는 근거가 있을 때만 true다. 일반 채소 안전, 일반 식단, 데이터베이스 소개처럼 주제 비특이 자료만으로는 true로 만들지 않는다. true인 항목은 실제 근거 sourceIds를 반드시 넣는다. forced는 반드시 true다. 이유는 한국어로 쓴다.'},
+    {role:'user',content:JSON.stringify({canonicalSubject:canonical,keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,forced,extensions:EXTENSIONS,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific,notes:s.notes.slice(0,2200)}))})}
+  ],extensionSchema(evidence.sources),{model,fetcher,numPredict:5000});
+  return normalizeExtensionDecisions(item,evidence,result,forced);
 }
