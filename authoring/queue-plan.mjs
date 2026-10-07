@@ -103,7 +103,6 @@ export function selectPlanSources(evidence,item,max=7){
 }
 
 function planSchema(skeleton,sources){
-  const sourceIds=sources.map(s=>s.id);
   const ids=skeleton.map(s=>s.id);
   return {type:'object',additionalProperties:false,required:['primaryQuestion','readerSituation','nextActions','sections'],properties:{
     primaryQuestion:{type:'string',minLength:12,maxLength:220},
@@ -113,8 +112,10 @@ function planSchema(skeleton,sources){
       id:{type:'string',enum:ids},
       heading:{type:'string',minLength:4,maxLength:90},
       question:{type:'string',minLength:8,maxLength:160},
-      claims:{type:'array',minItems:1,maxItems:2,items:{type:'object',additionalProperties:false,required:['id','text','sourceIds'],properties:{
-        id:{type:'string',pattern:'^c[0-9]{1,2}
+      claims:{type:'array',minItems:1,maxItems:2,items:{type:'object',additionalProperties:false,required:['id','text'],properties:{
+        id:{type:'string',pattern:'^c[0-9]{1,2}$'},
+        text:{type:'string',minLength:8,maxLength:180}
+      }}}
     }}}
   }};
 }
@@ -340,103 +341,3 @@ export async function planArticle(item,evidence,{model,fetcher=fetch,currentTitl
   }
   return {plan,scope,required,sources,skeleton,failures,repaired,initialPlan,initialFailures};
 }
-
-},
-        text:{type:'string',minLength:8,maxLength:180},
-        sourceIds:{type:'array',minItems:1,maxItems:3,items:{type:'string',enum:sourceIds}}
-      }}}
-    }}}
-  }};
-}
-function normalizePlanToSkeleton(plan,skeleton){
-  const byId=new Map((plan?.sections??[]).map(section=>[section.id,section]));
-  return {...plan,sections:skeleton.map(base=>{
-    const generated=byId.get(base.id);
-    return generated?{...generated,id:base.id,modules:[...base.modules]}:{...base,claims:[]};
-  })};
-}
-function sourceBundle(sources){
-  return sources.map(s=>({
-    id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific===true,
-    scopeNote:s.scopeNote,notes:String(s.notes??'').slice(0,1200)
-  }));
-}
-function normalizedNumbers(text){
-  const out=[];
-  for(const match of String(text??'').matchAll(/\b\d+(?:[.,]\d+)?(?:\s*(?:kcal|mg|mcg|μg|µg|g|kg|ml|mL|l|L|%|회|일|주|개월|년|℃|°C))?/g)){
-    const raw=match[0].replace(/,/g,'').replace(/\s+/g,'').replace(/µg|μg/g,'mcg').toLowerCase();
-    const n=Number(raw.match(/^\d+(?:\.\d+)?/)?.[0]);
-    if(Number.isInteger(n)&&n>=1900&&n<=2100&&(/^\d{4}(?:년)?$/.test(raw)))continue;
-    out.push(raw);
-  }
-  return [...new Set(out)];
-}
-function sourceText(source){return norm(`${source?.title??''} ${source?.scopeNote??''} ${source?.notes??''}`).replace(/,/g,'').replace(/\s+/g,'').replace(/µg|μg/g,'mcg').toLowerCase();}
-function sourceSupportsClaim(source,claim){
-  if(!source)return false;
-  if(claim.type==='nutrition')return source.role==='nutrition'||source.kind==='nutrition-database'||(source.role==='health'&&!looksAgricultural(source));
-  if(claim.type==='safety')return ['safety','authorization'].includes(source.role)||safetyText(source);
-  if(claim.type==='dose')return ['official','guideline','trial'].includes(source.kind)&&['authorization','safety','health'].includes(source.role);
-  if(claim.type==='interaction')return ['official','guideline','systematic-review','trial'].includes(source.kind)&&['authorization','safety','health'].includes(source.role);
-  if(['disease','treatment'].includes(claim.type))return ['official','guideline','systematic-review','trial'].includes(source.kind)&&['health','authorization'].includes(source.role)&&!looksAgricultural(source);
-  if(claim.type==='benefit')return source.role==='health'&&!looksAgricultural(source)&&(['official','guideline','systematic-review','trial'].includes(source.kind)||(source.kind==='article'&&source.topicSpecific===true));
-  return source.topicSpecific===true||['official','guideline','nutrition-database'].includes(source.kind);
-}
-function highRiskClaim(claim){
-  return claim?.risk==='high'||HIGH_RISK_TYPES.has(claim?.type)||/(질병|예방|치료|복용량|용량|상호작용|금기|임신|수유|응급|심각한 부작용)/u.test(claim?.text??'');
-}
-export function validateEvidencePlan(item,evidence,plan,scope,sources=selectPlanSources(evidence,item)){
-  const failures=[],sourceById=new Map(sources.map(s=>[s.id,s])),skeleton=buildCoreSkeleton(item);
-  if(!plan||!Array.isArray(plan.sections)||plan.sections.length!==skeleton.length)failures.push({code:'PLAN_SECTION_COUNT'});
-  const expectedById=new Map(skeleton.map(s=>[s.id,s])),sectionIds=new Set(),claimIds=new Set(),covered=new Set();
-  for(const section of plan?.sections??[]){
-    if(sectionIds.has(section.id)||!expectedById.has(section.id))failures.push({code:'PLAN_SECTION_ID',sectionId:section.id});sectionIds.add(section.id);
-    const expected=expectedById.get(section.id);
-    if(expected){
-      for(const module of expected.modules)covered.add(module);
-      if(JSON.stringify(section.modules??[])!==JSON.stringify(expected.modules))failures.push({code:'PLAN_SKELETON_MODULES',sectionId:section.id});
-    }
-    for(const claim of section.claims??[]){
-      if(claimIds.has(claim.id))failures.push({code:'PLAN_CLAIM_ID',claimId:claim.id});claimIds.add(claim.id);
-      const cited=(claim.sourceIds??[]).map(id=>sourceById.get(id)).filter(Boolean);
-      if(!cited.length||cited.length!==(claim.sourceIds??[]).length){failures.push({code:'PLAN_SOURCE',claimId:claim.id});continue;}
-      if(!cited.some(source=>sourceSupportsClaim(source,claim)))failures.push({code:'PLAN_SCOPE',claimId:claim.id,type:claim.type});
-      if(highRiskClaim(claim)&&!cited.some(source=>['official','guideline','systematic-review','trial'].includes(source.kind)&&!looksAgricultural(source)))failures.push({code:'PLAN_HIGH_RISK_SOURCE',claimId:claim.id,type:claim.type});
-      for(const token of normalizedNumbers(claim.text))if(!cited.some(source=>sourceText(source).includes(token)))failures.push({code:'PLAN_NUMBER_SOURCE',claimId:claim.id,token});
-    }
-  }
-  for(const section of skeleton)if(!sectionIds.has(section.id))failures.push({code:'PLAN_SKELETON_SECTION',sectionId:section.id});
-  for(const module of DOMAIN_RULES[item.domain].core)if(!covered.has(module))failures.push({code:'PLAN_CORE_MODULE',module});
-  return failures;
-}
-
-async function requestPlan(item,evidence,scope,required,sources,skeleton,{model,fetcher,currentTitle,repair=null}){
-  const [min,max]=lengthBandForScope(scope);
-  const nutritionAvailable=item.domain!=='food'||evidence?.nutrition?.available===true;
-  const nutritionInstruction=nutritionAvailable
-    ?'공식 영양 DB가 포함된 경우에만 그 source의 실제 수치와 단위를 사용할 수 있다.'
-    :'이번 근거 묶음에는 공식 영양 DB가 없다. identity-nutrition 섹션은 숫자형 영양성분을 만들지 말고, 확인 가능한 정성 정보와 근거 한계를 설명한다. nutrition 타입의 수치 주장을 만들지 않는다.';
-  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
-  const repairSystem=repair?` 이전 plan은 코드 검증에 실패했다. failures에 적힌 문제만 고친다. 특히 PLAN_NUMBER_SOURCE는 근거 없는 숫자를 제거하거나 source에 실제 있는 숫자로만 교체하고, PLAN_SCOPE/PLAN_HIGH_RISK_SOURCE는 근거 수준을 낮추지 말고 unsupported 주장을 삭제·완화한다. 공식 영양 DB가 없으면 nutrition 관련 숫자는 모두 제거한다. section을 빼거나 coreSkeleton을 바꾸지 않는다.`:'';
-  return ollamaJson([
-    {role:'system',content:baseSystem+repairSystem},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,nutritionEvidence:evidence?.nutrition??null,sources:sourceBundle(sources),repair})}
-  ],planSchema(skeleton,sources),{model,fetcher,numPredict:repair?1600:(scope==='deep'?2400:scope==='comprehensive'?2100:1800),numCtx:12288});
-}
-
-export async function planArticle(item,evidence,{model,fetcher=fetch,currentTitle=''}={}){
-  const scope=inferWritingScope(item,currentTitle),required=[...DOMAIN_RULES[item.domain].core],sources=selectPlanSources(evidence,item),skeleton=buildCoreSkeleton(item);
-  let rawPlan=await requestPlan(item,evidence,scope,required,sources,skeleton,{model,fetcher,currentTitle});
-  let plan=normalizePlanToSkeleton(rawPlan,skeleton);
-  let failures=validateEvidencePlan(item,evidence,plan,scope,sources);
-  const initialPlan=plan,initialFailures=failures;
-  let repaired=false;
-  if(failures.length){
-    rawPlan=await requestPlan(item,evidence,scope,required,sources,skeleton,{model,fetcher,currentTitle,repair:{failures,plan}});
-    plan=normalizePlanToSkeleton(rawPlan,skeleton);
-    failures=validateEvidencePlan(item,evidence,plan,scope,sources);
-    repaired=true;
-  }
-  return {plan,scope,required,sources,skeleton,failures,repaired,initialPlan,initialFailures};
-}
-
