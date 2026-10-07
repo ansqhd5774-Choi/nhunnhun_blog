@@ -61,10 +61,9 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: ./.github/actions/setup-node-pnpm
+      - uses: actions/setup-node@v5
         with:
-          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
-          cache-restore-key: ${{ runner.os }}-pnpm-store-
+          node-version: '24'
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Unit and regression tests
