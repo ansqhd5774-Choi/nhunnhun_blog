@@ -1,24 +1,15 @@
-name: Setup Node and pnpm cache
-description: Configure Node 24 and restore pnpm store paths without third-party setup actions.
+name: Setup Node
+description: Shared Node 24 setup for NHUNNHUN workflows.
 inputs:
   cache-key:
-    description: OS-scoped pnpm store cache key.
-    required: true
+    description: Reserved cache key supplied by workflow.
+    required: false
   cache-restore-key:
-    description: OS-scoped pnpm store restore prefix.
-    required: true
+    description: Reserved restore prefix supplied by workflow.
+    required: false
 runs:
   using: composite
   steps:
     - uses: actions/setup-node@v5
       with:
         node-version: '24'
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/.local/share/pnpm/store
-          ~/AppData/Local/pnpm/store
-          ~/.pnpm-store
-        key: ${{ inputs.cache-key }}
-        restore-keys: |
-          ${{ inputs.cache-restore-key }}
