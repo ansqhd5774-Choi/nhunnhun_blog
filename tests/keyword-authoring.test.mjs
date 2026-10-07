@@ -8,9 +8,11 @@ test('모델의 출처 ID를 실제 조회 자료로 제한한다',()=>{
 test('카르노산을 카르노신으로 오역한 실제 오류의 재발을 막는다',()=>{
   assert.deepEqual(VERIFIED_ALIASES['카르노산'],{domain:'nutrient',englishQuery:'carnosic acid'});
 });
-test('키워드 정규화·중복·15개 한도',()=>{
+test('키워드 정규화·중복 제거, 생성 개수는 발행 한도와 분리',()=>{
   assert.deepEqual(parseKeywords('# 설명\r\n 참기름  보관법\n참기름 보관법\n'),['참기름 보관법']);
-  assert.throws(()=>parseKeywords(Array.from({length:16},(_,i)=>`주제${i}`).join('\n')),/E_KEYWORD_INPUT/);
+  const many=Array.from({length:101},(_,i)=>`주제${i}`);
+  assert.deepEqual(parseKeywords(many.join('\n')),many);
+  assert.throws(()=>parseKeywords('주'.repeat(121)),/E_KEYWORD_INPUT/);
   assert.equal(keywordId('참기름'),keywordId('참기름'));
   assert.notEqual(keywordId('참기름'),keywordId('들기름'));
 });
