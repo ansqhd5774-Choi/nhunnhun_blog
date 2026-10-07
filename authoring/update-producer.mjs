@@ -11,10 +11,10 @@ import { assertImageReview } from '../publishing/image-review.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
 import { renderEditorialPost } from '../publishing/editorial.mjs';
 
-function git(args,root,{allowFailure=false}={}){
+function git(args,root,{allowFailure=false,trimOutput=true}={}){
   const r=spawnSync('git',args,{cwd:root,encoding:'utf8'});
   if(r.status!==0&&!allowFailure)throw Object.assign(new Error('E_QUEUE_GIT'),{args,stderr:r.stderr,stdout:r.stdout});
-  return (r.stdout||'').trim();
+  return trimOutput?(r.stdout||'').trim():(r.stdout||'');
 }
 function remoteMain(root){return (git(['ls-remote','origin','refs/heads/main'],root).split(/\s+/)[0]||'').trim();}
 async function fetchPublic(item,fetcher){
@@ -31,8 +31,8 @@ function makeSource(item,currentTitle,sourceId,article,body,images){
     category:item.category,contentStandard:'R1'
   };
 }
-function changedPaths(root){
-  return git(['status','--porcelain','--untracked-files=all'],root).split(/\r?\n/).filter(Boolean).map(line=>line.slice(3).trim()).filter(Boolean);
+export function changedPaths(root){
+  return git(['status','--porcelain','--untracked-files=all'],root,{trimOutput:false}).split(/\r?\n/).filter(Boolean).map(line=>line.slice(3).trim()).filter(Boolean);
 }
 async function commitPaths(root,item,sourceId,message,archivedIds=[]){
   const changed=changedPaths(root);
@@ -66,16 +66,27 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   await writeQueueState(root,item.articleId,running);
   let operationalWritten=false;
   let archivedIds=[];
+  const resultDir=resolve(root,'generated-drafts/queue',process.env.GITHUB_RUN_ID??`local-${Date.now()}`);
+  await mkdir(resultDir,{recursive:true});
+  const checkpoint=async(stage,value)=>{
+    await writeFile(resolve(resultDir,`${item.articleId}-${stage}.json`),JSON.stringify(value,null,2)+'\n');
+    console.log('QUEUE_STAGE '+JSON.stringify({articleId:item.articleId,stage,at:new Date().toISOString()}));
+  };
   try{
     const current=await fetchPublic(item,fetcher);
     const evidence=await collectEvidence(item,current.html,{model,fetcher});
+    await checkpoint('evidence',{item,currentTitle:current.title,evidence,baseSha});
     const extensions=await decideExtensions(item,evidence,{model,fetcher});
+    await checkpoint('extensions',extensions);
     const {article,required}=await draftArticle(item,evidence,extensions,{model,fetcher});
+    await checkpoint('draft',{article,required});
     const images=await reusableImages(root,item);
     const rendered=renderBody(article,evidence,images);
     const details=await reviewDetails(item,article,evidence,extensions,{model,fetcher});
+    await checkpoint('details',details);
     const source=makeSource(item,current.title,sourceId,article,rendered.html,images);
     const {review,report}=await finalizeReview(source,item,evidence,extensions,article,required,details,rendered.glossary,{model,fetcher});
+    await checkpoint('reviewed',{source,review,report});
     assertImageReview(source);
     checkUpdateSource(source,`${sourceId}.json`);
     renderEditorialPost(source);

@@ -73,12 +73,21 @@ jobs:
         run: node authoring\update-queue.mjs assert-local-only
         env:
           OLLAMA_HOST: http://127.0.0.1:11434
+
       - name: Queue 1건 조사·작성·검토·승격
         id: producer
         run: node authoring\update-producer.mjs
         env:
           OLLAMA_MODEL: qwen3:4b
           OLLAMA_HOST: http://127.0.0.1:11434
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: queue-producer-${{ github.run_id }}
+          path: generated-drafts/queue/${{ github.run_id }}/
+          if-no-files-found: ignore
+          retention-days: 7
 
   dispatch:
     if: needs.produce.result == 'success' && needs.produce.outputs.complete != 'true' && needs.produce.outputs.source_id != ''

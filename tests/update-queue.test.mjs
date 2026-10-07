@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {changedPaths} from '../authoring/update-producer.mjs';
 import { parseUpdateQueue, assertLocalOnly, assertProtectedDiff, queueSourceId, selectNextQueueItem,archiveCompletedSources,restoreArchivedSources } from '../authoring/update-queue.mjs';
 import {dispatchQueuedUpdate} from '../authoring/update-queue-dispatch.mjs';
 import {consumerMatches} from '../authoring/update-queue-finalize.mjs';
@@ -128,5 +130,16 @@ test('같은 URL의 완료 source만 archive하고 기존 원장은 보존·복�
     await writeFile(join(root,'publishing/update-state/prior-327.json'),JSON.stringify({...ledger,phase:'submitting'}));
     await assert.rejects(archiveCompletedSources(root,source),/E_QUEUE_EXISTING_UPDATE_PENDING/);
     assert.deepEqual(JSON.parse(await readFile(join(root,'updates/prior-327.json'))),source);
+  } finally {await rm(root,{recursive:true,force:true});}
+});
+test('실제 Git porcelain 첫 줄의 선행 공백을 보존해 삭제 경로가 잘리지 않음',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'queue-git-status-'));
+  try {
+    const git=args=>{const result=spawnSync('git',args,{cwd:root,encoding:'utf8'});assert.equal(result.status,0,result.stderr);};
+    git(['init','-q']);git(['config','user.name','queue-test']);git(['config','user.email','queue-test@example.invalid']);
+    await writeFile(join(root,'prior-source.json'),'{}');git(['add','--','prior-source.json']);git(['commit','-qm','fixture']);
+    await rm(join(root,'prior-source.json'));
+    await writeFile(join(root,'new-source.json'),'{}');
+    assert.deepEqual(changedPaths(root),['prior-source.json','new-source.json']);
   } finally {await rm(root,{recursive:true,force:true});}
 });
