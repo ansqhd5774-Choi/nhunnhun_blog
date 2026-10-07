@@ -187,11 +187,15 @@ export function validateEvidencePlan(item,evidence,plan,scope,sources=selectPlan
 
 async function requestPlan(item,evidence,scope,required,sources,skeleton,{model,fetcher,currentTitle,repair=null}){
   const [min,max]=lengthBandForScope(scope);
-  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
-  const repairSystem=repair?` 이전 plan은 코드 검증에 실패했다. failures에 적힌 문제만 고친다. 특히 PLAN_NUMBER_SOURCE는 근거 없는 숫자를 제거하거나 source에 실제 있는 숫자로만 교체하고, PLAN_SCOPE/PLAN_HIGH_RISK_SOURCE는 근거 수준을 낮추지 말고 unsupported 주장을 삭제·완화한다. section을 빼거나 coreSkeleton을 바꾸지 않는다.`:'';
+  const nutritionAvailable=item.domain!=='food'||evidence?.nutrition?.available===true;
+  const nutritionInstruction=nutritionAvailable
+    ?'공식 영양 DB가 포함된 경우에만 그 source의 실제 수치와 단위를 사용할 수 있다.'
+    :'이번 근거 묶음에는 공식 영양 DB가 없다. identity-nutrition 섹션은 숫자형 영양성분을 만들지 말고, 확인 가능한 정성 정보와 근거 한계를 설명한다. nutrition 타입의 수치 주장을 만들지 않는다.';
+  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치는 코드가 결정하므로 modules를 출력하지 않는다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
+  const repairSystem=repair?` 이전 plan은 코드 검증에 실패했다. failures에 적힌 문제만 고친다. 특히 PLAN_NUMBER_SOURCE는 근거 없는 숫자를 제거하거나 source에 실제 있는 숫자로만 교체하고, PLAN_SCOPE/PLAN_HIGH_RISK_SOURCE는 근거 수준을 낮추지 말고 unsupported 주장을 삭제·완화한다. 공식 영양 DB가 없으면 nutrition 관련 숫자는 모두 제거한다. section을 빼거나 coreSkeleton을 바꾸지 않는다.`:'';
   return ollamaJson([
     {role:'system',content:baseSystem+repairSystem},
-    {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,sources:sourceBundle(sources),repair})}
+    {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,nutritionEvidence:evidence?.nutrition??null,sources:sourceBundle(sources),repair})}
   ],planSchema(skeleton,sources),{model,fetcher,numPredict:repair?1600:(scope==='deep'?2400:scope==='comprehensive'?2100:1800),numCtx:12288});
 }
 
