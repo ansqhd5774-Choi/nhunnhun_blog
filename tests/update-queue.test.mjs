@@ -83,7 +83,7 @@ test('selector skips item-level BLOCKED state and continues with the next keywor
     await mkdir(join(root,'content-reviews','updates'),{recursive:true});
     await mkdir(join(root,'publishing','update-state'),{recursive:true});
     await writeFile(join(root,'authoring','update-queue.txt'),'음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 바나나 - https://nhunnhun.tistory.com/328\n');
-    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_DRAFT_VALIDATION'}));
+    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',error:'E_QUEUE_DRAFT_VALIDATION',policyVersion:QUEUE_POLICY_VERSION}));
     const fetcher=async()=>({ok:true,text:async()=>'<meta property="og:title" content="현재 글">'});
     const selected=await selectNextQueueItem(root,{fetcher});
     assert.equal(selected.item.articleId,'328');
