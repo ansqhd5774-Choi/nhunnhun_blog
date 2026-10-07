@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-65",
     "order": 6,
@@ -9,9 +11,11 @@
     "articleId": "65",
     "targetUrl": "https://nhunnhun.tistory.com/65"
   },
-  "sourceId": "auto-65-r1-20261007-8d40c9d2",
-  "baseSha": "eca3e56fd1fa96012e7b97066e68a6e924d89dc7",
-  "startedAt": "2026-10-07T05:34:15.065Z",
+  "sourceId": "auto-65-r1-20261007-e0e6ba8f",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T08:37:42.019Z",
+  "heartbeatAt": "2026-10-07T08:38:57.748Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -29,76 +33,45 @@
       "articleId": "180"
     }
   ],
-  "blockedAt": "2026-10-07T05:35:15.098Z",
+  "blockedAt": "2026-10-07T08:38:57.751Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "20g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.5g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.05g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.02g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
         "token": "100g"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "200g"
+        "claimId": "c5",
+        "token": "12일"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "24"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
-        "token": "4°c"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "4°c"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "24"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "claimId": "c9",
+        "token": "100g"
       }
     ],
-    "scope": "standard"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "12일"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c9",
+        "token": "100g"
+      }
+    ],
+    "scope": "standard",
+    "repaired": true
   },
   "publicMutation": false
 }

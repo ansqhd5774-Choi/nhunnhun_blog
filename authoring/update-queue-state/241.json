@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-241",
     "order": 57,
@@ -9,9 +11,11 @@
     "articleId": "241",
     "targetUrl": "https://nhunnhun.tistory.com/241"
   },
-  "sourceId": "auto-241-r1-20261007-a627b9b2",
-  "baseSha": "8a132e783b87d5fb2cee19fb7e63e4e07900a5ff",
-  "startedAt": "2026-10-07T06:37:39.770Z",
+  "sourceId": "auto-241-r1-20261007-04810c96",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:38:31.535Z",
+  "heartbeatAt": "2026-10-07T09:39:23.272Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -35,8 +39,7 @@
       "articleId": "249"
     },
     {
-      "articleId": "310",
-      "sourceId": "update-310-granola-r1-rewrite-20261007"
+      "articleId": "310"
     },
     {
       "articleId": "331"
@@ -183,54 +186,65 @@
       "articleId": "332"
     }
   ],
-  "blockedAt": "2026-10-07T06:38:27.966Z",
+  "blockedAt": "2026-10-07T09:39:23.275Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_SCOPE",
         "claimId": "c1",
-        "type": "disease"
+        "type": "nutrition"
       },
       {
-        "code": "PLAN_SCOPE",
+        "code": "PLAN_HIGH_RISK_SOURCE",
         "claimId": "c2",
-        "type": "disease"
+        "type": "nutrition"
       },
       {
         "code": "PLAN_SCOPE",
         "claimId": "c3",
-        "type": "disease"
+        "type": "benefit"
       },
       {
         "code": "PLAN_SCOPE",
         "claimId": "c4",
-        "type": "disease"
-      },
-      {
-        "code": "PLAN_SCOPE",
-        "claimId": "c5",
-        "type": "disease"
+        "type": "nutrition"
       },
       {
         "code": "PLAN_SCOPE",
         "claimId": "c6",
-        "type": "disease"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "type": "nutrition"
       }
     ],
-    "scope": "focused"
+    "initialFailures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c1",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c2",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c3",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c4",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "nutrition"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
   },
   "publicMutation": false
 }

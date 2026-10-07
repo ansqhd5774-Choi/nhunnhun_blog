@@ -1,5 +1,7 @@
 {
-  "status": "BLOCKED_CONTENT",
+  "status": "BLOCKED_GENERATION",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-330",
     "order": 29,
@@ -9,9 +11,11 @@
     "articleId": "330",
     "targetUrl": "https://nhunnhun.tistory.com/330"
   },
-  "sourceId": "auto-330-r1-20261007-ea980ce9",
-  "baseSha": "7ef56cef46a3fe5cd7a6bb8a7169d5de52c6757d",
-  "startedAt": "2026-10-07T05:56:54.461Z",
+  "sourceId": "auto-330-r1-20261007-1fa895bb",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:03:30.461Z",
+  "heartbeatAt": "2026-10-07T09:03:32.114Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -99,41 +103,11 @@
       "articleId": "312"
     }
   ],
-  "blockedAt": "2026-10-07T05:57:57.728Z",
-  "error": "E_QUEUE_PLAN_VALIDATION",
+  "blockedAt": "2026-10-07T09:04:52.117Z",
+  "error": "E_OLLAMA_LENGTH_LIMIT",
   "details": {
-    "failures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "2주"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "6개월"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "5일"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
-      }
-    ],
-    "scope": "standard"
+    "outputTokens": 1600,
+    "promptTokens": 4806
   },
   "publicMutation": false
 }

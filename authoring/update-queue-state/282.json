@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-282",
     "order": 24,
@@ -9,9 +11,11 @@
     "articleId": "282",
     "targetUrl": "https://nhunnhun.tistory.com/282"
   },
-  "sourceId": "auto-282-r1-20261007-2d475643",
-  "baseSha": "a1116a069d0aa8318542b3998269c71480cf4bc0",
-  "startedAt": "2026-10-07T05:51:40.483Z",
+  "sourceId": "auto-282-r1-20261007-32582dcf",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T08:57:29.999Z",
+  "heartbeatAt": "2026-10-07T08:58:27.732Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -84,19 +88,14 @@
       "articleId": "250"
     }
   ],
-  "blockedAt": "2026-10-07T05:52:27.951Z",
+  "blockedAt": "2026-10-07T08:58:27.736Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_SCOPE",
-        "claimId": "c2",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_SCOPE",
         "claimId": "c3",
-        "type": "general"
+        "type": "benefit"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
@@ -105,38 +104,59 @@
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "1회"
+        "claimId": "c5",
+        "token": "5"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "10g"
+        "claimId": "c5",
+        "token": "6개월"
       },
       {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "2회"
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "safety"
       },
       {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "1년"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c7",
+        "type": "safety"
       }
     ],
-    "scope": "focused"
+    "initialFailures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c3",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "20g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "5"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "6개월"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c7",
+        "type": "safety"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
   },
   "publicMutation": false
 }

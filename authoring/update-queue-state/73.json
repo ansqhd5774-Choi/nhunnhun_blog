@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-73",
     "order": 43,
@@ -9,9 +11,11 @@
     "articleId": "73",
     "targetUrl": "https://nhunnhun.tistory.com/73"
   },
-  "sourceId": "auto-73-r1-20261007-f15ed28d",
-  "baseSha": "12fce0f546add8bf820369416140c8cc720c4ebf",
-  "startedAt": "2026-10-07T06:11:01.254Z",
+  "sourceId": "auto-73-r1-20261007-e624e66d",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:20:05.262Z",
+  "heartbeatAt": "2026-10-07T09:21:10.483Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -141,34 +145,19 @@
       "articleId": "247"
     }
   ],
-  "blockedAt": "2026-10-07T06:11:49.902Z",
+  "blockedAt": "2026-10-07T09:21:10.489Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "22g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "10g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "200kcal"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "100g"
+        "token": "2회"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "4°c"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
@@ -176,19 +165,35 @@
         "token": "3일"
       },
       {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "6개월"
       }
     ],
-    "scope": "focused"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "2회"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "4°c"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "3일"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "6개월"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
   },
   "publicMutation": false
 }

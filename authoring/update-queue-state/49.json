@@ -1,5 +1,7 @@
 {
-  "status": "BLOCKED_CONTENT",
+  "status": "BLOCKED_IMAGE",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-49",
     "order": 61,
@@ -9,9 +11,11 @@
     "articleId": "49",
     "targetUrl": "https://nhunnhun.tistory.com/49"
   },
-  "sourceId": "auto-49-r1-20261007-95577029",
-  "baseSha": "b90e5fc28ee6efb71e632313405c754f4716e4ae",
-  "startedAt": "2026-10-07T06:41:40.622Z",
+  "sourceId": "auto-49-r1-20261007-8e034dbc",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:43:20.077Z",
+  "heartbeatAt": "2026-10-07T09:43:42.745Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -35,8 +39,7 @@
       "articleId": "249"
     },
     {
-      "articleId": "310",
-      "sourceId": "update-310-granola-r1-rewrite-20261007"
+      "articleId": "310"
     },
     {
       "articleId": "331"
@@ -195,42 +198,8 @@
       "articleId": "278"
     }
   ],
-  "blockedAt": "2026-10-07T06:42:24.101Z",
-  "error": "E_QUEUE_PLAN_VALIDATION",
-  "details": {
-    "failures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "preparation"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "storage"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
-      }
-    ],
-    "scope": "focused"
-  },
+  "blockedAt": "2026-10-07T09:43:43.009Z",
+  "error": "E_QUEUE_IMAGE_REVIEW_REQUIRED",
+  "details": null,
   "publicMutation": false
 }

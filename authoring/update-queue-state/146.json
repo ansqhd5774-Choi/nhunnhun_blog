@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-146",
     "order": 18,
@@ -9,9 +11,11 @@
     "articleId": "146",
     "targetUrl": "https://nhunnhun.tistory.com/146"
   },
-  "sourceId": "auto-146-r1-20261007-952c29f0",
-  "baseSha": "ecd52e93281ba4f36257af3aa4980cbbc830be9e",
-  "startedAt": "2026-10-07T05:45:44.474Z",
+  "sourceId": "auto-146-r1-20261007-92a245ba",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T08:50:56.502Z",
+  "heartbeatAt": "2026-10-07T08:52:00.811Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -66,69 +70,25 @@
       "articleId": "245"
     }
   ],
-  "blockedAt": "2026-10-07T05:46:45.348Z",
+  "blockedAt": "2026-10-07T08:52:00.816Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "1.7g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "1.2g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "0.1g"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c5",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c6",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
-        "token": "10g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "10g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c11",
+        "claimId": "c4",
         "token": "2주"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
       }
     ],
-    "scope": "focused"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "2주"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
   },
   "publicMutation": false
 }

@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-204",
     "order": 46,
@@ -9,9 +11,11 @@
     "articleId": "204",
     "targetUrl": "https://nhunnhun.tistory.com/204"
   },
-  "sourceId": "auto-204-r1-20261007-d43a435d",
-  "baseSha": "59279b855874c07e96bc0a26137b9f09b4ce4677",
-  "startedAt": "2026-10-07T06:14:43.246Z",
+  "sourceId": "auto-204-r1-20261007-34f04a71",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:23:41.509Z",
+  "heartbeatAt": "2026-10-07T09:24:36.793Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -150,27 +154,65 @@
       "articleId": "329"
     }
   ],
-  "blockedAt": "2026-10-07T06:16:05.413Z",
+  "blockedAt": "2026-10-07T09:24:36.801Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "30g"
+        "token": "3일"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "50g"
+        "token": "300g"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "100g"
+        "token": "6주"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "6개월"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "300g"
       }
     ],
-    "scope": "comprehensive"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "3일"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "300g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "6주"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "6개월"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "300g"
+      }
+    ],
+    "scope": "comprehensive",
+    "repaired": true
   },
   "publicMutation": false
 }

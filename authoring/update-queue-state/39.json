@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-39",
     "order": 12,
@@ -9,9 +11,11 @@
     "articleId": "39",
     "targetUrl": "https://nhunnhun.tistory.com/39"
   },
-  "sourceId": "auto-39-r1-20261007-84a325bc",
-  "baseSha": "fccde86945efd5f7f1aee7caaa1103f3ae11d59b",
-  "startedAt": "2026-10-07T05:39:09.479Z",
+  "sourceId": "auto-39-r1-20261007-6fc8cf57",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T08:44:10.743Z",
+  "heartbeatAt": "2026-10-07T08:45:33.668Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -48,41 +52,75 @@
       "articleId": "252"
     }
   ],
-  "blockedAt": "2026-10-07T05:40:16.314Z",
+  "blockedAt": "2026-10-07T08:45:33.673Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c3",
-        "token": "100g"
+        "token": "42247558"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "100g"
+        "token": "42607535"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c5",
-        "token": "100g"
+        "token": "42365925"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c6",
-        "token": "20°c"
+        "token": "42333053"
       },
       {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "general"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "42680143"
       }
     ],
-    "scope": "standard"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c3",
+        "token": "42247558"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "42607535"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "42365925"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "42333053"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "general"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c7",
+        "token": "42680143"
+      }
+    ],
+    "scope": "standard",
+    "repaired": true
   },
   "publicMutation": false
 }

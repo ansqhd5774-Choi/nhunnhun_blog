@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-325",
     "order": 47,
@@ -9,9 +11,11 @@
     "articleId": "325",
     "targetUrl": "https://nhunnhun.tistory.com/325"
   },
-  "sourceId": "auto-325-r1-20261007-da129785",
-  "baseSha": "3d0c980fc08f98e836199e6ae6826aa292c1d430",
-  "startedAt": "2026-10-07T06:16:39.281Z",
+  "sourceId": "auto-325-r1-20261007-e8f611ce",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:24:38.357Z",
+  "heartbeatAt": "2026-10-07T09:25:30.810Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -153,158 +157,55 @@
       "articleId": "204"
     }
   ],
-  "blockedAt": "2026-10-07T06:17:46.179Z",
+  "blockedAt": "2026-10-07T09:25:30.842Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
-        "code": "PLAN_SCOPE",
-        "claimId": "c1",
-        "type": "nutrition"
-      },
-      {
-        "code": "PLAN_SCOPE",
+        "code": "PLAN_HIGH_RISK_SOURCE",
         "claimId": "c2",
         "type": "nutrition"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "150kcal"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "25g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "3g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "10mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "0.3mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c3",
-        "token": "2g"
+        "claimId": "c4",
+        "token": "200"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "150kcal"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "25g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "3g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "10mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "0.3mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "2g"
+        "token": "300g"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c5",
-        "token": "15%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "15%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c8",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_SCOPE",
-        "claimId": "c9",
-        "type": "nutrition"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c9",
-        "token": "5"
-      },
-      {
-        "code": "PLAN_SCOPE",
-        "claimId": "c10",
-        "type": "nutrition"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c10",
-        "token": "5"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "storage"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "token": "6개월"
       }
     ],
-    "scope": "standard"
+    "initialFailures": [
+      {
+        "code": "PLAN_HIGH_RISK_SOURCE",
+        "claimId": "c2",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "200"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "300g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "6개월"
+      }
+    ],
+    "scope": "standard",
+    "repaired": true
   },
   "publicMutation": false
 }

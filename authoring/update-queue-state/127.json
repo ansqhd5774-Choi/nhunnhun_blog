@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-127",
     "order": 41,
@@ -9,9 +11,11 @@
     "articleId": "127",
     "targetUrl": "https://nhunnhun.tistory.com/127"
   },
-  "sourceId": "auto-127-r1-20261007-3f771a2f",
-  "baseSha": "cc9e4ac700894572bb082977d3a18d059d61967c",
-  "startedAt": "2026-10-07T06:09:07.347Z",
+  "sourceId": "auto-127-r1-20261007-6e6a97f6",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:17:51.529Z",
+  "heartbeatAt": "2026-10-07T09:18:55.596Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -135,20 +139,10 @@
       "articleId": "47"
     }
   ],
-  "blockedAt": "2026-10-07T06:09:57.070Z",
+  "blockedAt": "2026-10-07T09:18:55.600Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
-      {
-        "code": "PLAN_SCOPE",
-        "claimId": "c1",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_SCOPE",
-        "claimId": "c3",
-        "type": "general"
-      },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
@@ -156,33 +150,24 @@
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c6",
-        "token": "3주"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "2개월"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "token": "2주"
       }
     ],
-    "scope": "focused"
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c6",
+        "token": "2주"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
   },
   "publicMutation": false
 }

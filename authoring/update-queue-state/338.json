@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-338",
     "order": 49,
@@ -9,9 +11,11 @@
     "articleId": "338",
     "targetUrl": "https://nhunnhun.tistory.com/338"
   },
-  "sourceId": "auto-338-r1-20261007-ed416ded",
-  "baseSha": "efbaf794c0aface26c77ffdad8ad47408872d2c5",
-  "startedAt": "2026-10-07T06:22:00.216Z",
+  "sourceId": "auto-338-r1-20261007-34bdf1c6",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:26:43.003Z",
+  "heartbeatAt": "2026-10-07T09:27:45.203Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -159,93 +163,145 @@
       "articleId": "131"
     }
   ],
-  "blockedAt": "2026-10-07T06:23:21.433Z",
+  "blockedAt": "2026-10-07T09:27:45.205Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c1",
-        "token": "10"
+        "code": "PLAN_SCOPE",
+        "claimId": "c3",
+        "type": "benefit"
       },
       {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c1",
-        "token": "12"
+        "code": "PLAN_SCOPE",
+        "claimId": "c4",
+        "type": "benefit"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c4",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "100mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "500mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "20mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
         "token": "200"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c7",
+        "claimId": "c4",
         "token": "400ml"
       },
       {
+        "code": "PLAN_SCOPE",
+        "claimId": "c5",
+        "type": "benefit"
+      },
+      {
         "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "100ml"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "2g"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_SCOPE",
         "claimId": "c8",
-        "token": "30mg"
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c9",
+        "type": "safety"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c9",
-        "token": "90"
+        "token": "200"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
         "claimId": "c9",
-        "token": "5"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c10",
-        "token": "10g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c10",
-        "token": "10"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "storage"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "selection"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "safety"
-      },
-      {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "token": "400ml"
       }
     ],
-    "scope": "standard"
+    "initialFailures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c3",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c4",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "200"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "400ml"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c5",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "100ml"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "2g"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "benefit"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c7",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c8",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c9",
+        "type": "safety"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c9",
+        "token": "200"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c9",
+        "token": "400ml"
+      }
+    ],
+    "scope": "standard",
+    "repaired": true
   },
   "publicMutation": false
 }

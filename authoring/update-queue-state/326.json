@@ -1,5 +1,7 @@
 {
   "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
   "item": {
     "id": "q-326",
     "order": 35,
@@ -9,9 +11,11 @@
     "articleId": "326",
     "targetUrl": "https://nhunnhun.tistory.com/326"
   },
-  "sourceId": "auto-326-r1-20261007-6ebca1bb",
-  "baseSha": "d0afcab7598a5f22f7924d6d647b08a243db4cb0",
-  "startedAt": "2026-10-07T06:03:45.259Z",
+  "sourceId": "auto-326-r1-20261007-8a4deee7",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:10:34.100Z",
+  "heartbeatAt": "2026-10-07T09:11:51.102Z",
+  "recovered": true,
   "skippedCurrent": [
     {
       "articleId": "327"
@@ -117,29 +121,14 @@
       "articleId": "130"
     }
   ],
-  "blockedAt": "2026-10-07T06:04:42.857Z",
+  "blockedAt": "2026-10-07T09:11:51.105Z",
   "error": "E_QUEUE_PLAN_VALIDATION",
   "details": {
     "failures": [
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
+        "claimId": "c1",
         "token": "92%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "110mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "10mg"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
@@ -148,20 +137,29 @@
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "7"
+        "claimId": "c5",
+        "token": "5일"
+      }
+    ],
+    "initialFailures": [
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c1",
+        "token": "92%"
       },
       {
         "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "10일"
+        "claimId": "c4",
+        "token": "100g"
       },
       {
-        "code": "PLAN_CORE_MODULE",
-        "module": "decision"
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c5",
+        "token": "5일"
       }
     ],
-    "scope": "standard"
+    "scope": "standard",
+    "repaired": true
   },
   "publicMutation": false
 }

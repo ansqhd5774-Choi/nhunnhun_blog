@@ -1,0 +1,280 @@
+{
+  "status": "BLOCKED_CONTENT",
+  "policyVersion": "R5.1",
+  "runId": "37560028252",
+  "item": {
+    "id": "q-320",
+    "order": 67,
+    "domain": "food",
+    "category": "음식",
+    "keyword": "현미",
+    "articleId": "320",
+    "targetUrl": "https://nhunnhun.tistory.com/320"
+  },
+  "sourceId": "auto-320-r1-20261007-35ea9c90",
+  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
+  "startedAt": "2026-10-07T09:47:19.601Z",
+  "heartbeatAt": "2026-10-07T09:48:18.689Z",
+  "recovered": false,
+  "skippedCurrent": [
+    {
+      "articleId": "327"
+    },
+    {
+      "articleId": "269"
+    },
+    {
+      "articleId": "323"
+    },
+    {
+      "articleId": "179"
+    },
+    {
+      "articleId": "180"
+    },
+    {
+      "articleId": "65"
+    },
+    {
+      "articleId": "249"
+    },
+    {
+      "articleId": "310"
+    },
+    {
+      "articleId": "331"
+    },
+    {
+      "articleId": "239"
+    },
+    {
+      "articleId": "252"
+    },
+    {
+      "articleId": "39"
+    },
+    {
+      "articleId": "167"
+    },
+    {
+      "articleId": "299"
+    },
+    {
+      "articleId": "333"
+    },
+    {
+      "articleId": "337"
+    },
+    {
+      "articleId": "245"
+    },
+    {
+      "articleId": "146"
+    },
+    {
+      "articleId": "358"
+    },
+    {
+      "articleId": "321"
+    },
+    {
+      "articleId": "272"
+    },
+    {
+      "articleId": "251"
+    },
+    {
+      "articleId": "250"
+    },
+    {
+      "articleId": "282"
+    },
+    {
+      "articleId": "91"
+    },
+    {
+      "articleId": "26"
+    },
+    {
+      "articleId": "339"
+    },
+    {
+      "articleId": "312"
+    },
+    {
+      "articleId": "330"
+    },
+    {
+      "articleId": "296"
+    },
+    {
+      "articleId": "120"
+    },
+    {
+      "articleId": "240"
+    },
+    {
+      "articleId": "196"
+    },
+    {
+      "articleId": "130"
+    },
+    {
+      "articleId": "326"
+    },
+    {
+      "articleId": "309"
+    },
+    {
+      "articleId": "318"
+    },
+    {
+      "articleId": "136"
+    },
+    {
+      "articleId": "315"
+    },
+    {
+      "articleId": "47"
+    },
+    {
+      "articleId": "127"
+    },
+    {
+      "articleId": "247"
+    },
+    {
+      "articleId": "73"
+    },
+    {
+      "articleId": "283"
+    },
+    {
+      "articleId": "329"
+    },
+    {
+      "articleId": "204"
+    },
+    {
+      "articleId": "325"
+    },
+    {
+      "articleId": "131"
+    },
+    {
+      "articleId": "338"
+    },
+    {
+      "articleId": "248"
+    },
+    {
+      "articleId": "324"
+    },
+    {
+      "articleId": "359"
+    },
+    {
+      "articleId": "328"
+    },
+    {
+      "articleId": "322"
+    },
+    {
+      "articleId": "344"
+    },
+    {
+      "articleId": "332"
+    },
+    {
+      "articleId": "241"
+    },
+    {
+      "articleId": "48"
+    },
+    {
+      "articleId": "79"
+    },
+    {
+      "articleId": "278"
+    },
+    {
+      "articleId": "49"
+    },
+    {
+      "articleId": "335"
+    },
+    {
+      "articleId": "317"
+    },
+    {
+      "articleId": "341"
+    },
+    {
+      "articleId": "393"
+    },
+    {
+      "articleId": "242"
+    }
+  ],
+  "blockedAt": "2026-10-07T09:48:18.695Z",
+  "error": "E_QUEUE_PLAN_VALIDATION",
+  "details": {
+    "failures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c1",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c4",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c5",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "nutrition"
+      }
+    ],
+    "initialFailures": [
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c1",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c4",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_NUMBER_SOURCE",
+        "claimId": "c4",
+        "token": "100g"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c5",
+        "type": "nutrition"
+      },
+      {
+        "code": "PLAN_SCOPE",
+        "claimId": "c6",
+        "type": "nutrition"
+      }
+    ],
+    "scope": "focused",
+    "repaired": true
+  },
+  "publicMutation": false
+}
