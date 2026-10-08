@@ -53,7 +53,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
   const baseSha=git(['rev-parse','HEAD'],root);
   if(!dryRun&&baseSha!==remoteMain(root))throw new Error('E_QUEUE_SOURCE_DRIFT');
   const selected=dryRun?{item:parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8')).find(x=>x.articleId===articleId),skipped:[]}
-    :await selectNextQueueItem(root,{fetcher});
+    :await selectNextQueueItem(root,{fetcher,articleId});
   if(dryRun&&!selected.item)throw Error('E_QUEUE_DRY_RUN_TARGET');
   if(!selected.item){
     console.log('QUEUE_COMPLETE '+JSON.stringify({policyVersion:QUEUE_POLICY_VERSION}));

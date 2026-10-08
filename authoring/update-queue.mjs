@@ -92,10 +92,11 @@ function staleRunning(qstate,currentRunId=process.env.GITHUB_RUN_ID,now=Date.now
   return Number.isFinite(stamp)&&now-stamp>130*60*1000;
 }
 export function shouldRetryState(){return false;}
-export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID}={}){
+export async function selectNextQueueItem(root=process.cwd(),{fetcher=fetch,currentRunId=process.env.GITHUB_RUN_ID,articleId=null}={}){
   const items=parseUpdateQueue(await readFile(resolve(root,'authoring/update-queue.txt'),'utf8'));
   const skipped=[];
   for(const item of items){
+    if(articleId&&item.articleId!==String(articleId))continue;
     const qstate=await readQueueState(root,item.articleId);
     if(qstate?.error==='E_QUEUE_MUTATION_UNCERTAIN'||qstate?.publicMutation===null)
       throw Object.assign(new Error('E_QUEUE_MUTATION_UNCERTAIN'),{queueState:qstate,item});

@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED",
+  "status": "RETRY_READY",
   "policyVersion": "R5.3",
   "runId": "37676335167",
   "item": {
@@ -23,7 +23,14 @@
   "validationWarnings": [],
   "articleId": "327",
   "blockedAt": "2026-10-07T20:05:50.276Z",
-  "error": "E_QUEUE_MUTATION_UNCERTAIN",
+  "error": null,
   "ledgerPhase": null,
-  "publicMutation": null
+  "publicMutation": false,
+  "reconciledAt": "2026-10-08T00:09:58.432Z",
+  "reconciliation": {
+    "runId": "37676934148",
+    "updateJob": "cancelled",
+    "updateSteps": 0,
+    "reason": "Mutation job never started"
+  }
 }
