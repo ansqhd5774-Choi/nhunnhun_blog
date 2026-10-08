@@ -90,6 +90,10 @@ test('selector skips item-level BLOCKED state and continues with the next keywor
     assert.equal(selected.item.articleId,'328');
     assert.equal(selected.skipped[0].articleId,'327');
     assert.equal(selected.skipped[0].blockedStatus,'BLOCKED_CONTENT');
+    const requested=await selectNextQueueItem(root,{fetcher,articleId:'327'});
+    assert.equal(requested.item.articleId,'327');
+    await writeFile(join(root,'authoring','update-queue-state','327.json'),JSON.stringify({status:'BLOCKED_CONTENT',publicMutation:null}));
+    await assert.rejects(selectNextQueueItem(root,{fetcher,articleId:'327'}),/E_QUEUE_MUTATION_UNCERTAIN/);
   }finally{await rm(root,{recursive:true,force:true});}
 });
 
