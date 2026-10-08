@@ -1,7 +1,7 @@
 name: Validate and publish Tistory posts
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
       - 'publishing/content-*.mjs'
       - 'publishing/cross-domain.mjs'
@@ -40,7 +40,11 @@ concurrency:
   cancel-in-progress: false
 jobs:
   validate:
-    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    runs-on:
+      - self-hosted
+      - Windows
+      - X64
+      - tistory-validation
     defaults:
       run:
         shell: cmd
@@ -83,8 +87,9 @@ jobs:
       group: nhunnhun-tistory-mutation
       cancel-in-progress: false
     needs: validate
-    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate.outputs.should_publish == 'true'
-    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    if: vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' &&
+      needs.validate.outputs.should_publish == 'true'
+    runs-on: [ self-hosted, windows, x64, tistory-publisher ]
     defaults:
       run:
         shell: cmd
@@ -114,5 +119,3 @@ jobs:
         env:
           PUBLISH_ENABLED: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-

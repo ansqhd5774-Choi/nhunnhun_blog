@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   test:
-    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    runs-on: [self-hosted, Windows, X64, tistory-validation]
     timeout-minutes: 20
     defaults:
       run:
