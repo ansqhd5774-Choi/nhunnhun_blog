@@ -1,12 +1,13 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
+import {assertDirectEmphasis} from './direct-emphasis.mjs';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
   const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
-  if (post.contentStandard !== undefined && post.contentStandard !== 'R1') throw new Error('E_CONTENT_STANDARD_VERSION');
+  if (post.contentStandard !== undefined && post.contentStandard !== 'R1' && !(post.contentStandard==='SP1'&&post.id?.startsWith('direct-'))) throw new Error('E_CONTENT_STANDARD_VERSION');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
   if (typeof post.title !== 'string' || !post.title.trim() || post.title.length > 150 || /[\r\n]/.test(post.title)) throw new Error('E_TITLE');
   if (typeof post.category !== 'string' || !post.category.trim()) throw new Error('E_CATEGORY');
@@ -35,6 +36,10 @@ export function checkPost(post, filename) {
   return post;
 }
 export function checkPublishHtml(post) {
+  if(post.id?.startsWith('direct-')) {
+    assertDirectEmphasis(post);
+    if(!post.representativeImageUrl)throw Error('E_REPRESENTATIVE_IMAGE');
+  }
   // Strict publishing HTML is checked only for a post that can create a NEW public article.
   // Already-published source may retain richer archival markup without becoming eligible for republishing.
   const clean = sanitizeHtml(post.bodyHtml, {
@@ -56,11 +61,13 @@ export function fingerprint(post) {
   if (post.contentStandard) parts.push(post.contentStandard);
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
 }
-export async function loadPosts(directory = 'posts') {
+export async function loadPosts(directory = 'posts', sourceId = process.env.PUBLISH_SOURCE_ID || null) {
+  if(sourceId!==null&&!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId))throw Error('E_POST_TARGET_ID');
   const posts = [];
-  for (const name of (await readdir(directory)).filter(n => n.endsWith('.json')).sort()) {
+  for (const name of (await readdir(directory)).filter(n => n.endsWith('.json')&&(!sourceId||n===sourceId+'.json')).sort()) {
     posts.push(checkPost(JSON.parse(await readFile(`${directory}/${name}`, 'utf8')), name));
   }
+  if(sourceId&&posts.length!==1)throw Error('E_POST_TARGET_SOURCE_NOT_FOUND');
   if (new Set(posts.map(p => p.id)).size !== posts.length || new Set(posts.map(p => p.title)).size !== posts.length) throw new Error('E_DUPLICATE_POST');
   return posts;
 }

@@ -1,4 +1,5 @@
 import './direct-emphasis-guard.test.mjs';
+import './direct-new-post.test.mjs';
 import test from 'node:test';
 import './emphasis-observation.test.mjs';
 import './direct-preparation.test.mjs';
