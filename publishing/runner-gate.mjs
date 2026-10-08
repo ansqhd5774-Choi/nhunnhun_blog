@@ -2,8 +2,11 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 export const RUNNER_LABELS = ['self-hosted', 'windows', 'x64', 'tistory-publisher'];
-export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha) {
-  if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha || checkoutSha !== remoteSha) throw new Error('BLOCKED_SOURCE_DRIFT');
+export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths) {
+  if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha) throw new Error('BLOCKED_SOURCE_DRIFT');
+  if(checkoutSha===remoteSha)return;
+  // Only documentation-only forward changes may pass. Runtime/source/unknown changes fail closed.
+  if(!Array.isArray(changedPaths)||!changedPaths.length||changedPaths.some(p=>!(p.startsWith('docs/')||p==='AGENTS.md'||p==='README.md')))throw new Error('BLOCKED_SOURCE_DRIFT');
 }
 export function classifyRunners(runners) {
   if (!Array.isArray(runners)) return 'RUNNER_UNREACHABLE';
@@ -15,7 +18,16 @@ export function classifyRunners(runners) {
 export function assertCurrentSource() {
   const checkout = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
   const remote = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], {encoding:'utf8'}).trim().split(/\s+/)[0];
-  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote);
+  let changedPaths;
+  if(checkout!==remote) {
+    try {
+      execFileSync('git',['fetch','--no-tags','origin','main'],{stdio:'pipe'});
+      if(execFileSync('git',['rev-parse','origin/main'],{encoding:'utf8'}).trim()!==remote)throw Error('drift');
+      execFileSync('git',['merge-base','--is-ancestor',checkout,remote],{stdio:'pipe'});
+      changedPaths=execFileSync('git',['diff','--name-only',checkout,remote],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+    } catch {throw Error('BLOCKED_SOURCE_DRIFT');}
+  }
+  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote,changedPaths);
   return checkout;
 }
 async function main() {
