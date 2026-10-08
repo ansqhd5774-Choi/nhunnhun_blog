@@ -36,3 +36,20 @@ test('internal-link verifier still fails permanent 404',async()=>{
   const request={get:async()=>({ok:()=>false,status:()=>404,url:()=> 'https://nhunnhun.tistory.com/374'})};
   await assert.rejects(()=>verifyInternalLink(request,'https://nhunnhun.tistory.com/374',async()=>{}),/E_QA_INTERNAL_LINK/);
 });
+import { publishedUrls } from '../publishing/published-url.mjs';
+
+test('publication discovery normalizes title whitespace and deduplicates numeric URLs', () => {
+  assert.deepEqual(publishedUrls([
+    {text:'은행\n 하루 몇 알',href:'https://nhunnhun.tistory.com/399?category=1'},
+    {text:'은행 하루 몇 알',href:'https://nhunnhun.tistory.com/399#comments'},
+    {text:'은행 하루 몇 알',href:'https://other.tistory.com/399'},
+    {text:'다른 글',href:'https://nhunnhun.tistory.com/400'},
+    {text:'은행 하루 몇 알',href:'https://nhunnhun.tistory.com/manage/post/399'}
+  ], '은행 하루 몇 알'), ['https://nhunnhun.tistory.com/399']);
+});
+test('publication discovery keeps ambiguous and missing results unresolved', () => {
+  const links=[399,400].map(id=>({text:'은행 하루 몇 알',href:`https://nhunnhun.tistory.com/${id}`}));
+  assert.equal(publishedUrls(links,'은행 하루 몇 알').length,2);
+  assert.deepEqual(publishedUrls(links,'없는 글'),[]);
+  assert.deepEqual(publishedUrls(links,''),[]);
+});

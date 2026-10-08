@@ -13,6 +13,7 @@ import { BLOG, loadPosts, checkPublishHtml, eligible, fingerprint, assertArticle
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
 import { assertImageReview } from './image-review.mjs';
+import { publishedUrls } from './published-url.mjs';
 
 
 function imageSources(html) {
@@ -345,17 +346,20 @@ try {
         }, state.sha);
         console.log(`SCHEDULED: ${post.id} ${post.scheduledAt}`);
       } else {
-      const publicUrls = await page.locator('a').evaluateAll((links, title) => [...new Set(links
-        .filter(a => (a.textContent || '').replace(/\\s+/g,' ').trim().includes(title))
-        .map(a => a.href)
-        .filter(href => /^https:\/\/nhunnhun\.tistory\.com\/\d+$/.test(href)))], post.title);
-      if (publicUrls.length !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
-      const url = assertArticleUrl(publicUrls[0]);
       stage = 'public-verification';
       // Verify anonymously, so an owner-only/private page cannot count as published.
       publicBrowser = await openPublicBrowser(browserConfig);
       const publicContext = await verificationContext(publicBrowser);
       const publicPage = await publicContext.newPage();
+      let publicUrls = publishedUrls(await page.locator('a').evaluateAll(links => links.map(a => ({text:a.textContent,href:a.href}))), post.title);
+      if (publicUrls.length !== 1) {
+        // A successful submit can return manager links using slugs instead of IDs.
+        // Read the public search once; never repeat the mutation to discover its URL.
+        await publicPage.goto(`${BLOG}/search/${encodeURIComponent(post.title)}`, {waitUntil:'domcontentloaded'});
+        publicUrls = publishedUrls(await publicPage.locator('a').evaluateAll(links => links.map(a => ({text:a.textContent,href:a.href}))), post.title);
+      }
+      if (publicUrls.length !== 1) throw new Error('E_PUBLICATION_UNCERTAIN');
+      const url = assertArticleUrl(publicUrls[0]);
       await publicPage.goto(url, {waitUntil:'domcontentloaded'});
       if (!(await publicPage.locator('body').innerText()).includes(post.title)) throw new Error('E_PUBLICATION_UNCERTAIN');
       const content = publicPage.locator('.contents_style');
