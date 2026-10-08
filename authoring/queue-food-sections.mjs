@@ -51,7 +51,7 @@ export function renderFoodMarkdown(markdown) {
       while(lines[i+1]?.trim().startsWith('|')){i++;html+='<tr>'+cells(lines[i]).map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>';}
       html+='</tbody></table>';continue;
     }
-    if(/^\d+[.)]\s+/.test(line)){flush();html+='<ol start="'+line.match(/^\d+/)[0]+'"><li>'+inline(line.replace(/^\d+[.)]\s+/,''))+'</li></ol>';continue;}
+    if(/^\d+[.)]\s+/.test(line)){flush();html+='<ol><li>'+inline(line.replace(/^\d+[.)]\s+/,''))+'</li></ol>';continue;}
     if(/^[-*]\s+/.test(line)){if(paragraph.length)flush();if(!list){html+='<ul>';list=true;}html+='<li>'+inline(line.replace(/^[-*]\s+/,''))+'</li>';continue;}
     if(!line||/^---+$/.test(line)){flush();continue;}
     if(list)flush();
