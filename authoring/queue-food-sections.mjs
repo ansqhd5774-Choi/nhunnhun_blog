@@ -14,7 +14,7 @@ export function foodSectionInstructions(keyword='가지') {
   return FOOD_SECTIONS.map(s=>({...s,question:s.question.replace('{keyword}',keyword)}));
 }
 export function foodSectionPrompt(spec,index,subject) {
-  return `${index+1} ${spec.question}\n주제: ${subject}\n제목: ${spec.question}\n언어: 한국어 약 ${spec.targetChars}자\n형식: ${spec.format}\n내용: ${spec.include}`;
+  return `${index+1} ${spec.question}\n주제: ${subject}\n제목: ${spec.question}\n언어: 한국어 약 ${spec.targetChars}자\n형식: ${spec.format}\n내용: ${spec.include}\n- 핵심 단어 굵은 글씨 적용 (**단어**)\n- 중요한 문구 형광펜 적용 (==문구==)`;
 }
 export async function writeFoodSections(item,evidence,{cached=(_stage,_input,action)=>action(),onCacheHit,onMetrics=()=>{},model,fetcher=fetch}={}) {
   const subject=evidence.query&&evidence.query!==item.keyword?`${item.keyword}(${evidence.query})`:item.keyword;
@@ -32,12 +32,12 @@ export async function writeFoodSections(item,evidence,{cached=(_stage,_input,act
     sections.push({id:`section-${index}`,heading:spec.question,paragraphs:[raw],markdown:raw,modules:[],sourceIds:[],strongPhrase:''});
   }
   const introduction=sections[0].markdown.replace(/^#{1,6}[^\n]*\n+/,'').trim();
-  const lead=introduction.split(/\n\s*\n/)[0].replace(/\*\*/g,'');
+  const lead=introduction.split(/\n\s*\n/)[0].replace(/\*\*|==/g,'').replace(/<\/?mark>/g,'');
   return {title:`${item.keyword} 영양소·효과·궁합·주의사항·보관`,lead,summary:lead,sections,plan:{scope:'food-sections'}};
 }
 
 const escape=text=>String(text).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-const inline=text=>escape(text).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+const inline=text=>escape(text).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/==([^=\n]+)==/g,'<u>$1</u>').replace(/&lt;mark&gt;([\s\S]*?)&lt;\/mark&gt;/g,'<u>$1</u>');
 export function renderFoodMarkdown(markdown) {
   const lines=markdown.replace(/^#{1,6}[^\n]*\n+/,'').split(/\r?\n/);
   let html='',paragraph=[],list=false;
