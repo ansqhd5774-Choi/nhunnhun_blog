@@ -19,6 +19,27 @@ export function sourceIdForEvent({eventName,sourceId,eventPayload}={}) {
   return [...changed][0].slice('updates/'.length,-'.json'.length);
 }
 
+// GitHub Actions can omit commit file arrays in its normalized push event.
+// Read the authoritative before..after diff when the event itself has no file list.
+export async function resolveDirectSourceId({eventName,sourceId,eventPayload,token,fetcher=fetch}={}) {
+  try { return sourceIdForEvent({eventName,sourceId,eventPayload}); }
+  catch(error) {
+    if(eventName!=='push'||error.message!=='E_DIRECT_PUSH_SOURCE_COUNT')throw error;
+    const before=String(eventPayload?.before??''),after=String(eventPayload?.after??'');
+    if(!/^[0-9a-f]{40}$/.test(before)||!/^([0-9a-f]{40})$/.test(after)||/^0+$/.test(before))
+      throw Error('E_DIRECT_PUSH_RANGE');
+    const response=await fetcher('https://api.github.com/repos/ansqhd5774-Choi/nhunnhun_blog/compare/'+before+'...'+after,{
+      headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'},
+      signal:AbortSignal.timeout(20000)
+    });
+    if(!response.ok)throw Error('E_DIRECT_PUSH_COMPARE_HTTP');
+    const diff=await response.json();
+    if(!Array.isArray(diff.files)||diff.files.length>=300)throw Error('E_DIRECT_PUSH_COMPARE_INCOMPLETE');
+    const paths=diff.files.filter(file=>['added','modified','renamed'].includes(file.status)).map(file=>file.filename);
+    return sourceIdForEvent({eventName:'push',eventPayload:{ref:eventPayload.ref,deleted:eventPayload.deleted,commits:[{added:paths,modified:[]}]}});
+  }
+}
+
 export async function dispatchDirectSource({sourceId,commitSha,token,root=process.cwd(),dispatch=dispatchQueuedUpdate}={}){
   if(!/^direct-[a-z0-9-]{2,70}$/.test(sourceId??''))throw Error('E_DIRECT_SOURCE_ID');
   const source=JSON.parse(await readFile(resolve(root,'updates',sourceId+'.json'),'utf8'));
@@ -39,7 +60,7 @@ async function main(){
     if(!process.env.GITHUB_EVENT_PATH)throw Error('E_DIRECT_PUSH_EVENT_PATH');
     eventPayload=JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH,'utf8'));
   }
-  const sourceId=sourceIdForEvent({eventName,sourceId:process.env.SOURCE_ID,eventPayload});
+  const sourceId=await resolveDirectSourceId({eventName,sourceId:process.env.SOURCE_ID,eventPayload,token:process.env.GITHUB_TOKEN});
   const result=await dispatchDirectSource({sourceId,commitSha:process.env.SOURCE_COMMIT,token:process.env.GITHUB_TOKEN});
   console.log(result.alreadyUpdated?'DIRECT_SOURCE_ALREADY_UPDATED':'DIRECT_SOURCE_DISPATCHED',sourceId);
 }
