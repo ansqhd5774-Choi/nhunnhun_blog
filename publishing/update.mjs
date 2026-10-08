@@ -263,9 +263,12 @@ try{
 
       stage='editor-open';
       try{
-        await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
-      }catch{
-        throw new Error('E_UPDATE_EDITOR_OPEN_NAVIGATION');
+        const editorUrl=new URL(page.url());
+        if(editorUrl.origin!==BLOG||editorUrl.pathname!==`/manage/newpost/${update.articleId}`){
+          await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
+        }
+      }catch(error){
+        throw Object.assign(new Error('E_UPDATE_EDITOR_OPEN_NAVIGATION'),{cause:error});
       }
       if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
       await page.locator('#post-title-inp').waitFor({state:'visible',timeout:15000}).catch(()=>{
