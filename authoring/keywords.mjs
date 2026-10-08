@@ -134,4 +134,4 @@ export async function runKeywords({root=process.cwd(),saveBranches=false}={}) {
     console.log(`KEYWORD_DRAFT_SAVED: ${result.state.id}`);
   }
 }
-if(process.argv[1] && import.meta.url===pathToFileURL(resolve(process.argv[1])).href) runKeywords({saveBranches:process.argv.includes('--save-branches')}).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_KEYWORD_FAILED');process.exitCode=1;});
+if(process.argv[1] && import.meta.url===pathToFileURL(resolve(process.argv[1])).href) Promise.reject(new Error('E_OLLAMA_AUTHORING_RETIRED_USE_DIRECT_SOURCE')).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_KEYWORD_FAILED');process.exitCode=1;});
