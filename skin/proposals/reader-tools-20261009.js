@@ -14,7 +14,8 @@
     headings.forEach((heading, i) => {
       if (!heading.id) heading.id = `nh-section-${i + 1}`;
       const li = document.createElement('li'), link = document.createElement('a');
-      link.href = `#${heading.id}`; link.textContent = heading.textContent.trim();
+      link.href = `#${heading.id}`;
+      link.textContent = heading.closest('.nh-direct-v2') ? heading.textContent.trim().replace(/^\d{2}(?!\d)\s*/, '') : heading.textContent.trim();
       link.addEventListener('click', event => {
         event.preventDefault();
         heading.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
