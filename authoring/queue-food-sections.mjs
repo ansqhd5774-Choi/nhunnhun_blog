@@ -20,7 +20,8 @@ export async function writeFoodSections(item,evidence,{cached=(_stage,_input,act
   const subject=evidence.query&&evidence.query!==item.keyword?`${item.keyword}(${evidence.query})`:item.keyword;
   const sections=[];
   for(const [index,spec] of foodSectionInstructions(item.keyword).entries()) {
-    const messages=[{role:'user',content:foodSectionPrompt(spec,index,subject)}];
+    const materials=(evidence.sources??[]).map(s=>({title:s.title,url:s.url,text:s.notes??s.text??s.abstract??s.excerpt??s.summary??''})).filter(s=>s.text).slice(0,6);
+    const messages=[{role:'user',content:foodSectionPrompt(spec,index,subject)+(materials.length?'\n참고 자료 — 해당 항목과 관련된 정보를 사용:\n'+JSON.stringify(materials).slice(0,12000):'')}];
     const raw=await cached(`food-section-${index+1}`,{messages,model},async()=>{
       const started=Date.now();
       const result=await localRequest({model,stream:false,messages,keep_alive:'5m',options:{num_ctx:8192,num_predict:4000}},fetcher);
@@ -50,6 +51,7 @@ export function renderFoodMarkdown(markdown) {
       while(lines[i+1]?.trim().startsWith('|')){i++;html+='<tr>'+cells(lines[i]).map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>';}
       html+='</tbody></table>';continue;
     }
+    if(/^\d+[.)]\s+/.test(line)){flush();html+='<ol start="'+line.match(/^\d+/)[0]+'"><li>'+inline(line.replace(/^\d+[.)]\s+/,''))+'</li></ol>';continue;}
     if(/^[-*]\s+/.test(line)){if(paragraph.length)flush();if(!list){html+='<ul>';list=true;}html+='<li>'+inline(line.replace(/^[-*]\s+/,''))+'</li>';continue;}
     if(!line||/^---+$/.test(line)){flush();continue;}
     if(list)flush();

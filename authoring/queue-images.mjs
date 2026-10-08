@@ -7,19 +7,19 @@ async function imageDecision(messages,{model,fetcher}){
   if(!response.ok)throw Error('E_IMAGE_MODEL_RESPONSE');
   const result=await response.json();return JSON.parse(result.message.content);
 }
-export async function collectSectionImages(item,article,{subject=item.keyword,model='gemma3:4b',fetcher=fetch}={}){
+export async function collectSectionImages(item,article,{subject=item.keyword,model='gemma3:4b',fetcher=fetch,representativeRetry=0}={}){
   const sections=article.sections.map(s=>({heading:s.heading,text:clean(s.markdown??(s.paragraphs??[]).join(' ')).slice(0,350)}));
   const plan=await imageDecision([{role:'user',content:'각 항목에 필요한 실제 사진의 피사체를 영어 검색어로 작성한다. Commons는 검색어의 모든 단어를 함께 찾는다. 기본 검색어는 영문 주제명 자체이며, 구체 장면이 필요할 때만 명사 한 단어를 추가한다. 검색어는 2~4단어다. best quality, health benefits, how to 같은 검색 질문 대신 사진에 보이는 물건이나 장면을 쓴다. 항목당 검색어 하나. 사진의 설명 가치가 없으면 빈 문자열. JSON {"queries":["검색어",...]}만 반환한다.\n'+JSON.stringify({subject,keyword:item.keyword,sections})+'\n영어 검색어만 사용한다. 모든 검색어는 '+subject+'로 시작한다. 항목과 연결할 사진이 없으면 빈 문자열. queries 배열을 반환한다.'}],{model,fetcher});
   const images=[],used=new Set(),descriptions=[];
   for(const [sectionIndex,section] of sections.entries()){
-    const query=String(plan.queries?.[sectionIndex]??'').trim();
+    const query=representativeRetry?subject:String(plan.queries?.[sectionIndex]??'').trim()||subject;
     let result='omitted';
     try{
       if(query){
         const url=new URL('https://commons.wikimedia.org/w/api.php');
-        url.search=new URLSearchParams({action:'query',format:'json',generator:'search',gsrsearch:query,gsrnamespace:'6',gsrlimit:'3',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'1000'});
+        url.search=new URLSearchParams({action:'query',format:'json',generator:'search',gsrsearch:query,gsrnamespace:'6',gsrlimit:representativeRetry?'9':'3',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'1000'});
         const response=await fetcher(url,{signal:AbortSignal.timeout(12000)});
-        if(!response.ok)throw Error('E_IMAGE_SEARCH');
+        if(!response.ok)throw Object.assign(Error('E_IMAGE_SEARCH'),{status:response.status});
         const data=await response.json(),candidates=[];
         for(const page of Object.values(data.query?.pages??{})){
           const info=page.imageinfo?.[0];
@@ -44,8 +44,13 @@ export async function collectSectionImages(item,article,{subject=item.keyword,mo
           }
         }
       }
-    }catch(error){result='unavailable';}
+    }catch(error){result='unavailable';console.log('QUEUE_IMAGE_ERROR '+JSON.stringify({articleId:item.articleId,section:sectionIndex+1,code:error.message,status:error.status??null}));}
     console.log('QUEUE_IMAGE_SECTION '+JSON.stringify({articleId:item.articleId,section:sectionIndex+1,query,result}));
   }
+  if(!images.length){
+    if(representativeRetry<1)return collectSectionImages(item,article,{subject,model,fetcher,representativeRetry:representativeRetry+1});
+    throw Error('E_IMAGE_REPRESENTATIVE_REQUIRED');
+  }
+  images[0].representative=true;
   return images;
 }

@@ -5,6 +5,7 @@ import { glossaryPass } from './queue-draft.mjs';
 import { fetchSource, isTopicSpecificSource } from './queue-research.mjs';
 import { renderFoodMarkdown } from './queue-food-sections.mjs';
 import { applyFoodDesign } from './food-design.mjs';
+import { applyChosenEmphasis } from './food-emphasis.mjs';
 
 const BLOG='https://nhunnhun.tistory.com';
 
@@ -293,10 +294,10 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     return '<p><a href="'+esc(x.sourcePage??x.src)+'" title="'+esc(credit)+'">'+image+'</a></p>';
   });
   const sectionImages=images.some(x=>Number.isInteger(x.sectionIndex));
-  let html=(sectionImages?'':imageTags[0]??'')+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
+  let html=(sectionImages?'':imageTags[0]??'')+(article.plan?.scope==='food-sections'?'':'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>');
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
-    if(article.plan?.scope==='food-sections')html+='\n'+renderFoodMarkdown(section.markdown);
+    if(article.plan?.scope==='food-sections')html+='\n'+applyChosenEmphasis(renderFoodMarkdown(section.markdown),section.emphasis);
     else {
     section.paragraphs.forEach((paragraph,pIndex)=>{
       let body=linkify(paragraph,internalLinks,usedLinks);

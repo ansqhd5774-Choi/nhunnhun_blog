@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, parseUpdateQueue, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
+import {chooseFoodEmphasis} from './food-emphasis.mjs';
 import { collectEvidence, sourceMainText } from './queue-research.mjs';
 import { collectSectionImages } from './queue-images.mjs';
 import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './queue-r53.mjs';
@@ -112,6 +113,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,internalLinks,baseSha});
 
     const article=await timed('writerMs',()=>writeSinglePassArticle(item,evidence,options));
+    if(article.plan?.scope==='food-sections')await timed('emphasisMs',()=>chooseFoodEmphasis(article,options));
     const images=await timed('imageSearchMs',()=>collectSectionImages(item,article,{subject:evidence.query||item.keyword,model,fetcher}));
     console.log('QUEUE_IMAGES '+JSON.stringify({articleId:item.articleId,count:images.length}));
     try{const ps=await fetcher('http://127.0.0.1:11434/api/ps',{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
