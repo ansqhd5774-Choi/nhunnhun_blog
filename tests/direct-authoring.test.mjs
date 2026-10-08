@@ -54,6 +54,9 @@ test('direct dispatch requires existing approved source and calls existing publi
  const root=await mkdtemp(join(tmpdir(),'nh-direct-'));let calls=0;
  try{await mkdir(join(root,'updates'));await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));const dispatch=async args=>{calls++;assert.equal(args.sourceId,source.id);return {submitted:true};};
  await dispatchDirectSource({root,sourceId:source.id,commitSha:'a'.repeat(40),token:'fixture',dispatch});assert.equal(calls,1);
+ await mkdir(join(root,'publishing','update-state'),{recursive:true});
+ await writeFile(join(root,'publishing','update-state',source.id+'.json'),JSON.stringify({phase:'submitting'}));
+ await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_ALREADY_ATTEMPTED/);assert.equal(calls,1);
  await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify({...source,approved:false}));await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_UPDATE_APPROVAL/);assert.equal(calls,1);
  await assert.rejects(dispatchDirectSource({root,sourceId:'auto-179-test',dispatch}),/E_DIRECT_SOURCE_ID/);
  }finally{await rm(root,{recursive:true,force:true});}
