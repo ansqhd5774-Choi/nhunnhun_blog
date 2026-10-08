@@ -7,6 +7,10 @@ on:
       - .github/workflows/publish-posts.yml
   workflow_dispatch:
     inputs:
+      source_id:
+        description: '신규 발행할 posts JSON ID (빈 값은 기존 동작)'
+        required: false
+        type: string
       publish:
         description: 'Actually publish one pending post'
         required: false
@@ -14,6 +18,8 @@ on:
         type: boolean
 permissions:
   contents: read
+env:
+  PUBLISH_SOURCE_ID: ${{ inputs.source_id }}
 concurrency:
   group: nhunnhun-validation-${{ github.sha }}
   cancel-in-progress: false
@@ -25,6 +31,7 @@ jobs:
         shell: cmd
     outputs:
       should_publish: ${{ steps.mutation-gate.outputs.should_mutate }}
+      source_id: ${{ steps.mutation-gate.outputs.source_id }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -56,9 +63,12 @@ jobs:
       - name: Revalidate publish source at mutation boundary
         run: pnpm validate
         env:
+          PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
   publish:
+    env:
+      PUBLISH_SOURCE_ID: ${{ needs.validate.outputs.source_id }}
     concurrency:
       group: nhunnhun-tistory-mutation
       cancel-in-progress: false
