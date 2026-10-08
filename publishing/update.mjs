@@ -138,6 +138,21 @@ function replaceImageSources(html,mapping,representativeSource){
     return out;
   });
 }
+async function selectEditorMode(page,mode){
+  const selector=mode==='html'?'#editor-mode-html':'#editor-mode-kakao';
+  if(mode==='html'&&await page.locator('.CodeMirror:visible').count())return;
+  const option=page.locator(selector);
+  if(!await option.isVisible()){
+    await page.locator('#editor-mode-layer-btn-open').click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});});
+  }
+  await option.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});});
+  await option.click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});});
+  await page.waitForFunction(expected=>{
+    const mode=document.querySelector('#editor-mode-layer-btn-open')?.textContent??'';
+    return expected==='html'?mode.includes('HTML')&&[...document.querySelectorAll('.CodeMirror')].some(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'):mode.includes('기본모드')||mode.includes('기본 모드');
+  },mode,{timeout:10000,polling:100}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});});
+}
+
 async function probeManagedPost(page,update){
   try{
     const currentUrl=new URL(page.url());
@@ -259,15 +274,7 @@ try{
       if(currentTitle!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
 
       stage='original-mode-menu';
-      const originalModeButton=page.locator('#editor-mode-layer-btn-open');
-      await originalModeButton.waitFor({state:'attached',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
-      const originalModeOpened=await originalModeButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
-      if(!originalModeOpened) throw new Error('E_UPDATE_EDITOR_MODE_MENU');
-      stage='original-html-select';
-      const originalHtmlButton=page.locator('#editor-mode-html');
-      await originalHtmlButton.waitFor({state:'visible',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
-      const originalHtmlOpened=await originalHtmlButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
-      if(!originalHtmlOpened) throw new Error('E_UPDATE_EDITOR_HTML_MODE');
+      await selectEditorMode(page,'html');
       stage='original-codemirror-wait';
       const cm=page.locator('.CodeMirror:visible');
       await cm.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_CODEMIRROR_WAIT'),{cause:error});});
@@ -275,14 +282,8 @@ try{
       const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'').catch(error=>{throw Object.assign(Error('E_UPDATE_CODEMIRROR_READ'),{cause:error});});
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
-      stage='restore-basic-open';
-      const modeOpen=page.locator('#editor-mode-layer-btn-open');
-      if(await modeOpen.count()!==1) throw new Error('E_UPDATE_EDITOR_MODE_CONTROL');
-      await modeOpen.evaluate(el=>el.click());
       stage='restore-basic-select';
-      const basicMode=page.locator('#editor-mode-kakao');
-      await basicMode.waitFor({state:'attached',timeout:10000});
-      await basicMode.evaluate(el=>el.click());
+      await selectEditorMode(page,'basic');
       stage='restore-basic-ready';
       await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:15000});
 
@@ -298,14 +299,7 @@ try{
 
       stage='stage-content';
       await page.locator('#post-title-inp').fill(update.title);
-      const stageModeButton=page.locator('#editor-mode-layer-btn-open');
-      await stageModeButton.waitFor({state:'attached',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
-      const stageModeOpened=await stageModeButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
-      if(!stageModeOpened) throw new Error('E_UPDATE_EDITOR_MODE_MENU');
-      const stageHtmlButton=page.locator('#editor-mode-html');
-      await stageHtmlButton.waitFor({state:'visible',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
-      const stageHtmlOpened=await stageHtmlButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
-      if(!stageHtmlOpened) throw new Error('E_UPDATE_EDITOR_HTML_MODE');
+      await selectEditorMode(page,'html');
       const code=page.locator('.CodeMirror:visible .CodeMirror-code');
       await code.waitFor({state:'visible'});
       await code.click();
