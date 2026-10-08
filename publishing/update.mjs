@@ -153,18 +153,20 @@ async function probeManagedPost(page,update){
           headers:{Accept:'application/json'}
         });
         let data=null;
-        try{data=await response.json();}catch{}
-        const items=Array.isArray(data?.items)?data.items:Array.isArray(data?.data?.items)?data.data.items:[];
+        try{data=await response.json();}catch{throw Error('E_UPDATE_TARGET_RESPONSE_JSON');}
+        const items=Array.isArray(data?.items)?data.items:Array.isArray(data?.data?.items)?data.data.items:null;
+        if(!items)throw Error('E_UPDATE_TARGET_RESPONSE_SCHEMA');
         return {status:response.status,items};
       }
       let first=await getPage(1,title);
       let item=first.items.find(x=>String(x?.id)===String(id))||null;
       let status=first.status;
       if(!item && status===200){
-        for(let page=1;page<=5 && !item;page++){
+        for(let page=1;page<=100 && !item;page++){
           const scan=await getPage(page,'');
           status=scan.status;
-          if(status!==200) break;
+          if(status!==200||scan.items.length===0) break;
+          if(page===100)throw Error('E_UPDATE_TARGET_SCAN_LIMIT');
           item=scan.items.find(x=>String(x?.id)===String(id))||null;
         }
       }
@@ -184,6 +186,7 @@ async function probeManagedPost(page,update){
     }));
     if(result.status!==200) throw new Error('E_UPDATE_TARGET_PROBE');
     if(!result.found) throw new Error('E_UPDATE_TARGET_NOT_FOUND');
+    if((result.title||'').trim()===update.title&&update.title!==update.expectedCurrentTitle) throw new Error('E_UPDATE_TARGET_ALREADY_CHANGED');
     if((result.title||'').trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
     return result;
   }catch(error){
