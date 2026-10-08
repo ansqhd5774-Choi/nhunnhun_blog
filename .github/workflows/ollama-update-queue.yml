@@ -121,7 +121,7 @@ jobs:
         id: producer
         run: node authoring\update-producer.mjs
         env:
-          OLLAMA_MODEL: qwen3:4b
+          OLLAMA_MODEL: gemma3:4b
           OLLAMA_HOST: http://127.0.0.1:11434
           QUEUE_DRY_RUN: ${{ inputs.dry_run || 'false' }}
           QUEUE_ARTICLE_ID: ${{ inputs.article_id || '327' }}
