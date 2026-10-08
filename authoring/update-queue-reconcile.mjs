@@ -10,7 +10,7 @@ export async function reconcileReadyUpdates({root=process.cwd(),token=process.en
   for(const file of await readdir(directory)){
     if(!/^\d+\.json$/.test(file))continue;
     const state=JSON.parse(await readFile(resolve(directory,file),'utf8'));
-    if(state.status!=='READY_FOR_UPDATE')continue;
+    if(state.status!=='READY_FOR_UPDATE'&&!(state.status==='BLOCKED'&&['E_QUEUE_MUTATION_UNCERTAIN','E_QUEUE_UPDATE_NOT_COMPLETED'].includes(state.error)))continue;
     if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(state.sourceId??''))throw Error('E_QUEUE_RECONCILE_SOURCE');
     const response=await fetcher('https://api.github.com/repos/ansqhd5774-Choi/nhunnhun_blog/commits?path='+encodeURIComponent('updates/'+state.sourceId+'.json')+'&per_page=1',
       {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(20000)});
