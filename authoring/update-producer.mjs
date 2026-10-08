@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { selectNextQueueItem, parseUpdateQueue, assertLocalOnly, writeQueueState, queueSourceId, publicTitleFromHtml, assertProtectedDiff,archiveCompletedSources,restoreArchivedSources, QUEUE_POLICY_VERSION } from './update-queue.mjs';
 import { collectEvidence, sourceMainText } from './queue-research.mjs';
 import { reusableImages } from './queue-draft.mjs';
+import { collectSectionImages } from './queue-images.mjs';
 import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './queue-r53.mjs';
 import { writeSinglePassArticle, singlePassReceipt } from './queue-single-pass.mjs';
 import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
@@ -111,8 +112,10 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     const internalLinks=await timed('internalLinkMs',()=>collectInternalLinks(root,item,current.html,evidence));
     await checkpoint('evidence',{item,currentTitle:current.title,evidence,internalLinks,baseSha});
 
-    const images=await timed('imageLookupMs',()=>reusableImages(root,item));
     const article=await timed('writerMs',()=>writeSinglePassArticle(item,evidence,options));
+    let images=await timed('imageSearchMs',()=>collectSectionImages(item,article,{subject:evidence.query||item.keyword,fetcher}));
+    if(!images.length)images=await timed('imageLookupMs',()=>reusableImages(root,item));
+    console.log('QUEUE_IMAGES '+JSON.stringify({articleId:item.articleId,count:images.length}));
     try{const ps=await fetcher('http://127.0.0.1:11434/api/ps',{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
       metrics.modelPlacementAfterWriter=(ps.models??[]).filter(m=>m.name===model).map(({name,size,size_vram,context_length})=>({name,size,size_vram,context_length}));
     }catch{metrics.modelPlacementAfterWriter=null;}

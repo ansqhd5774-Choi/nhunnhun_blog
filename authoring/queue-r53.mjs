@@ -286,7 +286,8 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
   const strict=article.plan?.scope==='evidence-first';
   const usedLinks=new Set();
   const imageTags=images.map(x=>'<p><img src="'+esc(x.src)+'" alt="'+esc(x.alt)+'"></p>');
-  let html=(imageTags[0]??'')+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
+  const sectionImages=images.some(x=>Number.isInteger(x.sectionIndex));
+  let html=(sectionImages?'':imageTags[0]??'')+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
     if(article.plan?.scope==='food-sections')html+='\n'+renderFoodMarkdown(section.markdown);
@@ -307,8 +308,11 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     }
     const citations=sourceLinks(evidence,section.sourceIds);
     if(citations.length)html+='\n<p>근거: '+citations.map(s=>'<a href="'+esc(s.url)+'">'+esc(s.title)+'</a>').join(' · ')+'</p>';
-    if(index===1&&imageTags[1])html+='\n'+imageTags[1];
-    if(index===3&&imageTags[2])html+='\n'+imageTags[2];
+    if(sectionImages){images.forEach((image,i)=>{if(image.sectionIndex===index)html+='\n'+imageTags[i];});}
+    else {
+      if(index===1&&imageTags[1])html+='\n'+imageTags[1];
+      if(index===3&&imageTags[2])html+='\n'+imageTags[2];
+    }
   });
   if(article.plan?.scope!=='food-sections')html+='\n<h2>핵심 정리</h2><ul>'+article.sections.map(s=>'<li>'+esc(shortQuote(s.paragraphs[0]))+'</li>').join('')+'</ul>';
   const related=internalLinks.filter(link=>usedLinks.has(link.url)).slice(0,5);
