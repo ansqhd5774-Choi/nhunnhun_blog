@@ -405,16 +405,19 @@ try{
 
       stage='publish-dialog';
       await page.locator('#publish-layer-btn').click();
+      await page.locator('.publish_editor').waitFor({state:'visible',timeout:10000}).catch(()=>{throw Error('E_UPDATE_PUBLISH_DIALOG');});
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
       const deleteRepresentative=thumb.locator('button.ico_delete, button.mce-ico.ico_delete');
       if(await deleteRepresentative.count()){
-        await deleteRepresentative.first().click();
+        stage='representative-remove';
+        await deleteRepresentative.first().evaluate(el=>el.click()).catch(()=>{throw Error('E_UPDATE_REPRESENTATIVE_REMOVE');});
         await page.waitForFunction(()=>{
           const box=document.querySelector('.publish_editor .box_thumb');
           return !!box && ((box.textContent||'').includes('대표이미지 추가') || !!box.querySelector('input[type="file"]'));
-        },{timeout:10000});
+        },null,{timeout:10000});
       }
+      stage='representative-upload';
       const repPath=join(tempDir,'update-representative.bin');
       await downloadImage(update.representativeImageUrl,repPath);
       const repInput=thumb.locator('input[type="file"]');
@@ -425,9 +428,10 @@ try{
         if(!box) return false;
         const text=(box.textContent||'').trim();
         return !text.includes('대표이미지 추가');
-      },{timeout:10000});
+      },null,{timeout:10000});
       if((await thumb.innerText().catch(()=>''))?.includes('대표이미지 추가')) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
 
+      stage='submit-control';
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
         const button=page.getByRole('button',{name,exact:true});
