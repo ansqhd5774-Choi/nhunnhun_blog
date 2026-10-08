@@ -29,3 +29,6 @@
 
 ## Queue R5.5 사용자 승인 단순 작성
 기존 URL 자동 수정 Producer는 docs/content/PRODUCER_SINGLE_PASS_R55.md를 따른다. SP1 생성 영수증은 내용 검토 PASS가 아니다. 내용 검토·보완 반복을 추가하지 않으며 기존 R1 직접 작성과 미변경 source 규칙은 보존한다.
+
+## GPT 직접 작성 — 2026-10-09 최신 사용자 지시
+음식 및 기존 URL 수정은 docs/content/DIRECT_AUTHORING_R1.md를 우선한다. Ollama 작성·강조 호출은 운영 경로에서 사용하지 않는다. GPT가 원고와 사진을 준비하고 direct-* source를 기존 발행 러너에 전달한다.

@@ -6,20 +6,20 @@ export async function chooseFoodEmphasis(article,{model,fetcher,cached=(_s,_i,fn
     const r=await localRequest({model,messages,stream:false,format:'json',keep_alive:'5m',options:{num_ctx:8192,num_predict:2200,temperature:0}},fetcher);
     return JSON.parse(r.message.content);
   });
-  article.sections.forEach((s,i)=>{s.emphasis=(raw.sections?.[i]?.phrases??[]).filter(p=>typeof p.text==='string'&&p.text.trim()&&s.markdown.includes(p.text)&&[1,2,3].includes(p.level));});
+  article.sections.forEach((s,i)=>{s.emphasis=(raw.sections?.[i]?.phrases??[]).filter(p=>typeof p.text==='string'&&p.text.trim()&&s.markdown.replace(/\*\*|==/g,'').includes(p.text)&&[1,2,3].includes(p.level));});
   return article;
 }
 export function applyChosenEmphasis(html,phrases=[]){
   const esc=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
   return html.split(/(<[^>]+>)/g).map(chunk=>{
     if(chunk.startsWith('<'))return chunk;
-    let out=chunk;
-    for(const p of [...phrases].sort((a,b)=>b.text.length-a.text.length)){
-      const text=esc(p.text);if(!out.includes(text))continue;
-      const strong='<strong>'+text+'</strong>';
-      out=out.replace(text,p.level===1?strong:'<mark>'+(p.level===3?'<u>'+strong+'</u>':strong)+'</mark>');
-      break;
-    }
-    return out;
+    const choices=[...phrases].sort((a,b)=>b.text.length-a.text.length);
+    const byText=new Map(choices.map(p=>[esc(p.text),p]));
+    if(!byText.size)return chunk;
+    const pattern=[...byText.keys()].map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+    return chunk.replace(new RegExp(pattern,'g'),text=>{
+      const p=byText.get(text),strong='<strong>'+text+'</strong>';
+      return p.level===1?strong:'<mark>'+(p.level===3?'<u>'+strong+'</u>':strong)+'</mark>';
+    });
   }).join('');
 }

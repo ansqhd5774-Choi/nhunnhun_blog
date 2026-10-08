@@ -8,15 +8,11 @@ import { parse } from 'yaml';
 import { fileURLToPath } from 'node:url';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const workflow=path=>parse(read('.github/workflows/'+path));
-test('queue code maintenance does not start production and cancelled runs do not occupy summary runner',()=>{
-  const w=workflow('ollama-update-queue.yml');
-  assert.deepEqual(w.on.push.paths,['authoring/update-queue.txt']);
-  assert.ok(w.on.workflow_dispatch);
-  assert.ok(w.on.schedule.length>0);
-  assert.match(w.jobs.summary.if,/!cancelled\(\)/);
-  assert.match(w.jobs.summary.if,/needs\.produce\.result != 'skipped'/);
-  assert.ok(!w.jobs.summary.steps.some(s=>s.run?.includes('pnpm install')));
-  assert.ok(w.jobs.summary.steps.some(s=>s.uses==='actions/setup-node@v5'));
+test('direct workflow never starts generation on code or keyword pushes',()=>{
+ const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on),['workflow_dispatch']);
+ assert.equal(w.jobs.produce,undefined);assert.equal(w.jobs.summary,undefined);
+ assert.equal(w.on.workflow_dispatch.inputs.source_id.required,true);
+ assert.ok(w.jobs.dispatch.steps.some(x=>x.run==='node authoring/direct-dispatch.mjs'));
 });
 for(const [file,job,kind]of [['publish-posts.yml','publish','posts'],['update-posts.yml','update','updates']]) {
  test(`${job}: common content paths are watched without broad publish-all paths`,()=>{const w=workflow(file);assert.ok(w.on.push.paths.includes('publishing/content-*.mjs'));assert.ok(w.on.push.paths.includes('publishing/standards/**'));assert.ok(w.on.push.paths.includes('content-reviews/**'));assert.ok(!w.on.push.paths.includes('publishing/**'));});

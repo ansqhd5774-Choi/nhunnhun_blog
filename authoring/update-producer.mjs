@@ -170,9 +170,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
 }
 
 async function main(){
-  const fs=await import('node:fs');
-  return runQueueProducer({dryRun:process.argv.includes('--dry-run')||process.env.QUEUE_DRY_RUN==='true',articleId:process.argv.find(x=>x.startsWith('--article='))?.split('=')[1]??process.env.QUEUE_ARTICLE_ID,commit:!process.argv.includes('--no-commit'),onOutput:values=>{
-    if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(values).map(([key,value])=>key+'='+String(value??'').replace(/\r?\n/g,' ')+'\n').join(''));
-  }});
+  throw new Error('E_OLLAMA_AUTHORING_RETIRED_USE_DIRECT_SOURCE');
 }
+
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)main().catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_QUEUE_FAILED');if(error.details)console.error(JSON.stringify(error.details));process.exitCode=1;});

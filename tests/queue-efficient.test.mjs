@@ -138,12 +138,11 @@ test('pending consumer exits without sleep or mutation',async()=>{
     assert.equal(result.status,'PENDING');assert.ok(requests.every(method=>method==='GET'));
   }finally{globalThis.fetch=previous;}
 });
-test('workflow reconciles on consumer completion, never polls while holding publisher runner',async()=>{
-  const w=parse(await readFile(new URL('../.github/workflows/ollama-update-queue.yml',import.meta.url),'utf8'));
-  assert.deepEqual(w.on.workflow_run.types,['completed']);assert.equal(w.jobs.finalize,undefined);
-  assert.ok(w.jobs.reconcile.steps.some(s=>s.run==='node authoring/update-queue-reconcile.mjs'));
-  assert.equal(w.on.workflow_dispatch.inputs.dry_run.default,true);
-  assert.ok(w.jobs.produce.if.includes("github.event_name != 'workflow_run'"));
+test('direct workflow holds no publisher runner while waiting on consumer completion',async()=>{
+ const w=parse(await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8'));
+ assert.equal(w.on.workflow_run,undefined);assert.equal(w.jobs.finalize,undefined);assert.equal(w.jobs.reconcile,undefined);
+ assert.equal(w.jobs.dispatch.timeoutMinutes,undefined);assert.equal(w.jobs.dispatch['timeout-minutes'],5);
+ assert.ok(w.jobs.dispatch.steps.some(x=>x.run==='node authoring/direct-dispatch.mjs'));
 });
 
 test('editor summaries never become writer source facts',()=>{

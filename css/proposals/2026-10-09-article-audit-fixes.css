@@ -1,0 +1,6 @@
+/* NHUNNHUN ARTICLE DESIGN AUDIT FIX 20261009 */
+.contents_style > div[aria-hidden="true"],.tt_article_useless_p_margin > div[aria-hidden="true"]{display:none!important;}
+.contents_style table,.tt_article_useless_p_margin table{table-layout:auto!important;}
+.contents_style td,.contents_style th,.tt_article_useless_p_margin td,.tt_article_useless_p_margin th{word-break:normal!important;overflow-wrap:normal!important;}
+.contents_style > p:has(img),.tt_article_useless_p_margin > p:has(img){text-align:center;}
+@media(max-width:600px){.contents_style div:has(>table),.tt_article_useless_p_margin div:has(>table){overflow-x:auto!important;-webkit-overflow-scrolling:touch;}.contents_style table,.tt_article_useless_p_margin table{min-width:580px!important;}.contents_style th:first-child,.contents_style td:first-child,.tt_article_useless_p_margin th:first-child,.tt_article_useless_p_margin td:first-child{min-width:105px;}.contents_style th:nth-child(2),.contents_style td:nth-child(2),.tt_article_useless_p_margin th:nth-child(2),.tt_article_useless_p_margin td:nth-child(2){min-width:90px;}}
