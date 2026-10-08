@@ -300,12 +300,7 @@ try{
         stage=`image-upload-${i+1}`;
         imageMap.set(sources[i],await uploadImage(page,sources[i],i,tempDir));
       }
-      let targetHtml=replaceImageSources(rendered,imageMap,update.representativeImageUrl);
-      if(update.contentStandard==='SP1'&&!sources.length){
-        const previousImage=originalHtml.match(/\[##_Image[\s\S]*?_##\]|<img\b[^>]*>/i)?.[0];
-        if(previousImage){targetHtml='<p>'+previousImage+'</p>'+targetHtml;console.log('UPDATE_IMAGE_FALLBACK: preserved-first-existing-image');}
-        else console.log('UPDATE_IMAGES: 0; no-existing-image');
-      }
+      const targetHtml=replaceImageSources(rendered,imageMap,update.representativeImageUrl);
 
       stage='stage-content';
       await page.locator('#post-title-inp').fill(update.title);
