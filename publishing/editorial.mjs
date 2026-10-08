@@ -118,16 +118,18 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
     '<div style="margin:28px 0 32px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:8px;background:#fbfcfe;"><p style="margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#2563eb;">$1</p>$2</div>'
   );
 
-  out=out.replace(/<h2>/g,ACCENT+H2);
-  out=out.replace(/<h3>/g,H3);
+  let sectionNumber=0;
+  out=out.replace(/<h2>/g,()=>version==='SP1'?'<h2 style="margin:36px 0 16px;padding:16px 0 0;border:0;border-top:1px solid #e2e5e9;background:none;font-size:24px;line-height:1.45;font-weight:800;color:#243142;">'+(++sectionNumber)+'. ':ACCENT+H2);
+  out=out.replace(/<h3>/g,version==='SP1'?'<h3 style="margin:24px 0 12px;font-size:19px;line-height:1.5;color:#243142;font-weight:700;">':H3);
 
   out=out.replace(/<table>\s*([\s\S]*?)\s*<\/table>/g,(_m,inner)=>styleTable(inner,{fluid:version==='SP1'}));
   if(version==='SP1'){
     out=out.replace(/<p>/g,'<p style="margin:0 0 16px;font-size:16px;line-height:1.85;color:#334155;overflow-wrap:anywhere;">');
     out=out.replace(/<ol>/g,'<ol style="margin:18px 0 24px;padding-left:26px;color:#334155;">');
     out=out.replace(/<ul>/g,'<ul style="margin:18px 0 24px;padding-left:24px;color:#334155;">');
-    out=out.replace(/<li>/g,'<li style="margin:0 0 12px;padding:10px 12px;background:#f8fafc;border:1px solid #e5eaf0;border-radius:8px;font-size:16px;line-height:1.85;overflow-wrap:anywhere;">');
-    out=out.replace(/(<li[^>]*>)<strong>/g,'$1<strong style="display:block;margin-bottom:6px;font-size:17px;">');
+    out=out.replace(/<li>/g,'<li style="margin:0 0 10px;padding:0;background:none;border:0;font-size:16px;line-height:1.8;color:#243142;overflow-wrap:anywhere;">');
+    out=out.replace(/<strong>/g,'<strong style="font-weight:750;color:#182332;">');
+    out=out.replace(/background:#f5f6f8;/g,'background:#f4f3ef;');
     out=out.replace(/table-layout:auto;/g,'table-layout:fixed;');
     out=out.replace(/(<t[dh] style=")/g,'$1white-space:normal !important;min-width:0 !important;overflow-wrap:anywhere;');
   }
