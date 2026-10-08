@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import YAML from 'yaml';
 test('manual update prepares once while push validation remains read-only',()=>{
  const w=YAML.parse(fs.readFileSync('.github/workflows/update-posts.yml','utf8').replace(/^\uFEFF/,''));
- assert.equal(w.jobs['validate-update'].if,"github.event_name == 'push'");
+ assert.equal(w.jobs['validate-update'],undefined);assert.equal(w.on.push,undefined);
  const job=w.jobs.update;
  assert.equal(job.needs,undefined);
  for(const guard of ['workflow_dispatch','inputs.update == true','TISTORY_PUBLISH_ENABLED',"refs/heads/main"])assert.ok(job.if.includes(guard));

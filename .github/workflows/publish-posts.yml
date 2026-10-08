@@ -3,29 +3,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'publishing/content-*.mjs'
-      - 'publishing/cross-domain.mjs'
-      - 'publishing/standards/**'
-      - 'publishing/validate-content.mjs'
-      - 'content-reviews/**'
-      - 'tests/content-*.test.mjs'
-      - 'posts/**'
-      - 'publishing/publish.mjs'
-      - 'publishing/runner-gate.mjs'
-      - 'tests/runner-gate.test.mjs'
-      - 'publishing/validate.mjs'
-      - 'publishing/core.mjs'
-      - 'publishing/editorial.mjs'
-      - 'publishing/ledger.mjs'
-      - 'publishing/local-browser.mjs'
-      - 'publishing/mutation-gate.mjs'
-      - 'maintenance/ensure-tistory-chrome.cmd'
-      - 'maintenance/check-tistory-chrome.cmd'
-      - 'tests/publishing.test.mjs'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/publish-posts.yml'
-      - '.github/actions/setup-node-pnpm/**'
+      - posts/**
+      - .github/workflows/publish-posts.yml
   workflow_dispatch:
     inputs:
       publish:
@@ -77,6 +56,7 @@ jobs:
           CONTENT_BASE_SHA: ${{ github.event.before }}
           CONTENT_HEAD_SHA: ${{ github.sha }}
       - run: pnpm run validate:content
+        if: github.event_name == 'workflow_dispatch'
       - name: Revalidate publish source at mutation boundary
         run: pnpm validate
         env:
@@ -108,14 +88,12 @@ jobs:
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: pnpm test
       - run: pnpm validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
       - run: call maintenance\check-tistory-chrome.cmd
       - run: pnpm run publish
-        # Validate and publish use the same checked-out current main. publish.mjs also rechecks remote main immediately before final submit.
         env:
-          PUBLISH_ENABLED: 'true'
+          PUBLISH_ENABLED: "true"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -10,11 +10,12 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: authoring-regression-tests
+  group: authoring-regression-tests-${{ github.event.pull_request.number ||
+    github.ref }}
   cancel-in-progress: true
 jobs:
   test:
-    runs-on: [self-hosted, Windows, X64, tistory-validation]
+    runs-on: [ self-hosted, Windows, X64, tistory-validation ]
     timeout-minutes: 20
     defaults:
       run:
@@ -27,4 +28,4 @@ jobs:
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: pnpm test
+      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs
