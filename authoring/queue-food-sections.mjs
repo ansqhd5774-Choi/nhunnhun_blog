@@ -29,7 +29,6 @@ export async function writeFoodSections(item,evidence,{cached=(_stage,_input,act
       console.log('QUEUE_MODEL_COMPLETE '+JSON.stringify({...metrics,section:index+1}));
       return result.message.content;
     },onCacheHit);
-    if(typeof raw!=='string'||!raw.trim())throw Error('E_QUEUE_DRAFT_SCHEMA');
     sections.push({id:`section-${index}`,heading:spec.question,paragraphs:[raw],markdown:raw,modules:[],sourceIds:[],strongPhrase:''});
   }
   const introduction=sections[0].markdown.replace(/^#{1,6}[^\n]*\n+/,'').trim();

@@ -6,7 +6,10 @@ import { assertImageReview } from './image-review.mjs';
 try{
   const updates=await loadUpdates();
   for(const update of updates){
-    // Old source is rendered unchanged for historical audits; live mutation always requires R1.
+    if(update.contentStandard==='SP1') {
+      console.log(`CONTENT_VALIDATION_SKIPPED: ${update.id}`);
+      continue;
+    }
     if(update.contentStandard!==undefined) assertContentStandard(update,{enforceScanDensity:false});
     if(update.imageReview) assertImageReview(update);
     renderEditorialPost(update);

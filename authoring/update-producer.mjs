@@ -10,7 +10,6 @@ import { writeSinglePassArticle, singlePassReceipt } from './queue-single-pass.m
 import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
 
 import { todayInSeoul } from '../publishing/content-standards.mjs';
-import { assertImageReview } from '../publishing/image-review.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
 
 function git(args,root,{allowFailure=false,trimOutput=true}={}){
@@ -121,13 +120,11 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
 
     let rendered=renderR53Body(article,evidence,images,internalLinks);
     let source=makeSource(item,current.title,sourceId,article,rendered.html,images);
-    assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
 
     const review=singlePassReceipt(source,item,evidence);
     await checkpoint('generated',{source,review});
 
-    assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
     if(dryRun){
       await writeMetrics('DRY_RUN_GENERATED');

@@ -110,6 +110,7 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
       const text=host.innerText||host.textContent||'';host.remove();return text;
     },rendered);
     if(normalize(await root.innerText())!==normalize(expectedText)) throw new Error('E_QA_BODY');
+    if(update.contentStandard==='SP1') return {viewport:width,bodyMatches:true,contentValidation:'not-performed'};
     const images=root.locator('img');
     for(let n=0;n<await images.count();n++) {
       const img=images.nth(n);

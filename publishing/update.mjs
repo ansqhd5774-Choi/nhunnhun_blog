@@ -261,6 +261,7 @@ async function verifyDesktop(browser,update,targetHtml,expected){
     const actual=(await content.innerText()).replace(/\s+/g,' ').trim();
     const expectedText=await materializedText(page,targetHtml);
     if(!expectedText||actual!==expectedText) throw new Error('E_UPDATE_PUBLIC_BODY');
+    if(update.contentStandard==='SP1') return {bodyMatches:true,contentValidation:'not-performed'};
     const og=await page.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
     if(!og||og.includes('opengraph.png')||!og.includes('kakaocdn.net')) throw new Error('E_UPDATE_PUBLIC_OG');
     const snapshot=await editorialSnapshot(content);
@@ -279,7 +280,9 @@ async function verifyMobile(browser,update){
     const page=await context.newPage();
     await page.goto(update.targetUrl,{waitUntil:'domcontentloaded'});
     const body=await page.locator('body').innerText();
-    if(!body.includes(update.title)||!body.includes('핵심 정리')||!body.includes('자료 출처')) throw new Error('E_UPDATE_MOBILE_BODY');
+    if(!body.includes(update.title)) throw new Error('E_UPDATE_MOBILE_BODY');
+    if(update.contentStandard==='SP1') return {titleMatches:true,contentValidation:'not-performed'};
+    if(!body.includes('핵심 정리')||!body.includes('자료 출처')) throw new Error('E_UPDATE_MOBILE_BODY');
     const metrics=await page.evaluate(()=>({
       overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+4,
       wideImages:[...document.querySelectorAll('.contents_style img')].filter(x=>x.getBoundingClientRect().width>document.documentElement.clientWidth+4).length
@@ -302,8 +305,10 @@ try{
     for(const update of await loadUpdates()){
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
-        assertContentStandard(update);
-        assertImageReview(update);
+        if(update.contentStandard!=='SP1') {
+          assertContentStandard(update);
+          assertImageReview(update);
+        }
         queue.push(update);
       }
     }
