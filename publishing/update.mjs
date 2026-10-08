@@ -140,10 +140,13 @@ function replaceImageSources(html,mapping,representativeSource){
 }
 async function probeManagedPost(page,update){
   try{
-    await page.goto(`${BLOG}/manage/posts`,{waitUntil:'domcontentloaded',timeout:30000});
+    const currentUrl=new URL(page.url());
+    if(currentUrl.origin!==BLOG||!currentUrl.pathname.startsWith('/manage'))
+      await page.goto(`${BLOG}/manage/posts`,{waitUntil:'domcontentloaded',timeout:30000});
     const managedUrl=new URL(page.url());
     if(managedUrl.origin!==BLOG||!managedUrl.pathname.startsWith('/manage')) throw new Error('E_LOGIN_REQUIRED');
     const result=await page.evaluate(async ({id,title})=>{
+      try {
       async function getPage(page,searchKeyword=''){
         const params=new URLSearchParams({
           category:'-3',page:String(page),searchKeyword,searchType:'title',visibility:'all'
@@ -177,7 +180,9 @@ async function probeManagedPost(page,update){
         visibility:item?.visibility||null,
         title:item?.title||null
       };
+      }catch(error){return {errorCode:/^E_UPDATE_[A-Z0-9_]+$/.test(error.message)?error.message:'E_UPDATE_TARGET_FETCH',exceptionType:error.name};}
     },{id:update.articleId,title:update.expectedCurrentTitle});
+    if(result.errorCode)throw Object.assign(Error(result.errorCode),{details:{exceptionType:result.exceptionType}});
     console.log('UPDATE_TARGET_PROBE '+JSON.stringify({
       articleId:update.articleId,
       status:result.status,
@@ -363,7 +368,7 @@ try{
   const code=/^(?:E_[A-Z0-9_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
   console.error('UPDATE_DIAGNOSTIC: '+stage+' '+code);
   const originalError=error?.cause??error;
-  console.error('UPDATE_EXCEPTION '+JSON.stringify({stage,type:originalError?.name??'Error',timeout:/timeout/i.test(originalError?.message??''),strictLocator:/strict mode violation/i.test(originalError?.message??''),targetClosed:/closed/i.test(originalError?.message??'')}));
+  console.error('UPDATE_EXCEPTION '+JSON.stringify({details:error?.details??null,stage,type:originalError?.name??'Error',timeout:/timeout/i.test(originalError?.message??''),strictLocator:/strict mode violation/i.test(originalError?.message??''),targetClosed:/closed/i.test(originalError?.message??'')}));
   if(editorPage) {
     const snapshot=await Promise.race([editorPage.evaluate(()=>({path:location.pathname,mode:document.querySelector('#editor-mode-layer-btn-open')?.textContent?.trim(),editors:[...document.querySelectorAll('.CodeMirror')].map(el=>({visible:!!(el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'),api:typeof el.CodeMirror?.getValue==='function'}))})).catch(()=>null),new Promise(resolve=>setTimeout(()=>resolve(null),1500))]);
     console.error('UPDATE_EDITOR_STATE '+JSON.stringify(snapshot));
