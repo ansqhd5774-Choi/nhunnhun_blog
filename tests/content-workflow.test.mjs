@@ -8,6 +8,16 @@ import { parse } from 'yaml';
 import { fileURLToPath } from 'node:url';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const workflow=path=>parse(read('.github/workflows/'+path));
+test('queue code maintenance does not start production and cancelled runs do not occupy summary runner',()=>{
+  const w=workflow('ollama-update-queue.yml');
+  assert.deepEqual(w.on.push.paths,['authoring/update-queue.txt']);
+  assert.ok(w.on.workflow_dispatch);
+  assert.ok(w.on.schedule.length>0);
+  assert.match(w.jobs.summary.if,/!cancelled\(\)/);
+  assert.match(w.jobs.summary.if,/needs\.produce\.result != 'skipped'/);
+  assert.ok(!w.jobs.summary.steps.some(s=>s.run?.includes('pnpm install')));
+  assert.ok(w.jobs.summary.steps.some(s=>s.uses==='actions/setup-node@v5'));
+});
 for(const [file,job,kind]of [['publish-posts.yml','publish','posts'],['update-posts.yml','update','updates']]) {
  test(`${job}: common content paths are watched without broad publish-all paths`,()=>{const w=workflow(file);assert.ok(w.on.push.paths.includes('publishing/content-*.mjs'));assert.ok(w.on.push.paths.includes('publishing/standards/**'));assert.ok(w.on.push.paths.includes('content-reviews/**'));assert.ok(!w.on.push.paths.includes('publishing/**'));});
  test(`${job}: CMD, main-only approval, checkpoint and one-item guards remain`,()=>{const w=workflow(file);assert.equal(w.jobs[job].defaults.run.shell,'cmd');assert.ok(w.jobs[job].if.includes("github.ref == 'refs/heads/main'"));assert.ok(w.jobs[job].if.includes('TISTORY_PUBLISH_ENABLED'));const code=read(`publishing/${job}.mjs`);assert.match(code,job==='publish'?/E_ONE_POST_PER_RUN/:/E_ONE_UPDATE_PER_RUN/);assert.match(code,/phase:'submitting'/);assert.ok(code.indexOf(`assertContentStandard(${job==='publish'?'post':'update'})`)<code.indexOf('await openEditorConnection'));});

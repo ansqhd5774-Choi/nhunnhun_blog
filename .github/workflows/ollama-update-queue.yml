@@ -7,10 +7,6 @@ on:
     branches: [main]
     paths:
       - 'authoring/update-queue.txt'
-      - 'authoring/update-queue.mjs'
-      - 'authoring/queue-r53.mjs'
-      - 'authoring/update-producer.mjs'
-      - 'publishing/content-standards.mjs'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -157,7 +153,7 @@ jobs:
           SOURCE_ID: ${{ needs.produce.outputs.source_id }}
 
   summary:
-    if: ${{ always() && github.event_name != 'pull_request' }}
+    if: ${{ always() && !cancelled() && github.event_name != 'pull_request' && needs.produce.result != 'skipped' }}
     needs: [test, produce, dispatch]
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
@@ -170,11 +166,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-      - uses: ./.github/actions/setup-node-pnpm
+      - uses: actions/setup-node@v5
         with:
-          enable-cache: ${{ runner.environment == 'github-hosted' }}
-          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
-          cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+          node-version: '24'
       - name: Queue 성공·실패·남은 항목 요약
         run: node authoring/update-queue-summary.mjs
