@@ -1,7 +1,7 @@
 {
-  "status": "RETRY_READY",
-  "policyVersion": "R5.3",
-  "runId": "37676335167",
+  "status": "READY_FOR_UPDATE",
+  "policyVersion": "R5.5",
+  "runId": "37707938651",
   "item": {
     "id": "q-327",
     "order": 1,
@@ -11,26 +11,14 @@
     "articleId": "327",
     "targetUrl": "https://nhunnhun.tistory.com/327"
   },
-  "sourceId": "auto-327-r53-20261008-e1ff762a",
-  "baseSha": "9810a306f70a1e26cdce06ca8628e315b77a918c",
-  "startedAt": "2026-10-07T19:44:16.042Z",
-  "heartbeatAt": "2026-10-07T19:44:38.070Z",
+  "sourceId": "auto-327-r55-20261008-d6763544",
+  "baseSha": "1755e8d28bc2324d4fdc6c4e0c4234a88fa08446",
+  "startedAt": "2026-10-08T00:36:29.890Z",
+  "heartbeatAt": "2026-10-08T00:36:30.656Z",
   "recovered": false,
   "skippedCurrent": [],
-  "preparedAt": "2026-10-07T19:44:39.311Z",
-  "title": "가지 효능·영양성분｜칼로리·고르는 법·보관법·조리법·주의사항",
-  "fingerprint": "e1a15be6d3601f3c39dfad01bd3a314549901b219f1fce82aa6febbc4f660e26",
-  "validationWarnings": [],
-  "articleId": "327",
-  "blockedAt": "2026-10-07T20:05:50.276Z",
-  "error": null,
-  "ledgerPhase": null,
-  "publicMutation": false,
-  "reconciledAt": "2026-10-08T00:09:58.432Z",
-  "reconciliation": {
-    "runId": "37676934148",
-    "updateJob": "cancelled",
-    "updateSteps": 0,
-    "reason": "Mutation job never started"
-  }
+  "preparedAt": "2026-10-08T00:36:31.605Z",
+  "title": "가지 영양소·효과·궁합·주의사항·보관",
+  "fingerprint": "3810b1314db4eebbfb9961405acc678224a7369dc3808a09381cdfef142d58f9",
+  "contentValidation": "not-performed"
 }

@@ -1,0 +1,97 @@
+{
+  "version": "SP1",
+  "domain": "food",
+  "sourceDigest": "1ee5d84850181043b9b93bcc84d25d8f8019ded618b9d877cca27633269e3590",
+  "generatedAt": "2026-10-08",
+  "policy": "single-write-auto-publish-user-content-review",
+  "semanticReview": "not-performed",
+  "instructions": [
+    {
+      "question": "소개",
+      "targetChars": 250,
+      "format": "서술형",
+      "include": "한국 제철 정보, 특징"
+    },
+    {
+      "question": "영양소와 핵심 성분",
+      "targetChars": 400,
+      "format": "서술형, 기본표, 핵심표, 효과",
+      "include": "표(성분,일일영양소)"
+    },
+    {
+      "question": "꾸준히 먹으면 신체 변화는?",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과(요약형)",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "궁합이 잘 맞는 음식과 시너지 효과",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "섭취 시 주의사항",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "좋은 가지 고르는 방법과 보관",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    }
+  ],
+  "sources": [
+    {
+      "title": "USDA FoodData Central — Eggplant dip",
+      "url": "https://fdc.nal.usda.gov/food-details/2710049/nutrients"
+    },
+    {
+      "title": "5 A Day – Food Facts – Healthier Families",
+      "url": "https://www.nhs.uk/healthier-families/food-facts/5-a-day/"
+    },
+    {
+      "title": "Selecting and Serving Produce Safely",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+    },
+    {
+      "title": "Food Search | USDA FoodData Central",
+      "url": "https://fdc.nal.usda.gov/food-search/"
+    },
+    {
+      "title": "Update Log | USDA FoodData Central",
+      "url": "https://fdc.nal.usda.gov/log/"
+    },
+    {
+      "title": "Nightshade Vegetables: A Dietary Trigger for Worsening Inflammatory Bowel Disease and Irritable Bowel Syndrome?",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37202602/"
+    },
+    {
+      "title": "Health benefits and bioactive compounds of eggplant.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30064803/"
+    },
+    {
+      "title": "The Phenolics and Antioxidant Properties of Black and Purple versus White Eggplant Cultivars.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35458607/"
+    },
+    {
+      "title": "Nutritional Composition, Phytochemical Profiles, and Pharmacological Effects of Ethiopian Eggplant (Solanum aethiopicum L.).",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39683621/"
+    },
+    {
+      "title": "Persian Traditional Medicine and Ocular Health.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/27800504/"
+    },
+    {
+      "title": "Health benefits and bioactive compounds of eggplant",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30064803/"
+    },
+    {
+      "title": "FDA — Selecting and Serving Produce Safely",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+    }
+  ],
+  "notes": []
+}
