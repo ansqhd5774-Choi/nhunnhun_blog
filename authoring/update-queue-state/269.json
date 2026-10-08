@@ -1,7 +1,7 @@
 {
-  "status": "SKIPPED",
-  "policyVersion": "R5.3",
-  "runId": "37675692929",
+  "status": "READY_FOR_UPDATE",
+  "policyVersion": "R5.5",
+  "runId": "37759228234",
   "item": {
     "id": "q-269",
     "order": 2,
@@ -11,20 +11,14 @@
     "articleId": "269",
     "targetUrl": "https://nhunnhun.tistory.com/269"
   },
-  "sourceId": "auto-269-r53-20261008-aa015dca",
-  "baseSha": "53e795e368a373febadbc13ad260812a2850d6e2",
-  "startedAt": "2026-10-07T19:39:28.579Z",
-  "heartbeatAt": "2026-10-07T19:39:32.020Z",
-  "recovered": true,
-  "skippedCurrent": [
-    {
-      "articleId": "327",
-      "sourceId": null,
-      "status": "SKIPPED"
-    }
-  ],
-  "failedAt": "2026-10-07T19:39:32.066Z",
-  "error": "E_QUEUE_IMAGE_REVIEW_REQUIRED",
-  "details": null,
-  "publicMutation": false
+  "sourceId": "auto-269-r55-20261008-4cad2b6c",
+  "baseSha": "9470a12c8335a1c8720d81dc1ea8a3dd2c9cac64",
+  "startedAt": "2026-10-08T09:51:22.012Z",
+  "heartbeatAt": "2026-10-08T09:52:07.540Z",
+  "recovered": false,
+  "skippedCurrent": [],
+  "preparedAt": "2026-10-08T09:52:08.582Z",
+  "title": "간장 영양소·효과·궁합·주의사항·보관",
+  "fingerprint": "c35741bcec4812f71b38a8d6197642a7c2e5d3d6d8826fc8860d512a5e8e0b29",
+  "contentValidation": "not-performed"
 }

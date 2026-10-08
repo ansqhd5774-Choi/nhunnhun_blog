@@ -1,0 +1,81 @@
+{
+  "version": "SP1",
+  "domain": "food",
+  "sourceDigest": "3e18bc183b0ef7d1667f6f8ba4006ac08325bbdfeed5766be6b66dea0105f8e6",
+  "generatedAt": "2026-10-08",
+  "policy": "single-write-auto-publish-user-content-review",
+  "semanticReview": "not-performed",
+  "instructions": [
+    {
+      "question": "소개",
+      "targetChars": 250,
+      "format": "서술형",
+      "include": "한국 제철 정보, 특징"
+    },
+    {
+      "question": "영양소와 핵심 성분",
+      "targetChars": 400,
+      "format": "서술형, 기본표, 핵심표, 효과",
+      "include": "표(성분,일일영양소)"
+    },
+    {
+      "question": "꾸준히 먹으면 신체 변화는?",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과(요약형)",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "궁합이 잘 맞는 음식과 시너지 효과",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "섭취 시 주의사항",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "좋은 가지 고르는 방법과 보관",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    }
+  ],
+  "sources": [
+    {
+      "title": "USDA FoodData Central — Soy sauce",
+      "url": "https://fdc.nal.usda.gov/food-details/2707442/nutrients"
+    },
+    {
+      "title": "5 A Day – Food Facts – Healthier Families",
+      "url": "https://www.nhs.uk/healthier-families/food-facts/5-a-day/"
+    },
+    {
+      "title": "Selecting and Serving Produce Safely",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+    },
+    {
+      "title": "Dietary factors and risk of gout and hyperuricemia: a meta-analysis and systematic review.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30485934/"
+    },
+    {
+      "title": "Effect of Soy Isoflavones on Measures of Estrogenicity: A Systematic Review and Meta-Analysis of Randomized Controlled Trials.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39433088/"
+    },
+    {
+      "title": "Fermentation and the microbial community of Japanese koji and miso: A review.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34056716/"
+    },
+    {
+      "title": "Comprehensive Nutritional and Dietary Intervention for Autism Spectrum Disorder-A Randomized, Controlled 12-Month Trial.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/29562612/"
+    },
+    {
+      "title": "Soy and Gastrointestinal Health: A Review.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37111176/"
+    }
+  ],
+  "notes": []
+}
