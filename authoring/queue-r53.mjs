@@ -285,7 +285,12 @@ function imageAttribution(images){
 export function renderR53Body(article,evidence,images,internalLinks=[]){
   const strict=article.plan?.scope==='evidence-first';
   const usedLinks=new Set();
-  const imageTags=images.map(x=>'<p><img src="'+esc(x.src)+'" alt="'+esc(x.alt)+'"></p>');
+  const imageTags=images.map(x=>{
+    const image='<img src="'+esc(x.src)+'" alt="'+esc(x.alt)+'">';
+    if(article.plan?.scope!=='food-sections')return '<p>'+image+'</p>';
+    const credit=[x.author,x.license,x.licenseUrl].filter(Boolean).join(' — ');
+    return '<p><a href="'+esc(x.sourcePage??x.src)+'" title="'+esc(credit)+'">'+image+'</a></p>';
+  });
   const sectionImages=images.some(x=>Number.isInteger(x.sectionIndex));
   let html=(sectionImages?'':imageTags[0]??'')+'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>';
   article.sections.forEach((section,index)=>{
@@ -320,6 +325,6 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     html+='\n<h2>함께 보면 좋은 글</h2>';
     for(const link of related)html+='\n<p><a href="'+esc(link.url)+'"><strong>'+esc(link.label)+'</strong></a></p>';
   }
-  html+='\n<h2>자료 출처</h2><ul>'+(article.plan?.scope==='food-sections'?[]:(evidence?.sources??[])).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
+  if(article.plan?.scope!=='food-sections')html+='\n<h2>자료 출처</h2><ul>'+(evidence?.sources??[]).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
   return strict?glossaryPass(html):{html,glossary:[]};
 }
