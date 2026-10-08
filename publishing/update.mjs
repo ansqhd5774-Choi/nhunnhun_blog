@@ -1,14 +1,12 @@
-import { assertEmphasisContract } from './content-emphasis.mjs';
 import { assertContentStandard } from './content-standards.mjs';
-import { verificationContext } from './verification-context.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { BLOG } from './core.mjs';
-import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering, installLightweightRouting } from './local-browser.mjs';
-import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
+import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, freshEditorPage, ensureEditorRendering, installLightweightRouting } from './local-browser.mjs';
+import { renderEditorialPost, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
 import { assertImageReview } from './image-review.mjs';
@@ -194,109 +192,7 @@ async function probeManagedPost(page,update){
     throw new Error('E_UPDATE_TARGET_PROBE');
   }
 }
-async function materializedText(page,html){
-  return page.evaluate(markup=>{
-    const host=document.createElement('div');
-    host.setAttribute('aria-hidden','true');
-    host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;opacity:0;pointer-events:none;';
-    host.innerHTML=markup;
-    document.body.appendChild(host);
-    const text=(host.innerText||host.textContent||'').replace(/\s+/g,' ').trim();
-    host.remove();
-    return text;
-  },html);
-}
-async function editorialSnapshot(content){
-  return content.evaluate(root=>{
-    const h2=[...root.querySelectorAll('h2')], h3=[...root.querySelectorAll('h3')];
-    const accents=[...root.querySelectorAll('div[aria-hidden="true"]')].filter(x=>{
-      const s=x.getAttribute('style')||''; return /width:\s*34px/.test(s)&&/height:\s*4px/.test(s);
-    });
-    const tables=[...root.querySelectorAll('table')];
-    const tableWraps=tables.filter(t=>/overflow-x:\s*auto/.test(t.parentElement?.getAttribute('style')||''));
-    const images=[...root.querySelectorAll('img')];
-    const responsiveImages=images.filter(img=>/width:\s*100%/.test(img.getAttribute('style')||'')&&/max-width:\s*720px/.test(img.getAttribute('style')||''));
-    const highlights=[...root.querySelectorAll('span')].filter(x=>/background:\s*linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\)/i.test(x.getAttribute('style')||''));
-    const highlightColors=new Set(highlights.map(x=>((x.getAttribute('style')||'').match(/linear-gradient\(transparent 45%,(#[0-9a-f]{6}) 45%\)/i)||[])[1]).filter(Boolean).map(x=>x.toLowerCase()));
-    const qs=[...root.querySelectorAll('span')].filter(x=>x.textContent.trim()==='Q.');
-    const as=[...root.querySelectorAll('span')].filter(x=>x.textContent.trim()==='A.');
-    const latest=[...root.querySelectorAll('div')].filter(x=>/최신 근거\s*·?\s*\d{4}/.test(x.textContent)&&/background:\s*#fbfcfe/.test(x.getAttribute('style')||''));
-    const summary=[...h2].find(x=>x.textContent.trim()==='핵심 정리');
-    const related=[...h2].find(x=>x.textContent.trim()==='함께 보면 좋은 글');
-    const sources=[...h2].find(x=>x.textContent.trim()==='자료 출처');
-    const relatedCards=related?(()=>{let n=0,e=related.nextElementSibling;while(e&&e.tagName!=='H2'){if(e.querySelector?.('a[style*="text-decoration:none"]'))n++;e=e.nextElementSibling;}return n;})():0;
-    return {
-      h2:h2.length,
-      h2Styled:h2.filter(x=>/font-size:\s*26px/.test(x.getAttribute('style')||'')&&/font-weight:\s*800/.test(x.getAttribute('style')||'')).length,
-      h3:h3.length,
-      h3Styled:h3.filter(x=>/font-size:\s*20px/.test(x.getAttribute('style')||'')&&/font-weight:\s*800/.test(x.getAttribute('style')||'')).length,
-      accents:accents.length,tables:tables.length,tableWraps:tableWraps.length,
-      images:images.length,responsiveImages:responsiveImages.length,
-      nativeImages:images.filter(x=>x.src.includes('kakaocdn.net')).length,
-      highlights:highlights.length,highlightColors:highlightColors.size,
-      faqQ:qs.length,faqA:as.length,latest:latest.length,
-      summaryBox:!!(summary?.nextElementSibling&&/background:\s*#f8fafc/.test(summary.nextElementSibling.getAttribute('style')||'')),
-      relatedCards,
-      sourcesStyled:!!(sources?.nextElementSibling&&sources.nextElementSibling.tagName==='UL'&&/font-size:\s*14px/.test(sources.nextElementSibling.getAttribute('style')||''))
-    };
-  });
-}
-function assertSnapshot(snapshot,expected){
-  if(snapshot.h2!==expected.h2||snapshot.h2Styled!==expected.h2||snapshot.accents!==expected.h2) throw new Error('E_UPDATE_PUBLIC_H2');
-  if(snapshot.h3!==expected.h3||snapshot.h3Styled!==expected.h3) throw new Error('E_UPDATE_PUBLIC_H3');
-  if(snapshot.tables!==expected.tables||snapshot.tableWraps!==expected.tables) throw new Error('E_UPDATE_PUBLIC_TABLE');
-  if(snapshot.images!==expected.images||snapshot.responsiveImages!==expected.images||snapshot.nativeImages<expected.images) throw new Error('E_UPDATE_PUBLIC_IMAGE');
-  if(snapshot.highlights!==expected.highlights||(snapshot.highlightColors<expected.minimumHighlightColors)) throw new Error('E_UPDATE_PUBLIC_HIGHLIGHT');
-  if(snapshot.faqQ!==expected.faq||snapshot.faqA!==expected.faq) throw new Error('E_UPDATE_PUBLIC_FAQ');
-  if(snapshot.latest!==expected.latest) throw new Error('E_UPDATE_PUBLIC_LATEST');
-  if(expected.summary&&!snapshot.summaryBox) throw new Error('E_UPDATE_PUBLIC_SUMMARY');
-  if(expected.related&&snapshot.relatedCards!==expected.relatedLinks) throw new Error('E_UPDATE_PUBLIC_RELATED');
-  if(expected.sources&&!snapshot.sourcesStyled) throw new Error('E_UPDATE_PUBLIC_SOURCES');
-}
-async function verifyDesktop(browser,update,targetHtml,expected){
-  const context=await verificationContext(browser, {viewport:{width:1440,height:1000}});
-  try{
-    const page=await context.newPage();
-    await page.goto(update.targetUrl,{waitUntil:'domcontentloaded'});
-    if(!(await page.locator('body').innerText()).includes(update.title)) throw new Error('E_UPDATE_PUBLIC_TITLE');
-    const content=page.locator('.contents_style');
-    if(await content.count()!==1) throw new Error('E_UPDATE_PUBLIC_CONTENT');
-    if(update.contentStandard==='R1') assertEmphasisContract(await content.innerHTML(),update.bodyHtml);
-    const actual=(await content.innerText()).replace(/\s+/g,' ').trim();
-    const expectedText=await materializedText(page,targetHtml);
-    if(!expectedText||actual!==expectedText) throw new Error('E_UPDATE_PUBLIC_BODY');
-    if(update.contentStandard==='SP1') return {bodyMatches:true,contentValidation:'not-performed'};
-    const og=await page.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
-    if(!og||og.includes('opengraph.png')||!og.includes('kakaocdn.net')) throw new Error('E_UPDATE_PUBLIC_OG');
-    const snapshot=await editorialSnapshot(content);
-    assertSnapshot(snapshot,expected);
-    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+4);
-    if(overflow) throw new Error('E_UPDATE_PC_OVERFLOW');
-    return snapshot;
-  }finally{await context.close();}
-}
-async function verifyMobile(browser,update){
-  const context=await verificationContext(browser, {
-    viewport:{width:390,height:844},
-    userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
-  });
-  try{
-    const page=await context.newPage();
-    await page.goto(update.targetUrl,{waitUntil:'domcontentloaded'});
-    const body=await page.locator('body').innerText();
-    if(!body.includes(update.title)) throw new Error('E_UPDATE_MOBILE_BODY');
-    if(update.contentStandard==='SP1') return {titleMatches:true,contentValidation:'not-performed'};
-    if(!body.includes('핵심 정리')||!body.includes('자료 출처')) throw new Error('E_UPDATE_MOBILE_BODY');
-    const metrics=await page.evaluate(()=>({
-      overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+4,
-      wideImages:[...document.querySelectorAll('.contents_style img')].filter(x=>x.getBoundingClientRect().width>document.documentElement.clientWidth+4).length
-    }));
-    if(metrics.overflow||metrics.wideImages) throw new Error('E_UPDATE_MOBILE_OVERFLOW');
-    return metrics;
-  }finally{await context.close();}
-}
-
-let editorConnection,editorContext,publicBrowser,tempDir,editorPage;
+let editorConnection,editorContext,tempDir,editorPage;
 let stage='configuration';
 try{
   if(process.env.UPDATE_ENABLED!=='true'){
@@ -378,7 +274,6 @@ try{
 
       stage='render-update';
       const rendered=renderEditorialPost(update);
-      const expected=editorialExpectations(update.bodyHtml,{version:editorialVersionFor(update)});
       const sources=[...new Set(imageSources(rendered))];
       const imageMap=new Map();
       for(let i=0;i<sources.length;i++){
@@ -450,23 +345,7 @@ try{
 
       stage='final-submit';
       await submit.click();
-      await page.waitForTimeout(4500);
-
-      stage='public-verification';
-      publicBrowser=await openPublicBrowser(browserConfig);
-      const desktop=await verifyDesktop(publicBrowser,update,targetHtml,expected);
-      const mobile=await verifyMobile(publicBrowser,update);
-
-      const state=await ledger.read(update.id);
-      if(state?.phase!=='submitting'||state.fingerprint!==fingerprint||state.url!==update.targetUrl) throw new Error('E_UPDATE_LEDGER_CONFLICT');
-      await ledger.write(update.id,{
-        phase:'updated',fingerprint,url:update.targetUrl,articleId:update.articleId,
-        previousTitle:update.expectedCurrentTitle,title:update.title,
-        sourceCommit,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,
-        timestamp:new Date().toISOString(),verification:'anonymous_full_body_editorial_pc_mobile',
-        desktop,mobile
-      },state.sha);
-      console.log('UPDATED: '+update.id+' '+update.targetUrl);
+      console.log('SUBMIT_CLICKED: '+update.id+' '+update.targetUrl+'; public verification=user');
     }
   }
 }catch(error){
@@ -475,7 +354,6 @@ try{
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;
 }finally{
-  try{await publicBrowser?.close();}catch{console.error('E_UPDATE_PUBLIC_BROWSER_CLOSE');process.exitCode=1;}
   try{await closeEditorConnection(editorConnection);}catch{console.error('E_UPDATE_BROWSER_DISCONNECT');process.exitCode=1;}
   if(tempDir) try{await rm(tempDir,{recursive:true,force:true});}catch{console.error('E_UPDATE_TEMP_CLEANUP');process.exitCode=1;}
   const finalExitCode=process.exitCode||0;

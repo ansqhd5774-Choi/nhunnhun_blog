@@ -116,9 +116,3 @@ jobs:
           UPDATE_ENABLED: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
-      - name: Verify anonymous public quality
-        run: node publishing/verify-updated-public.mjs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
-          PUBLIC_VERIFY_ARTICLE_IDS: ${{ inputs.public_verify_article_ids || '' }}

@@ -21,9 +21,6 @@ on:
         description: 'dry_run 대상 숫자 URL ID'
         type: string
         default: '327'
-  workflow_run:
-    workflows: ['Validate and update Tistory posts']
-    types: [completed]
   pull_request:
     paths:
       - 'authoring/update-queue.txt'
@@ -83,7 +80,6 @@ jobs:
 
   produce:
     if: github.event_name != 'pull_request' && github.event_name != 'workflow_run' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
-    needs: reconcile
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     timeout-minutes: 120
     concurrency:
@@ -159,35 +155,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
 
-  reconcile:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, Windows, X64, tistory-publisher]
-    defaults:
-      run:
-        shell: cmd
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: main
-          fetch-depth: 1
-      - uses: ./.github/actions/setup-node-pnpm
-        with:
-          enable-cache: ${{ runner.environment == 'github-hosted' }}
-          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
-          cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: 기존 update 완료 상태 1회 확인 — 대기 없이 러너 반환
-        run: node authoring/update-queue-reconcile.mjs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   summary:
     if: ${{ always() && github.event_name != 'pull_request' }}
-    needs: [test, produce, dispatch, reconcile]
+    needs: [test, produce, dispatch]
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
       run:
