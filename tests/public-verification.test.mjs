@@ -37,6 +37,17 @@ test('internal-link verifier still fails permanent 404',async()=>{
   await assert.rejects(()=>verifyInternalLink(request,'https://nhunnhun.tistory.com/374',async()=>{}),/E_QA_INTERNAL_LINK/);
 });
 import { publishedUrls } from '../publishing/published-url.mjs';
+import {directPublicExpectations,assertDirectPublicSnapshot} from '../publishing/direct-public-contract.mjs';
+
+test('direct public verification follows the varied renderer and rejects lost emphasis or styling',()=>{
+  const html='<h2>소개</h2><p><mark><u><strong>핵심</strong></u></mark></p><table><tr><td>자료</td></tr></table>';
+  const snapshot={...directPublicExpectations(html),stylesVisible:true};
+  assert.doesNotThrow(()=>assertDirectPublicSnapshot(snapshot,html));
+  for(const key of ['h2','numbers','tables','tableWraps','marks','boldMarks','underlinedMarks']){
+    assert.throws(()=>assertDirectPublicSnapshot({...snapshot,[key]:0},html),/E_DIRECT_PUBLIC_/);
+  }
+  assert.throws(()=>assertDirectPublicSnapshot({...snapshot,stylesVisible:false},html),/E_DIRECT_PUBLIC_STYLE/);
+});
 
 test('publication discovery normalizes title whitespace and deduplicates numeric URLs', () => {
   assert.deepEqual(publishedUrls([
