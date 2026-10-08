@@ -86,7 +86,7 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
   const topic=topicFromTitle(title);
 
   // Restrained multi-color highlighter: source <u> marks only short key phrases.
-  out=version==='R4'?renderSemanticEmphasis(out):applyHighlights(out);
+  out=version==='R4'?renderSemanticEmphasis(out):version==='SP1'?out.replace(/<mark>/g,'<mark style="background:#fff1a8;color:inherit;padding:0 .06em;">').replace(/<u>/g,'<u style="text-decoration:underline;text-underline-offset:3px;">'):applyHighlights(out);
 
   // Hero and lead.
   out=out.replace(

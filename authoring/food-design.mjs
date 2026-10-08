@@ -13,10 +13,18 @@ export function applyFoodDesign(html){
       if(/^<h2\b/i.test(part)){numbers=0;highlights=0;}
       return part;
     }
-    if(stack.some(tag=>['strong','u','mark','a','h1','h2','h3'].includes(tag)))return part;
+    if(stack.some(tag=>['u','mark','a','h1','h2','h3'].includes(tag)))return part;
+    const bold=stack.includes('strong');
+    if(highlights<2)part=part.replace(/\d+월부터\s*\d+월까지|(?:DHA[·,\s]*EPA[^.!?<>]{0,12})?오메가-3 지방산|\d+(?:\.\d+)?(?:\s*[~～–-]\s*\d+(?:\.\d+)?)?\s*(?:℃|°C|개월|일)(?![a-z])/g,text=>{
+      if(highlights>=2)return text;
+      highlights++;
+      const key=bold?text:'<strong>'+text+'</strong>';
+      return '<mark>'+((/℃|°C/.test(text)||/보관/.test(part))?'<u>'+key+'</u>':key)+'</mark>';
+    });
+    if(bold)return part;
     // Only a short existing caution/action sentence. No medical benefit selection.
     if(highlights<1&&stack.includes('p'))part=part.replace(/[^.!?。\n]{4,70}(?:주의해야 합니다|주의하세요|피하세요|확인하세요)[.!?]?/g,text=>{
-      if(highlights>=1)return text;highlights++;return '<u>'+text+'</u>';
+      if(highlights>=1)return text;highlights++;return '<mark><strong><u>'+text+'</u></strong></mark>';
     });
     if(numbers<2)part=part.replace(/\d+(?:\.\d+)?(?:\s*[~～–-]\s*\d+(?:\.\d+)?)?\s*(?:mg|mcg|μg|kcal|kg|g|mL|ml|°C|℃|%|개월|주|일)(?![a-z])/g,text=>{
       if(numbers>=2)return text;numbers++;return '<strong>'+text+'</strong>';
