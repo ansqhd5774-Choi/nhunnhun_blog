@@ -161,7 +161,7 @@ test('generic Ollama rewrite job accepts food and medicine categories but keeps 
 test('direct workflow uses validation runner and prepared source without AI keys',async()=>{
  const workflow=await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8');
  assert.match(workflow,/workflow_dispatch/);assert.match(workflow,/group: nhunnhun-direct-source-dispatch/);
- assert.match(workflow,/self-hosted, Windows, X64, tistory-validation/);assert.match(workflow,/direct-dispatch\.mjs/);
+ assert.match(workflow,/runs-on: windows-latest/);assert.match(workflow,/direct-dispatch\.mjs/);
  assert.doesNotMatch(workflow,/OLLAMA_MODEL|11434|OPENAI_API_KEY|ANTHROPIC_API_KEY|schedule:/);
  assert.match(workflow,/actions: write/);assert.match(workflow,/SOURCE_ID:/);
 });

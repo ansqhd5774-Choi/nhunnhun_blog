@@ -194,7 +194,7 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
 
 test('validation and public publisher use the Windows CMD self-hosted runner with mutation isolated to publish', () => {
   const w=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
-  assert.deepEqual(w.jobs.validate['runs-on'],['self-hosted','Windows','X64','tistory-validation']);
+  assert.equal(w.jobs.validate['runs-on'],'windows-latest');
   assert.deepEqual(w.jobs.validate.defaults,{run:{shell:'cmd'}});
   assert.deepEqual(w.jobs.publish['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.publish.defaults,{run:{shell:'cmd'}});

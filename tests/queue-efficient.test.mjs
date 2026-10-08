@@ -142,7 +142,7 @@ test('direct workflow holds no publisher runner while waiting on consumer comple
  const w=parse(await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8'));
  assert.equal(w.on.workflow_run,undefined);assert.equal(w.jobs.finalize,undefined);assert.equal(w.jobs.reconcile,undefined);
  assert.equal(w.jobs.dispatch.timeoutMinutes,undefined);assert.equal(w.jobs.dispatch['timeout-minutes'],5);
- assert.deepEqual(w.jobs.dispatch['runs-on'],['self-hosted','Windows','X64','tistory-validation']);
+ assert.equal(w.jobs.dispatch['runs-on'],'windows-latest');
  assert.ok(w.jobs.dispatch.steps.some(x=>x.run?.includes('node authoring/direct-dispatch.mjs')));
 });
 
