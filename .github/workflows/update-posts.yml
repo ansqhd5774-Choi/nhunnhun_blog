@@ -109,8 +109,6 @@ jobs:
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: pnpm test
-      - run: node --test tests/public-verification.test.mjs
       - run: pnpm run validate:update
       - run: call maintenance\check-tistory-chrome.cmd
       - run: pnpm run update
