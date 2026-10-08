@@ -55,7 +55,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   content-quality:
-    runs-on: [ self-hosted, Windows, X64, tistory-validation ]
+    runs-on: windows-latest
     defaults:
       run:
         shell: cmd

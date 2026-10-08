@@ -19,9 +19,10 @@ test('varied renderer assigns layouts by section and preserves emphasis and imag
 test('workflow starts only from explicit prepared-source dispatch with no AI generation',async()=>{
  const text=await readFile('.github/workflows/direct-author-update.yml','utf8');const workflow=YAML.parse(text.replace(/^\uFEFF/,''));
  assert.deepEqual(Object.keys(workflow.on),['workflow_dispatch']);assert.ok(!/OLLAMA_HOST|update-producer|api\/chat|schedule:/.test(text));
- assert.ok(workflow.jobs.dispatch.steps.every(step=>!step.uses),'dispatcher must run without external action archive downloads');
- assert.ok(text.includes('git fetch --quiet --depth=1 origin $env:GITHUB_SHA'));
- assert.ok(text.includes("if ($actual -ne $env:GITHUB_SHA)"));
+ assert.equal(workflow.jobs.dispatch['runs-on'],'windows-latest');
+ const checkout=workflow.jobs.dispatch.steps.find(step=>step.uses==='actions/checkout@v5');
+ assert.equal(checkout.with.ref,'${{ github.sha }}');assert.equal(checkout.with['persist-credentials'],false);
+ assert.doesNotMatch(text,/RUNNER_WORKSPACE|DIRECT_CHECKOUT|externals\/node24/);
 });
 test('direct dispatch requires existing approved source and calls existing publish dispatcher once',async()=>{
  const root=await mkdtemp(join(tmpdir(),'nh-direct-'));let calls=0;

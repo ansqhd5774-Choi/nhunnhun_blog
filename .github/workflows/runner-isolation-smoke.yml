@@ -5,12 +5,12 @@ permissions:
   contents: read
 jobs:
   validation:
-    runs-on: [self-hosted, Windows, X64, tistory-validation]
+    runs-on: windows-latest
     timeout-minutes: 2
     steps:
       - shell: powershell
         run: |
-          if ($env:RUNNER_NAME -ne 'c06-tistory-validation') { throw 'WRONG_VALIDATION_RUNNER' }
+          if ('${{ runner.environment }}' -ne 'github-hosted') { throw 'WRONG_VALIDATION_RUNNER' }
           Write-Output "VALIDATION_RUNNER_PASS $env:RUNNER_NAME"
   publisher:
     runs-on: [self-hosted, Windows, X64, tistory-publisher]

@@ -1,5 +1,4 @@
 name: GPT 직접 작성 원고 발행
-
 on:
   workflow_dispatch:
     inputs:
@@ -7,70 +6,32 @@ on:
         description: 'GPT가 준비한 updates/direct-*.json ID'
         required: true
         type: string
-
 permissions:
   contents: read
   actions: write
-
 concurrency:
   group: nhunnhun-direct-source-dispatch
   cancel-in-progress: false
-
 jobs:
   dispatch:
-    runs-on: [self-hosted, Windows, X64, tistory-validation]
+    runs-on: windows-latest
     timeout-minutes: 5
     defaults:
       run:
         shell: cmd
     steps:
-      # Dispatch must not depend on downloading action archives before any step runs.
-      - name: 고정 커밋 준비 — 외부 액션 다운로드 없음
-        shell: powershell
-        env:
-          GH_CHECKOUT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $taskPath = Join-Path $env:RUNNER_TEMP "direct-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
-          New-Item -ItemType Directory -Path $taskPath -ErrorAction Stop | Out-Null
-          Set-Location $taskPath
-          $env:GIT_CONFIG_COUNT = '1'
-          $env:GIT_CONFIG_KEY_0 = 'http.https://github.com/.extraheader'
-          $auth = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("x-access-token:$env:GH_CHECKOUT_TOKEN"))
-          $env:GIT_CONFIG_VALUE_0 = "AUTHORIZATION: basic $auth"
-          try {
-            git init --quiet
-            if ($LASTEXITCODE -ne 0) { throw 'E_DIRECT_GIT_INIT' }
-            git remote add origin "https://github.com/$env:GITHUB_REPOSITORY.git"
-            git fetch --quiet --depth=1 origin $env:GITHUB_SHA
-            if ($LASTEXITCODE -ne 0) { throw 'E_DIRECT_GIT_FETCH' }
-            git checkout --quiet --detach FETCH_HEAD
-            if ($LASTEXITCODE -ne 0) { throw 'E_DIRECT_GIT_CHECKOUT' }
-            $actual = git rev-parse HEAD
-            if ($actual -ne $env:GITHUB_SHA) { throw 'E_DIRECT_SOURCE_DRIFT' }
-          } finally {
-            Remove-Item Env:GIT_CONFIG_COUNT,Env:GIT_CONFIG_KEY_0,Env:GIT_CONFIG_VALUE_0,Env:GH_CHECKOUT_TOKEN -ErrorAction SilentlyContinue
-          }
-          "DIRECT_CHECKOUT=$taskPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: 로컬 Node와 고정 pnpm 준비
-        shell: powershell
-        run: |
-          $ErrorActionPreference = 'Stop'
-          Set-Location $env:DIRECT_CHECKOUT
-          $runnerRoot = Split-Path (Split-Path $env:RUNNER_WORKSPACE -Parent) -Parent
-          $nodeDir = Join-Path $runnerRoot 'externals/node24/bin'
-          $nodeExe = Join-Path $nodeDir 'node.exe'
-          if (!(Test-Path $nodeExe)) { throw 'E_DIRECT_NODE24_MISSING' }
-          $env:PATH = "$nodeDir;$env:PATH"
-          $npmDir = Split-Path (Get-Command npm.cmd -ErrorAction Stop).Source -Parent
-          $npmCli = Join-Path $npmDir 'node_modules/npm/bin/npm-cli.js'
-          & $nodeExe $npmCli exec --yes --package=pnpm@11.19.0 -- pnpm install --frozen-lockfile --ignore-scripts
-          if ($LASTEXITCODE -ne 0) { throw 'E_DIRECT_DEPENDENCIES' }
-          $nodeDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          enable-cache: 'true'
+          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          cache-restore-key: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: 준비된 원고 연결 — AI 호출 없음
-        run: |
-          cd /d "%DIRECT_CHECKOUT%"
-          node authoring/direct-dispatch.mjs
+        run: node authoring/direct-dispatch.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_COMMIT: ${{ github.sha }}
