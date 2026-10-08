@@ -1,7 +1,20 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "813debd45c0b886b70ae8eca7072f995d6c951f6d63c52c231f5615a140ba8ce",
   "sourceCommit": "71b84bdc36730edb4b47d0de24c8847621cc8c8b",
   "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-08T23:13:55.233Z"
+  "timestamp": "2026-10-08T23:17:41.5384429Z",
+  "url": "https://nhunnhun.tistory.com/398",
+  "verifiedBy": "anonymous-browser-cross-check",
+  "verificationEvidence": {
+    "runId": "37858075824",
+    "images": 3,
+    "tables": 3,
+    "level2": 16,
+    "level3": 5,
+    "internalLinks": 3,
+    "pcVerified": true,
+    "mobileWidth": 390,
+    "discrepancy": "Workflow failed during post-submit URL discovery; public article confirmed without resubmission."
+  }
 }
