@@ -158,29 +158,22 @@ test('generic Ollama rewrite job accepts food and medicine categories but keeps 
   assert.throws(()=>validateJob({...base,targetUrl:'https://nhunnhun.tistory.com/328'}),/E_OLLAMA_JOB/);
 });
 
-test('queue workflow is local-only, one-at-a-time and does not pass paid AI keys',async()=>{
-  const workflow=await readFile(new URL('../.github/workflows/ollama-update-queue.yml',import.meta.url),'utf8');
-  assert.match(workflow,/workflow_dispatch/);
-  assert.match(workflow,/group: nhunnhun-ollama-update-queue/);
-  assert.match(workflow,/self-hosted, Windows, X64, tistory-publisher/);
-  assert.match(workflow,/update-producer\.mjs/);
-  assert.match(workflow,/update-queue-finalize\.mjs/);
-  assert.match(workflow,/127\.0\.0\.1:11434/);
-  assert.doesNotMatch(workflow,/OPENAI_API_KEY|ANTHROPIC_API_KEY/);
-  assert.match(workflow,/actions: write/);
-  assert.match(workflow,/update-queue-dispatch\.mjs/);
-  assert.match(workflow,/group: nhunnhun-tistory-mutation/);
-  assert.match(workflow,/CONTENT_UPDATE_QUEUE_ENABLED/);
+test('direct workflow uses publisher runner and prepared source without AI keys',async()=>{
+ const workflow=await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8');
+ assert.match(workflow,/workflow_dispatch/);assert.match(workflow,/group: nhunnhun-direct-source-dispatch/);
+ assert.match(workflow,/self-hosted, Windows, X64, tistory-publisher/);assert.match(workflow,/direct-dispatch\.mjs/);
+ assert.doesNotMatch(workflow,/OLLAMA_MODEL|11434|OPENAI_API_KEY|ANTHROPIC_API_KEY|schedule:/);
+ assert.match(workflow,/actions: write/);assert.match(workflow,/SOURCE_ID:/);
 });
 
 test('GITHUB_TOKEN 원고 commit 뒤 main SHA 확인 후 기존 수정 workflow를 명시 호출',async()=>{
   const sha='a'.repeat(40),calls=[];
   const fetcher=async(url,options)=>{calls.push({url,options});return url.endsWith('main')?{ok:true,json:async()=>({object:{sha}})}:{status:204};};
-  assert.equal((await dispatchQueuedUpdate({token:'fixture',commitSha:sha,fetcher})).submitted,true);
+  assert.equal((await dispatchQueuedUpdate({token:'fixture',commitSha:sha,sourceId:'direct-327-test',fetcher})).submitted,true);
   assert.ok(calls[1].url.endsWith('/actions/workflows/update-posts.yml/dispatches'));
-  assert.deepEqual(JSON.parse(calls[1].options.body),{ref:'main',inputs:{update:'true'}});
+  assert.deepEqual(JSON.parse(calls[1].options.body),{ref:'main',inputs:{update:'true',source_id:'direct-327-test'}});
   calls.length=0;
-  await assert.rejects(dispatchQueuedUpdate({token:'fixture',commitSha:'b'.repeat(40),fetcher}),/E_QUEUE_SOURCE_DRIFT/);
+  await assert.rejects(dispatchQueuedUpdate({token:'fixture',commitSha:'b'.repeat(40),sourceId:'direct-327-test',fetcher}),/E_QUEUE_SOURCE_DRIFT/);
   assert.equal(calls.length,1);
 });
 test('DONE에는 같은 SHA의 실제 수동 수정 workflow 성공이 필요',()=>{
