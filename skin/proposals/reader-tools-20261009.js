@@ -8,7 +8,7 @@
     if (headings.length < 2) return;
     const nav = document.createElement('nav');
     nav.id = 'nh-reader-tools'; nav.setAttribute('aria-label', '본문 목차');
-    const details = document.createElement('details');
+    const details = document.createElement('details'); details.open = true;
     const summary = document.createElement('summary'); summary.textContent = '이 글의 목차';
     const list = document.createElement('ol');
     headings.forEach((heading, i) => {
