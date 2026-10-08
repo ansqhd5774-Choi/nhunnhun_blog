@@ -375,6 +375,10 @@ try{
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;
 }finally{
+  if(editorPage){
+    try{await editorPage.unrouteAll({behavior:'ignoreErrors'});}
+    catch{console.error('E_UPDATE_ROUTING_CLEANUP');process.exitCode=1;}
+  }
   try{await closeEditorConnection(editorConnection);}catch{console.error('E_UPDATE_BROWSER_DISCONNECT');process.exitCode=1;}
   if(tempDir) try{await rm(tempDir,{recursive:true,force:true});}catch{console.error('E_UPDATE_TEMP_CLEANUP');process.exitCode=1;}
   const finalExitCode=process.exitCode||0;
