@@ -1,0 +1,4 @@
+Source: auto-327-r53-20261008-e1ff762a
+Reason: superseded by the approved six-section gemma3 writer.
+Evidence: update run 37676934148 was cancelled before the mutation job started (zero steps).
+Archived for recovery; not a completed publication.
