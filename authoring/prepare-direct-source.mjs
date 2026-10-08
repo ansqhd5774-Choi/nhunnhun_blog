@@ -4,13 +4,16 @@ import {pathToFileURL} from 'node:url';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {renderDirectArticle} from '../publishing/direct-design.mjs';
 import {observeEmphasis} from './emphasis-summary.mjs';
+import {pairingReview} from './pairing-review.mjs';
+import {checkPost} from '../publishing/core.mjs';
 
 // A single local preparation view; no AI, network, content gate or publication.
 export function prepareDirectSource(source) {
-  checkUpdateSource(source,source.id+'.json');
+  if(source.articleId)checkUpdateSource(source,source.id+'.json');
+  else checkPost(source,source.id+'.json');
   const observation=observeEmphasis(source.bodyHtml);
   return {
-    report:{sourceId:source.id,...observation},
+    report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml)},
     preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'
   };
 }
