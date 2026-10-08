@@ -102,7 +102,7 @@ test('attempt history includes failures and does not count duplicate writes twic
 });
 test('semantic reviewer failure never becomes automatic PASS',async()=>{
   const target={...item('food'),category:'음식'},contract=buildWritingContract(target,evidence),article=assembleDraft(draft(contract),contract);
-  const base=JSON.parse(await readFile(new URL('../updates/auto-327-r53-20261008-e1ff762a.json',import.meta.url),'utf8'));
+  const base=JSON.parse(await readFile(new URL('../authoring/update-source-archive/auto-327-r53-20261008-e1ff762a.json',import.meta.url),'utf8'));
   const enriched={...evidence,query:'test topic',sources:evidence.sources.map(s=>({...s,checkedAt:todayInSeoul(),scopeNote:'현재 주제에 적용할 수 있는 자료의 대상과 한계를 확인한 공식 자료다.'}))};
   const rendered=renderR53Body(article,enriched,base.imageReview);
   const source={...base,id:'auto-999-r54-test',articleId:'999',targetUrl:'https://nhunnhun.tistory.com/999',title:article.title,bodyHtml:rendered.html};
@@ -142,7 +142,8 @@ test('direct workflow holds no publisher runner while waiting on consumer comple
  const w=parse(await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8'));
  assert.equal(w.on.workflow_run,undefined);assert.equal(w.jobs.finalize,undefined);assert.equal(w.jobs.reconcile,undefined);
  assert.equal(w.jobs.dispatch.timeoutMinutes,undefined);assert.equal(w.jobs.dispatch['timeout-minutes'],5);
- assert.ok(w.jobs.dispatch.steps.some(x=>x.run==='node authoring/direct-dispatch.mjs'));
+ assert.deepEqual(w.jobs.dispatch['runs-on'],['self-hosted','Windows','X64','tistory-validation']);
+ assert.ok(w.jobs.dispatch.steps.some(x=>x.run?.includes('node authoring/direct-dispatch.mjs')));
 });
 
 test('editor summaries never become writer source facts',()=>{
