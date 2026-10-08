@@ -190,6 +190,7 @@ async function probeManagedPost(page,update){
     return result;
   }catch(error){
     if(error?.message==='E_LOGIN_REQUIRED'||/^E_UPDATE_/.test(String(error?.message||''))) throw error;
+    console.error('UPDATE_TARGET_EXCEPTION '+JSON.stringify({type:error?.name??'Error',timeout:/timeout/i.test(error?.message??''),navigation:/navigation|interrupted|closed/i.test(error?.message??'')}));
     throw new Error('E_UPDATE_TARGET_PROBE');
   }
 }
@@ -327,7 +328,8 @@ try{
       tempDir=await mkdtemp(join(tmpdir(),'tistory-update-'));
       let page=await freshEditorPage(editorContext);
       editorPage=page;
-      await ensureEditorRendering(editorContext,page);
+      const viewportSession=await ensureEditorRendering(editorContext,page);
+      await viewportSession.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
       await installLightweightRouting(page);
       page.setDefaultTimeout(25000);
       page.on('dialog',d=>{void (async()=>{try{if(d.type()==='confirm') await d.accept(); else await d.dismiss();}catch(error){const message=String(error?.message||error||'');if(!/No dialog is showing|Target page, context or browser has been closed|Browser has been closed/i.test(message)) console.error('E_UPDATE_DIALOG_HANDLER');}})();});
@@ -434,7 +436,7 @@ try{
       stage='submit-control';
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
-        const button=page.getByRole('button',{name,exact:true});
+        const button=page.getByRole('button',{name,exact:true}).and(page.locator('button:visible'));
         if(await button.count()){submit=button.last();break;}
       }
       if(!submit) throw new Error('E_UPDATE_SUBMIT_CONTROL');
