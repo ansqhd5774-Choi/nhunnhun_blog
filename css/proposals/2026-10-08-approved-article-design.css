@@ -1,0 +1,15 @@
+/* 본문 디자인 전용: 메뉴, 광고, 사이드바를 변경하지 않음 */
+.contents_style,.tt_article_useless_p_margin{color:#243142;font-size:17px;line-height:1.8;overflow-wrap:break-word;}
+.contents_style p,.tt_article_useless_p_margin p{font-size:17px!important;line-height:1.8!important;color:#243142!important;margin:0 0 18px!important;}
+.contents_style h2,.tt_article_useless_p_margin h2{font-size:24px!important;line-height:1.45!important;font-weight:800!important;color:#243142!important;margin:36px 0 16px!important;padding:16px 0 0!important;border:0!important;border-top:1px solid #e2e5e9!important;background:none!important;}
+.contents_style h3,.tt_article_useless_p_margin h3{font-size:19px!important;line-height:1.5!important;margin:24px 0 12px!important;color:#243142!important;}
+.contents_style li,.tt_article_useless_p_margin li{font-size:17px!important;line-height:1.8!important;margin:0 0 10px!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;}
+.contents_style li strong,.tt_article_useless_p_margin li strong{display:inline!important;font-size:inherit!important;}
+.contents_style strong,.tt_article_useless_p_margin strong{font-weight:750!important;color:#182332!important;}
+.contents_style mark,.tt_article_useless_p_margin mark{background:#fff1a8!important;color:inherit!important;padding:0 .06em;}
+.contents_style u,.tt_article_useless_p_margin u{text-decoration:underline!important;text-underline-offset:3px;}
+.contents_style table,.tt_article_useless_p_margin table{width:100%!important;min-width:0!important;border-collapse:collapse;table-layout:fixed;font-size:15px!important;}
+.contents_style th,.tt_article_useless_p_margin th{background:#f4f3ef!important;}
+.contents_style td,.contents_style th,.tt_article_useless_p_margin td,.tt_article_useless_p_margin th{padding:10px 12px!important;border:1px solid #e2e5e9!important;white-space:normal!important;overflow-wrap:anywhere;}
+.contents_style img,.tt_article_useless_p_margin img{max-width:100%!important;max-height:420px!important;width:auto!important;height:auto!important;object-fit:contain;}
+@media(max-width:600px){.contents_style p,.tt_article_useless_p_margin p,.contents_style li,.tt_article_useless_p_margin li{font-size:16px!important;}.contents_style h2,.tt_article_useless_p_margin h2{font-size:22px!important;}.contents_style td,.contents_style th,.tt_article_useless_p_margin td,.tt_article_useless_p_margin th{padding:8px!important;font-size:14px!important;}}
