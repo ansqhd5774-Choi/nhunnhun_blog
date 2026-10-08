@@ -22,7 +22,7 @@
   "fingerprint": "3810b1314db4eebbfb9961405acc678224a7369dc3808a09381cdfef142d58f9",
   "contentValidation": "not-performed",
   "articleId": "327",
-  "blockedAt": "2026-10-08T00:48:47.847Z",
+  "blockedAt": "2026-10-08T00:51:08.357Z",
   "error": "E_QUEUE_UPDATE_NOT_COMPLETED",
   "ledgerPhase": null,
   "publicMutation": false
