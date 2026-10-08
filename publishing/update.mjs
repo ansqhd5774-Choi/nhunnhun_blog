@@ -253,18 +253,21 @@ try{
       const currentTitle=(await page.locator('#post-title-inp').inputValue()).trim();
       if(currentTitle!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
 
-      stage='read-original';
+      stage='original-mode-menu';
       const originalModeButton=page.locator('#editor-mode-layer-btn-open');
       await originalModeButton.waitFor({state:'attached',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
       const originalModeOpened=await originalModeButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
       if(!originalModeOpened) throw new Error('E_UPDATE_EDITOR_MODE_MENU');
+      stage='original-html-select';
       const originalHtmlButton=page.locator('#editor-mode-html');
       await originalHtmlButton.waitFor({state:'visible',timeout:10000}).catch(()=>{throw new Error('E_UPDATE_EDITOR_MODE_MENU');});
       const originalHtmlOpened=await originalHtmlButton.evaluate(el=>{el.click();return true;}).catch(()=>false);
       if(!originalHtmlOpened) throw new Error('E_UPDATE_EDITOR_HTML_MODE');
+      stage='original-codemirror-wait';
       const cm=page.locator('.CodeMirror:visible');
-      await cm.waitFor({state:'visible'});
-      const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+      await cm.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_CODEMIRROR_WAIT'),{cause:error});});
+      stage='original-codemirror-read';
+      const originalHtml=await cm.evaluate(el=>el?.CodeMirror?.getValue?.()||'').catch(error=>{throw Object.assign(Error('E_UPDATE_CODEMIRROR_READ'),{cause:error});});
       if(!originalHtml.trim()) throw new Error('E_UPDATE_ORIGINAL_EMPTY');
 
       stage='restore-basic-open';
@@ -359,6 +362,12 @@ try{
 }catch(error){
   const code=/^(?:E_[A-Z0-9_]+|BLOCKED_SOURCE_DRIFT)$/.test(error?.message??'')?error.message:'E_UPDATE_RUNTIME';
   console.error('UPDATE_DIAGNOSTIC: '+stage+' '+code);
+  const originalError=error?.cause??error;
+  console.error('UPDATE_EXCEPTION '+JSON.stringify({stage,type:originalError?.name??'Error',timeout:/timeout/i.test(originalError?.message??''),strictLocator:/strict mode violation/i.test(originalError?.message??''),targetClosed:/closed/i.test(originalError?.message??'')}));
+  if(editorPage) {
+    const snapshot=await Promise.race([editorPage.evaluate(()=>({path:location.pathname,mode:document.querySelector('#editor-mode-layer-btn-open')?.textContent?.trim(),editors:[...document.querySelectorAll('.CodeMirror')].map(el=>({visible:!!(el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'),api:typeof el.CodeMirror?.getValue==='function'}))})).catch(()=>null),new Promise(resolve=>setTimeout(()=>resolve(null),1500))]);
+    console.error('UPDATE_EDITOR_STATE '+JSON.stringify(snapshot));
+  }
   console.error('STOP: 기존 글 수정 결과가 불명확하면 자동 재수정하지 않습니다.');
   process.exitCode=1;
 }finally{
