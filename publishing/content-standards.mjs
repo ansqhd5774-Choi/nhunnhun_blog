@@ -129,7 +129,7 @@ export function assertContentStandard(source, options = {}) {
     const receipt=options.manifest??readContentReview(source,options);
     if(receipt.version!=='SP1'||receipt.sourceDigest!==contentDigest(source)||receipt.semanticReview!=='not-performed'
       ||receipt.policy!=='single-write-auto-publish-user-content-review')throw Error('E_CONTENT_RECEIPT_INVALID');
-    return {passed:true,errors:[],warnings:[],semanticVerification:'not-performed'};
+    return {passed:null,skipped:true,errors:[],warnings:[],semanticVerification:'not-performed'};
   }
   if (source?.contentStandard !== CONTENT_STANDARD_VERSION) throw new Error('E_CONTENT_STANDARD_REQUIRED');
   const report = evaluateContent(source, options.manifest ?? readContentReview(source, options), options);

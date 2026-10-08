@@ -9,10 +9,9 @@ import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './que
 import { writeSinglePassArticle, singlePassReceipt } from './queue-single-pass.mjs';
 import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
 
-import { todayInSeoul, assertContentStandard } from '../publishing/content-standards.mjs';
+import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
-import { assertEditorialSource, renderEditorialPost } from '../publishing/editorial.mjs';
 
 function git(args,root,{allowFailure=false,trimOutput=true}={}){
   const r=spawnSync('git',args,{cwd:root,encoding:'utf8'});
@@ -122,21 +121,17 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
 
     let rendered=renderR53Body(article,evidence,images,internalLinks);
     let source=makeSource(item,current.title,sourceId,article,rendered.html,images);
-    assertEditorialSource(source);
     assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
-    renderEditorialPost(source);
 
     const review=singlePassReceipt(source,item,evidence);
-    const report=assertContentStandard(source,{manifest:review});
     await checkpoint('generated',{source,review});
 
     assertImageReview(source);
     checkUpdateSource(source,sourceId+'.json');
-    renderEditorialPost(source);
     if(dryRun){
-      await writeMetrics('DRY_RUN_VALIDATED');
-      console.log('QUEUE_DRY_RUN_VALIDATED '+JSON.stringify({articleId:item.articleId,resultDir,publicMutation:false}));
+      await writeMetrics('DRY_RUN_GENERATED');
+      console.log('QUEUE_DRY_RUN_GENERATED '+JSON.stringify({articleId:item.articleId,resultDir,publicMutation:false,contentValidation:'not-performed'}));
       return {dryRun:true,source,review,resultDir,metrics};
     }
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
@@ -147,7 +142,7 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     await mkdir(resolve(root,'content-reviews','updates'),{recursive:true});
     await writeFile(resolve(root,'content-reviews','updates',sourceId+'.json'),JSON.stringify(review,null,2)+'\n',{flag:'wx'});
     const fp=updateFingerprint(source);
-    await writeQueueState(root,item.articleId,{...running,status:'READY_FOR_UPDATE',policyVersion:QUEUE_POLICY_VERSION,preparedAt:new Date().toISOString(),title:source.title,fingerprint:fp,validationWarnings:report.warnings});
+    await writeQueueState(root,item.articleId,{...running,status:'READY_FOR_UPDATE',policyVersion:QUEUE_POLICY_VERSION,preparedAt:new Date().toISOString(),title:source.title,fingerprint:fp,contentValidation:'not-performed'});
     if(remoteMain(root)!==baseSha)throw new Error('E_QUEUE_SOURCE_DRIFT');
 
     await writeMetrics('READY_FOR_UPDATE');

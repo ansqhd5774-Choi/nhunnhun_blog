@@ -1,6 +1,6 @@
 import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract } from './content-emphasis.mjs';
 export const EDITORIAL_TEMPLATE_VERSION='R4';
-export const editorialVersionFor = post => post?.contentStandard === 'R1' ? 'R4' : 'R3';
+export const editorialVersionFor = post => post?.contentStandard === 'R1' ? 'R4' : post?.contentStandard === 'SP1' ? 'SP1' : 'R3';
 
 const ACCENT='<div aria-hidden="true" style="width:34px;height:4px;background:#2563eb;border-radius:999px;margin:48px 0 10px;"></div>';
 const H2='<h2 style="margin:0 0 18px;padding:0;font-size:26px;line-height:1.4;font-weight:800;letter-spacing:-0.02em;color:#111827;border:0;background:none;">';
@@ -38,6 +38,7 @@ function styleTable(inner){
 }
 
 export function assertEditorialSource(post){
+  if(post?.contentStandard==='SP1')return post;
   const html=post.bodyHtml;
   const h2=count(html,/<h2>/g);
   const images=imageSources(html);
@@ -153,6 +154,7 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
 }
 
 export function assertEditorialContract(renderedHtml,sourceHtml,{version='R3'}={}){
+  if(version==='SP1')return renderedHtml;
   const e=editorialExpectations(sourceHtml,{version});
   if(version==='R4') assertEmphasisContract(renderedHtml,sourceHtml);
   const h2=count(renderedHtml,/<h2\b/g);

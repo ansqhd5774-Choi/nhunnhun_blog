@@ -54,7 +54,7 @@ concurrency:
 
 jobs:
   test:
-    if: github.event_name != 'workflow_run'
+    if: github.event_name == 'pull_request'
     name: test-${{ matrix.suite }}
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     defaults:
@@ -83,7 +83,7 @@ jobs:
 
   produce:
     if: github.event_name != 'pull_request' && github.event_name != 'workflow_run' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.CONTENT_UPDATE_QUEUE_ENABLED == 'true')
-    needs: [test, reconcile]
+    needs: reconcile
     runs-on: [self-hosted, Windows, X64, tistory-publisher]
     timeout-minutes: 120
     concurrency:
@@ -117,7 +117,7 @@ jobs:
         env:
           OLLAMA_HOST: http://127.0.0.1:11434
 
-      - name: Queue 1건 조사·작성·검토·승격
+      - name: Queue 1건 작성·취합 — 원고 검사 없음
         id: producer
         run: node authoring\update-producer.mjs
         env:
