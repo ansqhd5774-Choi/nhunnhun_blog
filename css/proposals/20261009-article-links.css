@@ -1,0 +1,5 @@
+/* Body links are recognisable independently of bold emphasis. */
+.nh-direct-v2 .article-body a[href] {color:#176b82!important;text-decoration:underline!important;text-decoration-color:#65aabc!important;text-decoration-thickness:2px!important;text-underline-offset:4px;background:#eef8fa;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .15s,color .15s;}
+.nh-direct-v2 .article-body a[href]:hover {color:#114d62!important;background:#d9eff4;text-decoration-color:currentColor!important;}
+.nh-direct-v2 .article-body a[href]:focus-visible {outline:2px solid #176b82;outline-offset:3px;}
+.nh-direct-v2 .article-body a[href] strong {color:inherit!important;}
