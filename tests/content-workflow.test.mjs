@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const workflow=path=>parse(read('.github/workflows/'+path));
 test('direct workflow never starts generation on code or keyword pushes',()=>{
- const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on),['workflow_dispatch']);
+ const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on).sort(),['push','workflow_dispatch']);assert.deepEqual(w.on.push.branches,['main']);assert.deepEqual(w.on.push.paths,['updates/direct-*.json']);
  assert.equal(w.jobs.produce,undefined);assert.equal(w.jobs.summary,undefined);
  assert.equal(w.on.workflow_dispatch.inputs.source_id.required,true);
  assert.ok(w.jobs.dispatch.steps.some(x=>x.run?.includes('node authoring/direct-dispatch.mjs')));

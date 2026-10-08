@@ -1,5 +1,9 @@
-name: GPT 직접 작성 원고 발행
+name: GPT 직접 작성 원고 수정 요청 전달
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'updates/direct-*.json'
   workflow_dispatch:
     inputs:
       source_id:
@@ -10,7 +14,7 @@ permissions:
   contents: read
   actions: write
 concurrency:
-  group: nhunnhun-direct-source-dispatch
+  group: nhunnhun-direct-source-dispatch-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   dispatch:
