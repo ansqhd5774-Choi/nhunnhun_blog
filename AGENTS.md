@@ -1,5 +1,8 @@
 # nhunnhun 티스토리 작업 기준
 
+## 기준 우선순위 — GPT 직접 작성
+음식의 GPT 직접 작성 및 direct-* 원고 수정에는 `docs/content/DIRECT_AUTHORING_R1.md`의 최신 사용자 지시가 우선한다. 아래 R1/R4의 중첩 금지·짧은 구절 한정·강조 개수 기준은 이 경로에 적용하지 않는다. 직접 작성은 1단계 strong, 2단계 mark+strong, 3단계 mark+u+strong을 사용한다. 의학적 근거·인증·HTML 보안·중복 제출 보호는 유지한다. 기존 R1/R4 원고 경로와 변경 없는 과거 원고의 계약은 보존한다.
+
 ## ACTIVE — Content Standard R1 / Editorial R4 (2026-10-07)
 
 - 음식·영양소·약·질병의 신규 작성 및 앞으로의 전체 수정은 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 먼저 읽는다.
