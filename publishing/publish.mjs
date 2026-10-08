@@ -14,6 +14,7 @@ import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, editorialExpectations, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION, editorialVersionFor } from './editorial.mjs';
 import { assertImageReview } from './image-review.mjs';
 import { publishedUrls } from './published-url.mjs';
+import { assertDirectPublicSnapshot } from './direct-public-contract.mjs';
 
 
 function imageSources(html) {
@@ -388,6 +389,25 @@ try {
         const og = await publicPage.locator('meta[property="og:image"]').getAttribute('content').catch(()=>null);
         if (!og || og.includes('opengraph.png') || !og.includes('kakaocdn.net')) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
       }
+      if (post.contentStandard === 'SP1' && post.id.startsWith('direct-')) {
+        const directSnapshot=await content.evaluate(root=>{
+          const article=root.querySelector('.nh-direct-v2 .article-body');
+          const all=selector=>[...(article?.querySelectorAll(selector)||[])];
+          const marks=all('mark'),numbers=all('h2 > small');
+          return {roots:root.querySelectorAll('.nh-direct-v2 .article-body').length,
+            h2:all('h2').length,numbers:numbers.length,h3:all('h3').length,
+            tables:all('table').length,tableWraps:all('.table-scroll > table').length,
+            images:all('img').length,marks:marks.length,boldMarks:all('mark strong').length,
+            underlinedMarks:all('mark u strong').length,badges:all('.badge').length,
+            stylesVisible:marks.every(m=>{
+              const s=getComputedStyle(m),b=m.querySelector('strong');
+              const u=m.querySelector('u');
+              return s.display!=='none'&&s.visibility!=='hidden'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&
+                b&&Number(getComputedStyle(b).fontWeight)>=600&&(!u||getComputedStyle(u).textDecorationLine.includes('underline'));
+            })&&numbers.every(n=>parseFloat(getComputedStyle(n).fontSize)>=20)};
+        });
+        assertDirectPublicSnapshot(directSnapshot,post.bodyHtml);
+      } else {
       const editorialSnapshot = await content.evaluate(root => {
         const h2=[...root.querySelectorAll('h2')];
         const h3=[...root.querySelectorAll('h3')];
@@ -458,6 +478,7 @@ try {
         (editorialExpected.related && editorialSnapshot.relatedCards !== editorialExpected.relatedLinks) ||
         (editorialExpected.sources && !editorialSnapshot.sourcesStyled)
       ) throw new Error('E_EDITORIAL_PUBLIC_CONTRACT');
+      }
       if (post.contentStandard === 'R1') {
         const mobileContext = await verificationContext(publicBrowser, {viewport:{width:390,height:844}});
         try {
@@ -472,7 +493,7 @@ try {
       }
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
-      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()}, state.sha);
+      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:editorialVersionFor(post),timestamp:new Date().toISOString()}, state.sha);
       console.log(`PUBLISHED: ${post.id} ${url}`);
       }
     } else console.log('NO_PENDING_POSTS');
