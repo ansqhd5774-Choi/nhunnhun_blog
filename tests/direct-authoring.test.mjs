@@ -1,5 +1,6 @@
 import test from 'node:test';
 import './emphasis-observation.test.mjs';
+import './direct-preparation.test.mjs';
 import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,writeFile,rm,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
