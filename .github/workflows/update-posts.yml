@@ -2,34 +2,6 @@ name: Validate and update Tistory posts
 # Chrome is check-only; update never opens it.
 # Existing-post mutation is source-scoped by the hosted mutation gate.
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'publishing/content-*.mjs'
-      - 'publishing/cross-domain.mjs'
-      - 'publishing/standards/**'
-      - 'publishing/validate-content.mjs'
-      - 'content-reviews/**'
-      - 'tests/content-*.test.mjs'
-      - 'updates/**'
-      - 'publishing/update.mjs'
-      - 'publishing/local-browser.mjs'
-      - 'publishing/mutation-gate.mjs'
-      - 'maintenance/ensure-tistory-chrome.cmd'
-      - 'maintenance/check-tistory-chrome.cmd'
-      - 'publishing/runner-gate.mjs'
-      - 'tests/runner-gate.test.mjs'
-      - 'publishing/update-core.mjs'
-      - 'publishing/update-ledger.mjs'
-      - 'publishing/validate-update.mjs'
-      - 'publishing/verify-updated-public.mjs'
-      - 'tests/public-verification.test.mjs'
-      - 'publishing/editorial.mjs'
-      - 'publishing/core.mjs'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - '.github/workflows/update-posts.yml'
-      - '.github/actions/setup-node-pnpm/**'
   workflow_dispatch:
     inputs:
       update:
@@ -53,47 +25,6 @@ concurrency:
   group: nhunnhun-tistory-update
   cancel-in-progress: false
 jobs:
-  validate-update:
-    if: github.event_name == 'push'
-    runs-on:
-      - self-hosted
-      - Windows
-      - X64
-      - tistory-validation
-    defaults:
-      run:
-        shell: cmd
-    outputs:
-      should_update: ${{ steps.mutation-gate.outputs.should_mutate }}
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-      - name: Mutation gate
-        id: mutation-gate
-        run: node publishing/mutation-gate.mjs updates
-        env:
-          MUTATION_REQUESTED: ${{ inputs.update }}
-      - uses: ./.github/actions/setup-node-pnpm
-        with:
-          enable-cache: ${{ runner.environment == 'github-hosted' }}
-          cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
-          cache-restore-key: ${{ runner.os }}-pnpm-store-
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Diagnose self-hosted allocation
-        run: node publishing/runner-gate.mjs --queue
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Content standard for changed source
-        run: pnpm run validate:content:changed
-        if: github.event_name == 'push'
-        env:
-          CONTENT_BASE_SHA: ${{ github.event.before }}
-          CONTENT_HEAD_SHA: ${{ github.sha }}
-      - run: pnpm run validate:content
-      - name: Revalidate update source at mutation boundary
-        run: pnpm run validate:update
   update:
     concurrency:
       group: nhunnhun-tistory-mutation

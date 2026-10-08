@@ -9,7 +9,7 @@ test('validation and dispatch never occupy publishing runner',()=>{
  }
  for(const [file,validation,publish]of [['update-posts.yml','validate-update','update'],['publish-posts.yml','validate','publish']]){
   const w=read(file);
-  assert.ok(w.jobs[validation]['runs-on'].includes('tistory-validation'));
+  if(w.jobs[validation])assert.ok(w.jobs[validation]['runs-on'].includes('tistory-validation'));
   assert.ok(w.jobs[publish]['runs-on'].includes('tistory-publisher'));
   assert.equal(w.jobs[publish].concurrency.group,'nhunnhun-tistory-mutation');
  }

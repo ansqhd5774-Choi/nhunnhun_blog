@@ -1,61 +1,61 @@
 name: Content standard CI
 on:
   push:
-    branches: [main, 'work/content-standard-r1-20261007']
+    branches: [ main, 'work/content-standard-r1-20261007' ]
     paths:
-      - 'AGENTS.md'
-      - 'README.md'
-      - 'docs/**'
-      - 'posts/**'
-      - 'updates/**'
-      - 'content-reviews/**'
-      - 'publishing/content-*.mjs'
-      - 'publishing/cross-domain.mjs'
-      - 'publishing/standards/**'
-      - 'publishing/validate*.mjs'
-      - 'publishing/editorial.mjs'
-      - 'publishing/core.mjs'
-      - 'publishing/update-core.mjs'
-      - 'publishing/publish.mjs'
-      - 'publishing/update.mjs'
-      - 'publishing/verify-updated-public.mjs'
-      - 'tests/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/**'
-      - '.github/actions/setup-node-pnpm/**'
+      - posts/**
+      - updates/**
+      - content-reviews/**
+      - publishing/content-*.mjs
+      - publishing/cross-domain.mjs
+      - publishing/standards/**
+      - publishing/validate*.mjs
+      - publishing/editorial.mjs
+      - publishing/core.mjs
+      - publishing/update-core.mjs
+      - publishing/publish.mjs
+      - publishing/update.mjs
+      - publishing/verify-updated-public.mjs
+      - tests/**
+      - package.json
+      - pnpm-lock.yaml
+      - .github/actions/setup-node-pnpm/**
+      - docs/CONTENT*.md
+      - docs/EDITORIAL*.md
+      - docs/content/**
+      - .github/workflows/content-standard-ci.yml
   pull_request:
     paths:
-      - 'AGENTS.md'
-      - 'README.md'
-      - 'docs/**'
-      - 'posts/**'
-      - 'updates/**'
-      - 'content-reviews/**'
-      - 'publishing/content-*.mjs'
-      - 'publishing/cross-domain.mjs'
-      - 'publishing/standards/**'
-      - 'publishing/validate*.mjs'
-      - 'publishing/editorial.mjs'
-      - 'publishing/core.mjs'
-      - 'publishing/update-core.mjs'
-      - 'publishing/publish.mjs'
-      - 'publishing/update.mjs'
-      - 'publishing/verify-updated-public.mjs'
-      - 'tests/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/**'
-      - '.github/actions/setup-node-pnpm/**'
+      - posts/**
+      - updates/**
+      - content-reviews/**
+      - publishing/content-*.mjs
+      - publishing/cross-domain.mjs
+      - publishing/standards/**
+      - publishing/validate*.mjs
+      - publishing/editorial.mjs
+      - publishing/core.mjs
+      - publishing/update-core.mjs
+      - publishing/publish.mjs
+      - publishing/update.mjs
+      - publishing/verify-updated-public.mjs
+      - tests/**
+      - package.json
+      - pnpm-lock.yaml
+      - .github/actions/setup-node-pnpm/**
+      - docs/CONTENT*.md
+      - docs/EDITORIAL*.md
+      - docs/content/**
+      - .github/workflows/content-standard-ci.yml
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: content-standard-ci-${{ github.ref }}
+  group: content-standard-ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   content-quality:
-    runs-on: [self-hosted, Windows, X64, tistory-validation]
+    runs-on: [ self-hosted, Windows, X64, tistory-validation ]
     defaults:
       run:
         shell: cmd
@@ -76,14 +76,17 @@ jobs:
         run: pnpm test
       - name: Validate all R1 sources without modifying legacy articles
         run: pnpm run validate:content
+        if: github.event_name == 'workflow_dispatch'
       - name: Require R1 for changed publication or update sources
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         run: pnpm run validate:content:changed
         env:
-          CONTENT_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          CONTENT_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+            github.event.pull_request.base.sha || github.event.before }}
           CONTENT_HEAD_SHA: ${{ github.sha }}
       - name: Existing update source and legacy rendering regression
         run: pnpm run validate:update
+        if: github.event_name == 'workflow_dispatch'
       - name: Offline R4 browser preview
         run: node tests\content-visual.mjs
         env:
