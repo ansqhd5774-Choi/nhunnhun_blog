@@ -53,11 +53,20 @@ jobs:
           }
           "DIRECT_CHECKOUT=$taskPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: 로컬 Node와 고정 pnpm 준비
+        shell: powershell
         run: |
-          cd /d "%DIRECT_CHECKOUT%"
-          node -e "if(Number(process.versions.node.split('.')[0])<24)process.exit(1)"
-          if errorlevel 1 exit /b 1
-          call npm exec --yes --package=pnpm@11.19.0 -- pnpm install --frozen-lockfile --ignore-scripts
+          $ErrorActionPreference = 'Stop'
+          Set-Location $env:DIRECT_CHECKOUT
+          $runnerRoot = Split-Path (Split-Path $env:RUNNER_WORKSPACE -Parent) -Parent
+          $nodeDir = Join-Path $runnerRoot 'externals/node24/bin'
+          $nodeExe = Join-Path $nodeDir 'node.exe'
+          if (!(Test-Path $nodeExe)) { throw 'E_DIRECT_NODE24_MISSING' }
+          $env:PATH = "$nodeDir;$env:PATH"
+          $npmDir = Split-Path (Get-Command npm.cmd -ErrorAction Stop).Source -Parent
+          $npmCli = Join-Path $npmDir 'node_modules/npm/bin/npm-cli.js'
+          & $nodeExe $npmCli exec --yes --package=pnpm@11.19.0 -- pnpm install --frozen-lockfile --ignore-scripts
+          if ($LASTEXITCODE -ne 0) { throw 'E_DIRECT_DEPENDENCIES' }
+          $nodeDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: 준비된 원고 연결 — AI 호출 없음
         run: |
           cd /d "%DIRECT_CHECKOUT%"
