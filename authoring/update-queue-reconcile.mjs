@@ -5,6 +5,12 @@ import { finalizeQueuedUpdate } from './update-queue-finalize.mjs';
 
 export async function reconcileReadyUpdates({root=process.cwd(),token=process.env.GITHUB_TOKEN,fetcher=fetch,finalize=finalizeQueuedUpdate}={}) {
   if(!token)throw Error('E_QUEUE_RECONCILE_TOKEN');
+  const activeResponse=await fetcher('https://api.github.com/repos/ansqhd5774-Choi/nhunnhun_blog/actions/workflows/update-posts.yml/runs?per_page=100',{headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(20000)});
+  if(!activeResponse.ok)throw Error('E_QUEUE_RECONCILE_RUN_READ');
+  if((await activeResponse.json()).workflow_runs.some(run=>run.status!=='completed')) {
+    console.log('QUEUE_RECONCILE_DEFERRED: update workflow active; checkpoint unchanged');
+    return [];
+  }
   const directory=resolve(root,'authoring/update-queue-state');
   const results=[];
   for(const file of await readdir(directory)){

@@ -70,7 +70,8 @@ export async function finalizeQueuedUpdate({sourceId,articleId,token,commitSha,t
   const statePath=`authoring/update-queue-state/${articleId}.json`,previous=await getJsonFile(statePath,token);
   const uncertain=!(noMutation||ledger?.phase==='failed'&&ledger.publicMutationConfirmed===false);
   const value={...(previous?.value??{}),status:'BLOCKED',articleId,sourceId,blockedAt:new Date().toISOString(),error:uncertain?'E_QUEUE_MUTATION_UNCERTAIN':'E_QUEUE_UPDATE_NOT_COMPLETED',ledgerPhase:ledger?.phase??null,publicMutation:uncertain?null:false};
-  await putJsonFile(statePath,value,token,previous?.sha);
+  if(previous?.value?.status!==value.status||previous?.value?.error!==value.error||previous?.value?.ledgerPhase!==value.ledgerPhase||previous?.value?.publicMutation!==value.publicMutation)
+    await putJsonFile(statePath,value,token,previous?.sha);
   throw new Error(value.error);
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
