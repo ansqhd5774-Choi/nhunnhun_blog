@@ -100,6 +100,12 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
     return '<p>'+img.replace(/>$/, ' loading="lazy" decoding="async" style="width:100%;max-width:720px;height:auto;display:block;margin:18px auto 24px;">')+'</p>';
   });
 
+  // SP1 image limits also apply when the live skin has not yet received the CSS patch.
+  if(version==='SP1')out=out.replace(/<img\b[^>]*>/gi,tag=>{
+    const limit='max-width:min(100%,640px) !important;max-height:420px !important;width:auto !important;height:auto !important;object-fit:contain;display:block;margin:20px auto;';
+    return /\sstyle="/.test(tag)?tag.replace(/\sstyle="([^"]*)"/,(_m,style)=>' style="'+style+';'+limit+'"'):tag.replace(/>$/,' style="'+limit+'">');
+  });
+
   // Opening quick summary becomes the standard top information card.
   out=out.replace(
     /<blockquote><strong>핵심만 먼저:<\/strong>\s*([\s\S]*?)<\/blockquote>/,

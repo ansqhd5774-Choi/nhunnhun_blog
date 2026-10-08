@@ -1,0 +1,10 @@
+/* 본문 이미지 표시 크기 제한: 원본 비율 유지 */
+.contents_style img {
+  max-width: min(100%, 640px) !important;
+  max-height: 420px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  display: block;
+  margin: 20px auto;
+}
