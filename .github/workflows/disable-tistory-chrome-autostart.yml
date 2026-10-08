@@ -1,9 +1,5 @@
 name: Disable Tistory Chrome auto-open
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/disable-tistory-chrome-autostart.yml'
   workflow_dispatch:
 permissions:
   contents: read

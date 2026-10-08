@@ -15,3 +15,19 @@ test('content CI owns code checks, mutation workflows retain boundary validation
  const author=read('generate-draft.yml');assert.ok(author.concurrency.group.includes('github.event.pull_request.number'));
  assert.ok(author.jobs.test.steps.some(s=>s.run==='node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs'));
 });
+test('all workflows use dedicated self-hosted runners without hosted fallback',()=>{
+ for(const file of fs.readdirSync('.github/workflows').filter(n=>/\.ya?ml$/.test(n))){
+  const workflow=read(file);
+  for(const [name,job] of Object.entries(workflow.jobs)){
+   if(job.uses) continue;
+   assert.ok(Array.isArray(job['runs-on']),`${file}/${name}: explicit runner labels required`);
+   const labels=job['runs-on'].map(s=>s.toLowerCase());
+   assert.ok(labels.includes('self-hosted'),`${file}/${name}: hosted execution prohibited`);
+   assert.ok(labels.includes('tistory-validation')||labels.includes('tistory-publisher'),`${file}/${name}: dedicated runner required`);
+  }
+ }
+});
+test('runner maintenance executes only on explicit dispatch',()=>{
+ const workflow=read('disable-tistory-chrome-autostart.yml');
+ assert.deepEqual(Object.keys(workflow.on),['workflow_dispatch']);
+});
