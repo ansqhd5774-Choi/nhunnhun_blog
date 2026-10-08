@@ -139,8 +139,10 @@ function replaceImageSources(html,mapping,representativeSource){
   });
 }
 async function selectEditorMode(page,mode){
-  const selector=mode==='html'?'#editor-mode-html':'#editor-mode-kakao';
-  if(mode==='html'&&await page.locator('.CodeMirror:visible').count())return;
+  const selector=mode==='html'?'#editor-mode-html-text':'#editor-mode-kakao-text';
+  const visibleEditors=await page.locator('.CodeMirror:visible').count();
+  if(mode==='html'&&visibleEditors)return;
+  if(mode==='basic'&&!visibleEditors)return;
   const option=page.locator(selector);
   if(!await option.isVisible()){
     await page.locator('#editor-mode-layer-btn-open').click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});});
@@ -148,8 +150,8 @@ async function selectEditorMode(page,mode){
   await option.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});});
   await option.click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});});
   await page.waitForFunction(expected=>{
-    const mode=document.querySelector('#editor-mode-layer-btn-open')?.textContent??'';
-    return expected==='html'?mode.includes('HTML')&&[...document.querySelectorAll('.CodeMirror')].some(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'):mode.includes('기본모드')||mode.includes('기본 모드');
+    const visibleEditors=[...document.querySelectorAll('.CodeMirror')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+    return expected==='html'?visibleEditors.some(el=>typeof el.CodeMirror?.getValue==='function'):visibleEditors.length===0;
   },mode,{timeout:10000,polling:100}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});});
 }
 
