@@ -2,6 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {resolve} from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
+import {assertDirectEmphasis} from '../publishing/direct-emphasis.mjs';
 
 const repo='ansqhd5774-Choi/nhunnhun_blog';
 const command=args=>execFileSync('gh',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
@@ -11,6 +12,7 @@ export function startDirectPublish(sourceId,{run=command}={}) {
   const result=JSON.parse(run(['api',`repos/${repo}/contents/updates/${sourceId}.json?ref=main`]));
   const source=JSON.parse(Buffer.from(result.content,'base64').toString('utf8'));
   checkUpdateSource(source,sourceId+'.json');
+  assertDirectEmphasis(source);
   if(!source.representativeImageUrl) throw Error('E_UPDATE_REPRESENTATIVE');
   if(run(['variable','get','TISTORY_PUBLISH_ENABLED','--repo',repo])!=='true') throw Error('E_DIRECT_PUBLISH_DISABLED');
   // Any recorded attempt needs inspection; never blindly resend an uncertain submit.
