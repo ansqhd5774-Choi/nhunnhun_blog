@@ -328,6 +328,6 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     for(const link of related)html+='\n<p><a href="'+esc(link.url)+'"><strong>'+esc(link.label)+'</strong></a></p>';
   }
   if(article.plan?.scope!=='food-sections')html+='\n<h2>자료 출처</h2><ul>'+(evidence?.sources??[]).map(s=>'<li><a href="'+esc(s.url)+'">'+esc(s.title)+'</a> — 자료 확인일 '+esc(s.checkedAt)+'</li>').join('')+imageAttribution(images)+'</ul>';
-  if(article.plan?.scope==='food-sections')html=applyFoodDesign(html);
+  if(article.plan?.scope==='food-sections')html=applyFoodDesign(html).split(/(<[^>]+>)/g).map(part=>part.startsWith('<')?part:part.replaceAll('&quot;','"')).join('');
   return strict?glossaryPass(html):{html,glossary:[]};
 }
