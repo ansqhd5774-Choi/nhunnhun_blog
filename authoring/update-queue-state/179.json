@@ -1,7 +1,7 @@
 {
-  "status": "BLOCKED_CONTENT",
-  "policyVersion": "R5.1",
-  "runId": "37560028252",
+  "status": "READY_FOR_UPDATE",
+  "policyVersion": "R5.5",
+  "runId": "37783808181",
   "item": {
     "id": "q-179",
     "order": 4,
@@ -11,161 +11,14 @@
     "articleId": "179",
     "targetUrl": "https://nhunnhun.tistory.com/179"
   },
-  "sourceId": "auto-179-r1-20261007-84410a60",
-  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
-  "startedAt": "2026-10-07T08:35:32.855Z",
-  "heartbeatAt": "2026-10-07T08:36:31.201Z",
-  "recovered": true,
-  "skippedCurrent": [
-    {
-      "articleId": "327"
-    },
-    {
-      "articleId": "269"
-    },
-    {
-      "articleId": "323"
-    }
-  ],
-  "blockedAt": "2026-10-07T08:36:31.203Z",
-  "error": "E_QUEUE_PLAN_VALIDATION",
-  "details": {
-    "failures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "77kcal"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "1.1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "16g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "42mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "12mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "1일"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "300g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "10%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "15%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c5",
-        "token": "2개월"
-      }
-    ],
-    "initialFailures": [
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "100g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "77kcal"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "1.1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "16g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "0.1g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "42mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c2",
-        "token": "12mg"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "1일"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "200g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "300g"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "10%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c4",
-        "token": "15%"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c5",
-        "token": "2개월"
-      }
-    ],
-    "scope": "focused",
-    "repaired": true
-  },
-  "publicMutation": false
+  "sourceId": "auto-179-r55-20261008-13aed8ad",
+  "baseSha": "4a0229acf6e170e8f493a6555a68dad6444bfac5",
+  "startedAt": "2026-10-08T13:26:01.087Z",
+  "heartbeatAt": "2026-10-08T13:27:20.565Z",
+  "recovered": false,
+  "skippedCurrent": [],
+  "preparedAt": "2026-10-08T13:27:21.899Z",
+  "title": "감자 영양소·효과·궁합·주의사항·보관",
+  "fingerprint": "90c4aa29dfb2b033ab768e532edbdb004c07e4e55e492fa4d28a3e46b8423adf",
+  "contentValidation": "not-performed"
 }
