@@ -154,6 +154,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_COMMIT: ${{ needs.produce.outputs.commit_sha }}
+          SOURCE_ID: ${{ needs.produce.outputs.source_id }}
 
   summary:
     if: ${{ always() && github.event_name != 'pull_request' }}

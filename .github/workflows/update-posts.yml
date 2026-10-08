@@ -37,6 +37,10 @@ on:
         required: false
         default: false
         type: boolean
+      source_id:
+        description: '수정할 JSON 요청 ID 한 건'
+        required: true
+        type: string
       public_verify_article_ids:
         description: 'Optional comma-separated numeric article IDs for read-only public verification; empty verifies all update records.'
         required: false
@@ -114,5 +118,6 @@ jobs:
       - run: pnpm run update
         env:
           UPDATE_ENABLED: 'true'
+          UPDATE_SOURCE_ID: ${{ inputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog

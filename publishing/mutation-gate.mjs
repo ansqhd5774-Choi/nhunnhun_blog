@@ -13,7 +13,7 @@ let shouldMutate = false;
 
 if (eventName === 'workflow_dispatch') {
   shouldMutate = requested;
-} else if (eventName === 'push') {
+} else if (eventName === 'push' && kind !== 'updates') {
   const event = eventPath ? JSON.parse(readFileSync(eventPath,'utf8')) : {};
   const before = event.before || '';
   let changed = '';

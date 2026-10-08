@@ -31,11 +31,13 @@ export function updateFingerprint(update){
     ...(update.contentStandard ? [update.contentStandard,update.category] : [])
   ])).digest('hex');
 }
-export async function loadUpdates(directory='updates'){
+export async function loadUpdates(directory='updates',sourceId=null){
+  if(sourceId!==null&&!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId))throw Error('E_UPDATE_TARGET_ID');
   const out=[];
-  for(const name of (await readdir(directory)).filter(n=>n.endsWith('.json')).sort()){
+  for(const name of (await readdir(directory)).filter(n=>n.endsWith('.json')&&(!sourceId||n===`${sourceId}.json`)).sort()){
     out.push(checkUpdateSource(JSON.parse(await readFile(`${directory}/${name}`,'utf8')),name));
   }
+  if(sourceId&&out.length!==1)throw Error('E_UPDATE_TARGET_SOURCE_NOT_FOUND');
   if(new Set(out.map(x=>x.articleId)).size!==out.length) throw new Error('E_UPDATE_DUPLICATE_ARTICLE');
   return out;
 }

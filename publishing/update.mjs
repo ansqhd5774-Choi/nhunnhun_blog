@@ -203,9 +203,11 @@ try{
   }else{
     assertLocalGit();
     assertCurrentSource();
+    const sourceId=process.env.UPDATE_SOURCE_ID;
+    if(!sourceId)throw Error('E_UPDATE_TARGET_ID_REQUIRED');
     const ledger=new UpdateLedger();
     const queue=[];
-    for(const update of await loadUpdates()){
+    for(const update of await loadUpdates('updates',sourceId)){
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
         if(update.contentStandard!=='SP1') {
@@ -215,6 +217,7 @@ try{
         queue.push(update);
       }
     }
+    console.log('UPDATE_SELECTION '+JSON.stringify({sourceId,count:queue.length}));
     if(queue.length>1) throw new Error('E_ONE_UPDATE_PER_RUN');
     if(!queue.length){
       console.log('NO_PENDING_UPDATES');
