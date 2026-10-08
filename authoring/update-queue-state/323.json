@@ -1,7 +1,7 @@
 {
-  "status": "BLOCKED_CONTENT",
-  "policyVersion": "R5.1",
-  "runId": "37560028252",
+  "status": "READY_FOR_UPDATE",
+  "policyVersion": "R5.5",
+  "runId": "37778953422",
   "item": {
     "id": "q-323",
     "order": 3,
@@ -11,78 +11,14 @@
     "articleId": "323",
     "targetUrl": "https://nhunnhun.tistory.com/323"
   },
-  "sourceId": "auto-323-r1-20261007-7fb73df7",
-  "baseSha": "9a784e30d378457eb01b3afe65cf244da2d5c2c6",
-  "startedAt": "2026-10-07T08:34:19.199Z",
-  "heartbeatAt": "2026-10-07T08:35:31.682Z",
-  "recovered": true,
-  "skippedCurrent": [
-    {
-      "articleId": "327"
-    },
-    {
-      "articleId": "269"
-    }
-  ],
-  "blockedAt": "2026-10-07T08:35:31.685Z",
-  "error": "E_QUEUE_PLAN_VALIDATION",
-  "details": {
-    "failures": [
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c2",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c4",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c6",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "3일"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c8",
-        "type": "general"
-      }
-    ],
-    "initialFailures": [
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c2",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c4",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c6",
-        "type": "general"
-      },
-      {
-        "code": "PLAN_NUMBER_SOURCE",
-        "claimId": "c6",
-        "token": "3일"
-      },
-      {
-        "code": "PLAN_HIGH_RISK_SOURCE",
-        "claimId": "c8",
-        "type": "general"
-      }
-    ],
-    "scope": "focused",
-    "repaired": true
-  },
-  "publicMutation": false
+  "sourceId": "auto-323-r55-20261008-e484c1f2",
+  "baseSha": "bf15e756b9b48aa0f67f08956bf226db390de70d",
+  "startedAt": "2026-10-08T12:46:09.006Z",
+  "heartbeatAt": "2026-10-08T12:47:04.061Z",
+  "recovered": false,
+  "skippedCurrent": [],
+  "preparedAt": "2026-10-08T12:47:05.371Z",
+  "title": "갈치 영양소·효과·궁합·주의사항·보관",
+  "fingerprint": "9381cf4c9d7094eac4d59c12259a31a3c00f03948647c2933671955989ee4b92",
+  "contentValidation": "not-performed"
 }

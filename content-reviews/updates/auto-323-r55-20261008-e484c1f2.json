@@ -1,0 +1,77 @@
+{
+  "version": "SP1",
+  "domain": "food",
+  "sourceDigest": "3d35066d1221354bbb10f8b387c6b762d73f2146e84fc9d92fcfbec3801778ad",
+  "generatedAt": "2026-10-08",
+  "policy": "single-write-auto-publish-user-content-review",
+  "semanticReview": "not-performed",
+  "instructions": [
+    {
+      "question": "소개",
+      "targetChars": 250,
+      "format": "서술형",
+      "include": "한국 제철 정보, 특징"
+    },
+    {
+      "question": "영양소와 핵심 성분",
+      "targetChars": 400,
+      "format": "서술형, 기본표, 핵심표, 효과",
+      "include": "표(성분,일일영양소)"
+    },
+    {
+      "question": "꾸준히 먹으면 신체 변화는?",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과(요약형)",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "궁합이 잘 맞는 음식과 시너지 효과",
+      "targetChars": 400,
+      "format": "서술형, 핵심 효과",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "섭취 시 주의사항",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    },
+    {
+      "question": "좋은 가지 고르는 방법과 보관",
+      "targetChars": 400,
+      "format": "서술형, 요약형",
+      "include": "구체적이고 논리적인 효과"
+    }
+  ],
+  "sources": [
+    {
+      "title": "USDA FoodData Central — Fish, fish sticks, frozen, prepared",
+      "url": "https://fdc.nal.usda.gov/food-details/174195/nutrients"
+    },
+    {
+      "title": "5 A Day – Food Facts – Healthier Families",
+      "url": "https://www.nhs.uk/healthier-families/food-facts/5-a-day/"
+    },
+    {
+      "title": "Selecting and Serving Produce Safely",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+    },
+    {
+      "title": "Physiochemical Quality, Microbial Diversity, and Volatile Components of Monascus-Fermented Hairtail Surimi.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37569159/"
+    },
+    {
+      "title": "Effects of chickpea protein-stabilized Pickering emulsion on the structure and gelling properties of hairtail fish myosin gel.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36934711/"
+    },
+    {
+      "title": "The formation and conversion of characteristic aroma profiles and key harmful substances in different high-temperature processing of hairtail (Trichiurus Haumela).",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38763630/"
+    },
+    {
+      "title": "The effect of ferrous-chelating hairtail peptides on iron deficiency and intestinal flora in rats.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/26425939/"
+    }
+  ],
+  "notes": []
+}
