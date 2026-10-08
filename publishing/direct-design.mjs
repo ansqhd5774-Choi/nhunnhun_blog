@@ -1,17 +1,15 @@
-// Called after strict source HTML security validation. No model or network requests.
+// Generated from the user-approved varied preview. Source text is never rewritten.
+const CSS=".nh-direct-v2 *{box-sizing:border-box}.nh-direct-v2 .article-body{margin:0;background:#fff;color:#263541;font-family:Arial,'Malgun Gothic',sans-serif;font-size:16px;line-height:1.85}.nh-direct-v2 .article-body{max-width:820px;margin:auto;padding:48px 24px 90px}.nh-direct-v2 header{border-bottom:1px solid #e8eaed;padding:14px 24px;color:#927656;font-size:13px}.nh-direct-v2 h1{font-size:32px;line-height:1.4;letter-spacing:-1px;margin:12px 0 26px}.nh-direct-v2 h2{display:flex;align-items:center;gap:14px;font-size:24px;line-height:1.45;margin:56px 0 22px;letter-spacing:-.6px}.nh-direct-v2 h2 small{font-size:23px;font-weight:800;color:#a95325;min-width:36px;line-height:1.45;border-bottom:3px solid #df9567;padding:2px 0}.nh-direct-v2 h3{font-size:18px;line-height:1.5;margin:0 0 8px;color:#24343e}.nh-direct-v2 p{margin:12px 0 20px}.nh-direct-v2 img{width:100%;height:270px;object-fit:contain;display:block;margin:24px 0 40px}.nh-direct-v2 strong{font-weight:700}.nh-direct-v2 mark{background:#fff0b9;padding:0 2px}.nh-direct-v2 u{text-decoration-color:#ba6338;text-underline-offset:4px}.nh-direct-v2 .table-scroll{overflow:auto;border:1px solid #e1e6e8;border-radius:10px}.nh-direct-v2 table{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}.nh-direct-v2 th{background:#f3f5f4;text-align:left;color:#54625c}.nh-direct-v2 td,.nh-direct-v2 th{padding:12px 15px;border-bottom:1px solid #e6eae8}.nh-direct-v2 tr:last-child td{border:0}.nh-direct-v2 .effects article{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid #e4e8e6}.nh-direct-v2 .badge{flex-shrink:0;font-size:13px;color:#a96b46;font-weight:bold;padding-top:3px}.nh-direct-v2 .effects article p,.nh-direct-v2 .pairs article p,.nh-direct-v2 .cautions article p,.nh-direct-v2 .storage article p{margin:0}.nh-direct-v2 .pairs{background:#f6f7f4;padding:8px 26px;border-radius:12px}.nh-direct-v2 .pairs article{display:flex;gap:18px;padding:24px 0;border-bottom:1px solid #dde2d9}.nh-direct-v2 .pairs article:last-child{border:0}.nh-direct-v2 .pairs h3{color:#4c634e}.nh-direct-v2 .cautions article{padding:18px 22px;margin:12px 0;border-left:3px solid #d39a5b;background:#fffaf1;display:flex;gap:16px}.nh-direct-v2 .cautions article:nth-child(2){background:#fff1e8;border-color:#c97849}.nh-direct-v2 .storage article{display:flex;gap:16px;padding:18px 0}.nh-direct-v2 .storage .badge{color:#4d7960;font-size:20px}.nh-direct-v2 .note{color:#8d7865;font-size:13px}@media(max-width:600px){.nh-direct-v2 .article-body{padding:24px 20px 50px}.nh-direct-v2 h1{font-size:26px}.nh-direct-v2 h2{font-size:21px;margin-top:40px}.nh-direct-v2 .article-body{font-size:16px}.nh-direct-v2 .pairs{padding:6px 17px}.nh-direct-v2 .cautions article{padding:17px 15px}.nh-direct-v2 img{height:210px}}";
 export function renderDirectArticle(html){
-  let index=0;
-  let out=html.replace(/<h2>([\s\S]*?)<\/h2>/g,(_m,title)=>'<h2 id="direct-section-'+(++index)+'">'+index+'. '+title.replace(/^\d+[.)]\s*/,'')+'</h2>');
-  out=out.replace(/(?:<(?:ol|ul)>[\s\S]*?<\/(?:ol|ul)>\s*)+/g,group=>{
-    const cards=[...group.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m=>{
-      const text=m[1].replace(/^<strong>([\s\S]*?)<\/strong>/,(_n,label)=>'<strong>'+label.replace(/^\d+[.)]\s*/,'').replace(/[:：]\s*$/,'')+'</strong>');
-      return '<div class="info-card">'+text+'</div>';
-    });
-    return '<div class="card-grid">'+cards.join('')+'</div>';
-  });
-  out=out.replace(/<table>([\s\S]*?)<\/table>/g,'<div class="table-wrap"><table>$1</table></div>');
-  const headings=[...out.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>/g)];
-  const toc='<nav class="toc" aria-label="글 목차"><b>이 글에서 알아볼 내용</b>'+headings.map(x=>'<a href="#'+x[1]+'">'+x[2]+'</a>').join('')+'</nav>';
-  out=out.replace(/^\s*<p>(<img\b[^>]*>)<\/p>/,(_m,img)=>'<figure class="hero">'+img.replace(/>$/,' loading="eager" fetchpriority="high">')+'</figure>');
-  return '<div class="nh-direct">'+toc+out+'</div>';
+ let n=0;
+ let body=html.replace(/<h2>([\s\S]*?)<\/h2>/g,(_,title)=>{n++;return '<h2 id="direct-section-'+n+'"><small>'+String(n).padStart(2,'0')+'</small>'+title.replace(/^\d+[.)]\s*/,'')+'</h2>';});
+ let section=0;
+ body=body.split(/(?=<h2 id=)/).map(chunk=>{
+  if(chunk.startsWith('<h2'))section++;
+  const kind=({3:'effects',4:'pairs',5:'cautions',6:'storage'})[section];
+  if(!kind)return chunk;
+  return chunk.replace(/<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/g,(_,inside)=>{let i=0;return '<div class="'+kind+'">'+inside.replace(/<li><strong>([\s\S]*?)<\/strong>([\s\S]*?)<\/li>/g,(_,label,text)=>'<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label.replace(/[:：]\s*$/,'')+'</h3><p>'+text+'</p></div></article>')+'</div>';});
+ }).join('');
+ body=body.replace(/<table>/g,'<div class="table-scroll"><table>').replace(/<\/table>/g,'</table></div>');
+ return '<style>'+CSS+'</style><div class="nh-direct-v2"><div class="article-body">'+body+'</div></div>';
 }
