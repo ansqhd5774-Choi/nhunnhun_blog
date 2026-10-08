@@ -2,11 +2,17 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 export const RUNNER_LABELS = ['self-hosted', 'windows', 'x64', 'tistory-publisher'];
-export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths) {
+export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths, sourceId) {
   if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha) throw new Error('BLOCKED_SOURCE_DRIFT');
   if(checkoutSha===remoteSha)return;
   // Only documentation-only forward changes may pass. Runtime/source/unknown changes fail closed.
-  if(!Array.isArray(changedPaths)||!changedPaths.length||changedPaths.some(p=>!(p.startsWith('docs/')||p==='AGENTS.md'||p==='README.md')))throw new Error('BLOCKED_SOURCE_DRIFT');
+  const unrelated=p=>{
+    if(p.startsWith('docs/')||p==='AGENTS.md'||p==='README.md')return true;
+    if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??''))return false;
+    const match=p.match(/^(?:updates|publishing\/update-state)\/([a-z0-9][a-z0-9-]{2,79})\.json$/);
+    return !!match&&match[1]!==sourceId;
+  };
+  if(!Array.isArray(changedPaths)||!changedPaths.length||changedPaths.some(p=>!unrelated(p)))throw new Error('BLOCKED_SOURCE_DRIFT');
 }
 export function classifyRunners(runners) {
   if (!Array.isArray(runners)) return 'RUNNER_UNREACHABLE';
@@ -27,7 +33,7 @@ export function assertCurrentSource() {
       changedPaths=execFileSync('git',['diff','--name-only',checkout,remote],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
     } catch {throw Error('BLOCKED_SOURCE_DRIFT');}
   }
-  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote,changedPaths);
+  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote,changedPaths,process.env.UPDATE_SOURCE_ID);
   return checkout;
 }
 async function main() {

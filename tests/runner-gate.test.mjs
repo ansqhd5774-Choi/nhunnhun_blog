@@ -20,3 +20,9 @@ test('only documentation-only forward drift is accepted with known changed paths
  for(const paths of [[],['publishing/direct-design.mjs'],['updates/direct-299-test.json'],['pnpm-lock.yaml'],['.github/workflows/update-posts.yml'],['docs/a.md','publishing/update.mjs']])assert.throws(()=>assertSourceIdentity(a,a,b,paths),/BLOCKED_SOURCE_DRIFT/);
  assert.throws(()=>assertSourceIdentity(a,b,b,['docs/a.md']),/BLOCKED_SOURCE_DRIFT/);
 });
+test('selected source is protected while another article and its checkpoint may advance',()=>{
+ const a='a'.repeat(40),b='b'.repeat(40),id='direct-299-hempseed-oil-20261009';
+ assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,['updates/direct-333-other.json','publishing/update-state/direct-333-other.json'],id));
+ for(const p of ['updates/'+id+'.json','publishing/update-state/'+id+'.json','publishing/update.mjs'])assert.throws(()=>assertSourceIdentity(a,a,b,[p],id),/BLOCKED_SOURCE_DRIFT/);
+ assert.throws(()=>assertSourceIdentity(a,a,b,['updates/direct-333-other.json']),/BLOCKED_SOURCE_DRIFT/);
+});
