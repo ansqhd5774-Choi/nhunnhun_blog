@@ -1,5 +1,5 @@
 {
-  "status": "READY_FOR_UPDATE",
+  "status": "BLOCKED",
   "policyVersion": "R5.5",
   "runId": "37707938651",
   "item": {
@@ -20,5 +20,10 @@
   "preparedAt": "2026-10-08T00:36:31.605Z",
   "title": "가지 영양소·효과·궁합·주의사항·보관",
   "fingerprint": "3810b1314db4eebbfb9961405acc678224a7369dc3808a09381cdfef142d58f9",
-  "contentValidation": "not-performed"
+  "contentValidation": "not-performed",
+  "articleId": "327",
+  "blockedAt": "2026-10-08T00:41:40.186Z",
+  "error": "E_QUEUE_MUTATION_UNCERTAIN",
+  "ledgerPhase": null,
+  "publicMutation": null
 }
