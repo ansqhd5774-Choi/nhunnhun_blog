@@ -294,7 +294,8 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     return '<p><a href="'+esc(x.sourcePage??x.src)+'" title="'+esc(credit)+'">'+image+'</a></p>';
   });
   const sectionImages=images.some(x=>Number.isInteger(x.sectionIndex));
-  let html=(sectionImages?'':imageTags[0]??'')+(article.plan?.scope==='food-sections'?'':'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>');
+  const hero=article.plan?.scope==='food-sections'&&images.length>0;
+  let html=(hero?imageTags[0]:sectionImages?'':imageTags[0]??'')+(article.plan?.scope==='food-sections'?'':'\n<p>'+esc(article.lead)+'</p>\n<blockquote><strong>핵심만 먼저:</strong> '+esc(article.summary)+'</blockquote>');
   article.sections.forEach((section,index)=>{
     html+='\n<h2>'+esc(section.heading)+'</h2>';
     if(article.plan?.scope==='food-sections')html+='\n'+applyChosenEmphasis(renderFoodMarkdown(section.markdown),section.emphasis);
@@ -315,7 +316,7 @@ export function renderR53Body(article,evidence,images,internalLinks=[]){
     }
     const citations=sourceLinks(evidence,section.sourceIds);
     if(citations.length)html+='\n<p>근거: '+citations.map(s=>'<a href="'+esc(s.url)+'">'+esc(s.title)+'</a>').join(' · ')+'</p>';
-    if(sectionImages){images.forEach((image,i)=>{if(image.sectionIndex===index)html+='\n'+imageTags[i];});}
+    if(sectionImages){images.forEach((image,i)=>{if(image.sectionIndex===index&&!(hero&&i===0))html+='\n'+imageTags[i];});}
     else {
       if(index===1&&imageTags[1])html+='\n'+imageTags[1];
       if(index===3&&imageTags[2])html+='\n'+imageTags[2];
