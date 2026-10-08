@@ -7,7 +7,33 @@ import YAML from 'yaml';
 import {renderEditorialPost} from '../publishing/editorial.mjs';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
+import {startDirectPublish} from '../authoring/start-direct-publish.mjs';
 const source={id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg',bodyHtml:'<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg" alt="감자"></p><h2>소개</h2><p>소개 문장.</p><ul><li><strong>핵심:</strong> 설명 그대로.</li><li><strong>보관:</strong> 조건 그대로.</li></ul><table><tbody><tr><td>성분</td><td>값</td></tr></tbody></table>'};
+test('local publication entry reads remote main and starts one update without another writer job',()=>{
+ let starts=0;
+ const run=args=>{
+  if(args[0]==='api'&&args[1].includes('/updates/')){assert.ok(args[1].endsWith('?ref=main'));return JSON.stringify({content:Buffer.from(JSON.stringify(source)).toString('base64')});}
+  if(args[0]==='variable')return 'true';
+  if(args[0]==='api')throw Object.assign(Error('Not found'),{stderr:'HTTP 404'});
+  if(args[0]==='run')return '[]';
+  starts++;assert.equal(args[2],'update-posts.yml');assert.ok(args.includes('update=true'));
+  return 'https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/123';
+ };
+ assert.equal(startDirectPublish(source.id,{run}).state,'DISPATCHED');assert.equal(starts,1);
+});
+test('local entry does not resend an existing run or uncertain ledger read',()=>{
+ let starts=0;
+ const run=args=>{
+  if(args[0]==='api'&&args[1].includes('/updates/'))return JSON.stringify({content:Buffer.from(JSON.stringify(source)).toString('base64')});
+  if(args[0]==='variable')return 'true';
+  if(args[0]==='api')throw Object.assign(Error('Not found'),{stderr:'HTTP 404'});
+  if(args[0]==='run')return JSON.stringify([{displayTitle:`Update ${source.id}`,status:'queued',url:'https://github.com/example/run'}]);
+  starts++;return '';
+ };
+ assert.equal(startDirectPublish(source.id,{run}).state,'EXISTING_RUN');assert.equal(starts,0);
+ assert.throws(()=>startDirectPublish(source.id,{run:args=>args[1]?.includes('/update-state/')?(()=>{throw Error('HTTP 403');})():run(args)}),/E_DIRECT_LEDGER_READ/);
+ assert.equal(starts,0);
+});
 test('varied renderer assigns layouts by section and preserves emphasis and image',()=>{
  const sections=['소개','영양','신체 변화','궁합','주의','보관'].map((x,i)=>'<h2>'+x+'</h2><ul><li><strong>항목</strong><mark><strong>중요 수치</strong></mark> 설명 그대로.</li></ul>').join('');
  const out=renderEditorialPost({...source,bodyHtml:source.bodyHtml.split('<h2>')[0]+sections});
