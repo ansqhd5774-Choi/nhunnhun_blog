@@ -8,10 +8,13 @@ import {renderEditorialPost} from '../publishing/editorial.mjs';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
 const source={id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg',bodyHtml:'<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg" alt="감자"></p><h2>소개</h2><p>소개 문장.</p><ul><li><strong>핵심:</strong> 설명 그대로.</li><li><strong>보관:</strong> 조건 그대로.</li></ul><table><tbody><tr><td>성분</td><td>값</td></tr></tbody></table>'};
-test('direct renderer preserves image and text while constructing cards and table wrapper',()=>{
- checkUpdateSource(source,source.id+'.json');const out=renderEditorialPost(source);
- assert.equal((out.match(/<img\b/g)||[]).length,1);assert.equal((out.match(/class="info-card"/g)||[]).length,2);
- assert.ok(out.includes('class="hero"'));assert.ok(out.includes('class="table-wrap"'));assert.ok(out.includes('설명 그대로.'));assert.ok(out.includes('조건 그대로.'));assert.ok(!out.includes('<strong>핵심:</strong>'));
+test('varied renderer assigns layouts by section and preserves emphasis and image',()=>{
+ const sections=['소개','영양','신체 변화','궁합','주의','보관'].map((x,i)=>'<h2>'+x+'</h2><ul><li><strong>항목</strong><mark><strong>중요 수치</strong></mark> 설명 그대로.</li></ul>').join('');
+ const out=renderEditorialPost({...source,bodyHtml:source.bodyHtml.split('<h2>')[0]+sections});
+ for(const name of ['effects','pairs','cautions','storage'])assert.ok(out.includes('class="'+name+'"'));
+ assert.ok(!out.includes('card-grid'));assert.ok(out.includes('<small>03</small>'));
+ assert.ok(out.includes('<mark><strong>중요 수치</strong></mark>'));assert.equal((out.match(/<img\b/g)||[]).length,1);
+ assert.ok(out.includes('font-size:23px'));assert.ok(out.includes('@media(max-width:600px)'));
 });
 test('workflow starts only from explicit prepared-source dispatch with no AI generation',async()=>{
  const text=await readFile('.github/workflows/direct-author-update.yml','utf8');const workflow=YAML.parse(text.replace(/^\uFEFF/,''));
