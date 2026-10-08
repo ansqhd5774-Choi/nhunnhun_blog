@@ -1,5 +1,8 @@
 # NHUNNHUN 건강 콘텐츠 작성·검토 기준 R1
 
+## 직접 작성 경로 예외
+음식 GPT 직접 작성 및 direct-* 수정에는 `content/DIRECT_AUTHORING_R1.md`의 최신 강조·작성·제출 기준이 우선한다. 아래 Editorial R4 강조 제한을 해당 경로로 가져오지 않는다. 기존 R1/R4 경로의 계약과 의학적 근거·보안 보호는 유지한다.
+
 **상태: ACTIVE — 신규 발행·앞으로 수정하는 글의 기준.** 2026-10-07, Asia/Seoul.
 대상은 `nhunnhun.tistory.com`과 `ansqhd5774-Choi/nhunnhun_blog`뿐이다. 운영·인증·발행 경로는 기존 실행 규칙 R2를 유지하며, 내용·문체는 이 문서, 새 강조 표현은 Editorial R4를 우선한다. 과거 글과 발행 기록은 자동 변환하거나 재발행하지 않는다.
 
