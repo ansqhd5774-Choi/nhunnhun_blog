@@ -1,7 +1,10 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "3cabcad326b6dda64cf712b514091061a1e8672e9cf9bb1e8984953ae600f781",
   "sourceCommit": "4a6579d6640a23942640dbc6f105405d4240241d",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-08T23:38:20.089Z"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-08T23:41:36.912Z",
+  "url": "https://nhunnhun.tistory.com/399",
+  "verification": "public browser cross-check after legacy design verification mismatch",
+  "publicationRun": "37860408766"
 }
