@@ -64,7 +64,7 @@ test('cloud workflow has serial execution and an explicit main-only activation g
   assert.equal(workflow.jobs.validate.steps.find(step => step.id === 'mutation-gate').run,'node publishing/mutation-gate.mjs posts');
   assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with['fetch-depth'],0);
   assert.equal(workflow.jobs.publish.needs, 'validate');
-  assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm test'));
+  assert.ok(!workflow.jobs.publish.steps.some(step => step.run === 'pnpm test'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm validate'));
   assert.ok(workflow.jobs.publish.steps.some(step => step.run === 'pnpm run publish'));
   assert.equal(workflow.jobs.validate.steps.find(step => step.uses === 'actions/checkout@v5').with.ref,'${{ github.sha }}');
@@ -194,7 +194,7 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
 
 test('validation and public publisher use the Windows CMD self-hosted runner with mutation isolated to publish', () => {
   const w=parse(readFileSync(new URL('../.github/workflows/publish-posts.yml',import.meta.url),'utf8'));
-  assert.deepEqual(w.jobs.validate['runs-on'],['self-hosted','Windows','X64','tistory-publisher']);
+  assert.deepEqual(w.jobs.validate['runs-on'],['self-hosted','Windows','X64','tistory-validation']);
   assert.deepEqual(w.jobs.validate.defaults,{run:{shell:'cmd'}});
   assert.deepEqual(w.jobs.publish['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.publish.defaults,{run:{shell:'cmd'}});
@@ -319,7 +319,11 @@ test('retired execution records remain byte-identical and outside active workflo
     assert.equal(createHash('sha256').update(bytes).digest('hex'),record.sha256,record.source);
   }
   for(const name of readdirSync(new URL('../.github/workflows/',import.meta.url))){
-    assert.doesNotMatch(readFileSync(new URL('../.github/workflows/'+name,import.meta.url),'utf8'),/BROWSERBASE_|pwsh|powershell/i);
+    const workflow=parse(readFileSync(new URL('../.github/workflows/'+name,import.meta.url),'utf8'));
+    assert.doesNotMatch(JSON.stringify(workflow),/BROWSERBASE_/i);
+    for(const job of Object.values(workflow.jobs)){
+      for(const step of job.steps??[]) assert.ok(!String(step.uses??'').includes('legacy-browser-publisher'));
+    }
   }
   assert.doesNotMatch(readFileSync(new URL('../pnpm-lock.yaml',import.meta.url),'utf8'),/@browserbasehq/);
 });
@@ -347,19 +351,20 @@ test('existing-post update source is locked to one numeric public URL', () => {
 
 test('existing-post update workflow is separated from new publication on the Windows self-hosted runner', () => {
   const w=parse(readFileSync(new URL('../.github/workflows/update-posts.yml',import.meta.url),'utf8'));
-  assert.deepEqual(w.jobs['validate-update']['runs-on'],['self-hosted','Windows','X64','tistory-publisher']);
-  assert.deepEqual(w.jobs['validate-update'].defaults,{run:{shell:'cmd'}});
+  assert.equal(w.jobs['validate-update'],undefined);
+  assert.deepEqual(Object.keys(w.on),['workflow_dispatch']);
   assert.deepEqual(w.jobs.update['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.update.defaults,{run:{shell:'cmd'}});
-  assert.equal(w.jobs.update.needs,'validate-update');
+  assert.equal(w.jobs.update.needs,undefined);
   const all=JSON.stringify(w);
   assert.match(all,/pnpm run update/);
   assert.match(all,/pnpm run validate:update/);
   assert.doesNotMatch(all,/pnpm run publish|publishing\/publish\.mjs/);
-  assert.equal(w.jobs.update.if,"vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' && needs.validate-update.outputs.should_update == 'true'");
-  assert.equal(w.jobs['validate-update'].outputs.should_update,'${{ steps.mutation-gate.outputs.should_mutate }}');
-  assert.equal(w.jobs['validate-update'].steps.find(step => step.id === 'mutation-gate').run,'node publishing/mutation-gate.mjs updates');
-  assert.equal(w.jobs['validate-update'].steps.find(step => step.uses === 'actions/checkout@v5').with['fetch-depth'],0);
+  assert.equal(w.jobs.update.if,"github.event_name == 'workflow_dispatch' && inputs.update == true && vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
+  assert.equal(w.jobs.update.env.UPDATE_SOURCE_ID,'${{ inputs.source_id }}');
+  const runs=w.jobs.update.steps.map(step=>step.run);
+  assert.ok(runs.indexOf('pnpm run validate:update')<runs.indexOf('pnpm run update'));
+  assert.equal(w.jobs.update.steps.find(step=>step.uses==='actions/checkout@v5').with.ref,'${{ github.sha }}');
 });
 
 test('image review gate requires visually checked close-up hero and exact attribution', () => {

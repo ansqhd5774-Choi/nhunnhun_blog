@@ -158,10 +158,10 @@ test('generic Ollama rewrite job accepts food and medicine categories but keeps 
   assert.throws(()=>validateJob({...base,targetUrl:'https://nhunnhun.tistory.com/328'}),/E_OLLAMA_JOB/);
 });
 
-test('direct workflow uses publisher runner and prepared source without AI keys',async()=>{
+test('direct workflow uses validation runner and prepared source without AI keys',async()=>{
  const workflow=await readFile(new URL('../.github/workflows/direct-author-update.yml',import.meta.url),'utf8');
  assert.match(workflow,/workflow_dispatch/);assert.match(workflow,/group: nhunnhun-direct-source-dispatch/);
- assert.match(workflow,/self-hosted, Windows, X64, tistory-publisher/);assert.match(workflow,/direct-dispatch\.mjs/);
+ assert.match(workflow,/self-hosted, Windows, X64, tistory-validation/);assert.match(workflow,/direct-dispatch\.mjs/);
  assert.doesNotMatch(workflow,/OLLAMA_MODEL|11434|OPENAI_API_KEY|ANTHROPIC_API_KEY|schedule:/);
  assert.match(workflow,/actions: write/);assert.match(workflow,/SOURCE_ID:/);
 });
@@ -332,7 +332,7 @@ test('R5 writer splits one keyword into two concurrent section-generation reques
   assert.deepEqual(article.sections.map(s=>s.id),['s1','s2','s3','s4']);
 });
 
-test('R5.2 reuses only previously visual-checked image sets for the same subject',async()=>{
+test('reusable image lookup returns no unrelated subject images without blocking new search',async()=>{
   const root=await mkdtemp(join(tmpdir(),'queue-images-'));
   try{
     await mkdir(join(root,'updates'),{recursive:true});
@@ -349,7 +349,7 @@ test('R5.2 reuses only previously visual-checked image sets for the same subject
     const images=await reusableImages(root,{articleId:'393',keyword:'표고버섯'});
     assert.equal(images.length,3);
     assert.equal(images[0].role,'hero');
-    await assert.rejects(reusableImages(root,{articleId:'999',keyword:'배'}),/E_QUEUE_IMAGE_REVIEW_REQUIRED/);
+    assert.deepEqual(await reusableImages(root,{articleId:'999',keyword:'배'}),[]);
   }finally{await rm(root,{recursive:true,force:true});}
 });
 
