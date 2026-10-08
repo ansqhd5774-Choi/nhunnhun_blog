@@ -2,6 +2,7 @@ import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {checkUpdateSource,updateFingerprint} from '../publishing/update-core.mjs';
+import {assertDirectEmphasis} from '../publishing/direct-emphasis.mjs';
 import {dispatchQueuedUpdate} from './update-queue-dispatch.mjs';
 
 // A push may include several commits. Never guess which update should be mutated.
@@ -44,6 +45,7 @@ export async function dispatchDirectSource({sourceId,commitSha,token,root=proces
   if(!/^direct-[a-z0-9-]{2,70}$/.test(sourceId??''))throw Error('E_DIRECT_SOURCE_ID');
   const source=JSON.parse(await readFile(resolve(root,'updates',sourceId+'.json'),'utf8'));
   checkUpdateSource(source,sourceId+'.json');
+  assertDirectEmphasis(source);
   if(!source.representativeImageUrl)throw Error('E_UPDATE_REPRESENTATIVE');
   let ledger=null;
   try { ledger=JSON.parse(await readFile(resolve(root,'publishing/update-state',sourceId+'.json'),'utf8')); }

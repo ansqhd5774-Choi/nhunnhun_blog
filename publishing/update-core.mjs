@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
+import {assertDirectEmphasis} from './direct-emphasis.mjs';
 
 const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard'];
 
@@ -38,6 +39,7 @@ export async function loadUpdates(directory='updates',sourceId=null){
     out.push(checkUpdateSource(JSON.parse(await readFile(`${directory}/${name}`,'utf8')),name));
   }
   if(sourceId&&out.length!==1)throw Error('E_UPDATE_TARGET_SOURCE_NOT_FOUND');
+  if(sourceId)assertDirectEmphasis(out[0]);
   if(new Set(out.map(x=>x.articleId)).size!==out.length) throw new Error('E_UPDATE_DUPLICATE_ARTICLE');
   return out;
 }

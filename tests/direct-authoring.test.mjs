@@ -1,3 +1,4 @@
+import './direct-emphasis-guard.test.mjs';
 import test from 'node:test';
 import './emphasis-observation.test.mjs';
 import './direct-preparation.test.mjs';
@@ -10,7 +11,7 @@ import {renderEditorialPost} from '../publishing/editorial.mjs';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
 import {startDirectPublish} from '../authoring/start-direct-publish.mjs';
-const source={id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg',bodyHtml:'<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg" alt="감자"></p><h2>소개</h2><p>소개 문장.</p><ul><li><strong>핵심:</strong> 설명 그대로.</li><li><strong>보관:</strong> 조건 그대로.</li></ul><table><tbody><tr><td>성분</td><td>값</td></tr></tbody></table>'};
+const source={id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg',bodyHtml:'<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg" alt="감자"></p><h2>소개</h2><p><mark><strong>소개 문장.</strong></mark></p><ul><li><strong>핵심:</strong> 설명 그대로.</li><li><strong>보관:</strong> 조건 그대로.</li></ul><table><tbody><tr><td>성분</td><td>값</td></tr></tbody></table>'};
 test('local publication entry reads remote main and starts one update without another writer job',()=>{
  let starts=0;
  const run=args=>{
@@ -56,6 +57,9 @@ test('direct dispatch requires existing approved source and calls existing publi
  const root=await mkdtemp(join(tmpdir(),'nh-direct-'));let calls=0;
  try{await mkdir(join(root,'updates'));await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));const dispatch=async args=>{calls++;assert.equal(args.sourceId,source.id);return {submitted:true};};
  await dispatchDirectSource({root,sourceId:source.id,commitSha:'a'.repeat(40),token:'fixture',dispatch});assert.equal(calls,1);
+ await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify({...source,bodyHtml:'<p><strong>핵심</strong></p>'}));
+ await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_EMPHASIS_MISSING/);assert.equal(calls,1);
+ await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));
  await mkdir(join(root,'publishing','update-state'),{recursive:true});
  await writeFile(join(root,'publishing','update-state',source.id+'.json'),JSON.stringify({phase:'submitting'}));
  await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_ALREADY_ATTEMPTED/);assert.equal(calls,1);
