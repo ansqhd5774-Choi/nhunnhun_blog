@@ -1,0 +1,22 @@
+name: Runner isolation smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validation:
+    runs-on: [self-hosted, Windows, X64, tistory-validation]
+    timeout-minutes: 2
+    steps:
+      - shell: powershell
+        run: |
+          if ($env:RUNNER_NAME -ne 'c06-tistory-validation') { throw 'WRONG_VALIDATION_RUNNER' }
+          Write-Output "VALIDATION_RUNNER_PASS $env:RUNNER_NAME"
+  publisher:
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 2
+    steps:
+      - shell: powershell
+        run: |
+          if ($env:RUNNER_NAME -ne 'c06-tistory-publisher') { throw 'WRONG_PUBLISH_RUNNER' }
+          Write-Output "PUBLISH_RUNNER_PASS $env:RUNNER_NAME"

@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   dispatch:
-    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    runs-on: [self-hosted, Windows, X64, tistory-validation]
     timeout-minutes: 5
     defaults:
       run:

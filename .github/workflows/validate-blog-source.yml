@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   validate:
-    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    runs-on: [self-hosted, Windows, X64, tistory-validation]
     defaults:
       run:
         shell: cmd
