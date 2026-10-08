@@ -139,13 +139,13 @@ function replaceImageSources(html,mapping,representativeSource){
   });
 }
 async function selectEditorMode(page,mode){
-  const selector=mode==='html'?'#editor-mode-html-text':'#editor-mode-kakao-text';
+  const selector=mode==='html'?'#editor-mode-html-text:visible, #editor-mode-html-tistory:visible':'#editor-mode-kakao-text:visible, #editor-mode-kakao-tistory:visible';
   const visibleEditors=await page.locator('.CodeMirror:visible').count();
   if(mode==='html'&&visibleEditors)return;
   if(mode==='basic'&&!visibleEditors)return;
-  const option=page.locator(selector);
+  const option=page.locator(selector).first();
   if(!await option.isVisible()){
-    await page.locator('#editor-mode-layer-btn-open').click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});});
+    await page.locator('button:visible').filter({has:page.locator('.mce-txt')}).filter({hasText:/기본모드|HTML|마크다운/}).first().click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});});
   }
   await option.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});});
   await option.click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});});
