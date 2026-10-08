@@ -142,6 +142,9 @@ function replaceImageSources(html,mapping,representativeSource){
 }
 async function probeManagedPost(page,update){
   try{
+    await page.goto(`${BLOG}/manage/posts`,{waitUntil:'domcontentloaded',timeout:30000});
+    const managedUrl=new URL(page.url());
+    if(managedUrl.origin!==BLOG||!managedUrl.pathname.startsWith('/manage')) throw new Error('E_LOGIN_REQUIRED');
     const result=await page.evaluate(async ({id,title})=>{
       async function getPage(page,searchKeyword=''){
         const params=new URLSearchParams({
@@ -186,7 +189,7 @@ async function probeManagedPost(page,update){
     if((result.title||'').trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
     return result;
   }catch(error){
-    if(/^E_UPDATE_/.test(String(error?.message||''))) throw error;
+    if(error?.message==='E_LOGIN_REQUIRED'||/^E_UPDATE_/.test(String(error?.message||''))) throw error;
     throw new Error('E_UPDATE_TARGET_PROBE');
   }
 }
