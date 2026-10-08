@@ -14,3 +14,9 @@ test('runner diagnostics distinguish matching idle busy offline and unavailable'
   assert.equal(classifyRunners([]),'RUNNER_LABEL_MISMATCH');
   assert.equal(classifyRunners(null),'RUNNER_UNREACHABLE');
 });
+test('only documentation-only forward drift is accepted with known changed paths',()=>{
+ const a='a'.repeat(40),b='b'.repeat(40);
+ assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,['AGENTS.md','docs/content/DIRECT_AUTHORING_R1.md']));
+ for(const paths of [[],['publishing/direct-design.mjs'],['updates/direct-299-test.json'],['pnpm-lock.yaml'],['.github/workflows/update-posts.yml'],['docs/a.md','publishing/update.mjs']])assert.throws(()=>assertSourceIdentity(a,a,b,paths),/BLOCKED_SOURCE_DRIFT/);
+ assert.throws(()=>assertSourceIdentity(a,b,b,['docs/a.md']),/BLOCKED_SOURCE_DRIFT/);
+});
