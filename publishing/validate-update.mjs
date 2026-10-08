@@ -4,7 +4,7 @@ import { renderEditorialPost, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs
 import { assertImageReview } from './image-review.mjs';
 
 try{
-  const updates=await loadUpdates();
+  const updates=await loadUpdates('updates',process.env.UPDATE_SOURCE_ID || null);
   for(const update of updates){
     if(update.contentStandard==='SP1') {
       console.log(`CONTENT_VALIDATION_SKIPPED: ${update.id}`);
