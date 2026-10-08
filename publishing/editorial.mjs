@@ -29,12 +29,12 @@ function applyHighlights(html){
     return `<span style="background:linear-gradient(transparent 45%,${color} 45%);padding:0 .06em;">${inner}</span>`;
   });
 }
-function styleTable(inner){
+function styleTable(inner,{fluid=false}={}){
   let t=inner;
   t=t.replace(/<thead><tr>/g,'<thead><tr style="background:#f5f6f8;">');
   t=t.replace(/<th>/g,'<th style="padding:11px 12px;border-bottom:1px solid #dfe4ea;text-align:left;font-weight:700;">');
   t=t.replace(/<td>/g,'<td style="padding:10px 12px;border-top:1px solid #eef1f4;vertical-align:top;">');
-  return '<div style="overflow-x:auto;margin:14px 0 10px;border:1px solid #e5e7eb;border-radius:8px;"><table style="width:100%;min-width:520px;border-collapse:collapse;margin:0;background:#fff;font-size:14px;line-height:1.55;">'+t+'</table></div>';
+  return '<div style="overflow-x:auto;margin:14px 0 10px;border:1px solid #e5e7eb;border-radius:8px;"><table style="width:100%;'+(fluid?'min-width:0;table-layout:auto;overflow-wrap:anywhere;':'min-width:520px;')+'border-collapse:collapse;margin:0;background:#fff;font-size:14px;line-height:1.55;">'+t+'</table></div>';
 }
 
 export function assertEditorialSource(post){
@@ -115,7 +115,7 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
   out=out.replace(/<h2>/g,ACCENT+H2);
   out=out.replace(/<h3>/g,H3);
 
-  out=out.replace(/<table>\s*([\s\S]*?)\s*<\/table>/g,(_m,inner)=>styleTable(inner));
+  out=out.replace(/<table>\s*([\s\S]*?)\s*<\/table>/g,(_m,inner)=>styleTable(inner,{fluid:version==='SP1'}));
 
   out=out.replace(/<blockquote>/g,'<blockquote style="margin:18px 0 28px;padding:16px 18px;background:#f8fafc;border-left:4px solid #334155;color:#1f2937;">');
 

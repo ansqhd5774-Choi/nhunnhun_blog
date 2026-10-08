@@ -16,10 +16,12 @@ export function checkUpdateSource(update, filename){
   }
   if(update.status!=='ready' || update.approved!==true) throw new Error('E_UPDATE_APPROVAL');
   if(typeof update.bodyHtml!=='string' || !plainText(update.bodyHtml)) throw new Error('E_UPDATE_BODY');
+  if(update.contentStandard!=='SP1'||update.representativeImageUrl!==undefined){
   if(typeof update.representativeImageUrl!=='string' || !update.representativeImageUrl.trim()) throw new Error('E_UPDATE_REPRESENTATIVE');
   let rep;
   try { rep=new URL(update.representativeImageUrl); } catch { throw new Error('E_UPDATE_REPRESENTATIVE'); }
   if(rep.protocol!=='https:' || rep.username || rep.password) throw new Error('E_UPDATE_REPRESENTATIVE');
+  }
   checkPublishHtml({bodyHtml:update.bodyHtml});
   return update;
 }

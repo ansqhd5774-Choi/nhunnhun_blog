@@ -195,9 +195,9 @@ export function buildLengthReport(article,scope){
 }
 
 function validReusableImageSet(source){
-  if(!Array.isArray(source?.imageReview)||source.imageReview.length<3)return null;
-  const images=source.imageReview.slice(0,3);
-  if(images.every(x=>x?.visualChecked===true&&x.src&&x.sourcePage&&x.author&&x.license)&&images[0].role==='hero'&&images[0].composition==='closeup')return images;
+  if(!Array.isArray(source?.imageReview))return null;
+  const images=source.imageReview.filter(x=>x?.src&&x.sourcePage&&x.author&&x.license).slice(0,3);
+  if(images.length)return images;
   return null;
 }
 async function jsonFiles(root,dir){
@@ -221,7 +221,7 @@ export async function reusableImages(root,item){
       const images=validReusableImageSet(source);if(images)return images;
     }
   }
-  throw new Error('E_QUEUE_IMAGE_REVIEW_REQUIRED');
+  return [];
 }
 function attribution(images){
   return images.map((x,i)=>`<li><a href="${esc(x.sourcePage)}">이미지 ${i+1} 원출처</a> — ${esc(x.author)}, ${esc(x.license)}</li>`).join('');

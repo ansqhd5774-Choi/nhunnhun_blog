@@ -28,7 +28,7 @@ async function fetchPublic(item,fetcher){
 function makeSource(item,currentTitle,sourceId,article,body,images){
   return {
     id:sourceId,articleId:item.articleId,targetUrl:item.targetUrl,expectedCurrentTitle:currentTitle,title:article.title,
-    representativeImageUrl:images[0].src,imageReview:images,bodyHtml:body,status:'ready',approved:true,
+    representativeImageUrl:images[0]?.src,imageReview:images,bodyHtml:body,status:'ready',approved:true,
     category:item.category,contentStandard:'SP1'
   };
 }

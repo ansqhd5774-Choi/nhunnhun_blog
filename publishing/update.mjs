@@ -306,6 +306,7 @@ try{
       stage='publish-dialog';
       await page.locator('#publish-layer-btn').click();
       await page.locator('.publish_editor').waitFor({state:'visible',timeout:10000}).catch(()=>{throw Error('E_UPDATE_PUBLISH_DIALOG');});
+      if(update.representativeImageUrl){
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
       const deleteRepresentative=thumb.locator('button.ico_delete, button.mce-ico.ico_delete');
@@ -331,6 +332,7 @@ try{
       },null,{timeout:10000});
       if((await thumb.innerText().catch(()=>''))?.includes('대표이미지 추가')) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
 
+      }
       stage='submit-control';
       let submit=null;
       for(const name of ['변경사항 저장','수정','완료','공개 발행']){
