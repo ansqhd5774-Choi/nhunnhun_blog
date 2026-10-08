@@ -14,7 +14,7 @@ export function foodSectionInstructions(keyword='가지') {
   return FOOD_SECTIONS.map(s=>({...s,question:s.question.replace('{keyword}',keyword)}));
 }
 export function foodSectionPrompt(spec,index,subject) {
-  return `${index+1} ${spec.question}\n주제: ${subject}\n제목: ${spec.question}\n언어: 한국어 약 ${spec.targetChars}자\n형식: ${spec.format}\n내용: ${spec.include}\n- 핵심 단어 굵은 글씨 적용 (**단어**)\n- 중요한 문구 형광펜 적용 (==문구==)`;
+  return `${index+1} ${spec.question}\n주제: ${subject}\n제목: ${spec.question}\n언어: 한국어 약 ${spec.targetChars}자\n형식: ${spec.format}\n내용: ${spec.include}`;
 }
 export async function writeFoodSections(item,evidence,{cached=(_stage,_input,action)=>action(),onCacheHit,onMetrics=()=>{},model,fetcher=fetch}={}) {
   const subject=evidence.query&&evidence.query!==item.keyword?`${item.keyword}(${evidence.query})`:item.keyword;
