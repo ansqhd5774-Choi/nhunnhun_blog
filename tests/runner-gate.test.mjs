@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {assertSourceIdentity,classifyRunners,RUNNER_LABELS} from '../publishing/runner-gate.mjs';
+import {assertSourceIdentity,classifyRunners,RUNNER_LABELS,mutationSourceId} from '../publishing/runner-gate.mjs';
 test('queued stale workflow cannot mutate even when checkout uses new main',()=>{
   const a='a'.repeat(40), b='b'.repeat(40);
   assert.doesNotThrow(()=>assertSourceIdentity(a,a,a));
@@ -25,4 +25,14 @@ test('selected source is protected while another article and its checkpoint may 
  assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,['updates/direct-333-other.json','publishing/update-state/direct-333-other.json'],id));
  for(const p of ['updates/'+id+'.json','publishing/update-state/'+id+'.json','publishing/update.mjs'])assert.throws(()=>assertSourceIdentity(a,a,b,[p],id),/BLOCKED_SOURCE_DRIFT/);
  assert.throws(()=>assertSourceIdentity(a,a,b,['updates/direct-333-other.json']),/BLOCKED_SOURCE_DRIFT/);
+});
+test('new publication source ID scopes unrelated updates without weakening its own protection',()=>{
+ const a='a'.repeat(40),b='b'.repeat(40),id='direct-mussels-20261009';
+ const target=mutationSourceId({PUBLISH_SOURCE_ID:id});
+ assert.equal(target,id);
+ assert.equal(mutationSourceId({UPDATE_SOURCE_ID:id}),id);
+ assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,['updates/direct-272-octopus-20261009.json'],target));
+ for(const path of ['posts/'+id+'.json','publishing/state/'+id+'.json','publishing/publish.mjs'])
+   assert.throws(()=>assertSourceIdentity(a,a,b,[path],target),/BLOCKED_SOURCE_DRIFT/);
+ assert.throws(()=>assertSourceIdentity(a,a,b,['updates/direct-272-octopus-20261009.json'],mutationSourceId({})),/BLOCKED_SOURCE_DRIFT/);
 });
