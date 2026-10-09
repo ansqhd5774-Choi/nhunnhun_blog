@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "eeafe28b6e2a85796497914e166707ab34e075ecd4c8a61c8813dc39028ea7f2",
-  "sourceCommit": "fe750af936b20ac7bb3fe32588b3ff9a66573b74",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-09T16:41:33.233Z",
   "url": "https://nhunnhun.tistory.com/408",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-09T16:42:02.501Z",
+  "sourceCommit": "fe750af936b20ac7bb3fe32588b3ff9a66573b74",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37960726952",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-kamut-fermented-enzyme-20261010",
+    "url": "https://nhunnhun.tistory.com/408",
+    "checkedAt": "2026-10-09T16:42:02.501Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
