@@ -176,7 +176,7 @@ async function selectEditorMode(page,mode){
           await page.waitForFunction(()=>
             [...document.querySelectorAll('.CodeMirror')].every(el=>
               !el.getClientRects().length||getComputedStyle(el).visibility==='hidden'
-            ),{timeout:10000,polling:100}).catch(error=>{
+            ),null,{timeout:10000,polling:100}).catch(error=>{
               throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});
             });
           console.log('UPDATE_BASIC_MODE_DOM_TRANSITION_VERIFIED');
