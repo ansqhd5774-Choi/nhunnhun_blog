@@ -6,13 +6,24 @@ import { normalizeSkinHead } from '../scripts/normalize-skin-head.mjs';
 import { metadata,duplicateGroups } from '../scripts/audit-public-metadata.mjs';
 import { installGrowthNavigation } from '../scripts/install-growth-navigation.mjs';
 import { summarizeSchemaDates } from '../scripts/summarize-schema-dates.mjs';
-import { extractEvidence, accessState, reconcileSourceAccess } from '../scripts/audit-health-evidence.mjs';
+import { extractEvidence, accessState, reconcileSourceAccess, reconcileImageAccess } from '../scripts/audit-health-evidence.mjs';
 import { installGrowthEvents, protectExistingAnalytics } from '../scripts/install-growth-events.mjs';
 import { installRuntimeQuality } from '../scripts/install-health-runtime-quality.mjs';
 import { recordedSourceDates } from '../scripts/build-review-register.mjs';
 import { contentDigest } from '../publishing/content-standards.mjs';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
+
+test('image browser cross-check preserves transport failures and requires the exact loaded asset',()=>{
+ const original={key:'asset',status:403,access:'ACCESS_RESTRICTED'};
+ const browser={key:'asset',method:'public-image-navigation',checkedAt:'2026-10-10',result:{images:[{complete:true,naturalWidth:300,naturalHeight:200}]}};
+ const result=reconcileImageAccess(original,browser);
+ assert.equal(result.status,403);assert.equal(result.runtimeAccess,'BROWSER_IMAGE_LOADED');
+ assert.equal(result.discrepancy,true);assert.equal(result.imageLicenseReview,'NOT_PERFORMED');
+ for(const invalid of [{...browser,key:'other'},{...browser,result:{images:[{complete:false,naturalWidth:0,naturalHeight:0}]}},{...browser,result:{images:[]}}]) {
+  assert.equal(reconcileImageAccess(original,invalid).runtimeAccess,'UNCONFIRMED');
+ }
+});
 
 test('source dates require matching approved review and never use publication dates',()=>{
  const source={id:'record',bodyHtml:'<a href="https://official.example/safety">근거</a>'};

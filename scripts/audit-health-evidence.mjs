@@ -66,6 +66,17 @@ export function reconcileSourceAccess(automated, browser) {
     contentReview:browser.contentReview??'NOT_PERFORMED'};
 }
 
+export function reconcileImageAccess(automated, browser) {
+  const images=browser?.result?.images;
+  const loaded=browser?.key===automated.key && browser?.method==='public-image-navigation' && Number.isFinite(Date.parse(browser.checkedAt)) &&
+    Array.isArray(images) && images.length===1 && images[0].complete===true &&
+    images[0].naturalWidth>0 && images[0].naturalHeight>0;
+  if (!loaded) return {...automated,runtimeAccess:'UNCONFIRMED'};
+  return {...automated,runtimeAccess:'BROWSER_IMAGE_LOADED',browserCheckedAt:browser.checkedAt,
+    discrepancy:automated.access!=='HTTP_ACCESSIBLE_CONTENT_UNREVIEWED',
+    imageRelevanceReview:'NOT_PERFORMED',imageLicenseReview:'NOT_PERFORMED'};
+}
+
 export async function auditHealthEvidence(outDir, maxPages=0) {
   await fs.mkdir(outDir,{recursive:true});
   const file=path.join(outDir,'health-evidence-checkpoint.json');
@@ -129,15 +140,21 @@ export async function auditHealthEvidence(outDir, maxPages=0) {
   try {crosschecks=JSON.parse(await fs.readFile(path.join(outDir,'source-browser-crosschecks.json'),'utf8'));} catch {}
   const browserByUrl=new Map(crosschecks.map(r=>[r.sourceUrl,r]));
   const sources=Object.fromEntries(sourceUrls.map(u=>[u,reconcileSourceAccess(state.sources[u],browserByUrl.get(u))]));
+  let imageCrosschecks=[];
+  try {imageCrosschecks=JSON.parse(await fs.readFile(path.join(outDir,'image-access-crosschecks.json'),'utf8'));} catch {}
+  const browserByImage=new Map(imageCrosschecks.filter(r=>r.key).map(r=>[r.key,r]));
+  const images=Object.fromEntries(Object.entries(state.images).map(([key,record])=>[key,reconcileImageAccess({...record,key},browserByImage.get(key))]));
   const counts=rows=>rows.reduce((a,r)=>(a[r.access]=(a[r.access]??0)+1,a),{});
   const summary={checkedAt:new Date().toISOString(),sitemapStatus:sitemap.status,totalPublicUrls:urls.length,selected:selected.length,pagesChecked:selected.filter(u=>state.pages[u]).length,
     pageAccess:counts(selected.map(u=>state.pages[u])),uniqueSources:sourceUrls.length,sourceAccess:counts(sourceUrls.map(u=>state.sources[u])),uniqueImages:Object.keys(state.images).length,imageAccess:counts(Object.values(state.images)),
     missingAltImages:selected.flatMap(u=>state.pages[u]?.images??[]).filter(i=>!i.alt.trim()).length,
     browserCrosschecks:sourceUrls.filter(u=>sources[u].runtimeAccess==='BROWSER_CONTENT_DISPLAYED').length,
+    imageBrowserCrosschecks:Object.values(images).filter(r=>r.runtimeAccess==='BROWSER_IMAGE_LOADED').length,
+    imageIssues:Object.values(images).filter(r=>r.access!=='HTTP_ACCESSIBLE_CONTENT_UNREVIEWED'),
     sourceIssues:sourceUrls.filter(u=>state.sources[u].access!=='HTTP_ACCESSIBLE_CONTENT_UNREVIEWED').map(u=>({sourceUrl:u,...sources[u],affectedArticles:selected.filter(p=>state.pages[p]?.external.some(e=>e.sourceUrl===u))})),
     semanticReview:'NOT_PERFORMED',indexingVerification:'NOT_PERFORMED',imageLicenseReview:'NOT_PERFORMED'};
   await fs.writeFile(path.join(outDir,'health-evidence-summary.json'),JSON.stringify(summary,null,2));
-  console.log(JSON.stringify({...summary,sourceIssues:summary.sourceIssues.length}));
+  console.log(JSON.stringify({...summary,sourceIssues:summary.sourceIssues.length,imageIssues:summary.imageIssues.length}));
   return summary;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) await auditHealthEvidence(process.argv[2]??'evidence/health-evidence',Number(process.argv[3]??0));
