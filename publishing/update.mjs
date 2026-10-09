@@ -290,7 +290,7 @@ try{
           await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
         }
       }catch(error){
-        const cause=String(error?.message||'').replace(/https?:\\/\\/[^\\s)]+/g,'[URL]').slice(0,350);
+        const cause=String(error?.message||'').replace(new RegExp('https?:'+'/'+'/'+'[^ ]+','g'),'[URL]').slice(0,350);
         console.error('UPDATE_EDITOR_OPEN_CAUSE '+JSON.stringify({type:error?.name||'Error',message:cause,path:new URL(page.url()).pathname}));
         throw Object.assign(new Error('E_UPDATE_EDITOR_OPEN_NAVIGATION'),{cause:error});
       }
