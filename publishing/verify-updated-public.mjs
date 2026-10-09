@@ -1,6 +1,7 @@
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { verificationContext } from './verification-context.mjs';
 import {assertDirectPublicSnapshot} from './direct-public-contract.mjs';
+import {assertPublicTitle} from './public-title.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -101,7 +102,8 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
     if(!response?.ok() || articleUrl(page.url())!==update.targetUrl) throw new Error('E_QA_PUBLIC_RESPONSE');
     const canonical=await page.locator('link[rel="canonical"]').getAttribute('href');
     if(articleUrl(canonical)!==update.targetUrl) throw new Error('E_QA_CANONICAL');
-    if(!(await page.locator('h1').allTextContents()).map(normalize).includes(update.title)) throw new Error('E_QA_TITLE');
+    assertPublicTitle(await page.evaluate(() => ({heading:document.querySelector('h1')?.innerText,
+      og:document.querySelector('meta[property="og:title"]')?.content})),update.title);
     const root=page.locator(update.id.startsWith('direct-')?'.contents_style:has(.nh-direct-v2)':'.contents_style');
     if(await root.count()!==1) throw new Error('E_QA_ROOT');
     const expectedText=await page.evaluate(html=>{
