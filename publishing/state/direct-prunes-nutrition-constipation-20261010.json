@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "5bb810f3e16098ed6a1acb41dfc8d72ceebc3e898d6307e8c35047744ecf9500",
-  "sourceCommit": "0ab036d41b0be4842bd8f260e033652d1620948e",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-09T17:48:18.848Z",
   "url": "https://nhunnhun.tistory.com/409",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-09T17:48:55.308Z",
+  "sourceCommit": "0ab036d41b0be4842bd8f260e033652d1620948e",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37968471165",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-prunes-nutrition-constipation-20261010",
+    "url": "https://nhunnhun.tistory.com/409",
+    "checkedAt": "2026-10-09T17:48:55.308Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
