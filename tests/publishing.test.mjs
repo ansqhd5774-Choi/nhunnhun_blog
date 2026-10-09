@@ -170,7 +170,9 @@ test('only canonical publish workflow may invoke the public publisher', () => {
 });
 
 test('publish pipeline keeps the required recurrence-prevention gates', () => {
-  const publish=readFileSync(new URL('../publishing/publish.mjs', import.meta.url),'utf8');
+  const entry=readFileSync(new URL('../publishing/publish.mjs', import.meta.url),'utf8');
+  assert.match(entry,/await verifyPublishedPublic/);
+  const publish=entry+readFileSync(new URL('../publishing/verify-published-public.mjs', import.meta.url),'utf8');
   const validate=readFileSync(new URL('../publishing/validate.mjs', import.meta.url),'utf8');
   assert.match(publish,/renderEditorialPost\(post\)/);
   assert.match(publish,/assertEditorialContract\(stagedHtml, post\.bodyHtml,\{version:editorialVersionFor\(post\)\}\)/);
