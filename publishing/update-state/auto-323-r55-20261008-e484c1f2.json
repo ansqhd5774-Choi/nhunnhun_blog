@@ -12,9 +12,9 @@
     "sourceCommit": "b75c5dd43406b1c1ca17ffd15b2ea467d6beaac8",
     "fingerprint": "9381cf4c9d7094eac4d59c12259a31a3c00f03948647c2933671955989ee4b92",
     "runUrl": null,
-    "checkedAt": "2026-10-09T21:33:05.234Z",
-    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37994033593",
+    "checkedAt": "2026-10-09T23:51:03.886Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38006311036",
     "status": "PUBLIC_VERIFICATION_MISMATCH",
-    "code": "E_QA_BODY"
+    "code": "E_QA_IMAGES"
   }
 }
