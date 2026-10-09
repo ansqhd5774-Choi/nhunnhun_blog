@@ -13,7 +13,14 @@ export function prepareDirectSource(source) {
   else {checkPost(source,source.id+'.json');checkPublishHtml(source);}
   const observation=observeEmphasis(source.bodyHtml);
   return {
-    report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml)},
+    report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml),
+      editorialReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[
+        '제목·소제목이 실제 본문에서 답하는 내용과 일치하는가?',
+        '소개·효능·궁합은 장점을 먼저 설명하고 불필요한 반박을 반복하지 않는가?',
+        '흡수·상호작용·효과 크기의 구체적인 주장에 해당 원문 출처를 연결했는가?',
+        '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?',
+        '조리·보관 안내에 행동·시간·온도·조건을 명확하게 표시했는가?'
+      ]}},
     preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'
   };
 }
