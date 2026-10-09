@@ -10,6 +10,10 @@ const BLOG='https://nhunnhun.tistory.com';
 const normalize=s=>String(s||'').replace(/\s+/g,' ').trim();
 const hash=b=>createHash('sha256').update(b).digest('hex');
 
+export function headingStyleProfile(readingSkin,width) {
+  return readingSkin ? {h2:width<=600?'22px':'24px',h3:'19px',weight:'800'} : {h2:'26px',h3:'20px',weight:'800'};
+}
+
 export function articleUrl(value) {
   const u=new URL(value);
   if(u.origin!==BLOG || !/^\/\d+$/.test(u.pathname) || u.search || u.hash || u.username || u.password) throw new Error('E_QA_TARGET');
@@ -120,7 +124,8 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
       await img.evaluate(async el=>{ if(!el.complete) await Promise.race([new Promise(r=>{el.addEventListener('load',r,{once:true});el.addEventListener('error',r,{once:true});}),new Promise(r=>setTimeout(r,15000))]); });
     }
     await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);scrollTo(0,0);});
-    const metrics=await root.evaluate(el=>{
+    const headingProfile=headingStyleProfile(await page.locator('#nh-reading-layout-20261009').count()===1,width);
+    const metrics=await root.evaluate((el,headingProfile)=>{
       const imgs=[...el.querySelectorAll('img')],h2=[...el.querySelectorAll('h2')],h3=[...el.querySelectorAll('h3')],tables=[...el.querySelectorAll('table')];
       const hi=[...el.querySelectorAll('span')].filter(n=>/linear-gradient\(transparent 45%,#[0-9a-f]{6} 45%\)/i.test(n.getAttribute('style')||''));
       const colors=new Set(hi.map(n=>(n.getAttribute('style').match(/#[0-9a-f]{6}/i)||[])[0]).filter(Boolean));
@@ -134,13 +139,13 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
         heroPriority:imgs[0]?.getAttribute('loading')==='eager'&&imgs[0]?.getAttribute('fetchpriority')==='high',
         badLazyImages:imgs.slice(1).filter(n=>n.getAttribute('loading')!=='lazy').length,
         h2:h2.length,h3:h3.length,
-        badHeadingStyles:h2.filter(n=>{const c=getComputedStyle(n);return c.fontSize!=='26px'||c.fontWeight!=='800';}).length+h3.filter(n=>{const c=getComputedStyle(n);return c.fontSize!=='20px'||c.fontWeight!=='800';}).length,
+        badHeadingStyles:h2.filter(n=>{const c=getComputedStyle(n);return c.fontSize!==headingProfile.h2||c.fontWeight!==headingProfile.weight;}).length+h3.filter(n=>{const c=getComputedStyle(n);return c.fontSize!==headingProfile.h3||c.fontWeight!==headingProfile.weight;}).length,
         tables:tables.length,badTableWraps:tables.filter(n=>!['auto','scroll'].includes(getComputedStyle(n.parentElement).overflowX)).length,
         highlights:hi.length,highlightColors:colors.size,hiddenHighlights:hi.filter(n=>getComputedStyle(n).backgroundImage==='none').length,
         faqQ:[...el.querySelectorAll('span')].filter(n=>n.textContent.trim()==='Q.').length,
         faqA:[...el.querySelectorAll('span')].filter(n=>n.textContent.trim()==='A.').length
       };
-    });
+    },headingProfile);
     console.log('PUBLIC_QA_METRICS '+JSON.stringify({articleId:update.articleId,width,...metrics}));
     if(update.contentStandard==='SP1'&&update.id.startsWith('direct-')) {
       const snapshot=await root.evaluate(root=>{
