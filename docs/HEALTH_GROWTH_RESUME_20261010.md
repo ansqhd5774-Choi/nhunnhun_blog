@@ -10,6 +10,7 @@
 - Google /411: Google에는 아직 알려지지 않은 URL. 03:29 KST 실제 URL 테스트에서 등록 가능·색인 가능을 확인했고 스마트폰 렌더 화면에 브랜드·제목·최초 발행일·목차가 보였다. 색인 완료 또는 전체 본문·표·출처 대조 PASS로 확대하지 않는다.
 - Google 코어 웹 바이탈: 모바일·데스크톱 데이터 없음. 성능 합격·실패가 아니다.
 - 공개 /411의 분석 script 관찰: Naver wcslog.js 두 개, Google 분석 loader는 관찰되지 않았다. 이것만으로 전체 이벤트 수집 또는 전송 중복을 확정하지 않는다. GA4 속성·설치·수집 검증은 별도 남음.
+- 후속 공식 GA4 확인: 스트림 URL이 정확히 건강 블로그인 기존 웹 스트림을 확인했다. 상세 화면은 최근48시간 수집 활성·데이터 전송 중, 향상된 측정의 페이지 조회·스크롤·이탈 클릭 활성을 표시했다. 따라서 로더 관찰만으로 설치 누락을 판정하지 않고 기존 설치를 보존한다. custom related/source/share/copy 이벤트·DebugView·PII 검증은 미완료다.
 
 ## 로컬 진단과 준비
 
@@ -23,7 +24,7 @@
 
 전체 로컬 회귀294개 PASS. 새2개 검사는 schema identity/날짜 역전/누락과 의미·공식 검사 미수행의 분리를 확인한다.
 
-private 증거: 작업 루트 `evidence/growth-resume-20261010/`의 `bing-processing.png`, `gsc-pages.json`, `gsc-performance.png`, `gsc-live-render.png`, `search-priorities.json`, `schema-dates.json`, `review-register.json`, `tests.txt`. 전체 계정 화면·원자료는 저장소에 커밋하지 않는다.
+private 증거: 작업 루트 `evidence/growth-resume-20261010/`의 `bing-processing.png`, `gsc-pages.json`, `gsc-performance.png`, `gsc-live-render.png`, `ga4-stream.png`, `search-priorities.json`, `schema-dates.json`, `review-register.json`, `tests.txt`. 전체 계정 화면·원자료는 저장소에 커밋하지 않는다.
 
 ## 남은 범위
 
