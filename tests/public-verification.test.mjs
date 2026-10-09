@@ -1,8 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {articleUrl,ogAsset,checkMeasurements,assertImagePayload,verifyInternalLink} from '../publishing/verify-updated-public.mjs';
+import {articleUrl,ogAsset,checkMeasurements,assertImagePayload,verifyInternalLink,headingStyleProfile} from '../publishing/verify-updated-public.mjs';
 const e={images:3,h2:10,h3:3,tables:2,highlights:7,faq:5};
 const m={overflowPx:0,wideImages:0,images:3,missingAlt:0,brokenImages:0,nonNativeImages:0,h2:10,h3:3,badHeadingStyles:0,tables:2,badTableWraps:0,highlights:7,highlightColors:4,hiddenHighlights:0,faqQ:5,faqA:5,heroPriority:true,badLazyImages:0};
+test('approved reading skin uses exact responsive headings while legacy keeps its own profile',()=>{
+ assert.deepEqual(headingStyleProfile(true,1440),{h2:'24px',h3:'19px',weight:'800'});
+ assert.deepEqual(headingStyleProfile(true,390),{h2:'22px',h3:'19px',weight:'800'});
+ assert.deepEqual(headingStyleProfile(true,600),{h2:'22px',h3:'19px',weight:'800'});
+ assert.deepEqual(headingStyleProfile(true,601),{h2:'24px',h3:'19px',weight:'800'});
+ assert.deepEqual(headingStyleProfile(false,390),{h2:'26px',h3:'20px',weight:'800'});
+});
+
 test('only authorized numeric public article URLs',()=>{
   assert.equal(articleUrl('https://nhunnhun.tistory.com/112'),'https://nhunnhun.tistory.com/112');
   for(const s of ['https://nutriments.tistory.com/112','https://nhunnhun.tistory.com/manage','http://nhunnhun.tistory.com/112','https://nhunnhun.tistory.com/112?x=1']) assert.throws(()=>articleUrl(s));
