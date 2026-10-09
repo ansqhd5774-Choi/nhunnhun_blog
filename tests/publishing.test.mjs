@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {renderArticleCitations} from '../publishing/article-citations.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -517,3 +518,15 @@ test('publisher restores the last proven Tistory category option sequence', () =
   assert.match(publish,/E_TAG_CONTROL/);
 });
 
+test('only the two authorized citation repairs receive compact footer references',()=>{
+ const html='<p>본문<a href="https://example.org/a" title="근거 [1]">[1]</a></p><h2>자료 출처</h2><ul><li><a href="https://example.org/a">자료</a></li></ul>';
+ const allowed={articleId:'264',id:'update-264-citation-layout-20261010'};
+ const rendered=renderArticleCitations(html,allowed);
+ assert.match(rendered,/href="#nh-ref-1"/);
+ assert.match(rendered,/id="nh-ref-1"/);
+ assert.match(rendered,/font-size:12px!important/);
+ assert.match(rendered,/href="https:\/\/example.org\/a"/);
+ assert.equal(renderArticleCitations(html,{...allowed,articleId:'167'}),html);
+ assert.equal(renderArticleCitations(html,{...allowed,id:'update-264-existing'}),html);
+ assert.throws(()=>renderArticleCitations(html.replace('https://example.org/a">자료','https://example.org/b">자료'),allowed),/E_CITATION_TARGET/);
+});
