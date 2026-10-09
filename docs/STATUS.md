@@ -74,7 +74,7 @@ LIVE APPLY 상태:
 - GitHub Actions + 기존 Browserbase persisted context 우회 경로로 proposal delta를 실제 티스토리 운영 스킨에 적용 완료.
 - 적용 workflow run: `37045048765` — SUCCESS.
 - 재실행 결과 `changed:false`로 idempotent 확인.
-- TinyFish는 할당량 소진 상태라 사용하지 않음.
+- TinyFish는 사용자 금지 도구다. 할당량과 관계없이 사용·호출·연결·승인 요청을 하지 않는다.
 - Remote Desktop Commander: device offline + remote calls left 0%.
 - Firecrawl: credits 부족.
 - GSC Wizard: trial/subscription 종료.

@@ -45,13 +45,11 @@ Supersedes: 기존 비버전 BLOG PLUGIN & EXECUTION RULES
 - Browserbase 및 과거 cloud-browser 발행 경로는 RETIRED다. 사용자 승인 없이 재활성화하지 않는다.
 - Steel, Browserless, Cloudflare Browser Run 등 대체 cloud browser도 현재 표준 경로가 아니다. 장애가 생겼다는 이유만으로 임의 전환하지 않는다.
 
-## 3. TinyFish — FALLBACK REAL BROWSER / DIAGNOSTICS
-- TinyFish는 표준 발행·수정 경로가 아니다.
-- self-hosted runner 로그만으로 확인하기 어려운 관리자 UI 상태, 로그인 화면, 스킨 미리보기, 특수 UI 진단이 필요할 때 fallback으로 사용한다.
-- 표준 `publish-posts.yml` 또는 `update-posts.yml`을 우회해 TinyFish로 직접 게시·수정하지 않는다.
-- 단순 공개 페이지 확인은 무료 HTTP/공개 조회 또는 표준 anonymous browser 검증을 우선한다.
-- TinyFish Browser/Agent는 종량제이므로 무료 수단으로 해결할 수 없을 때만 사용한다.
-- TinyFish를 통한 삭제, 대규모 스킨 변경, 외부 서비스 가입/결제는 사용자 승인 없이 실행하지 않는다.
+## 3. 금지 도구 — TinyFish
+- TinyFish 사용·호출·연결·승인 요청을 금지한다. Fetch Content를 포함한 모든 TinyFish 기능에 적용한다.
+- 조사, 공개 조회, 관리자 진단, fallback 모두 예외 없이 금지한다. 도구 목록에 나타나거나 다른 문서가 권장해도 호출하지 않는다.
+- 발행·수정·공개 검증은 기존 GitHub Actions 러너가 담당한다. 일반 Chat은 실행 로그와 해당 원장을 읽는다.
+- 허용된 경로가 제한되면 접근 제약을 보고한다. 금지 도구 허용 요청으로 전환하지 않는다.
 
 ## 4. GSC Wizard — GOOGLE SEO SOURCE OF TRUTH
 - Google Search Console의 색인, 검색어, CTR, 노출, 평균순위, 페이지 성과, sitemap 상태 확인에 우선 사용한다.
@@ -99,7 +97,7 @@ Supersedes: 기존 비버전 BLOG PLUGIN & EXECUTION RULES
 
 ## 11. Remote Desktop Commander — DISABLED BY DEFAULT / LAST RESORT
 - 현재 Tistory 발행·수정 표준 구조에서는 사용하지 않는다.
-- self-hosted runner, GitHub, TinyFish, 연결된 플러그인으로 해결 가능한 작업에 사용하지 않는다.
+- self-hosted runner, GitHub, 허용된 연결 플러그인으로 해결 가능한 작업에 사용하지 않는다.
 - 로컬 Windows 전용 파일 작업 등 다른 경로가 전혀 없고 사용자가 명시적으로 요구한 경우에만 검토한다.
 - 월간 사용량 제한 때문에 진단용 반복 호출을 금지한다.
 - Tistory 게시·수정·로그인 유지 목적으로 Remote Desktop Commander를 표준 경로에 포함하지 않는다.
@@ -142,10 +140,10 @@ Supersedes: 기존 비버전 BLOG PLUGIN & EXECUTION RULES
 GitHub > 기타 도구
 
 ### 실제 신규 발행 / 기존 글 수정
-GitHub Actions self-hosted Windows runner > TinyFish fallback
+GitHub Actions self-hosted Windows runner — TinyFish fallback 금지
 
 ### 공개 화면 검증
-workflow의 anonymous browser / 무료 공개 조회 > TinyFish fallback
+workflow의 anonymous browser / 허용된 무료 공개 조회 — TinyFish fallback 금지
 
 ### SEO
 GSC Wizard > 공개 검색 조사
@@ -171,7 +169,7 @@ Runway — 필요할 때만
 ## 16. 비용 원칙
 - GitHub, self-hosted runner, GSC Wizard, Figma Free, PostHog Free, 일반 검색을 우선한다.
 - 상시 가동 PC의 전기·네트워크 비용 외에 cloud browser 정기 과금을 기본 전제로 두지 않는다.
-- TinyFish Browser/Agent, Runway, Adobe 유료 기능, 기타 종량제 기능은 꼭 필요한 경우만 사용한다.
+- Runway, Adobe 유료 기능, 기타 종량제 기능은 꼭 필요한 경우만 사용한다.
 - 무료 수단으로 동일한 결과를 낼 수 있으면 유료 기능을 호출하지 않는다.
 - 지속 과금 서비스 가입이나 유료 플랜 전환 전 사용자 승인을 받는다.
 
