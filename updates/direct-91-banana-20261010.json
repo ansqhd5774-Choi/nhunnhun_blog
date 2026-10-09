@@ -17,16 +17,6 @@
       "visualChecked": true
     },
     {
-      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Green%20yellow%20bananas%20dsc07775.jpg?width=960",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Green_yellow_bananas_dsc07775.jpg",
-      "author": "David Monniaux",
-      "license": "CC BY-SA 3.0",
-      "role": "context",
-      "composition": "context",
-      "alt": "시장에서 함께 진열된 녹색 덜 익은 바나나와 노란 잘 익은 바나나를 비교한 사진",
-      "visualChecked": true
-    },
-    {
       "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Sliced%20banana.jpg?width=960",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Sliced_banana.jpg",
       "author": "Fatimah Bello",
@@ -34,6 +24,16 @@
       "role": "detail",
       "composition": "closeup",
       "alt": "붉은 유리 접시에 바나나를 작은 원형 조각으로 썰어 담은 식사 활용 사진",
+      "visualChecked": true
+    },
+    {
+      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Green%20yellow%20bananas%20dsc07775.jpg?width=960",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Green_yellow_bananas_dsc07775.jpg",
+      "author": "David Monniaux",
+      "license": "CC BY-SA 3.0",
+      "role": "context",
+      "composition": "context",
+      "alt": "시장에서 함께 진열된 녹색 덜 익은 바나나와 노란 잘 익은 바나나를 비교한 사진",
       "visualChecked": true
     }
   ],
