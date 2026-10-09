@@ -174,7 +174,33 @@ test('GITHUB_TOKEN 원고 commit 뒤 main SHA 확인 후 기존 수정 workflow�
   assert.deepEqual(JSON.parse(calls[1].options.body),{ref:'main',inputs:{update:'true',source_id:'direct-327-test'}});
   calls.length=0;
   await assert.rejects(dispatchQueuedUpdate({token:'fixture',commitSha:'b'.repeat(40),sourceId:'direct-327-test',fetcher}),/E_QUEUE_SOURCE_DRIFT/);
-  assert.equal(calls.length,1);
+  assert.equal(calls.length,2);
+});
+
+test('dispatch allows another article checkpoint but blocks target/runtime drift',async()=>{
+  const sha='a'.repeat(40),head='b'.repeat(40);
+  for(const [paths,allowed] of [
+    [['publishing/update-state/direct-399-ginkgo-pairing-20261009.json'],true],
+    [['updates/direct-251-test.json'],false],
+    [['publishing/update-state/direct-251-test.json'],false],
+    [['publishing/core.mjs'],false],
+    [['unknown.txt'],false]
+  ]) {
+    let submitted=0;
+    const fetcher=async url=>url.endsWith('/main')?{ok:true,json:async()=>({object:{sha:head}})}:
+      url.includes('/compare/')?{ok:true,json:async()=>({status:'ahead',files:paths.map(filename=>({filename}))})}:
+      (submitted++,{status:204});
+    const invoke=()=>dispatchQueuedUpdate({token:'fixture',commitSha:sha,sourceId:'direct-251-test',fetcher});
+    if(allowed)await invoke();else await assert.rejects(invoke(),/E_QUEUE_SOURCE_DRIFT/);
+    assert.equal(submitted,allowed?1:0);
+  }
+});
+
+test('dispatch fails closed on incomplete or divergent compare response',async()=>{
+  for(const diff of [{status:'diverged',files:[]},{status:'ahead',files:Array.from({length:300},()=>({filename:'docs/a.md'}))},{status:'ahead'}]){
+    const fetcher=async url=>({ok:true,json:async()=>url.endsWith('/main')?{object:{sha:'b'.repeat(40)}}:diff});
+    await assert.rejects(dispatchQueuedUpdate({token:'fixture',commitSha:'a'.repeat(40),sourceId:'direct-251-test',fetcher}),/E_QUEUE_SOURCE_DRIFT/);
+  }
 });
 test('DONE에는 같은 SHA의 실제 수동 수정 workflow 성공이 필요',()=>{
   const run={event:'workflow_dispatch',head_sha:'actual',status:'completed',conclusion:'success'};

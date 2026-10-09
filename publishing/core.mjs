@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
+import {parseDocument} from 'htmlparser2';
 import {assertDirectEmphasis} from './direct-emphasis.mjs';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
@@ -47,8 +48,15 @@ export function checkPublishHtml(post) {
     allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'], mark:['data-tone'], span:['data-tone'], blockquote:['data-kind'] },
     allowedSchemes: ['https'], allowProtocolRelative: false,
   });
-  const normalizeVoidSyntax = html => html.replace(/<(img|br|hr)(\b[^>]*?)\s*\/?\s*>/gi, '<$1$2>');
-  if (normalizeVoidSyntax(clean) !== normalizeVoidSyntax(post.bodyHtml)) throw new Error('E_HTML_REQUIRES_REVIEW');
+  // Compare decoded DOM structure, not harmless entity/quote/void serialization.
+  // Sanitizer removals still change tags, attributes or text and fail closed.
+  const structure = html => {
+    const node = n => ({type:n.type,...(n.name?{name:n.name}:{}),
+      ...(n.attribs?{attributes:Object.entries(n.attribs).sort(([a],[b])=>a.localeCompare(b))}:{}),
+      ...(n.data!==undefined?{data:n.data}:{}),...(n.children?{children:n.children.map(node)}:{})});
+    return JSON.stringify(node(parseDocument(html)));
+  };
+  if (structure(clean) !== structure(post.bodyHtml)) throw new Error('E_HTML_REQUIRES_REVIEW');
   return post;
 }
 export function textHtml(html) { return html.replace(/<\/(?:p|h[2-4]|li|tr|blockquote)>|<br\s*\/?>/gi, ' '); }
