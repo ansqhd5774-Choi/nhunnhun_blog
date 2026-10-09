@@ -160,7 +160,31 @@ async function selectEditorMode(page,mode){
     // The publishing path uses this stable ID; the former .mce-txt selector
     // can miss a mode menu even when the correct button is available.
     const menu=page.locator('#editor-mode-layer-btn-open:visible');
-    if(await menu.count()!==1){await diagnostic();throw Error('E_UPDATE_EDITOR_MODE_MENU');}
+    if(await menu.count()!==1){
+      await diagnostic();
+      if(mode==='basic'){
+        // DOM evidence: the basic-mode control exists but its toolbar is hidden
+        // after HTML inspection. Invoke only the known mode control, and require
+        // CodeMirror to disappear before continuing to any image operation.
+        const used=await page.evaluate(()=>{
+          const control=document.getElementById('editor-mode-kakao');
+          if(!control)return false;
+          control.click();
+          return true;
+        }).catch(()=>false);
+        if(used){
+          await page.waitForFunction(()=>
+            [...document.querySelectorAll('.CodeMirror')].every(el=>
+              !el.getClientRects().length||getComputedStyle(el).visibility==='hidden'
+            ),{timeout:10000,polling:100}).catch(error=>{
+              throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});
+            });
+          console.log('UPDATE_BASIC_MODE_DOM_TRANSITION_VERIFIED');
+          return;
+        }
+      }
+      throw Error('E_UPDATE_EDITOR_MODE_MENU');
+    }
     await menu.click({timeout:10000}).catch(async error=>{
       await diagnostic();
       throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});
