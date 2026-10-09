@@ -4,6 +4,7 @@ import { assertContentStandard } from './content-standards.mjs';
 import { verificationContext } from './verification-context.mjs';
 import { safeRuntimeDiagnostic, hasHumanVerificationFailure } from './runtime-diagnostics.mjs';
 import { openHtmlMode } from './html-mode.mjs';
+import { preparePublishEditor, openPublishDialog } from './publish-dialog.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { localBrowserConfig, assertLocalGit, openEditorConnection, closeEditorConnection, openPublicBrowser, freshEditorPage, ensureEditorRendering, installLightweightRouting } from './local-browser.mjs';
 import { execFileSync } from 'node:child_process';
@@ -171,7 +172,6 @@ try {
       if (new URL(page.url()).origin !== BLOG) throw new Error('E_LOGIN_REQUIRED');
       await page.locator('#post-title-inp').waitFor({state:'visible'});
       stage = 'editor-content';
-      await page.locator('#post-title-inp').fill(post.title);
       stage = 'image-upload';
       const editorialHtml = renderEditorialPost(post);
       const editorialExpected = editorialExpectations(post.bodyHtml,{version:editorialVersionFor(post)});
@@ -205,14 +205,15 @@ try {
       const tagInput = page.locator('#tagText');
       await tagInput.waitFor({state:'visible', timeout:10000}).catch(() => { throw new Error('E_TAG_CONTROL'); });
       for (const tag of post.tags) { await tagInput.fill(tag); await tagInput.press('Enter'); }
-      await page.locator('#publish-layer-btn').click();
+      stage = 'publish-editor-ready';
+      await preparePublishEditor(page, {title:post.title,tags:post.tags});
       stage = 'publish-dialog';
+      await openPublishDialog(page, {title:post.title,tags:post.tags});
       if (representativeSource) {
         const panel=page.locator('.publish_editor');
         const thumb=panel.locator('.box_thumb');
         // Publication UI is asynchronous. Wait for its real thumbnail slot before
         // applying the existing fail-closed representative check.
-        await panel.waitFor({state:'visible',timeout:15000}).catch(()=>{throw Error('E_PUBLISH_DIALOG_UNAVAILABLE');});
         await thumb.first().waitFor({state:'visible',timeout:15000}).catch(()=>{throw Error('E_REPRESENTATIVE_UNVERIFIED');});
         const diagnostic=async(stageName)=>console.log('REPRESENTATIVE_SLOT_DIAG '+JSON.stringify(await page.evaluate(({stageName})=>{
           const panel=document.querySelector('.publish_editor');
