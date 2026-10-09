@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "8e611fcfadc6f9fde6b0d2a8d1abd512fa51bd9eb034680de0e47ebaa8cee6e2",
-  "sourceCommit": "e3e6f2dd7f8c9752f756d2cc6f072b3da32c4ab9",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-09T16:28:14.545Z",
   "url": "https://nhunnhun.tistory.com/407",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-09T16:28:47.581Z",
+  "sourceCommit": "e3e6f2dd7f8c9752f756d2cc6f072b3da32c4ab9",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37959138899",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-flavored-compound-butter-20261010",
+    "url": "https://nhunnhun.tistory.com/407",
+    "checkedAt": "2026-10-09T16:28:47.581Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
