@@ -5,6 +5,21 @@ import { compareInventory } from '../scripts/compare-public-inventory.mjs';
 import { normalizeSkinHead } from '../scripts/normalize-skin-head.mjs';
 import { metadata,duplicateGroups } from '../scripts/audit-public-metadata.mjs';
 import { installGrowthNavigation } from '../scripts/install-growth-navigation.mjs';
+import { summarizeSchemaDates } from '../scripts/summarize-schema-dates.mjs';
+
+test('schema date observations detect reversed dates and identity mismatch without semantic certification',()=>{
+  const rows=summarizeSchemaDates({one:{url:'https://nhunnhun.tistory.com/1',jsonLd:[{validJson:true,value:{'@graph':[{'@type':'BlogPosting',url:'https://nhunnhun.tistory.com/2',headline:'제목&middot;정보',datePublished:'2026-10-10',dateModified:'2026-10-09'}]}}]}});
+  assert.deepEqual(rows[0].issues,['SCHEMA_URL_MISMATCH','MODIFIED_BEFORE_PUBLISHED','HEADLINE_CONTAINS_HTML_ENTITY']);
+  assert.equal(rows[0].semanticReview,'NOT_PERFORMED');
+  assert.equal(rows[0].officialValidation,'NOT_PERFORMED');
+});
+
+test('schema observation preserves missing dates and missing Article as separate findings',()=>{
+  const rows=summarizeSchemaDates({one:{url:'https://nhunnhun.tistory.com/1',jsonLd:[{validJson:true,value:{'@type':'BlogPosting',url:'https://nhunnhun.tistory.com/1',headline:'건강'}}]},two:{url:'https://nhunnhun.tistory.com/2',jsonLd:[{validJson:false}]}});
+  assert.deepEqual(rows[0].dates,[{published:null,modified:null}]);
+  assert.deepEqual(rows[0].issues,['PUBLISHED_DATE_MISSING_OR_INVALID','MODIFIED_DATE_MISSING_OR_INVALID']);
+  assert.deepEqual(rows[1].issues,['ARTICLE_SCHEMA_MISSING']);
+});
 
 test('growth navigation preserves skin content and refuses duplicate installation',()=>{
   const s='<html><body>[##_article_rep_desc_##]<footer>Copyright</footer></body></html>';
