@@ -148,7 +148,7 @@ export async function freshEditorPage(context) {
       const url = new URL(page.url());
       return url.origin === 'https://nhunnhun.tistory.com'
         && url.pathname.startsWith('/manage')
-        && !/^\/manage\/post(?:[/?#]|$)/.test(url.pathname);
+        && !/^\/manage\/(?:post|newpost)(?:[/?#]|$)/.test(url.pathname);
     } catch {
       return false;
     }
