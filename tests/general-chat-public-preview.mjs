@@ -16,7 +16,7 @@ const intercepted={newContext:async options=>{
  const originalRoute=context.route.bind(context);
  const fixtureRoute=route=>route.request().resourceType()==='image'
   ?route.fulfill({status:200,contentType:'image/png',body:png})
-  :route.fulfill({status:200,contentType:'text/html; charset=utf-8',body:`<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="canonical" href="${source.targetUrl}">${removeUnderline?'<style>.nh-direct-v2 u{text-decoration:none!important}</style>':''}</head><body><h1>${source.title}</h1><div class="contents_style">${rendered}</div></body></html>`});
+  :route.fulfill({status:200,contentType:'text/html; charset=utf-8',body:`<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="canonical" href="${source.targetUrl}"><meta property="og:title" content="${source.title.replaceAll('&','&amp;').replaceAll('"','&quot;')}">${removeUnderline?'<style>.nh-direct-v2 u{text-decoration:none!important}</style>':''}</head><body><h1>${source.title.replace('｜','<br>')}</h1><div class="contents_style">${rendered}</div></body></html>`});
  // Keep the offline fixture authoritative after the verifier installs tracker routing.
  context.route=async(...args)=>{await originalRoute(...args);await originalRoute('**/*',fixtureRoute);};
  await originalRoute('**/*',fixtureRoute);
