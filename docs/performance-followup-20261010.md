@@ -65,3 +65,13 @@
 ## 목차 이동 보정 후보 검사
 
 모바일에서 details를 먼저 닫고 requestAnimationFrame에서 대상 heading 이동을 실행하도록 별도 후보를 작성했다. PC 즉시 이동, prefers-reduced-motion의 auto 동작, 기존 스킨 보존, 원본 불일치 차단을 검증하는 `tests/performance-toc-scroll-candidate.test.mjs` 5개 PASS. 메인 Codex가 관리자 저장을 확인했지만 공개 캐시 전파는 아직 확인하지 못했다. 반복 저장하지 않으며 공개 반영 후 이동 기능을 다시 확인한다.
+
+## 최신 공개 페이지 `/388` 운영 검증 완료
+
+메인 Codex가 최신 수정 공개 글 `/388`의 새 scroll/compact 코드를 확인했다. `/282`만 이전 캐시가 남았으며 전체 배포 실패가 아니다. 공식 사용자 Chrome에서 `/388` 최신 scrollPatch=true를 독립 확인하고 실제 링크 클릭으로 다음을 검증했다.
+
+- 모바일 390×844: 두 번째 목차를 클릭해 scrollY 2874, 대상 H2 상단 80.41px, 목차 details 닫힘, 가로 넘침 0px. 실제 이동 PASS.
+- PC 1440×1000: 세 번째 목차를 클릭해 scrollY 3626, 대상 H2 상단 100.45px, details 열림 유지, 가로 넘침 0px. 실제 이동 PASS.
+- private 운영 증거: performance-scroll-388-mobile.png, performance-scroll-388-desktop.png. 검사 후 viewport 복원·탭 정리.
+
+최종 상태: 최소 스킨 보정 구현·5개 회귀 검사·최신 공개 페이지 PC/모바일 실제 이동 PASS. `/282` 이전 캐시는 페이지별 전파 대기이며 후속 확인 대상. CLS 0.411 및 늦은 본문 TOC 삽입은 별도 후순위 구조 개선 대상이며 해소로 보고하지 않는다. field CWV는 여전히 데이터 없음.

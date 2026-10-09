@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {publicBodiesMatch} from '../publishing/public-body.mjs';
+const expected={text:'도입\n1. 소개\n소스 5mL에 나트륨 65mg.\n2. 보관\n제품 표시를 읽으세요.',headings:['1. 소개','2. 보관']};
+const actual={text:'도입\n소개\n소스 5mL에 나트륨 65mg.\n보관\n제품 표시를 읽으세요.',headings:['소개','보관']};
+test('reading skin H2 numbers alone can differ',()=>assert.equal(publicBodiesMatch(actual,expected),true));
+test('unchanged exact body remains valid',()=>assert.equal(publicBodiesMatch(expected,expected),true));
+test('changed amount must fail despite heading numbering',()=>assert.equal(publicBodiesMatch({...actual,text:actual.text.replace('65mg','650mg')},expected),false));
+test('missing paragraph must fail',()=>assert.equal(publicBodiesMatch({...actual,text:actual.text.replace('제품 표시를 읽으세요.','')},expected),false));
+test('changed heading meaning must fail',()=>assert.equal(publicBodiesMatch({...actual,headings:['효능','보관'],text:actual.text.replace('소개','효능')},expected),false));
+test('heading order mismatch must fail',()=>assert.equal(publicBodiesMatch({...actual,headings:['보관','소개']},expected),false));
+test('numbers in body prose stay exact',()=>assert.equal(publicBodiesMatch({...actual,text:actual.text+'\n1. 재료'}, {...expected,text:expected.text+'\n재료'}),false));
+test('duplicate body line matching numbered heading is ambiguous and fails',()=>assert.equal(publicBodiesMatch({...actual,text:actual.text+'\n소개'}, {...expected,text:expected.text+'\n1. 소개'}),false));
+test('a missing line boundary cannot silently remove numbers',()=>assert.equal(publicBodiesMatch({...actual,text:actual.text.replaceAll('\n',' ')},expected),false));
+test('a decimal quantity heading is not a numbered prefix',()=>assert.equal(publicBodiesMatch({text:'5g\n본문',headings:['5g']},{text:'1.5g\n본문',headings:['1.5g']}),false));

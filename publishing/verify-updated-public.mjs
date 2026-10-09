@@ -2,6 +2,7 @@ import { assertEmphasisContract } from './content-emphasis.mjs';
 import { verificationContext } from './verification-context.mjs';
 import {assertDirectPublicSnapshot} from './direct-public-contract.mjs';
 import {assertPublicTitle} from './public-title.mjs';
+import {publicBodiesMatch} from './public-body.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -110,13 +111,17 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
       og:document.querySelector('meta[property="og:title"]')?.content})),update.title);
     const root=page.locator(update.id.startsWith('direct-')?'.contents_style:has(.nh-direct-v2)':'.contents_style');
     if(await root.count()!==1) throw new Error('E_QA_ROOT');
-    const expectedText=await page.evaluate(html=>{
+    const expectedBody=await page.evaluate(html=>{
       const host=document.createElement('div');
       host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;opacity:0;pointer-events:none';
       host.innerHTML=html;document.body.appendChild(host);
-      const text=host.innerText||host.textContent||'';host.remove();return text;
+      const text=host.innerText||host.textContent||'';
+      const headings=[...host.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'');
+      host.remove();return {text,headings};
     },rendered);
-    if(normalize(await root.innerText())!==normalize(expectedText)) throw new Error('E_QA_BODY');
+    const actualBody=await root.evaluate(el=>({text:el.innerText,
+      headings:[...el.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'')}));
+    if(!publicBodiesMatch(actualBody,expectedBody)) throw new Error('E_QA_BODY');
     const images=root.locator('img');
     for(let n=0;n<await images.count();n++) {
       const img=images.nth(n);
