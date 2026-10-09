@@ -8,6 +8,8 @@
 - Google 공식 실적: 웹 검색, 2026-07-07~2026-10-06, 클릭24·노출1.82천·CTR1.3%·평균순위17.1. 글별 보고142행을 확보했다. 비글 URL 및 fragment 행을 숫자글과 구분했으며 합쳐 색인율이나 성과 상승률을 만들지 않았다.
 - 검색 개선 검토 후보: /199(320노출·1클릭), /268(205·0), /266(158·3), /214(89·6), /352(67·0). 한 기간의 검토 우선순위이며 자동 제목 변경·전체 재작성은 실행하지 않았다.
 - Google /411: Google에는 아직 알려지지 않은 URL. 03:29 KST 실제 URL 테스트에서 등록 가능·색인 가능을 확인했고 스마트폰 렌더 화면에 브랜드·제목·최초 발행일·목차가 보였다. 색인 완료 또는 전체 본문·표·출처 대조 PASS로 확대하지 않는다.
+- /411 색인 생성 요청1회 접수 완료: 공식 화면에서 우선순위 크롤링 대기열 추가를 확인했다. 완료된 색인이나 검색 노출로 보고하지 않는다.
+- /411 공식 리치 검색결과 테스트(03:35:47 KST): 유효한 글 항목1개. 선택사항 url 입력란 누락 경고1개는 NON_BLOCKING으로 기록했다. 결과 https://search.google.com/test/rich-results/result?id=JX7xCk0QVWx1ghGtVdwnjw . 전체354개 공식 검사나 의료 내용 검토를 대신하지 않는다.
 - Google 코어 웹 바이탈: 모바일·데스크톱 데이터 없음. 성능 합격·실패가 아니다.
 - 공개 /411의 분석 script 관찰: Naver wcslog.js 두 개, Google 분석 loader는 관찰되지 않았다. 이것만으로 전체 이벤트 수집 또는 전송 중복을 확정하지 않는다. GA4 속성·설치·수집 검증은 별도 남음.
 - 후속 공식 GA4 확인: 스트림 URL이 정확히 건강 블로그인 기존 웹 스트림을 확인했다. 상세 화면은 최근48시간 수집 활성·데이터 전송 중, 향상된 측정의 페이지 조회·스크롤·이탈 클릭 활성을 표시했다. 따라서 로더 관찰만으로 설치 누락을 판정하지 않고 기존 설치를 보존한다. custom related/source/share/copy 이벤트·DebugView·PII 검증은 미완료다.
@@ -24,7 +26,7 @@
 
 전체 로컬 회귀294개 PASS. 새2개 검사는 schema identity/날짜 역전/누락과 의미·공식 검사 미수행의 분리를 확인한다.
 
-private 증거: 작업 루트 `evidence/growth-resume-20261010/`의 `bing-processing.png`, `gsc-pages.json`, `gsc-performance.png`, `gsc-live-render.png`, `ga4-stream.png`, `search-priorities.json`, `schema-dates.json`, `review-register.json`, `tests.txt`. 전체 계정 화면·원자료는 저장소에 커밋하지 않는다.
+private 증거: 작업 루트 `evidence/growth-resume-20261010/`의 `bing-processing.png`, `gsc-pages.json`, `gsc-performance.png`, `gsc-live-render.png`, `gsc-index-request.png`, `rich-result.png`, `ga4-stream.png`, `search-priorities.json`, `schema-dates.json`, `review-register.json`, `tests.txt`. 전체 계정 화면·원자료는 저장소에 커밋하지 않는다.
 
 ## 남은 범위
 
