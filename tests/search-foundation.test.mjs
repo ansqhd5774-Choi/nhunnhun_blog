@@ -9,8 +9,22 @@ import { summarizeSchemaDates } from '../scripts/summarize-schema-dates.mjs';
 import { extractEvidence, accessState, reconcileSourceAccess } from '../scripts/audit-health-evidence.mjs';
 import { installGrowthEvents, protectExistingAnalytics } from '../scripts/install-growth-events.mjs';
 import { installRuntimeQuality } from '../scripts/install-health-runtime-quality.mjs';
+import { recordedSourceDates } from '../scripts/build-review-register.mjs';
+import { contentDigest } from '../publishing/content-standards.mjs';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
+
+test('source dates require matching approved review and never use publication dates',()=>{
+ const source={id:'record',bodyHtml:'<a href="https://official.example/safety">근거</a>'};
+ const review={version:'R1',sourceDigest:contentDigest(source),review:{status:'approved',checkedAt:'2026-10-01'},sources:[{url:'https://official.example/safety',role:'safety',checkedAt:'2026-09-30'}]};
+ assert.equal(recordedSourceDates(source,review,'2026-10-10').nextReviewAt,'2026-10-30');
+ assert.equal(recordedSourceDates({...source,bodyHtml:source.bodyHtml+' changed'},review,'2026-10-10').sourceCheckedAt,null);
+ assert.equal(recordedSourceDates(source,{...review,review:{status:'draft',checkedAt:'2026-10-01'}},'2026-10-10').sourceCheckedAt,null);
+ assert.equal(recordedSourceDates(source,{...review,sources:[{...review.sources[0],checkedAt:'2026-02-30'}]},'2026-10-10').sourceCheckedAt,null);
+ assert.equal(recordedSourceDates(source,{...review,sources:[{...review.sources[0],checkedAt:'2026-10-11'}]},'2026-10-10').sourceCheckedAt,null);
+ assert.equal(recordedSourceDates(source,{...review,sources:[{...review.sources[0],checkedAt:'2026-10-02'}]},'2026-10-10').sourceCheckedAt,null);
+ assert.equal(recordedSourceDates(source,{...review,sources:[{...review.sources[0],url:'https://other.example'}]},'2026-10-10').sourceCheckedAt,null);
+});
 
 test('runtime repair changes only same-page equivalent Article headline and preserves dates and other schemas',async()=>{
   const code=await fs.readFile(new URL('../skin/proposals/health-runtime-quality-20261010.js',import.meta.url),'utf8');
