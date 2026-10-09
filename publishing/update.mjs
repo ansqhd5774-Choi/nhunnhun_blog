@@ -159,8 +159,9 @@ async function selectEditorMode(page,mode){
   if(!await option.isVisible()){
     // The publishing path uses this stable ID; the former .mce-txt selector
     // can miss a mode menu even when the correct button is available.
-    const menu=page.locator('#editor-mode-layer-btn-open:visible');
-    if(await menu.count()!==1){
+    const menu=page.locator('#editor-mode-layer-btn-open:visible').first();
+    const menuReady=await menu.waitFor({state:'visible',timeout:10000}).then(()=>true,()=>false);
+    if(!menuReady){
       await diagnostic();
       if(mode==='basic'){
         // DOM evidence: the basic-mode control exists but its toolbar is hidden
