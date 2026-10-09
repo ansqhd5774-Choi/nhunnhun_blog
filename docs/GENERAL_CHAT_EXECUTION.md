@@ -21,6 +21,10 @@
 - 초안은 자동 발행 대상에 ready/approved로 저장하지 않는다. updates는 draft 계약을 지원하지 않으므로 초안은 별도 작업 경로/브랜치에 보존한다.
 - prepare-selected-source를 기존 러너 단계에서 실행해 보안·렌더 준비·강조 현황을 확인한다. 작성자는 출력된 문구를 실제 의미 검토 증거로 과장하지 않는다. 로컬 prepare 실행은 선택적인 운영자 보조 도구다.
 
+## 검색·갱신 후속 운영
+
+[32개 운영 계약](HEALTH_GROWTH_OPERATIONS.md)은 작성/발행 계약을 대체하지 않는다. 일반 Chat에 로컬 검색 점검 CLI·브라우저 기능을 요구하지 않고, 운영자가 만든 결과와 연결된 공식 도구를 읽는다. Google·네이버·Bing 등록/색인/유입은 공개 검증과 별도 상태다.
+
 ## 결과 확인
 
 러너가 실행·제출·공개 검증을 담당한다. 일반 Chat은 GitHub 실행 로그 및 publishing/state 또는 publishing/update-state의 해당 source 기록을 읽는다. 기존 수정은 publicResult에 source ID, fingerprint, sourceCommit, runUrl, checkedAt, status, 검증 항목을 기록한다. 원장 경로는 발행 trigger 대상이 아니므로 결과 기록이 새 원고 발행을 시작하지 않는다.
