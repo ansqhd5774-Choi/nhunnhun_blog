@@ -1,6 +1,6 @@
 import {execFileSync} from 'node:child_process';
 import {resolve} from 'node:path';
-import {pathToFileURL,fileURLToPath} from 'node:url';
+import {pathToFileURL} from 'node:url';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {assertDirectEmphasis} from '../publishing/direct-emphasis.mjs';
 
@@ -30,9 +30,7 @@ export function startDirectPublish(sourceId,{run=command}={}) {
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    // Explicit local entry only: do not consume an Actions job when Chrome is closed.
-    try {execFileSync('cmd.exe',['/d','/c',fileURLToPath(new URL('../maintenance/check-tistory-chrome.cmd',import.meta.url))],{stdio:'pipe'});}
-    catch {throw Error('E_TISTORY_CHROME_NOT_RUNNING');}
+    // Optional operator CLI for existing updates. Chrome is checked by the runner.
     console.log(JSON.stringify(startDirectPublish(process.argv[2])));
   }
   catch(error){console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_DIRECT_START_STATE_UNKNOWN');process.exitCode=1;}

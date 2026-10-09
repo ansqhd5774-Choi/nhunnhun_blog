@@ -1,3 +1,5 @@
+> RETIRED 운영 안내: Ollama 자동 작성은 현재 운영 경로에서 사용하지 않는다. 과거 절차·실험 기록으로만 보존한다. 일반 Chat 직접 작성은 GENERAL_CHAT_EXECUTION.md를 따른다.
+
 # Ollama 카르노산 /232 재작성
 
 GitHub에는 `authoring/jobs/carnosic-acid-232-rewrite.json`에 대상 URL·기존 제목·분류·수정 요구와 확인한 근거를 저장한다. 글 생성은 사용자의 PC에서 `http://127.0.0.1:11434`의 Ollama를 사용한다. GitHub hosted runner의 localhost는 사용자 PC가 아니므로 hosted Actions에서 이 주소로 실행하지 않는다. 기존 발행 러너를 수정하거나 외부에 Ollama 포트를 개방하지 않는다.

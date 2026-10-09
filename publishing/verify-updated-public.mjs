@@ -1,5 +1,6 @@
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { verificationContext } from './verification-context.mjs';
+import {assertDirectPublicSnapshot} from './direct-public-contract.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -92,7 +93,7 @@ export async function verifyInternalLink(request,url,sleep=(ms)=>new Promise(r=>
   }
   throw new Error('E_QA_INTERNAL_LINK');
 }
-async function verify(browser,update,width,expected,rendered,assetChecks) {
+export async function verifyUpdatedPage(browser,update,width,expected,rendered,assetChecks) {
   const context=await verificationContext(browser, {viewport:{width,height:width===390?844:1000}});
   try {
     const page=await context.newPage();
@@ -101,7 +102,7 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
     const canonical=await page.locator('link[rel="canonical"]').getAttribute('href');
     if(articleUrl(canonical)!==update.targetUrl) throw new Error('E_QA_CANONICAL');
     if(!(await page.locator('h1').allTextContents()).map(normalize).includes(update.title)) throw new Error('E_QA_TITLE');
-    const root=page.locator('.contents_style');
+    const root=page.locator(update.id.startsWith('direct-')?'.contents_style:has(.nh-direct-v2)':'.contents_style');
     if(await root.count()!==1) throw new Error('E_QA_ROOT');
     const expectedText=await page.evaluate(html=>{
       const host=document.createElement('div');
@@ -110,7 +111,6 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
       const text=host.innerText||host.textContent||'';host.remove();return text;
     },rendered);
     if(normalize(await root.innerText())!==normalize(expectedText)) throw new Error('E_QA_BODY');
-    if(update.contentStandard==='SP1') return {viewport:width,bodyMatches:true,contentValidation:'not-performed'};
     const images=root.locator('img');
     for(let n=0;n<await images.count();n++) {
       const img=images.nth(n);
@@ -140,7 +140,26 @@ async function verify(browser,update,width,expected,rendered,assetChecks) {
       };
     });
     console.log('PUBLIC_QA_METRICS '+JSON.stringify({articleId:update.articleId,width,...metrics}));
-    checkMeasurements(metrics,expected);
+    if(update.contentStandard==='SP1'&&update.id.startsWith('direct-')) {
+      const snapshot=await root.evaluate(root=>{
+        const article=root.querySelector('.nh-direct-v2 .article-body');
+        const all=selector=>[...(article?.querySelectorAll(selector)||[])];
+        const marks=all('mark'),numbers=all('h2 > small');
+        return {roots:root.querySelectorAll('.nh-direct-v2 .article-body').length,
+          h2:all('h2').length,numbers:numbers.length,h3:all('h3').length,
+          tables:all('table').length,tableWraps:all('.table-scroll > table').length,
+          images:all('img').length,marks:marks.length,boldMarks:all('mark strong').length,
+          underlinedMarks:all('mark u strong').length,badges:all('.badge').length,
+          stylesVisible:marks.every(m=>{
+            const s=getComputedStyle(m),b=m.querySelector('strong'),u=m.querySelector('u');
+            return s.display!=='none'&&s.visibility!=='hidden'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&
+              b&&Number(getComputedStyle(b).fontWeight)>=600&&(!u||getComputedStyle(u).textDecorationLine.includes('underline'));
+          })&&numbers.every(n=>parseFloat(getComputedStyle(n).fontSize)>=20)};
+      });
+      assertDirectPublicSnapshot(snapshot,update.bodyHtml);
+      if(metrics.overflowPx||metrics.wideImages||metrics.brokenImages||metrics.missingAlt||metrics.nonNativeImages||metrics.badTableWraps)throw Error('E_QA_DIRECT_LAYOUT');
+      metrics.direct=snapshot;
+    } else checkMeasurements(metrics,expected);
     if(update.contentStandard==='R1') assertEmphasisContract(await root.innerHTML(),update.bodyHtml);
     if(assetChecks) {
       const og=ogAsset(await page.locator('meta[property="og:image"]').getAttribute('content'));
@@ -176,8 +195,8 @@ async function main() {
         const state=await ledger.read(update.id);
         if(state?.phase!=='updated'||state.url!==update.targetUrl||state.fingerprint!==updateFingerprint(update)) throw new Error('E_QA_LEDGER');
         const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml,{version:editorialVersionFor(update)});
-        const desktop=await verify(browser,update,1440,expected,rendered,true);
-        const mobile=await verify(browser,update,390,expected,rendered,false);
+        const desktop=await verifyUpdatedPage(browser,update,1440,expected,rendered,true);
+        const mobile=await verifyUpdatedPage(browser,update,390,expected,rendered,false);
         console.log('PUBLIC_QA_PASS '+JSON.stringify({articleId:update.articleId,url:update.targetUrl,title:update.title,desktop,mobile}));
       } catch(error) {
         failures++;

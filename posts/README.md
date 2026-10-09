@@ -1,3 +1,5 @@
+> 최신 실행 기준: [일반 Chat 작성·러너 실행 계약](../docs/GENERAL_CHAT_EXECUTION.md)이 작성자 로컬 명령·GUI 의무와 공개 검증 담당에 우선합니다. 아래의 명령·미리보기·관리자 화면 절차는 러너/운영자용이며 일반 Chat의 필수 기능이 아닙니다. 직접 원고는 최신 DIRECT_AUTHORING_R1을 적용합니다.
+
 # 자동 발행할 글
 
 파일 하나가 새 게시글 하나다. example-post.json을 복사해 `고유ID.json`으로 저장하고 id도 파일명과 일치시킨다. 현재 예시는 draft이며 발행되지 않는다.
@@ -6,7 +8,7 @@
 2. bodyHtml에 본문 HTML을 넣는다. 이미지·링크는 HTTPS 주소만 허용하며 파일 업로드 기능은 아직 없다. script·iframe·폼·광고 코드·인라인 스타일은 금지한다.
 3. 초안은 status=draft, approved=false를 유지한다.
 4. 공개 게시할 최종 내용을 검토한 뒤 status=ready, approved=true로 바꾸어 main에 저장한다. 이 지정은 해당 내용의 공개 발행 승인이다.
-5. 클라우드 연결·운영 검증·발행 활성화 후에는 GitHub Actions가 자동 처리한다. PC와 Codex 앱은 켜 둘 필요가 없다.
+5. 클라우드 연결·운영 검증·발행 활성화 후에는 GitHub Actions가 자동 처리한다. Codex 앱은 필요 없지만 현재 self-hosted 발행 PC와 전용 Chrome은 준비돼 있어야 한다.
 
 최초 버전은 실행당 새 글 1개만 처리한다. 한 번에 미발행 ready 글 여러 개를 넣으면 중단한다. 승인된 글의 제목을 기존 공개 글과 중복시키지 않는다.
 published 기록이 있는 글을 수정해도 기존 티스토리 글 자동 수정이나 재게시를 하지 않는다. 해당 기능은 별도 작업이다.
