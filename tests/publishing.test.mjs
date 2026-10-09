@@ -12,6 +12,12 @@ import { checkUpdateSource, eligibleUpdate, updateFingerprint } from '../publish
 import { applyEditorialTemplate, renderEditorialPost, assertEditorialSource, assertEditorialContract, EDITORIAL_TEMPLATE_VERSION } from '../publishing/editorial.mjs';
 import { assertImageReview } from '../publishing/image-review.mjs';
 const base = {id:'first-post',title:'첫 글',category:'음식',tags:['음식'],bodyHtml:'<h2>제목</h2><p>내용입니다.</p>',status:'draft',approved:false};
+test('safe entity and void spellings pass while sanitizer removals remain blocked',()=>{
+  for(const html of ['<p>FDA Q&A</p>','<p>FDA Q&amp;A</p>','<p>&#38; &#x26; &quot;</p>','<p><br /></p>'])
+    assert.doesNotThrow(()=>checkPublishHtml({...base,bodyHtml:html}));
+  for(const html of ['<p onclick="alert(1)">text</p>','<script>alert(1)</script><p>text</p>','<p style="color:red">text</p>','<a href="javascript:alert(1)">text</a>'])
+    assert.throws(()=>checkPublishHtml({...base,bodyHtml:html}),/E_HTML_REQUIRES_REVIEW/);
+});
 test('draft posts never publish', () => assert.equal(eligible(base,null),false));
 test('unapproved ready posts are rejected', () => assert.throws(() => checkPost({...base,status:'ready'},'first-post.json')));
 test('approved ready post accepted', () => assert.equal(eligible(checkPublishHtml(checkPost({...base,status:'ready',approved:true},'first-post.json')),null),true));

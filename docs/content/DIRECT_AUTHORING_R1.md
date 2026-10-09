@@ -61,6 +61,7 @@
 사진: 대표 사진 1개 필수. 검색 결과를 GPT가 실제 화면으로 확인하고 주제가 사진의 중심인 파일을 고른다. 사진은 본문 첫 `<p><img src="..." alt="..."></p>`와 representativeImageUrl에 같은 주소로 저장한다. 본문 사진은 항목에 설명 가치가 있을 때 추가하며 같은 사진을 반복하지 않는다. 원출처·권한은 JSON 내부에 기록하며 자료출처/이미지출처 섹션을 자동 추가하지 않는다. 이번 감자 예시는 direct-photo-example.json에 저장했다.
 
 ## 실행
+저장 전 `node authoring/prepare-direct-source.mjs <원고 파일>`을 실행하고 성공 결과를 확인한다. 신규·수정 원고 모두 실제 발행 HTML 검사를 수행한다. HTML 엔티티 표기의 동등성은 공통 검사에서 해석하되 태그·속성·본문이 정제 과정에서 제거되는 변경은 차단한다. 원고를 GitHub에 직접 저장한 뒤 CI만 확인하는 방식으로 이 사전 검사를 대체하지 않는다.
 1. GPT가 `updates/direct-{articleId}-{작업일}.json`을 작성. 기존 update 스키마, contentStandard=SP1, 실제 승인 source만 ready/approved=true로 저장한다.
 2. 원문은 안전한 기본 HTML로 저장한다. class/style/script를 원문에 넣지 않는다.
 3. publishing/direct-design.mjs가 보안 검사 후 승인한 레이아웃을 조립한다. 스킨 CSS는 css/proposals/2026-10-09-direct-reference-design.css와 동일하게 유지한다.
