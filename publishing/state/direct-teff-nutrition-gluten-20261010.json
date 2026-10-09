@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "d9174386516161d5f26fa768929ef60352a875f7d86786923189b6485a7d3971",
-  "sourceCommit": "e321a5e783c214080e68e6f05f933e3c5e89d441",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-09T18:19:51.709Z",
   "url": "https://nhunnhun.tistory.com/411",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-09T18:20:24.092Z",
+  "sourceCommit": "e321a5e783c214080e68e6f05f933e3c5e89d441",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37972322086",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-teff-nutrition-gluten-20261010",
+    "url": "https://nhunnhun.tistory.com/411",
+    "checkedAt": "2026-10-09T18:20:24.092Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
