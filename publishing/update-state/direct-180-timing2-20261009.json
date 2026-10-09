@@ -5,5 +5,16 @@
   "articleId": "180",
   "sourceCommit": "e2569acd80a9cdf11c7af1429465ad7093c2df2e",
   "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-08T17:18:17.643Z"
+  "timestamp": "2026-10-08T17:18:17.643Z",
+  "publicResult": {
+    "sourceId": "direct-180-timing2-20261009",
+    "url": "https://nhunnhun.tistory.com/180",
+    "sourceCommit": "e2569acd80a9cdf11c7af1429465ad7093c2df2e",
+    "fingerprint": "e6a9ffeca3e91ad943a460f2495486a3e062de65acb81e1f95dbadf05d086cb0",
+    "runUrl": null,
+    "checkedAt": "2026-10-09T21:10:25.210Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37991576833",
+    "status": "PUBLIC_VERIFICATION_MISMATCH",
+    "code": "E_DIRECT_PUBLIC_STYLE"
+  }
 }
