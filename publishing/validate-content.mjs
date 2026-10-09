@@ -4,11 +4,36 @@ import { resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { assertContentStandard, contentDigest, todayInSeoul, DOMAIN_RULES } from './content-standards.mjs';
 import { EXTENSIONS, REVIEW_CHECKS, DOMAINS, SITE_CATEGORIES } from './standards/common.mjs';
-import { checkPost } from './core.mjs';
+import { checkPost, fingerprint } from './core.mjs';
 import { checkUpdateSource } from './update-core.mjs';
 import { renderEditorialPost } from './editorial.mjs';
 
 const sourcePath = value => /^(posts|updates)\/[a-z0-9][a-z0-9-]{2,79}\.json$/.test(value);
+
+// A provider's product-address correction is not a new health manuscript.
+// Preserve the published legacy source exactly; arbitrary URL or body changes still require R1.
+export function isPublishedProductLinkRepair(source, root = process.cwd()) {
+  if (source.contentStandard !== undefined || !/^repair-source-\d+-\d{8}$/.test(source.id ?? '') ||
+      source.id.split('-')[2] !== source.articleId) return false;
+  const directory = resolve(root,'posts');
+  if (!existsSync(directory)) return false;
+  for (const name of readdirSync(directory).filter(n=>/^[a-z0-9-]+\.json$/.test(n))) {
+    const original=JSON.parse(readFileSync(resolve(directory,name),'utf8'));
+    if (original.contentStandard !== undefined || original.title !== source.title ||
+        source.expectedCurrentTitle !== original.title || source.category !== original.category ||
+        source.representativeImageUrl !== original.representativeImageUrl ||
+        JSON.stringify(source.imageReview) !== JSON.stringify(original.imageReview)) continue;
+    const ledgerPath=resolve(root,'publishing','state',`${original.id}.json`);
+    if (!existsSync(ledgerPath)) continue;
+    const ledger=JSON.parse(readFileSync(ledgerPath,'utf8'));
+    if (ledger.phase !== 'published' || ledger.url !== source.targetUrl || ledger.fingerprint !== fingerprint(original)) continue;
+    let replacements=0;
+    const corrected=original.bodyHtml.replace(/(\bhref=(["']))https:\/\/www\.health\.kr\/drug\/([A-Za-z0-9]+)\2/g,
+      (_,prefix,quote,productId)=>{replacements++;return `${prefix}https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${productId}${quote}`;});
+    if (replacements > 0 && corrected === source.bodyHtml) return true;
+  }
+  return false;
+}
 export function targetsFromChanged(paths) {
   const out = new Set();
   for (const value of paths) {
@@ -66,6 +91,12 @@ export function runContentCli(args = process.argv.slice(2), env = process.env) {
       }
       if (args[0] !== '--check' && kind === 'posts' && source.status === 'draft' && !source.approved) { drafts++; continue; }
       if ((args.length === 0 || args[0] === '--all') && source.contentStandard === undefined) { legacy++; continue; }
+      if (kind === 'updates' && isPublishedProductLinkRepair(source)) {
+        renderEditorialPost(source);
+        console.log('CONTENT_CONTRACT_PASS '+JSON.stringify({path,scope:'published-product-address-only',semanticVerification:'unchanged-manuscript-not-recertified'}));
+        checked++;
+        continue;
+      }
       const report = assertContentStandard(source, {kind, enforceScanDensity: args[0] !== '--all'});
       renderEditorialPost(source);
       console.log('CONTENT_CONTRACT_PASS ' + JSON.stringify({path,domain:report.domain,semanticVerification:report.semanticVerification,warnings:report.warnings}));
