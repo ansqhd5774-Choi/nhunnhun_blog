@@ -1,7 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "3d85bcc94963460ede9255dff9c99df5682ce8bd2437efa2bf704e3d8541e795",
+  "url": "https://nhunnhun.tistory.com/402",
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-09T13:34:09.191Z",
   "sourceCommit": "33bb862578bc602dc60b6dbf1e5c855b917c3760",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-09T13:33:42.722Z"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37937555691",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-soy-isoflavones-20261009",
+    "url": "https://nhunnhun.tistory.com/402",
+    "checkedAt": "2026-10-09T13:34:09.191Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
