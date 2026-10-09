@@ -7,7 +7,6 @@
   "representativeImageUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pistachios.jpg?width=960",
   "imageReview": [
     {
-      "file": "Pistachios.jpg",
       "author": "pokipsy76 (marcodisce)",
       "license": "CC BY-SA 2.0",
       "role": "hero",
@@ -18,7 +17,6 @@
       "visualChecked": true
     },
     {
-      "file": "Pistacia vera Fruto 2010-8-20 CampodeCalatrava.jpg",
       "author": "Javier martin",
       "license": "Public Domain",
       "role": "context",
@@ -29,7 +27,6 @@
       "visualChecked": true
     },
     {
-      "file": "Kernel Pistachio.JPG",
       "author": "Hedi Aghlara",
       "license": "CC BY-SA 3.0",
       "role": "detail",
