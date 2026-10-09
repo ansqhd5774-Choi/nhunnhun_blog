@@ -1,3 +1,5 @@
+> RETIRED 운영 안내: Ollama 자동 작성은 현재 운영 경로에서 사용하지 않는다. 과거 절차·실험 기록으로만 보존한다. 일반 Chat 직접 작성은 GENERAL_CHAT_EXECUTION.md를 따른다.
+
 # 기존 URL 자동 수정 Queue
 
 목록은 `authoring/update-queue.txt`에 `음식 - 가지 - https://nhunnhun.tistory.com/327` 형식으로 한 번 저장합니다. 현재 108개 항목이 등록돼 있습니다. 신규 발행의 하루 15개 제한을 기존 수정 개수에 적용하지 않습니다.

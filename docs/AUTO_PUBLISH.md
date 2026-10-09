@@ -1,6 +1,6 @@
 # 자동 발행 — Windows self-hosted
 
-현재 발행 경로는 PRIVATE GitHub main → Ubuntu validate/test → Windows self-hosted CMD → 전용 Chrome → 익명 공개 검증 → GitHub ledger다. PC와 runner가 실행 중이어야 한다. 외부 유료 브라우저 SDK는 제거했다.
+현재 발행 경로는 공개 GitHub main → GitHub-hosted validate/test → Windows self-hosted CMD → 전용 Chrome → 익명 공개 검증 → GitHub ledger다. PC와 runner가 실행 중이어야 한다. 외부 유료 브라우저 SDK는 제거했다.
 
 초기 runner 등록·로그인은 [WINDOWS_TISTORY_PUBLISHER.md](WINDOWS_TISTORY_PUBLISHER.md)를 따른다. 준비 중 TISTORY_PUBLISH_ENABLED=false. 등록/로그인 후 현재 ledger와 source를 확인해 활성화한다.
 

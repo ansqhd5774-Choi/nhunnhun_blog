@@ -66,6 +66,11 @@ jobs:
           PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+      - name: 선택 원고 준비와 강조 현황 — 러너 담당
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
+        run: node authoring/prepare-selected-source.mjs posts
+        env:
+          PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
   publish:
     env:
       PUBLISH_SOURCE_ID: ${{ needs.validate.outputs.source_id }}

@@ -1,3 +1,5 @@
+> RETIRED 운영 안내: Ollama 자동 작성은 현재 운영 경로에서 사용하지 않는다. 과거 절차·실험 기록으로만 보존한다. 일반 Chat 직접 작성은 GENERAL_CHAT_EXECUTION.md를 따른다.
+
 # Producer R5.4 — 시간 측정·부분 보완·재개
 
 적용 범위: 음식·영양소·약·질병의 기존 URL 수정 Producer. 기존 publish/update 브라우저 러너, 승인·mutex·원장·공개 검증 계약은 변경하지 않는다.

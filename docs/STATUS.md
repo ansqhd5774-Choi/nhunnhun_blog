@@ -1,3 +1,5 @@
+> 현재 실행 기준은 GENERAL_CHAT_EXECUTION.md와 실제 YAML이다. 아래 등록·cloud·비공개 상태는 과거 시점 기록이며 현재 장애 판정에 사용하지 않는다.
+
 # 2026-10-03 현재 상태
 
 Windows self-hosted 전환 구현·테스트 준비. Browserbase 운영 경로 제거, 기존 운영 기록 보존. runner 미등록/최초 전용 로그인 미완료로 실제 발행은 대기 중이다. 기존 전복 1개만 대상이며 새 글·스킨·광고는 수정하지 않았다. 상세: WINDOWS_PUBLISHER_MIGRATION.md / WINDOWS_TISTORY_PUBLISHER.md.

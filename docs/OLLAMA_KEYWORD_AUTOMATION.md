@@ -1,3 +1,5 @@
+> RETIRED 운영 안내: Ollama 자동 작성은 현재 운영 경로에서 사용하지 않는다. 과거 절차·실험 기록으로만 보존한다. 일반 Chat 직접 작성은 GENERAL_CHAT_EXECUTION.md를 따른다.
+
 # GitHub 키워드 → 로컬 Ollama 자동 실행
 
 GitHub 저장소의 **authoring/keywords.txt**를 열어 연필(Edit)을 누르고 한 줄에 키워드 하나를 입력한 뒤 **Commit changes → main에 저장**합니다. 생성할 키워드 개수 제한 없이 순차 실행합니다. 별도 CMD를 실행할 필요는 없습니다. PC·기존 GitHub 로컬 러너·Ollama 서버가 켜져 있어야 합니다.

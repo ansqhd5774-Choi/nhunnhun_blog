@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/publishing.test.mjs tests/runner-gate.test.mjs tests/verification-context.test.mjs tests/runtime-diagnostics.test.mjs tests/html-mode.test.mjs tests/public-verification.test.mjs tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs tests/update-queue.test.mjs tests/queue-efficient.test.mjs tests/queue-single-pass.test.mjs tests/direct-authoring.test.mjs tests/ci-scope.test.mjs tests/update-preparation.test.mjs tests/runner-isolation.test.mjs",
+    "test": "node --test tests/publishing.test.mjs tests/runner-gate.test.mjs tests/verification-context.test.mjs tests/runtime-diagnostics.test.mjs tests/html-mode.test.mjs tests/public-verification.test.mjs tests/content-standards.test.mjs tests/content-emphasis.test.mjs tests/content-workflow.test.mjs tests/update-queue.test.mjs tests/queue-efficient.test.mjs tests/queue-single-pass.test.mjs tests/direct-authoring.test.mjs tests/ci-scope.test.mjs tests/update-preparation.test.mjs tests/runner-isolation.test.mjs tests/general-chat-workflow.test.mjs",
     "validate": "node publishing/validate.mjs",
     "publish": "node publishing/publish.mjs",
     "validate:update": "node publishing/validate-update.mjs",

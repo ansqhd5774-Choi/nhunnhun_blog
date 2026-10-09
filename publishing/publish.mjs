@@ -493,7 +493,11 @@ try {
       }
       const state = await ledger.read(post.id);
       if (state?.phase !== 'submitting' || state.fingerprint !== fingerprint(post)) throw new Error('E_LEDGER_CONFLICT');
-      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:editorialVersionFor(post),timestamp:new Date().toISOString()}, state.sha);
+      await ledger.write(post.id, {phase:'published',fingerprint:fingerprint(post),url,editorialTemplateVersion:editorialVersionFor(post),timestamp:new Date().toISOString(),
+        sourceCommit:state.sourceCommit||process.env.GITHUB_SHA||null,
+        runUrl:process.env.GITHUB_RUN_ID?`https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/${process.env.GITHUB_RUN_ID}`:null,
+        publicResult:{status:'PUBLIC_VERIFIED',sourceId:post.id,url,checkedAt:new Date().toISOString(),
+          checks:['title','body','images','representative','emphasis','desktop','mobile'],semanticVerification:'not-performed'}}, state.sha);
       console.log(`PUBLISHED: ${post.id} ${url}`);
       }
     } else console.log('NO_PENDING_POSTS');

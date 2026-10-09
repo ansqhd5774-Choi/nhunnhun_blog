@@ -59,3 +59,4 @@ try {
 const report={kind:'offline-render-preview-not-live-tistory',network:'blocked-except-synthetic-images',reports};
 writeFileSync(join(directory,'report.json'),JSON.stringify(report,null,2)+'\n');
 console.log('CONTENT_PREVIEW_PASS '+JSON.stringify(report));
+await import('./general-chat-public-preview.mjs');

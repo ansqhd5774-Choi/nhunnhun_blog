@@ -59,10 +59,36 @@ jobs:
           Error('E_UPDATE_TARGET_ID');const {runContentCli}=await
           import('./publishing/validate-content.mjs');runContentCli(['--check','updates/'+id+'.json']);"
       - run: pnpm run validate:update
+      - name: 선택 원고 준비와 강조 현황 — 러너 담당
+        run: node authoring/prepare-selected-source.mjs updates
       - run: call maintenance\check-tistory-chrome.cmd
       - run: pnpm run update
         env:
           UPDATE_ENABLED: 'true'
+          UPDATE_SOURCE_ID: ${{ inputs.source_id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+  verify-existing:
+    concurrency:
+      group: nhunnhun-tistory-mutation
+      cancel-in-progress: false
+    if: github.event_name == 'workflow_dispatch' && inputs.update == false && github.ref == 'refs/heads/main'
+    runs-on: [ self-hosted, windows, x64, tistory-publisher ]
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node-pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: 기존 제출 공개 확인 — 편집기 및 재제출 없음
+        run: node publishing/finalize-update.mjs
+        env:
           UPDATE_SOURCE_ID: ${{ inputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog

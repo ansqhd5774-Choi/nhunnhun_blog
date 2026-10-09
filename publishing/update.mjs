@@ -10,6 +10,7 @@ import { renderEditorialPost, assertEditorialContract, EDITORIAL_TEMPLATE_VERSIO
 import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mjs';
 import { UpdateLedger } from './update-ledger.mjs';
 import { assertImageReview } from './image-review.mjs';
+import {finalizeSelectedUpdate} from './finalize-update.mjs';
 
 function imageSources(html){
   return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
@@ -404,12 +405,17 @@ try{
 
       await ledger.write(update.id,{
         phase:'submitting',fingerprint,url:update.targetUrl,articleId:update.articleId,
-        sourceCommit,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString()
+        sourceCommit,editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION,timestamp:new Date().toISOString(),
+        runUrl:process.env.GITHUB_RUN_ID?`https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/${process.env.GITHUB_RUN_ID}`:null
       });
 
       stage='final-submit';
       await submit.click();
-      console.log('SUBMIT_CLICKED: '+update.id+' '+update.targetUrl+'; public verification=user');
+      console.log('SUBMIT_CLICKED: '+update.id+' '+update.targetUrl);
+      stage='public-verification';
+      const publicResult=await finalizeSelectedUpdate(update.id);
+      console.log('UPDATE_PUBLIC_RESULT '+JSON.stringify(publicResult));
+      if(publicResult.status!=='PUBLIC_VERIFIED')process.exitCode=1;
     }
   }
 }catch(error){
