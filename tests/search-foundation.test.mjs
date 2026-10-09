@@ -8,8 +8,36 @@ import { installGrowthNavigation } from '../scripts/install-growth-navigation.mj
 import { summarizeSchemaDates } from '../scripts/summarize-schema-dates.mjs';
 import { extractEvidence, accessState, reconcileSourceAccess } from '../scripts/audit-health-evidence.mjs';
 import { installGrowthEvents, protectExistingAnalytics } from '../scripts/install-growth-events.mjs';
+import { installRuntimeQuality } from '../scripts/install-health-runtime-quality.mjs';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
+
+test('runtime repair changes only same-page equivalent Article headline and preserves dates and other schemas',async()=>{
+  const code=await fs.readFile(new URL('../skin/proposals/health-runtime-quality-20261010.js',import.meta.url),'utf8');
+  const article={'@type':'BlogPosting',url:'https://nhunnhun.tistory.com/1',headline:'영양&middot;안내',datePublished:'2024-01-01',dateModified:'2026-10-10',image:'https://image.example/1.jpg'};
+  const foreign={...article,url:'https://nhunnhun.tistory.com/2'};
+  const different={...article,headline:'다른&middot;글'};
+  const product={'@type':'Product',url:article.url,headline:article.headline};
+  const block={textContent:JSON.stringify({'@graph':[article,foreign,different,product]})};
+  const document={readyState:'complete',body:{},querySelector:()=>({content:'영양·안내'}),querySelectorAll:s=>s.startsWith('script')?[block]:[],createElement:()=>({set innerHTML(value){this.value=value.replaceAll('&middot;','·').replaceAll('&lt;','<');}})};
+  vm.runInNewContext(code,{document,location:{origin:'https://nhunnhun.tistory.com',pathname:'/1'},MutationObserver:class{observe(){}}});
+  const result=JSON.parse(block.textContent)['@graph'];
+  assert.deepEqual(result[0],{...article,headline:'영양·안내'});
+  assert.deepEqual(result.slice(1),[foreign,different,product]);
+  const first=block.textContent;
+  vm.runInNewContext(code,{document,location:{origin:'https://nhunnhun.tistory.com',pathname:'/1'},MutationObserver:class{observe(){}}});
+  assert.equal(block.textContent,first);
+});
+
+test('runtime installer preserves manuscript placeholders and refuses duplicate or unsafe boundaries',()=>{
+  const skin='<html><head><title>[##_page_title_##]</title></head><body>[##_article_rep_desc_##]</body></html>';
+  const output=installRuntimeQuality(skin,'/* repair */','a:focus-visible{outline:3px solid green}');
+  assert.ok(output.includes('[##_article_rep_desc_##]'));
+  assert.equal((output.match(/nh-runtime-quality-20261010/g)||[]).length,1);
+  assert.throws(()=>installRuntimeQuality(output,'',''),/E_ALREADY_INSTALLED/);
+  assert.throws(()=>installRuntimeQuality(skin,'</script>',''),/E_SCRIPT_STYLE_BOUNDARY/);
+  assert.throws(()=>installRuntimeQuality('REDACTED'+skin,'',''),/E_LIVE_SOURCE_REQUIRED/);
+});
 
 test('source audit scopes evidence to the article and redacts signed image URLs',()=>{
   const result=extractEvidence('<nav><a href="https://unrelated.example/">nav</a></nav><div class="contents_style"><p>철분 <a href="https://ods.od.nih.gov/factsheets/Iron/">원문</a></p><img src="https://cdn.example/image.jpg?signature=secret" alt="음식"></div>','https://nhunnhun.tistory.com/1');

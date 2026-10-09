@@ -1,0 +1,4 @@
+/* Restore a visible keyboard focus without changing pointer appearance. */
+#wrap :is(a,button,input,summary):focus-visible,
+#nh-reading-dock :is(a,button):focus-visible,
+#nh-photo-viewer button:focus-visible{outline:3px solid #174d35!important;outline-offset:3px!important}
