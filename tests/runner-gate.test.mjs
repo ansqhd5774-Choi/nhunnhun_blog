@@ -36,3 +36,15 @@ test('new publication source ID scopes unrelated updates without weakening its o
    assert.throws(()=>assertSourceIdentity(a,a,b,[path],target),/BLOCKED_SOURCE_DRIFT/);
  assert.throws(()=>assertSourceIdentity(a,a,b,['updates/direct-272-octopus-20261009.json'],mutationSourceId({})),/BLOCKED_SOURCE_DRIFT/);
 });
+
+test('unrelated update review may advance but target review and unknown artifacts stay protected',()=>{
+ const a='a'.repeat(40),b='b'.repeat(40),id='direct-taro-nutrition-oxalate-storage-20261010';
+ assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,[
+   'updates/update-237-carvacrol-identity-review-20261010.json',
+   'content-reviews/updates/update-237-carvacrol-identity-review-20261010.json'
+ ],id));
+ for(const path of ['content-reviews/updates/'+id+'.json','content-reviews/posts/'+id+'.json',
+   'content-reviews/updates/unknown.txt','publishing/content-standards.mjs','pnpm-lock.yaml'])
+   assert.throws(()=>assertSourceIdentity(a,a,b,[path],id),/BLOCKED_SOURCE_DRIFT/);
+ assert.throws(()=>assertSourceIdentity(a,a,b,['content-reviews/updates/other-update.json']),/BLOCKED_SOURCE_DRIFT/);
+});

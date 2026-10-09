@@ -270,10 +270,9 @@ try {
       if (!(await publishButton.isEnabled())) throw new Error('E_PUBLISH_BUTTON_DISABLED');
       if (await page.locator('#post-title-inp').inputValue() !== post.title) throw new Error('E_TITLE_MISMATCH');
       // Durable checkpoint BEFORE the irreversible final click. A timeout must never resubmit blindly.
-      const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
-      const remoteMain = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], {encoding:'utf8'}).trim().split(/\s+/)[0] || '';
-      if (!remoteMain || remoteMain !== sourceCommit) throw new Error('E_SOURCE_DRIFT');
-      assertCurrentSource();
+      // Reuse Gate A's source-scoped policy immediately before the checkpoint.
+      // A second SHA-equality rule would reject unrelated article/doc changes.
+      const sourceCommit = assertCurrentSource();
       await ledger.write(post.id, {phase:'submitting', fingerprint:fingerprint(post), sourceCommit, editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION, timestamp:new Date().toISOString()}, previousStateSha);
       stage = 'final-submit';
       finalSubmitDialogs = [];

@@ -186,7 +186,7 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/editorialSnapshot\.relatedCards/);
   assert.match(publish,/editorialTemplateVersion:EDITORIAL_TEMPLATE_VERSION/);
   assert.match(publish,/E_REPRESENTATIVE_UNVERIFIED/);
-  assert.match(publish,/E_SOURCE_DRIFT/);
+  assert.match(publish,/const sourceCommit = assertCurrentSource\(\);/);
   assert.match(publish,/previousStateSha/);
   assert.match(publish,/stage === 'final-submit'/);
   assert.match(publish,/E_PUBLISH_BUTTON_DISABLED/);
@@ -196,7 +196,9 @@ test('publish pipeline keeps the required recurrence-prevention gates', () => {
   assert.match(publish,/FINAL_SUBMIT_RESPONSES/);
   assert.match(publish,/page\.goto\(\`\$\{BLOG\}\/manage\/posts\`/);
   assert.equal((publish.match(/publishButton\.click/g)||[]).length,1);
-  assert.match(publish,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
+  const sourceGate=readFileSync(new URL('../publishing/runner-gate.mjs',import.meta.url),'utf8');
+  assert.match(sourceGate,/git', \['ls-remote', 'origin', 'refs\/heads\/main'\]/);
+  assert.match(sourceGate,/assertSourceIdentity\(/);
   assert.match(validate,/renderEditorialPost\(post\)/);
 });
 
@@ -243,7 +245,8 @@ test('publisher attaches to the saved login Chrome and reuses only the authentic
   assert.match(verification,/context\.route\('\*\*\/\*'/);
   assert.match(verification,/serviceWorkers: 'block'/);
   assert.ok(p.indexOf("phase:'submitting'")<p.indexOf('await publishButton.click'));
-  assert.ok(p.indexOf("E_SOURCE_DRIFT")<p.indexOf("phase:'submitting'"));
+  const sourceCheckAt=p.indexOf('const sourceCommit = assertCurrentSource();');
+  assert.ok(sourceCheckAt>=0 && sourceCheckAt<p.indexOf("phase:'submitting'"));
 });
 
 test('configuration rejects missing executables, missing profiles, remote CDP and ordinary Chrome profiles', async () => {
