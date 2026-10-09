@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
+import {isPublishedProductLinkRepair} from '../publishing/validate-content.mjs';
+import {fingerprint} from '../publishing/core.mjs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -8,6 +10,22 @@ import { parse } from 'yaml';
 import { fileURLToPath } from 'node:url';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const workflow=path=>parse(read('.github/workflows/'+path));
+
+test('published product address repair preserves identity and rejects content, product, image and ledger changes',()=>{
+ const root=mkdtempSync(join(tmpdir(),'product-source-repair-'));
+ try {
+  mkdirSync(join(root,'posts'));mkdirSync(join(root,'publishing/state'),{recursive:true});
+  const original={id:'original-medicine',title:'제품 정보',category:'약학',representativeImageUrl:'https://example.org/photo.jpg',imageReview:{version:'original'},bodyHtml:'<p>제품 설명 <a href="https://www.health.kr/drug/A11ABBBBB2527">허가사항</a></p>'};
+  const ledger={phase:'published',url:'https://nhunnhun.tistory.com/388',fingerprint:fingerprint(original)};
+  writeFileSync(join(root,'posts/original-medicine.json'),JSON.stringify(original));
+  const ledgerFile=join(root,'publishing/state/original-medicine.json');writeFileSync(ledgerFile,JSON.stringify(ledger));
+  const request={...original,id:'repair-source-388-20261010',articleId:'388',targetUrl:ledger.url,expectedCurrentTitle:original.title,bodyHtml:original.bodyHtml.replace('/drug/A11ABBBBB2527','/searchDrug/result_drug.asp?drug_cd=A11ABBBBB2527')};
+  assert.equal(isPublishedProductLinkRepair(request,root),true);
+  for(const changed of [{bodyHtml:request.bodyHtml.replace('제품 설명','새 효능')},{bodyHtml:request.bodyHtml.replace('drug_cd=A11ABBBBB2527','drug_cd=OTHER')},{imageReview:{version:'changed'}},{representativeImageUrl:'https://example.org/new.jpg'},{contentStandard:'R1'},{id:'direct-388-test'},{articleId:'389'},{expectedCurrentTitle:'다른 제품'}]) assert.equal(isPublishedProductLinkRepair({...request,...changed},root),false);
+  writeFileSync(ledgerFile,JSON.stringify({...ledger,phase:'submitting'}));assert.equal(isPublishedProductLinkRepair(request,root),false);
+  writeFileSync(ledgerFile,JSON.stringify({...ledger,fingerprint:'stale'}));assert.equal(isPublishedProductLinkRepair(request,root),false);
+ } finally {rmSync(root,{recursive:true,force:true});}
+});
 test('direct workflow never starts generation on code or keyword pushes',()=>{
  const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on).sort(),['push','workflow_dispatch']);assert.deepEqual(w.on.push.branches,['main']);assert.deepEqual(w.on.push.paths,['updates/direct-*.json']);
  assert.equal(w.jobs.produce,undefined);assert.equal(w.jobs.summary,undefined);

@@ -1,4 +1,5 @@
 import { assertContentStandard } from './content-standards.mjs';
+import { isPublishedProductLinkRepair } from './validate-content.mjs';
 import { assertCurrentSource } from './runner-gate.mjs';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -282,7 +283,7 @@ try{
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
         if(update.contentStandard!=='SP1') {
-          assertContentStandard(update);
+          if(!isPublishedProductLinkRepair(update)) assertContentStandard(update);
           assertImageReview(update);
         }
         queue.push(update);
