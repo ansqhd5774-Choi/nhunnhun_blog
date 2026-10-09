@@ -8,6 +8,12 @@
 
 전체 로컬 회귀303/303 PASS. 공개 스킨이나 원고를 이 변경으로 수정하지 않았다.
 
+## 새 제출 강조 검사 보완
+
+계란 `/180`의 읽기 전용 실행 `37991576833`은 `E_DIRECT_PUBLIC_STYLE`로 실패했다. 실제 브라우저에서 형광펜 배경·노출·글 번호27px은 정상이고 중첩 strong은750으로 확인됐다. 실패 원인은 여러 단독 mark에 strong이 없다는 것이다. 사전 omission guard는 중첩1곳만 있으면 통과하지만 공개 검사는 모든 mark의 굵은 구조를 요구했다.
+
+새 제출의 기존 `prepare-selected-source` 단계에 mark 전체의 중첩 구조 검사를 연결했다. 단독 mark·일부만 굵게 만든 mark는 `E_DIRECT_EMPHASIS_STRUCTURE`로 편집기 진입 전에 차단한다. 자동 태그 생성·문장 변경·개수 강제는 없으며 작성자가 한 번에 보완한다. 과거 읽기 전용 loader와 공개 검사의 assertion은 변경하지 않았다. 새 전체 회귀305/305 PASS; 앞선303개는 이전 변경 범위의 결과다. 이 코드 변경만으로 과거 `/180`을 수정 완료로 처리하지 않는다.
+
 ## 실제 운영 증거
 
 - 홍합 `/400`: 읽기 전용 [37989170863](https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37989170863) SUCCESS, 원장 `updated / PUBLIC_VERIFIED`.
