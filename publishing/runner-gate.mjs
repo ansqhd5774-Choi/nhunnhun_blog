@@ -5,11 +5,12 @@ export const RUNNER_LABELS = ['self-hosted', 'windows', 'x64', 'tistory-publishe
 export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths, sourceId) {
   if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha) throw new Error('BLOCKED_SOURCE_DRIFT');
   if(checkoutSha===remoteSha)return;
-  // Only documentation-only forward changes may pass. Runtime/source/unknown changes fail closed.
+  // Documentation and other articles' update records may advance. The selected
+  // source/review, runtime, dependencies, and unknown paths still fail closed.
   const unrelated=p=>{
     if(p.startsWith('docs/')||p==='AGENTS.md'||p==='README.md')return true;
     if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??''))return false;
-    const match=p.match(/^(?:updates|publishing\/update-state)\/([a-z0-9][a-z0-9-]{2,79})\.json$/);
+    const match=p.match(/^(?:updates|content-reviews\/updates|publishing\/update-state)\/([a-z0-9][a-z0-9-]{2,79})\.json$/);
     return !!match&&match[1]!==sourceId;
   };
   if(!Array.isArray(changedPaths)||!changedPaths.length||changedPaths.some(p=>!unrelated(p)))throw new Error('BLOCKED_SOURCE_DRIFT');
