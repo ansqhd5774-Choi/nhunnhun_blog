@@ -1,0 +1,43 @@
+{
+  "page": "https://nhunnhun.tistory.com/282",
+  "baseline": {
+    "mobile": {
+      "score": 54,
+      "fcp": 3.2,
+      "lcp": 4.4,
+      "cls": 0.61,
+      "tbt": 0
+    },
+    "desktop": {
+      "score": 91,
+      "fcp": 1,
+      "lcp": 1.5,
+      "cls": 0.091,
+      "tbt": 50
+    }
+  },
+  "finalMobile": {
+    "score": 62,
+    "fcp": 5.3,
+    "lcp": 7.1,
+    "cls": 0.08,
+    "tbt": 40
+  },
+  "mobileOverflow390": 0,
+  "hoverItems": 9,
+  "unitTests": 3,
+  "limitations": [
+    "Single Lighthouse measurements are variable; no CrUX data",
+    "Mobile LCP is slower than baseline; not fully resolved",
+    "Kakao collector returned HTTP 429 in PSI",
+    "Responsive srcset experiment reverted"
+  ],
+  "finalDesktop": {
+    "fcp": 1.2,
+    "score": 89,
+    "cls": 0.089,
+    "tbt": 60,
+    "lcp": 1.5
+  },
+  "reportUrl": "https://pagespeed.web.dev/analysis/https-nhunnhun-tistory-com-282/obbw15m752"
+}

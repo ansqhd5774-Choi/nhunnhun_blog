@@ -41,7 +41,7 @@
     }
     // Hero image loads eagerly; subsequent article images use native lazy loading.
     body.querySelectorAll('img').forEach((image, i) => {
-      image.decoding = 'async'; image.loading = i === 0 ? 'eager' : 'lazy';
+      image.decoding = 'async'; image.loading = i === 0 ? 'eager' : 'lazy'; if(i===0)image.fetchPriority='high';
     });
     const images = [...body.querySelectorAll('.nh-direct-v2 img')].filter(image => !image.closest('a'));
     if (images.length && typeof HTMLDialogElement !== 'undefined') {
@@ -61,6 +61,5 @@
       });
     }
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  init();
 })();
