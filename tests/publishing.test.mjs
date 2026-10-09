@@ -389,6 +389,19 @@ test('image review gate requires visually checked close-up hero and exact attrib
   assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:false})}),/E_IMAGE_REVIEW_REQUIRED/);
 });
 
+test('image attribution accepts an apostrophe in a double-quoted file URL without relaxing exact matching', () => {
+  const names=["Perilla_frutescens'_foliage.jpg",'Ssam.jpg','Pickled_leaves.jpg'];
+  const review=names.map((name,i)=>({src:`https://commons.wikimedia.org/wiki/Special:Redirect/file/${name}?width=960`,alt:'실제로 검토한 깻잎 사진',role:i?'context':'hero',composition:i?'context':'closeup',sourcePage:`https://commons.wikimedia.org/wiki/File:${name}`,author:'Author',license:'CC BY-SA 3.0',visualChecked:true}));
+  const images=review.map(r=>`<p><img src="${r.src}" alt="${r.alt}"></p>`).join('');
+  const credits=review.map(r=>`<li><a href="${r.sourcePage}">출처</a></li>`).join('');
+  const item={representativeImageUrl:review[0].src,imageReview:review,bodyHtml:images+'<h2>자료 출처</h2><ul>'+credits+'</ul>'};
+  assert.doesNotThrow(()=>assertImageReview(item));
+  assert.throws(()=>assertImageReview({...item,bodyHtml:item.bodyHtml.replace(review[0].sourcePage,'https://commons.wikimedia.org/wiki/File:Other.jpg')}),/E_IMAGE_REVIEW_ATTRIBUTION/);
+  assert.throws(()=>assertImageReview({...item,bodyHtml:item.bodyHtml.replace(`href="${review[0].sourcePage}"`,`href="${review[0].sourcePage}'`)}),/E_IMAGE_REVIEW_ATTRIBUTION/);
+  const singleQuotes=images+'<h2>자료 출처</h2><ul>'+review.slice(1).map(r=>`<li><a href='${r.sourcePage}'>출처</a></li>`).join('')+`<li><a href="${review[0].sourcePage}">출처</a></li></ul>`;
+  assert.doesNotThrow(()=>assertImageReview({...item,bodyHtml:singleQuotes}));
+});
+
 
 test('publisher diagnoses Tistory daily limit and human verification without a second click', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');

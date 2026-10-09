@@ -5,7 +5,8 @@ const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\
 function imageTags(html=''){return [...String(html).matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]);}
 function attr(tag,name){return (tag.match(new RegExp('\\b'+name+'=(["\\\'])(.*?)\\1','i'))||[])[2]||'';}
 function sourceBlock(html=''){return (String(html).match(/<h2>자료 출처<\/h2>\s*<ul>([\s\S]*?)<\/ul>/)||[])[1]||'';}
-function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/[^"']+)\1/gi)].map(m=>m[2].replace(/&amp;/g,'&')));}
+// Match the closing delimiter to its opening quote; file names may contain apostrophes.
+function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/.*?)\1/gi)].map(m=>m[2].replace(/&amp;/g,'&')));}
 function assertHttps(value,code){let u;try{u=new URL(value);}catch{throw new Error(code);}if(u.protocol!=='https:'||u.username||u.password)throw new Error(code);return u;}
 export function assertImageReview(item){
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
