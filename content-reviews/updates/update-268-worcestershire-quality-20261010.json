@@ -1,0 +1,290 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "기존 /268 제목·성분 오류와 영양 근거 교정",
+    "topic": "우스터 소스",
+    "meaning": "액상 조미료의 제품별 영양성분과 선택·활용 기준",
+    "entityId": "food:worcestershire-sauce",
+    "status": "resolved",
+    "reason": "제조사 원재료와 영양성분표로 조미료를 식별하고 앤초비 오역을 교정한다."
+  },
+  "sourceDigest": "26611ca77c3bac523f2259b49362f83e3b89d8610ff2e3700deca8e8709e1212",
+  "intent": {
+    "primaryQuestion": "우스터 소스의 칼로리와 나트륨은 얼마이며 어떤 성분을 확인해야 하는가?",
+    "readerSituation": "조미료의 영양성분과 알레르기·구매 기준을 알아보는 독자",
+    "nextActions": [
+      "구입 제품의 1회분과 원재료 표시를 확인한다.",
+      "식사 전체의 나트륨과 실제 사용량을 함께 조절한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 longTerm 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 comparison 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 combinations 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 products 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 foodReplacement 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 essentialNutrient 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 cultivars 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 origins 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 seasonality 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 cost 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 folkRemedies 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 selfCheck 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 exercise 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 diet 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 vulnerableGroups 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 discontinuation 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 missedDose 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 myths 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "이 조미료의 검토 범위에서는 latest 확장 질문을 별도 효능·처방·우열 주장으로 만들지 않고 핵심 제품 표시와 활용 판단에 집중한다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 우스터 소스의 정체와 주요 성분",
+      "answerQuote": "우스터 소스는 식초·당류·향신료 등을 섞은 액상 조미료입니다.",
+      "sourceIds": [
+        "us"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "2. 칼로리·나트륨은 1회분으로 확인하세요",
+      "answerQuote": "아래 표는 미국 Lea & Perrins 제품의 영양성분표입니다.",
+      "sourceIds": [
+        "us"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 식사에서 기대할 수 있는 역할",
+      "answerQuote": "우스터 소스의 주된 역할은 식사의 맛과 향을 풍부하게 하는 것입니다.",
+      "sourceIds": [
+        "us",
+        "who"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "2. 칼로리·나트륨은 1회분으로 확인하세요",
+      "answerQuote": "mL는 부피, g은 무게입니다.",
+      "sourceIds": [
+        "us"
+      ]
+    },
+    {
+      "module": "preparation",
+      "heading": "4. 잘 어울리는 음식과 사용 방법",
+      "answerQuote": "음식 궁합은 맛과 식사 구성을 기준으로 고르세요.",
+      "sourceIds": [
+        "us"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "보관 온도와 개봉 후 사용기간은 해당 용기의 안내를 따르세요.",
+      "sourceIds": [
+        "us"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "고를 때는 원재료·1회분·나트륨을 먼저 비교하세요.",
+      "sourceIds": [
+        "us",
+        "ca",
+        "fda"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "5. 알레르기와 나트륨 확인",
+      "answerQuote": "미국 예시 제품은 앤초비를 포함하며 제조사는 앤초비 함유를 표시합니다.",
+      "sourceIds": [
+        "us",
+        "fda"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "구입한 제품의 표시를 우선하고 국가별 배합과 앤초비 포함 여부를 확인하세요.",
+      "sourceIds": [
+        "us",
+        "ca"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "nutrient의 처방·진단·영양제 선택으로 확대하지 않고 조미료의 표시 확인을 안내한다."
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "medicine의 처방·진단·영양제 선택으로 확대하지 않고 조미료의 표시 확인을 안내한다."
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "disease의 처방·진단·영양제 선택으로 확대하지 않고 조미료의 표시 확인을 안내한다."
+    }
+  },
+  "sources": [
+    {
+      "id": "us",
+      "url": "https://www.kraftheinz.com/lea-perrins/products/00051600000013-the-original-worcestershire-sauce",
+      "title": "Lea & Perrins 미국 제품 영양성분표",
+      "kind": "manufacturer",
+      "role": "nutrition",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "현재 제품 페이지의 Nutrition Facts 5mL·5kcal·나트륨65mg과 원재료·활용을 읽었다. 홍보영역의 0calories와 영양표5calories 불일치가 있어 영양표를 기준으로 명시했다."
+    },
+    {
+      "id": "ca",
+      "url": "https://www.kraftheinz.com/en-CA/lea-perrins/products/00057000009250-worcestershire-sauce",
+      "title": "Lea & Perrins 캐나다 원재료 표시",
+      "kind": "manufacturer",
+      "role": "product",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "판매 국가별 원재료 비교의 보리 맥아식초 표시만 확인하여 사용한다."
+    },
+    {
+      "id": "who",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/sodium-reduction",
+      "title": "WHO 나트륨 저감 안내",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "성인 하루 나트륨2000mg미만 기준과 전체 식사 기준을 읽었다. 특정 조미료 치료 효과를 주장하지 않는다."
+    },
+    {
+      "id": "fda",
+      "url": "https://www.fda.gov/consumers/consumer-updates/have-food-allergies-read-label",
+      "title": "FDA 알레르기 원재료 읽기",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "전체 원재료와 알레르기 표시를 구매 때마다 확인하는 일반 소비자 안내를 읽었다. 미국 표시 기준을 한국 허가 규정으로 옮기지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "name": "Codex 제조사·공식자료·실제 사진 검토",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "제목의 칼로리·나트륨·성분·알레르기·선택에 직접 답한다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "앤초비 오역과 부피·무게 혼용을 교정하고 제품 표시 범위를 명시했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "영양 공급·질병 예방·한 달 신체 변화로 확대하지 않는다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "판매국 원재료 차이와 같은 부피 영양 비교만 안내한다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "맛과 식사 구성 예시로 제한하고 임상 시너지로 주장하지 않는다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "나트륨과 생선 알레르기를 제품 표시 확인에 연결한다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "WHO 전체식사 기준과 FDA 원재료 확인을 구분한다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "풍미와 활용을 먼저 설명하고 구체적인 알레르기·나트륨 사항은 별도 항목에 둔다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "strong·의미별 mark·생활팁과 주의 배지로 강조한다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "Commons 세 원문 라이선스·작가와 실제 사진 화면을 확인했다. 앤초비 제조 현장 및 과거 포장 사진 범위를 캡션에 명시했다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "본문 작은 출처 번호와 하단 원문·사진 라이선스를 연결한다."
+      }
+    },
+    "warningResolutions": []
+  }
+}

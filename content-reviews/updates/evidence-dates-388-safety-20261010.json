@@ -1,0 +1,373 @@
+{
+  "version": "R1",
+  "domain": "medicine",
+  "classification": {
+    "status": "resolved",
+    "rawInput": "세티리진 vs 로라타딘",
+    "topic": "세티리진과 로라타딘",
+    "meaning": "국내 경구 항히스타민 정제 비교",
+    "reason": "기존 의약학 글의 최신 국내 허가와 중단 안전정보를 보완한다.",
+    "entityId": "medicine:cetirizine-loratadine"
+  },
+  "sourceDigest": "5fff0edbc51951618c94bbce398b9b989b80a760efd72072266b234bd825d69c",
+  "intent": {
+    "primaryQuestion": "비염약 세티리진과 로라타딘은 효과와 졸림에서 어떻게 다른가?",
+    "readerSituation": "비염 증상 때문에 국내 정제 선택과 복용 주의사항을 확인하려는 독자",
+    "nextActions": [
+      "실제 제품 설명서와 병용약을 약사에게 보여주고 선택한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "comparison": {
+      "applies": true,
+      "reason": "두 경구 성분의 진정 가능성과 대안 치료를 비교한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "discontinuation": {
+      "applies": true,
+      "reason": "장기 세티리진 복용 중단 이후의 안전 경고를 다룬다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "이번 기존 정제 비교 안전 보완에서 별도 확장 질문으로 다루지 않는다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 세티리진 vs 로라타딘 차이표",
+      "answerQuote": "2세대 H1 항히스타민제",
+      "sourceIds": [
+        "aria"
+      ]
+    },
+    {
+      "module": "indications",
+      "heading": "1. 세티리진 vs 로라타딘 차이표",
+      "answerQuote": "재채기·콧물·가려움·눈 증상",
+      "sourceIds": [
+        "zyrtec",
+        "claritin"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "4. 복용시간은 아침이 좋나요, 저녁이 좋나요?",
+      "answerQuote": "성인 및 체중 30kg 이상인 만 6세 이상: 10mg, 1일 1회",
+      "sourceIds": [
+        "claritin"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 복용시간은 아침이 좋나요, 저녁이 좋나요?",
+      "answerQuote": "지르텍정: 성인·6세 이상 10mg, 1일 1회 취침 전",
+      "sourceIds": [
+        "zyrtec"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "4. 복용시간은 아침이 좋나요, 저녁이 좋나요?",
+      "answerQuote": "클라리틴정: 성인 및 체중 30kg 이상인 만 6세 이상: 10mg, 1일 1회",
+      "sourceIds": [
+        "claritin"
+      ]
+    },
+    {
+      "module": "timeline",
+      "heading": "2. 비염 효과는 세티리진이 더 좋은가요?",
+      "answerQuote": "세티리진과 로라타딘의 14일 증상 개선 차이가 통계적으로 유의하지 않았습니다.",
+      "sourceIds": [
+        "child"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "3. 졸림은 어느 쪽이 더 심한가요?",
+      "answerQuote": "세티리진의 진정 가능성을 상대적으로 높게 보고",
+      "sourceIds": [
+        "aria"
+      ]
+    },
+    {
+      "module": "contraindications",
+      "heading": "6. 신장·간 기능이 좋지 않으면 차이가 있나요?",
+      "answerQuote": "클라리틴정은 만 6세 미만, 임부·수유부에게 금기입니다.",
+      "sourceIds": [
+        "claritin"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "6. 신장·간 기능이 좋지 않으면 차이가 있나요?",
+      "answerQuote": "현재 먹는 약 목록을 약사에게 보여주는 것이 우선입니다.",
+      "sourceIds": [
+        "zyrtec",
+        "claritin"
+      ]
+    },
+    {
+      "module": "medical_help",
+      "heading": "6. 신장·간 기능이 좋지 않으면 차이가 있나요?",
+      "answerQuote": "중단 후 심한 가려움이 생기면 복용 이력을 알리고 진료받으세요.",
+      "sourceIds": [
+        "fda"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "8. 정제는 어떻게 보관하나요?",
+      "answerQuote": "기밀용기, 실온 1~30°C 보관",
+      "sourceIds": [
+        "zyrtec",
+        "claritin"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "7. 결국 세티리진과 로라타딘 중 어떻게 고르면 되나요?",
+      "answerQuote": "‘효과가 충분한가’와 ‘졸림 때문에 일상에 지장이 없는가’를 동시에 보는 것입니다.",
+      "sourceIds": [
+        "aria"
+      ]
+    },
+    {
+      "module": "comparison",
+      "heading": "3. 졸림은 어느 쪽이 더 심한가요?",
+      "answerQuote": "세티리진군의 주간 졸림 점수가 로라타딘군보다 오전 10시, 정오, 오후 3시에 더 높았습니다.",
+      "sourceIds": [
+        "sleep"
+      ]
+    },
+    {
+      "module": "alternatives",
+      "heading": "5. 코막힘이 심하면 둘 중 무엇이 더 낫나요?",
+      "answerQuote": "비강 치료가 필요한지 의사·약사와 상의하는 편이 실용적입니다.",
+      "sourceIds": [
+        "aria"
+      ]
+    },
+    {
+      "module": "stopping",
+      "heading": "6. 신장·간 기능이 좋지 않으면 차이가 있나요?",
+      "answerQuote": "장기 복용이나 중단을 계획한다면 의사·약사와 상담하고",
+      "sourceIds": [
+        "fda"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "not-applicable",
+      "reason": "약효를 높이는 특정 음식 궁합을 근거 없이 추가하지 않는다."
+    },
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "영양제 대체나 특정 영양소 병용 이득을 주장하지 않는다."
+    },
+    "disease": {
+      "status": "included",
+      "relationship": "treatment-context",
+      "reason": "알레르기 비염의 코막힘은 비강 치료 상담과 연결한다.",
+      "heading": "5. 코막힘이 심하면 둘 중 무엇이 더 낫나요?",
+      "answerQuote": "비강 치료가 필요한지 의사·약사와 상의하는 편이 실용적입니다.",
+      "sourceIds": [
+        "aria"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "aria",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13256267/",
+      "title": "ARIA-EAACI 2026 경구 알레르기 치료 가이드라인",
+      "kind": "guideline",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    },
+    {
+      "id": "zyrtec",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200610765",
+      "title": "식품의약품안전처 지르텍정 허가사항",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    },
+    {
+      "id": "claritin",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200905692",
+      "title": "식품의약품안전처 클라리틴정 허가사항",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    },
+    {
+      "id": "fda",
+      "url": "https://www.fda.gov/drugs/drug-safety-communications/fda-requires-warning-about-rare-severe-itching-after-stopping-long-term-use-oral-allergy-medicines",
+      "title": "FDA 2025 장기 복용 중단 뒤 가려움 안전공지",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    },
+    {
+      "id": "child",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28441993/",
+      "title": "2017 소아 세티리진 로라타딘 무작위 비교시험",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    },
+    {
+      "id": "sleep",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/10868555/",
+      "title": "2000 세티리진 로라타딘 졸림 비교시험",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "이번에 읽은 원문 중 본문에 연결한 효과·안전·허가 주장에 한정하며 독립 의료인 감수가 아니다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [
+    {
+      "goal": "비염약 선택 시 낮 동안 졸림 가능성 비교",
+      "basis": "동일 용량 10mg 오전 복용을 비교한 무작위 시험과 최신 가이드라인",
+      "left": "세티리진",
+      "right": "로라타딘",
+      "directness": "head-to-head",
+      "limitations": "60명 1주 연구로 개인의 반응과 운전 안전을 보장하지 않는다.",
+      "heading": "3. 졸림은 어느 쪽이 더 심한가요?",
+      "answerQuote": "세티리진군의 주간 졸림 점수가 로라타딘군보다 오전 10시, 정오, 오후 3시에 더 높았습니다.",
+      "sourceIds": [
+        "sleep"
+      ]
+    }
+  ],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "kind": "ai",
+      "name": "Codex evidence dates reviewer",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "기존 비교 제목과 URL을 유지하고 약 선택 질문에 답했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "MFDS 두 제품 최신 허가와 읽은 임상 초록을 대조했고 읽지 못한 이전 정량 주장은 제외했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "집단 비교를 개인의 절대 우위나 졸림 없음으로 바꾸지 않았다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "동일 용량 직접 비교와 최신 가이드라인의 한계를 함께 표시했다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "임의 중복 복용이나 음식으로 약효를 높인다는 주장을 하지 않았다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "알레르기 비염의 치료 맥락만 연결하고 영양 대체를 추가하지 않았다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "FDA 중단 경고와 국내 금기·병용 주의를 확인하고 개인 중단 지시를 하지 않았다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "효과 선택 안내와 실제 필요한 안전 조건을 구분했다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "기존 강조를 보존하고 새 안전 경고 핵심만 짧게 강조했다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "기존 공개 이미지 3장과 기존 시각검토·라이선스 기록을 그대로 재사용했다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "추가한 국내 허가와 FDA 원문을 직접 읽고 검색 비교 의도를 보존했다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
