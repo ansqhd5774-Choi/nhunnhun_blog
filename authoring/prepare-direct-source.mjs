@@ -15,7 +15,8 @@ export function prepareDirectSource(source) {
   return {
     report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml),
       editorialReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[
-        '제목·소제목이 실제 본문에서 답하는 내용과 일치하는가?',
+        '건강·영양 중심 제목인가? 조리법 일부만으로 만들기를 주된 약속으로 삼지 않았는가?',
+        '제목·소제목이 본문의 중심 답과 비중에 맞는가?',
         '소개·효능·궁합은 장점을 먼저 설명하고 불필요한 반박을 반복하지 않는가?',
         '흡수·상호작용·효과 크기의 구체적인 주장에 해당 원문 출처를 연결했는가?',
         '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?',
