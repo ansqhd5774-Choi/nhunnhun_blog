@@ -6,6 +6,60 @@ import { normalizeSkinHead } from '../scripts/normalize-skin-head.mjs';
 import { metadata,duplicateGroups } from '../scripts/audit-public-metadata.mjs';
 import { installGrowthNavigation } from '../scripts/install-growth-navigation.mjs';
 import { summarizeSchemaDates } from '../scripts/summarize-schema-dates.mjs';
+import { extractEvidence, accessState, reconcileSourceAccess } from '../scripts/audit-health-evidence.mjs';
+import { installGrowthEvents, protectExistingAnalytics } from '../scripts/install-growth-events.mjs';
+import fs from 'node:fs/promises';
+import vm from 'node:vm';
+
+test('source audit scopes evidence to the article and redacts signed image URLs',()=>{
+  const result=extractEvidence('<nav><a href="https://unrelated.example/">nav</a></nav><div class="contents_style"><p>철분 <a href="https://ods.od.nih.gov/factsheets/Iron/">원문</a></p><img src="https://cdn.example/image.jpg?signature=secret" alt="음식"></div>','https://nhunnhun.tistory.com/1');
+  assert.equal(result.external.length,1);assert.equal(result.external[0].contentReview,'NOT_PERFORMED');
+  assert.equal(result.images[0].host,'cdn.example');assert.equal(result.images[0].path,'/image.jpg');
+  assert.equal(accessState(200,'text/html','<title>Just a moment...</title>'),'SOFT_ERROR_CANDIDATE');
+  assert.equal(accessState(403,'text/html'),'ACCESS_RESTRICTED');
+  assert.equal(accessState(200,'text/html','<title>자료</title><p>철분</p>'),'HTTP_ACCESSIBLE_CONTENT_UNREVIEWED');
+  const cross=reconcileSourceAccess({status:404,access:'NOT_FOUND',contentReview:'NOT_PERFORMED'},
+    {browserAccess:'CONTENT_DISPLAYED',checkedAt:'2026-10-10',title:'실제 원문'});
+  assert.equal(cross.status,404);assert.equal(cross.runtimeAccess,'BROWSER_CONTENT_DISPLAYED');
+  assert.equal(cross.discrepancy,true);assert.equal(cross.contentReview,'NOT_PERFORMED');
+  assert.equal(reconcileSourceAccess({access:'NOT_FOUND'}, {browserAccess:'UNCONFIRMED'}).runtimeAccess,'UNCONFIRMED');
+});
+
+test('growth event installer preserves existing skin and refuses duplicate or redacted input',()=>{
+  const skin='<html><body><script>existing()</script>[##_article_rep_desc_##]</body></html>';
+  const result=installGrowthEvents(skin,'/* events */');
+  assert.ok(result.includes('<script>existing()</script>'));assert.ok(result.includes('[##_article_rep_desc_##]'));
+  assert.throws(()=>installGrowthEvents(result,''),/E_ALREADY_INSTALLED/);
+  assert.throws(()=>installGrowthEvents('REDACTED'+skin,''),/E_LIVE_SOURCE_REQUIRED/);
+  const tagSkin="<script>gtag('config', 'GT-TEST');</script>";
+  const protectedSkin=protectExistingAnalytics(tagSkin);
+  const calls=[];
+  vm.runInNewContext(protectedSkin.replace(/^<script>|<\/script>$/g,''),{gtag:(...args)=>calls.push(args),
+    location:{origin:'https://nhunnhun.tistory.com',pathname:'/1',search:'?private=medical&nh_analytics_debug=1'},
+    document:{referrer:'https://search.example/?private=secret'},URL,URLSearchParams});
+  assert.equal(calls.length,1);assert.equal(calls[0][1],'GT-TEST');
+  assert.equal(calls[0][2].page_location,'https://nhunnhun.tistory.com/1');
+  assert.equal(calls[0][2].page_referrer,'https://search.example');assert.equal(calls[0][2].debug_mode,true);
+  assert.equal(protectExistingAnalytics(protectedSkin),protectedSkin);
+  assert.throws(()=>protectExistingAnalytics(tagSkin+tagSkin),/AMBIGUOUS/);
+});
+
+test('growth click tracking omits query, fragment, source path and user content and emits no page_view',async()=>{
+  const code=await fs.readFile(new URL('../skin/proposals/growth-events-20261010.js',import.meta.url),'utf8');
+  const calls=[];let handler;
+  const context={window:{gtag:(...args)=>calls.push(args)},location:{origin:'https://nhunnhun.tistory.com',pathname:'/1',search:'?private=medical&nh_analytics_debug=1'},URL,URLSearchParams,setTimeout,
+    document:{addEventListener:(name,fn)=>{assert.equal(name,'click');handler=fn;}}};
+  vm.runInNewContext(code,context);
+  const anchor=href=>({href,matches:s=>s==='a',closest:()=>true});
+  handler({target:{closest:()=>anchor('https://nhunnhun.tistory.com/2?private=secret#diagnosis')}});
+  handler({target:{closest:()=>anchor('https://ods.od.nih.gov/factsheets/Iron/?token=secret')}});
+  assert.deepEqual(calls.map(c=>c[1]),['related_link_click','source_click']);
+  const serialized=JSON.stringify(calls);
+  for(const forbidden of ['medical','secret','diagnosis','factsheets','page_view']) assert.equal(serialized.includes(forbidden),false);
+  assert.equal(calls[0][2].page_location,'https://nhunnhun.tistory.com/1');
+  assert.equal(calls[1][2].source_host,'ods.od.nih.gov');assert.equal(calls[1][2].interaction_stage,'requested');
+  vm.runInNewContext(code,context);assert.equal(calls.length,2);
+});
 
 test('schema date observations detect reversed dates and identity mismatch without semantic certification',()=>{
   const rows=summarizeSchemaDates({one:{url:'https://nhunnhun.tistory.com/1',jsonLd:[{validJson:true,value:{'@graph':[{'@type':'BlogPosting',url:'https://nhunnhun.tistory.com/2',headline:'제목&middot;정보',datePublished:'2026-10-10',dateModified:'2026-10-09'}]}}]}});
