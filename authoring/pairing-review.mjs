@@ -20,7 +20,7 @@ export function pairingReview(bodyHtml) {
   return {heading,combinations,reviewQuestions:[
     '각 조합이 어떤 성분·식사 구성을 어떻게 보완하는지 실제 문장으로 설명했는가?',
     '영양 보완, 흡수·상호작용 연구, 맛·조리 활용을 구분하고 근거 수준을 밝혔는가?',
-    '소량 고명처럼 기여가 작은 경우 과장하지 않고 한계를 설명했는가?',
+    '소량 고명은 풍미 역할로 설명하고, 각 조합에 불필요한 한계·반박 문장을 반복하지 않았는가?',
     '안전 주의가 궁합의 작용 설명을 대신하지 않았는가?'
   ],assessment:'AUTHOR_REVIEW_REQUIRED'};
 }
