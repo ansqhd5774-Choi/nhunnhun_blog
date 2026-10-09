@@ -11,6 +11,7 @@ import { loadUpdates, eligibleUpdate, updateFingerprint } from './update-core.mj
 import { UpdateLedger } from './update-ledger.mjs';
 import { assertImageReview } from './image-review.mjs';
 import {finalizeSelectedUpdate} from './finalize-update.mjs';
+import { preparePublishEditor, openPublishDialog } from './publish-dialog.mjs';
 
 function imageSources(html){
   return [...html.matchAll(/<img\b[^>]*\bsrc=(["'])(.*?)\1[^>]*>/gi)].map(m=>m[2]);
@@ -353,7 +354,6 @@ try{
       const targetHtml=replaceImageSources(rendered,imageMap,update.representativeImageUrl);
 
       stage='stage-content';
-      await page.locator('#post-title-inp').fill(update.title);
       await selectEditorMode(page,'html');
       const code=page.locator('.CodeMirror:visible .CodeMirror-code');
       await code.waitFor({state:'visible'});
@@ -363,9 +363,10 @@ try{
       const staged=await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
       assertEditorialContract(staged,update.bodyHtml,{version:editorialVersionFor(update)});
 
+      stage='publish-editor-ready';
+      await preparePublishEditor(page,{title:update.title});
       stage='publish-dialog';
-      await page.locator('#publish-layer-btn').click();
-      await page.locator('.publish_editor').waitFor({state:'visible',timeout:10000}).catch(()=>{throw Error('E_UPDATE_PUBLISH_DIALOG');});
+      await openPublishDialog(page,{title:update.title},console.log,'E_UPDATE_PUBLISH_DIALOG');
       if(update.representativeImageUrl){
       const thumb=page.locator('.publish_editor .box_thumb');
       if(await thumb.count()!==1) throw new Error('E_UPDATE_REPRESENTATIVE_UNVERIFIED');
