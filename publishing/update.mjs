@@ -139,15 +139,37 @@ function replaceImageSources(html,mapping,representativeSource){
   });
 }
 async function selectEditorMode(page,mode){
-  const selector=mode==='html'?'#editor-mode-html-text:visible, #editor-mode-html-tistory:visible':'#editor-mode-kakao-text:visible, #editor-mode-kakao-tistory:visible';
+  const selector=mode==='html'
+    ? '#editor-mode-html:visible, #editor-mode-html-text:visible, #editor-mode-html-tistory:visible'
+    : '#editor-mode-kakao:visible, #editor-mode-kakao-text:visible, #editor-mode-kakao-tistory:visible';
   const visibleEditors=await page.locator('.CodeMirror:visible').count();
   if(mode==='html'&&visibleEditors)return;
   if(mode==='basic'&&!visibleEditors)return;
   const option=page.locator(selector).first();
+  const diagnostic=async()=>{
+    const snapshot=await page.evaluate(()=>{
+      const ids=['editor-mode-layer-btn-open','editor-mode-html','editor-mode-html-text','editor-mode-html-tistory','editor-mode-kakao','editor-mode-kakao-text','editor-mode-kakao-tistory'];
+      return {path:location.pathname,controls:ids.map(id=>{
+        const el=document.getElementById(id);
+        return {id,found:!!el,visible:!!el?.getClientRects().length};
+      }),codeMirror:document.querySelectorAll('.CodeMirror').length};
+    }).catch(()=>({path:'unavailable'}));
+    console.log('UPDATE_MODE_DOM '+JSON.stringify({mode,...snapshot}));
+  };
   if(!await option.isVisible()){
-    await page.locator('button:visible').filter({has:page.locator('.mce-txt')}).filter({hasText:/기본모드|HTML|마크다운/}).first().click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});});
+    // The publishing path uses this stable ID; the former .mce-txt selector
+    // can miss a mode menu even when the correct button is available.
+    const menu=page.locator('#editor-mode-layer-btn-open:visible');
+    if(await menu.count()!==1){await diagnostic();throw Error('E_UPDATE_EDITOR_MODE_MENU');}
+    await menu.click({timeout:10000}).catch(async error=>{
+      await diagnostic();
+      throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});
+    });
   }
-  await option.waitFor({state:'visible',timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});});
+  await option.waitFor({state:'visible',timeout:10000}).catch(async error=>{
+    await diagnostic();
+    throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});
+  });
   await option.click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});});
   await page.waitForFunction(expected=>{
     const visibleEditors=[...document.querySelectorAll('.CodeMirror')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
@@ -268,6 +290,8 @@ try{
           await page.goto(`${BLOG}/manage/newpost/${update.articleId}`,{waitUntil:'domcontentloaded'});
         }
       }catch(error){
+        const cause=String(error?.message||'').replace(/https?:\\/\\/[^\\s)]+/g,'[URL]').slice(0,350);
+        console.error('UPDATE_EDITOR_OPEN_CAUSE '+JSON.stringify({type:error?.name||'Error',message:cause,path:new URL(page.url()).pathname}));
         throw Object.assign(new Error('E_UPDATE_EDITOR_OPEN_NAVIGATION'),{cause:error});
       }
       if(new URL(page.url()).origin!==BLOG) throw new Error('E_LOGIN_REQUIRED');
