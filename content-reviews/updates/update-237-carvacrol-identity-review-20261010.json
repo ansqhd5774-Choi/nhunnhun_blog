@@ -1,0 +1,336 @@
+{
+  "version": "R1",
+  "domain": "nutrient",
+  "classification": {
+    "rawInput": "기존 /237 성분명 혼동과 근거 없는 치료·용량·브랜드 교정",
+    "topic": "카르바크롤",
+    "meaning": "오레가노 향 성분 Carvacrol의 정체·연구 범위·섭취 판단",
+    "entityId": "compound:carvacrol:10364",
+    "status": "resolved",
+    "reason": "Carvacrol과 Carbazole 식별자를 대조했다. 기존 영양소 카테고리는 유지하되 필수영양소로 표현하지 않는다."
+  },
+  "sourceDigest": "b2e102fa4d7cb38e8ef4b80b6b3790c9e32bdd5ee2fa1c775cfdb6376dab9d7f",
+  "intent": {
+    "primaryQuestion": "카르바크롤은 어떤 성분이며 어느 수준의 효과와 안전 근거가 있는가?",
+    "readerSituation": "허브와 농축 제품의 차이·용량을 알아보려는 독자",
+    "nextActions": [
+      "영문 성분명과 실제 제품의 함량·제형을 확인한다.",
+      "질병 치료·농축 제품 사용은 근거를 확인하고 의료진과 상담한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "확인한 사람 연구는 한 달 안전성 시험이며 장기 효과·관리 계획을 만들 근거가 없다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "다른 영양제나 치료제의 효능 우열은 비교하지 않으며 이름 혼동을 구분한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "확인되지 않은 비타민·허브 시너지 조합을 제안하지 않는다. 복용약 상담은 핵심 상호작용에 포함한다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "특정 제품·브랜드 순위를 만들지 않고 핵심 selection에서 라벨 판단에 답한다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "필수영양소 섭취나 결핍 치료의 음식 대체를 다루는 주제가 아니다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "카르바크롤은 이 글에서 필수영양소로 다루지 않으며 결핍·권장섭취량을 만들지 않는다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "품종별 함량을 확인할 자료가 없어 품종별 구매 우열을 만들지 않는다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "원산지별 효능 우열을 뒷받침할 자료를 선택하지 않았다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "분리 성분의 연구·안전 안내에서 제철을 섭취 근거로 제시하지 않는다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "브랜드·가격 순위의 검증된 자료가 없어 순위를 만들지 않는다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "민간 치료의 처방·용량을 소개하지 않고 연구 유형을 설명한다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "질환을 스스로 판별하는 도구를 제공하는 글이 아니다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "운동 효과나 운동 처방을 입증하는 자료를 선택하지 않았다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "체중 감량 효과를 입증한 임상시험을 선택하지 않아 다이어트 처방을 만들지 않는다."
+    },
+    "vulnerableGroups": {
+      "applies": true,
+      "reason": "농축 제품에서 임신·수유·어린이 안전 확인이 중요하다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "장기 처방약의 감량·중단 일정이 주제가 아니며 불편 시 추가 섭취 보류는 안전에 포함한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "확립된 치료 용량·스케줄이 없어 누락량 보충법을 만들지 않는다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "성분 혼동과 시험 용량 오해는 핵심 정체·기대효과에서 직접 답한다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "과거 연구의 확인일을 새 연구 발표일로 포장하지 않는다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 카르바크롤은 어떤 성분인가요?",
+      "answerQuote": "카르바크롤(Carvacrol)은 식물의 향과 관련된 페놀성 성분",
+      "sourceIds": [
+        "identity",
+        "oregano"
+      ]
+    },
+    {
+      "module": "role",
+      "heading": "1. 카르바크롤은 어떤 성분인가요?",
+      "answerQuote": "오레가노의 휘발성 오일에 들어 있는 성분으로 소개됩니다.",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 어떤 효능이 연구되고 있나요?",
+      "answerQuote": "사람에서의 임상적 의미가 확립되지 않았다고 설명",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "10. 내 상황에서는 어떻게 활용하면 되나요?",
+      "answerQuote": "허브의 향과 맛을 즐기는 목적",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    {
+      "module": "expectations",
+      "heading": "4. 사람 대상 연구는 어디까지 확인됐나요?",
+      "answerQuote": "건강한 성인의 한 달 연구",
+      "sourceIds": [
+        "trial"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "5. 하루 섭취량은 어떻게 판단하나요?",
+      "answerQuote": "시험에서 사용한 용량은 개인의 권장섭취량과 다릅니다.",
+      "sourceIds": [
+        "trial"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "6. 허브와 농축 오일을 어떻게 구분하나요?",
+      "answerQuote": "요리에 사용하는 오레가노 허브와 농축 오일·보충제는 구분",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "7. 누구에게 확인이 필요한가요?",
+      "answerQuote": "임신 중 오레가노 오일을 보충제 용량으로 임의 섭취하지 마세요.",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "8. 다른 약과 함께 쓰거나 불편이 생기면?",
+      "answerQuote": "제품명과 성분표를 가지고 병용 여부를 상담",
+      "sourceIds": [
+        "safety"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "9. 제품을 고를 때 무엇을 확인하나요?",
+      "answerQuote": "정확한 원료명·제형·1회량·주의 표시",
+      "sourceIds": [
+        "safety"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "10. 내 상황에서는 어떻게 활용하면 되나요?",
+      "answerQuote": "처방 치료를 보충제로 바꾸지 않고 상담",
+      "sourceIds": [
+        "safety"
+      ]
+    },
+    {
+      "module": "vulnerable_groups",
+      "heading": "7. 누구에게 확인이 필요한가요?",
+      "answerQuote": "임신·수유 중이거나 어린이에게 농축 제품을 사용할 때",
+      "sourceIds": [
+        "safety"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "included",
+      "reason": "오레가노 허브와 농축 제품 사용을 구분한다.",
+      "relationship": "nutrient-source",
+      "heading": "6. 허브와 농축 오일을 어떻게 구분하나요?",
+      "answerQuote": "요리에 사용하는 오레가노 허브와 농축 오일·보충제는 구분",
+      "sourceIds": [
+        "oregano"
+      ]
+    },
+    "medicine": {
+      "status": "included",
+      "reason": "보충제를 현재 처방 치료 대신 사용하지 않도록 연결한다.",
+      "relationship": "risk-context",
+      "heading": "10. 내 상황에서는 어떻게 활용하면 되나요?",
+      "answerQuote": "처방 치료를 보충제로 바꾸지 않고 상담",
+      "sourceIds": [
+        "safety"
+      ]
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "특정 질병의 치료 효과를 입증할 연구를 선택하지 않아 질병별 효능 연결을 만들지 않는다."
+    }
+  },
+  "sources": [
+    {
+      "id": "identity",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/000010364",
+      "title": "PubChem · Carvacrol",
+      "kind": "official",
+      "role": "context",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "PubChem 검색 결과의 CID·분자식·성분 설명을 확인했다. 직접 페이지는 JavaScript 제한으로 전체 본문을 읽지 못해 화학 식별 범위에만 사용한다."
+    },
+    {
+      "id": "other",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/Carbazole",
+      "title": "PubChem · Carbazole",
+      "kind": "official",
+      "role": "context",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "PubChem 검색 결과의 Carbazole 식별정보를 확인했다. 직접 페이지 접근 제한이 있어 약효나 안전성을 이 자료로 판단하지 않는다."
+    },
+    {
+      "id": "oregano",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK591556/",
+      "title": "NIH LiverTox · Oregano (2023)",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "2023-04-28 NIH LiverTox 본문이 노출된 검색 결과와 PDF 검색 본문의 식물·연구 한계·임신·이상반응 설명을 읽었다. 직접 페이지는 브라우저 확인 화면으로 차단되어 전체 직접 열람으로 보고하지 않는다."
+    },
+    {
+      "id": "trial",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30486682/",
+      "title": "사람 대상 1상 안전성 연구 초록",
+      "kind": "trial",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "PubMed 검색에 노출된 연구 초록을 읽었다. 연구 전문은 읽지 않았으며 건강한 성인 한 달 안전성·내약성 시험 범위로 제한한다."
+    },
+    {
+      "id": "safety",
+      "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely",
+      "title": "NIH NCCIH · 보충제 안전 안내",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "NCCIH 공식 웹 본문의 제품과 연구 차이·상호작용·취약대상·치료 대체 주의를 읽었다. 카르바크롤 특정 약과의 입증된 상호작용으로 확대하지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "name": "Codex 성분·본문·출처 검토",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "성분의 정체에서 연구·용량 판단·주의·선택까지 질문 순서로 답했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "식별자·공식자료와 사람 연구 초록을 대조하고 직접 접근 제한을 기록했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "시험관 결과와 사람 대상 안전성 시험을 질병 치료 효과로 옮기지 않았다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "서로 다른 성분의 이름 구분이며 효능 우열 비교를 만들지 않았다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "확인되지 않은 음식·영양제 시너지를 제안하지 않았다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "허브 원료와 처방 치료 보충제 대체 위험을 연결하고 질병별 효능은 만들지 않았다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "임신·취약대상·고용량 불편을 공식 범위로 안내한다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "실제 다음 행동을 설명하며 근거 없는 치료·브랜드·섭취량을 제거했다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "R1/R4 영양소 의미별 강조와 주의 배지를 사용한다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "세 이미지의 실제 화면·작가·라이선스를 확인했고 식물 사진을 농축 제품 용량으로 쓰지 않았다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "/237 URL을 유지하고 제목과 Carvacrol 본문을 일치시킨다."
+      }
+    },
+    "warningResolutions": [
+      {
+        "code": "W_CONTENT_DUPLICATE_PROSE",
+        "note": "동일한 공식 자료 링크를 각 해당 소제목과 FAQ에 재인용한 참고문단 반복이며 본문 설명의 복제는 없다."
+      }
+    ]
+  }
+}
