@@ -207,14 +207,26 @@ try {
       await page.locator('#publish-layer-btn').click();
       stage = 'publish-dialog';
       if (representativeSource) {
-        const thumb = page.locator('.publish_editor .box_thumb');
-        if (await thumb.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
-        const text = (await thumb.innerText().catch(()=>'')) || '';
-        if (text.includes('대표이미지 추가')) {
-          const repPath = join(imageTempDir, 'tistory-representative.bin');
-          await downloadImage(representativeSource, repPath);
-          const input = thumb.locator('input[type="file"]');
-          if (await input.count() !== 1) throw new Error('E_REPRESENTATIVE_UNVERIFIED');
+        const panel=page.locator('.publish_editor');
+        const thumb=panel.locator('.box_thumb');
+        // Publication UI is asynchronous. Wait for its real thumbnail slot before
+        // applying the existing fail-closed representative check.
+        await panel.waitFor({state:'visible',timeout:15000}).catch(()=>{throw Error('E_PUBLISH_DIALOG_UNAVAILABLE');});
+        await thumb.first().waitFor({state:'visible',timeout:15000}).catch(()=>{throw Error('E_REPRESENTATIVE_UNVERIFIED');});
+        const diagnostic=async(stageName)=>console.log('REPRESENTATIVE_SLOT_DIAG '+JSON.stringify(await page.evaluate(({stageName})=>{
+          const panel=document.querySelector('.publish_editor');
+          const boxes=[...(panel?.querySelectorAll('.box_thumb')||[])];
+          return {stage:stageName,panelVisible:!!panel?.getClientRects().length,slotCount:boxes.length,
+            slots:boxes.map(el=>({visible:!!el.getClientRects().length,hasImage:!!el.querySelector('img,[style*="background-image"]'),
+              hasFileInput:!!el.querySelector('input[type="file"]'),addPrompt:(el.textContent||'').includes('대표이미지 추가')}))};
+        },{stageName}).catch(()=>({stage:stageName,unavailable:true}))));
+        if(await thumb.count()!==1){await diagnostic('slot-count');throw Error('E_REPRESENTATIVE_UNVERIFIED');}
+        const text=(await thumb.innerText().catch(()=>''))||'';
+        if(text.includes('대표이미지 추가')){
+          const repPath=join(imageTempDir,'tistory-representative.bin');
+          await downloadImage(representativeSource,repPath);
+          const input=thumb.locator('input[type="file"]');
+          if(await input.count()!==1){await diagnostic('file-input');throw Error('E_REPRESENTATIVE_UNVERIFIED');}
           await input.setInputFiles(repPath);
           await page.waitForFunction(() => {
             const box=document.querySelector('.publish_editor .box_thumb');
