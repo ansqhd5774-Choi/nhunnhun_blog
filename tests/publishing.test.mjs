@@ -439,6 +439,18 @@ test('persistent editor creates a new page when no stale write tab exists', asyn
   assert.equal(await freshEditorPage(context),created);
 });
 
+test('persistent editor never reuses an existing newpost edit page as the manager anchor', async () => {
+  const closed=[];
+  const editor={url:()=> 'https://nhunnhun.tistory.com/manage/newpost/272',close:async()=>closed.push('editor')};
+  const created={url:()=> 'about:blank'};
+  const context={pages:()=>[editor],newPage:async()=>created};
+  assert.equal(await freshEditorPage(context),created);
+  assert.deepEqual(closed,[]);
+  const manager={url:()=> 'https://nhunnhun.tistory.com/manage/posts'};
+  context.pages=()=>[editor,manager];
+  assert.equal(await freshEditorPage(context),manager);
+});
+
 test('dialog handler contains stale-dialog race guard', () => {
   const publish=readFileSync(new URL('../publishing/publish.mjs',import.meta.url),'utf8');
   assert.match(publish,/No dialog is showing/);
