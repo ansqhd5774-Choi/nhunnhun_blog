@@ -21,6 +21,9 @@ export function classifyRunners(runners) {
   if (matching.some(r => r.status === 'online' && !r.busy)) return 'RUNNER_READY';
   return matching.some(r => r.status === 'online') ? 'RUNNER_BUSY' : 'RUNNER_OFFLINE';
 }
+export function mutationSourceId(env=process.env) {
+  return env.UPDATE_SOURCE_ID || env.PUBLISH_SOURCE_ID;
+}
 export function assertCurrentSource() {
   const checkout = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
   const remote = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], {encoding:'utf8'}).trim().split(/\s+/)[0];
@@ -33,7 +36,7 @@ export function assertCurrentSource() {
       changedPaths=execFileSync('git',['diff','--name-only',checkout,remote],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
     } catch {throw Error('BLOCKED_SOURCE_DRIFT');}
   }
-  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote,changedPaths,process.env.UPDATE_SOURCE_ID);
+  assertSourceIdentity(process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : checkout, checkout, remote,changedPaths,mutationSourceId());
   return checkout;
 }
 async function main() {
