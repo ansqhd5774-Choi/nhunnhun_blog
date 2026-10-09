@@ -6,5 +6,16 @@
   "sourceCommit": "0c7dab2aa74ecc135f31fb0dad89181c2f11d823",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-09T19:43:30.715Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37981977872"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37981977872",
+  "publicResult": {
+    "sourceId": "repair-source-388-20261010",
+    "url": "https://nhunnhun.tistory.com/388",
+    "sourceCommit": "0c7dab2aa74ecc135f31fb0dad89181c2f11d823",
+    "fingerprint": "78bcfa313922b00b676e60a339bc8157fdc566408409510692225c2b2976827f",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37981977872",
+    "checkedAt": "2026-10-09T19:43:33.672Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/37981977872",
+    "status": "PUBLIC_VERIFICATION_MISMATCH",
+    "code": "E_QA_HEADINGS"
+  }
 }
