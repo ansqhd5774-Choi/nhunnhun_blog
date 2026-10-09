@@ -16,7 +16,7 @@ GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
 
 이 프로젝트는 작업 파일과 증거를 관리한다. GitHub 연결을 사용할 수 있는 ChatGPT에서는 저장소의 문서를 읽어 작업을 이어간다. 저장/수정/PR 기능은 해당 대화의 실제 도구와 권한을 별도로 확인한다. 로컬 프로젝트 생성과 GitHub 연결은 ChatGPT 클라우드 실행 환경 생성이나 티스토리 로그인 공유를 의미하지 않는다.
 
-`docs/BLOG_PLUGIN_EXECUTION_RULES_R2.md`를 블로그 도구 선택·실행·완료 판정의 ACTIVE 최상위 운영 기준으로 사용한다. 신규 글 작성·발행 디자인 기준은 `docs/EDITORIAL_PUBLISH_STANDARD_R3.md`를 ACTIVE 기준으로 사용한다. 신규 글은 서로 다른 본문 이미지 최소 3개와 제한적 다색 형광펜 강조 계약을 통과해야 한다.
+사용자 금지 지시와 `docs/GENERAL_CHAT_EXECUTION.md`가 도구 선택·작성자 역할·러너 실행·완료 판정에 우선한다. `docs/BLOG_PLUGIN_EXECUTION_RULES_R2.md`는 이 기준과 충돌하지 않는 범위의 도구 안내다. TinyFish 사용·호출·연결·승인 요청은 금지한다. 신규 글 작성·발행 디자인 기준은 `docs/EDITORIAL_PUBLISH_STANDARD_R3.md`를 ACTIVE 기준으로 사용한다. 신규 글은 서로 다른 본문 이미지 최소 3개와 제한적 다색 형광펜 강조 계약을 통과해야 한다.
 
 콘텐츠 운영 범위는 **음식 / 영양소 / 약학 / 질병 4개 카테고리 전체**다. 신규 주제는 카테고리 비율을 기계적으로 맞추지 않고 검색 수요·기존 검색의도 중복·GSC 성과·최신성 필요도를 기준으로 선택한다. 약학·질병 콘텐츠는 음식·영양소보다 높은 근거 수준과 안전성 검증을 적용한다.
 
