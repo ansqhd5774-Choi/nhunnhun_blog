@@ -1,0 +1,89 @@
+{
+  "scope": "전체 핵심 수치·안전·궁합·보관 출처 검토. 이미지권리·독립의료감수 별도",
+  "historicalRemaining": 141,
+  "candidateRemainingAfterAcceptedJoin": 140,
+  "reviewedOn": "2026-10-10",
+  "remoteMutation": false,
+  "schemaVersion": 1,
+  "sourceCommit": "2affc541810e9025fa2658f481271716a5e18814",
+  "publicMutation": false,
+  "rows": [
+    {
+      "sourceDigest": "45716319a3f98c821f6046fce8f73532c5b743d0880cb238350cb5affa58e55a",
+      "remaining": [
+        "국내 수확기 직접 근거",
+        "섬유·엽산·칼륨 역할 연결",
+        "선택·개별 보관 실용 팁 출처 연결"
+      ],
+      "wholeNextReviewAt": null,
+      "publicUrl": "https://nhunnhun.tistory.com/381",
+      "sourceId": "chestnut-calories-benefits-storage-20261006",
+      "wholeStatus": "UNKNOWN",
+      "wholeSourceCheckedAt": null
+    },
+    {
+      "sourceId": "direct-yuja-cheong-20261009",
+      "publicUrl": "https://nhunnhun.tistory.com/398",
+      "remaining": [],
+      "supersedesHistoricalUnknown": true,
+      "wholeSourceCheckedAt": "2026-10-10",
+      "claimMatrixDocument": "docs/evidence-dates-whole-three-review-20261010.md",
+      "wholeStatus": "PASS",
+      "sourceDateRecords": [
+        {
+          "documentDate": "2015-03-10",
+          "url": "https://www.who.int/publications/i/item/WHO-NMH-NHD-15.3",
+          "checkedAt": "2026-10-10",
+          "dateRole": "publication"
+        },
+        {
+          "documentDate": "2025-07-31",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/",
+          "checkedAt": "2026-10-10",
+          "dateRole": "updated"
+        },
+        {
+          "documentDate": "2005-10",
+          "url": "https://nchfp.uga.edu/how/store/storing-home-canned-jams-and-jellies/",
+          "checkedAt": "2026-10-10",
+          "dateRole": "prepared-month-only"
+        },
+        {
+          "documentDate": null,
+          "url": "https://www.fda.gov/food/buy-store-serve-safe-food/refrigerator-thermometers-cold-facts-about-food-safety",
+          "checkedAt": "2026-10-10",
+          "dateRole": "unobserved"
+        },
+        {
+          "documentDate": null,
+          "url": "https://www.ada.org/resources/ada-library/oral-health-topics/dental-erosion",
+          "checkedAt": "2026-10-10",
+          "dateRole": "unobserved"
+        },
+        {
+          "documentDate": null,
+          "url": "https://www.cdc.gov/diabetes/healthy-eating/carb-counting-manage-blood-sugar.html",
+          "checkedAt": "2026-10-10",
+          "dateRole": "top-2024-05-15-bottom-2024-05-14-ambiguous"
+        }
+      ],
+      "wholeNextReviewAt": "2026-11-09",
+      "sourceDigest": "27d5ff7a9ea460930ce08b58cb5f4555392943547025ffff364c1ad435244c12",
+      "nextReviewBasis": "기존 운영 안전정보 30일 목표"
+    },
+    {
+      "sourceDigest": "5c82019c3a3c3d7c542f1a3c373170041cb46508959b6ffd1866a5be32d7acf9",
+      "remaining": [
+        "USDA FDC 템페·두부 전체 영양표",
+        "USDA 남은 음식 원문 접근",
+        "2021 논문 본문·B12·발효 후 생균·세부 영양역할 연결"
+      ],
+      "wholeNextReviewAt": null,
+      "publicUrl": "https://nhunnhun.tistory.com/405",
+      "sourceId": "direct-tempeh-20261009",
+      "wholeStatus": "UNKNOWN",
+      "wholeSourceCheckedAt": null
+    }
+  ],
+  "candidateCompletedWholeReviews": 1
+}

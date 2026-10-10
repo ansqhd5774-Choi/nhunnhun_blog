@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import {joinWholeReview} from './evidence-dates-join-whole-review.mjs';
+// Synthetic fixtures: portable contract tests, not new production review evidence.
+const id='direct-yuja-cheong-20261009';
+const url='https://nhunnhun.tistory.com/398';
+const bytes=Buffer.from(JSON.stringify({id,bodyHtml:'<p>synthetic fixture</p>'}));
+const digest=crypto.createHash('sha256').update(bytes).digest('hex');
+const reg={rows:[{sourceId:id,sourceFile:'posts/direct-yuja-cheong-20261009.json',publicUrl:url,sourceCheckedAt:null},{sourceId:'earlier-source',publicUrl:'https://nhunnhun.tistory.com/275',sourceCheckedAt:null},{sourceId:'unreviewed-source',publicUrl:'https://nhunnhun.tistory.com/381',sourceCheckedAt:null}]};
+const prior={mappings:[{oldSourceId:'earlier-source',publicUrl:'https://nhunnhun.tistory.com/275',historicalSourceCheckedAt:null}],remainingActionableOriginalRecords:2};
+const review={rows:[{sourceId:id,publicUrl:url,sourceDigest:digest,wholeStatus:'PASS',wholeSourceCheckedAt:'2026-10-10',wholeNextReviewAt:'2026-11-09',remaining:[]},{sourceId:'unreviewed-source',wholeStatus:'UNKNOWN',wholeSourceCheckedAt:null,wholeNextReviewAt:null}]};
+const before=JSON.stringify(reg);
+const result=joinWholeReview(reg,prior,review,bytes);
+assert.equal(result.remainingActionableOriginalRecords,1);
+assert.equal(result.supersededOriginalRecords,2);
+assert.equal(result.mappings.find(r=>r.oldSourceId===id).activeFileSha256,digest);
+assert.equal(JSON.stringify(reg),before);
+assert.deepEqual(joinWholeReview(reg,result,review,bytes),result);
+assert.throws(()=>joinWholeReview(reg,prior,review,Buffer.concat([bytes,Buffer.from(' ')])),/E_CURRENT_SOURCE_DRIFT/);
+const unknown=structuredClone(review); unknown.rows[1].wholeSourceCheckedAt='2026-10-10';
+assert.throws(()=>joinWholeReview(reg,prior,unknown,bytes),/E_UNKNOWN_DATE/);
+const wrong=structuredClone(reg); wrong.rows[0].publicUrl='https://nhunnhun.tistory.com/405';
+assert.throws(()=>joinWholeReview(wrong,prior,review,bytes),/E_HISTORICAL_JOIN/);
+console.log('PASS: portable fixtures - exact join, history preserved, idempotency, drift rejection, unknown date rejection, URL rejection');

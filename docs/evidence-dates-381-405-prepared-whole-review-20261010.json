@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "2affc541810e9025fa2658f481271716a5e18814",
+  "currentOperationalRemaining": 140,
+  "remoteMutation": false,
+  "publicMutation": false,
+  "rows": [
+    {
+      "articleId": "381",
+      "publicUrl": "https://nhunnhun.tistory.com/381",
+      "currentSourceId": "chestnut-calories-benefits-storage-20261006",
+      "currentDigest": "45716319a3f98c821f6046fce8f73532c5b743d0880cb238350cb5affa58e55a",
+      "digestKind": "SHA256_EXACT_GIT_FILE_BYTES",
+      "currentWholeSourceCheckedAt": null,
+      "currentWholeNextReviewAt": null,
+      "preparedSourceId": "evidence-dates-381-season-fix-20261010",
+      "preparedFile": "updates/evidence-dates-381-season-fix-20261010.json",
+      "preparedDigest": "3ccb8a6e3fbf3c315c9c1c41a103a9b7adbfbac74e80744aa096e57e69b0febe",
+      "preparedWholeStatus": "PASS_ON_PREPARED_SOURCE_PENDING_PUBLIC_UPDATE",
+      "sourceReviewPerformedAt": "2026-10-10",
+      "preparedNextReviewAt": "2026-11-09",
+      "nextReviewBasis": "existing safety 30-day operations interval",
+      "claimMatrixDocument": "docs/evidence-dates-381-405-prepared-whole-review-20261010.md",
+      "remainingSourceClaimGaps": [],
+      "accessDiscrepancies": [],
+      "joinRequires": [
+        "actual standard update PUBLIC_VERIFIED",
+        "final active sourceId/URL/exact file digest equals prepared record",
+        "historical record exact join; immutable historical null remains preserved"
+      ],
+      "operationalJoinApplied": false
+    },
+    {
+      "articleId": "405",
+      "publicUrl": "https://nhunnhun.tistory.com/405",
+      "currentSourceId": "direct-tempeh-20261009",
+      "currentDigest": "5c82019c3a3c3d7c542f1a3c373170041cb46508959b6ffd1866a5be32d7acf9",
+      "digestKind": "SHA256_EXACT_GIT_FILE_BYTES",
+      "currentWholeSourceCheckedAt": null,
+      "currentWholeNextReviewAt": null,
+      "preparedSourceId": "evidence-dates-405-usda-precision-fix-20261010",
+      "preparedFile": "updates/evidence-dates-405-usda-precision-fix-20261010.json",
+      "preparedDigest": "62858bd6f2b0b79dd1d1fc41cd4dce1419613f5f71780bb9796a224eb0e2afb3",
+      "preparedWholeStatus": "PASS_ON_PREPARED_SOURCE_PENDING_PUBLIC_UPDATE",
+      "sourceReviewPerformedAt": "2026-10-10",
+      "preparedNextReviewAt": "2026-11-09",
+      "nextReviewBasis": "existing safety 30-day operations interval",
+      "claimMatrixDocument": "docs/evidence-dates-381-405-prepared-whole-review-20261010.md",
+      "remainingSourceClaimGaps": [],
+      "accessDiscrepancies": [
+        "FSIS leftovers live fetch unavailable; actual official indexed body read and existing direct Freezing same-claim evidence reused",
+        "Wiley2021 abstract/date read, not full text; detailed claims checked against2026 full official publisher text"
+      ],
+      "joinRequires": [
+        "actual standard update PUBLIC_VERIFIED",
+        "final active sourceId/URL/exact file digest equals prepared record",
+        "historical record exact join; immutable historical null remains preserved"
+      ],
+      "operationalJoinApplied": false
+    }
+  ]
+}
