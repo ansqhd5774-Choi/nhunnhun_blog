@@ -1,9 +1,11 @@
+> 네 카테고리 공통 기반: [음식 기반 공통 작성 계약](content/CATEGORY_CONTENT_PARITY.md)을 적용한다. 내용과 소제목만 분야에 맞게 바꾸며 강조·디자인·러너·발행·공개 검증은 동일하게 유지한다. 신규와 기존 전체 수정에 공통 적용한다.
+
 > 최신 실행 기준: [일반 Chat 작성·러너 실행 계약](GENERAL_CHAT_EXECUTION.md)이 작성자 로컬 명령·GUI 의무와 공개 검증 담당에 우선합니다. 아래의 명령·미리보기·관리자 화면 절차는 러너/운영자용이며 일반 Chat의 필수 기능이 아닙니다. 직접 원고는 최신 DIRECT_AUTHORING_R1을 적용합니다.
 
 # NHUNNHUN 건강 콘텐츠 작성·검토 기준 R1
 
 ## 직접 작성 경로 예외
-음식 GPT 직접 작성 및 direct-* 수정에는 `content/DIRECT_AUTHORING_R1.md`의 최신 강조·작성·제출 기준이 우선한다. 아래 Editorial R4 강조 제한을 해당 경로로 가져오지 않는다. 기존 R1/R4 경로의 계약과 의학적 근거·보안 보호는 유지한다.
+음식·영양소·약학·질병 GPT 직접 작성 및 direct-* 수정에는 `content/DIRECT_AUTHORING_R1.md`의 최신 강조·작성·제출 기준이 우선한다. 아래 Editorial R4 강조 제한을 해당 경로로 가져오지 않는다. 기존 R1/R4 경로의 계약과 의학적 근거·보안 보호는 유지한다.
 
 **상태: ACTIVE — 신규 발행·앞으로 수정하는 글의 기준.** 2026-10-07, Asia/Seoul.
 대상은 `nhunnhun.tistory.com`과 `ansqhd5774-Choi/nhunnhun_blog`뿐이다. 운영·인증·발행 경로는 기존 실행 규칙 R2를 유지하며, 내용·문체는 이 문서, 새 강조 표현은 Editorial R4를 우선한다. 과거 글과 발행 기록은 자동 변환하거나 재발행하지 않는다.
