@@ -75,3 +75,7 @@
 - private 운영 증거: performance-scroll-388-mobile.png, performance-scroll-388-desktop.png. 검사 후 viewport 복원·탭 정리.
 
 최종 상태: 최소 스킨 보정 구현·5개 회귀 검사·최신 공개 페이지 PC/모바일 실제 이동 PASS. `/282` 이전 캐시는 페이지별 전파 대기이며 후속 확인 대상. CLS 0.411 및 늦은 본문 TOC 삽입은 별도 후순위 구조 개선 대상이며 해소로 보고하지 않는다. field CWV는 여전히 데이터 없음.
+
+## `/282` 캐시 전파 후 실제 이동 확인
+
+후속 공식 브라우저 조회에서 /282의 scrollPatch=true, 목차9개, 가로 넘침0을 확인했다. 모바일390×844의 2번째목차 클릭은 애니메이션 완료 후 H2top99.72px·details닫힘·overflow0이었다. PC1440×1000의 3번째목차는 H2top100.25px·details열림·overflow0이었다. 검사 후viewport복원. 초기애니메이션 중간측정을 완료결과로 쓰지 않았다. private 증거 completion-parallel/282-resumed-mobile.png,282-resumed-desktop.png. 이 확인으로 /282 구 캐시 미확정은 해소됐으며 CLS/fieldCWV는 별도 미완료다.
