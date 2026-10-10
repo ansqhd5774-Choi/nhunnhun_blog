@@ -1,7 +1,7 @@
 import {cancelAltDialog} from './alt-maintenance-dialog-controls.mjs';
 import {pathToFileURL} from 'node:url';
 import {resolve,join} from 'node:path';
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,rename} from 'node:fs/promises';
 import {randomBytes,createCipheriv} from 'node:crypto';
 import {localBrowserConfig,assertLocalGit,openEditorConnection,closeEditorConnection,freshEditorPage,ensureEditorRendering,installLightweightRouting} from './local-browser.mjs';
 import {assertCurrentSource} from './runner-gate.mjs';
@@ -34,31 +34,38 @@ export function draftAltSnapshot(originalHtml,metadata,patch){
     expectedCurrentTitle:metadata.title,title:metadata.title,status:'draft',approved:false,operation:ALT_OPERATION,maintenance};
 }
 
-export async function observeAltEditor(page,patch,{selectMode=selectEditorMode,open=openPublishDialog,observe=observeAltMetadata,probe=probeManagedPost}={}){
-  await page.goto(`https://nhunnhun.tistory.com/manage/newpost/${patch.articleId}`,{waitUntil:'domcontentloaded',timeout:30000});
+export async function observeAltEditor(page,patch,{selectMode=selectEditorMode,open=openPublishDialog,observe=observeAltMetadata,probe=probeManagedPost,progress=()=>{}}={}){
+  const step=async(name,action)=>{progress({articleId:patch.articleId,stage:name,state:"start"});const result=await action();progress({articleId:patch.articleId,stage:name,state:"done"});return result;};
+  await step('navigation',()=>page.goto(`https://nhunnhun.tistory.com/manage/newpost/${patch.articleId}`,{waitUntil:'domcontentloaded',timeout:30000}));
   const current=new URL(page.url());
   if(current.origin!=='https://nhunnhun.tistory.com'||current.pathname!==`/manage/newpost/${patch.articleId}`)throw Error('E_ALT_SNAPSHOT_TARGET');
   await page.locator('#post-title-inp').waitFor({state:'visible',timeout:15000});
   const title=await page.locator('#post-title-inp').inputValue();
-  await probe(page,{articleId:patch.articleId,title,expectedCurrentTitle:title});
-  await open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG');
-  const before=await observe(page);
+  await step('managed-probe',()=>probe(page,{articleId:patch.articleId,title,expectedCurrentTitle:title}));
+  await step('dialog-open',()=>open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG'));
+  const before=await step('metadata-before',()=>observe(page));
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
-  await cancelAltDialog(page);
-  await selectMode(page,'html');
-  const originalHtml=await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
+  await step('dialog-cancel',()=>cancelAltDialog(page));
+  await step('mode-html',()=>selectMode(page,'html'));
+  const originalHtml=await step('html-read',()=>page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||''));
+  progress({articleId:patch.articleId,stage:'html-shape',state:'done',nonempty:!!originalHtml.trim(),literalImgCount:(originalHtml.match(/<img\b/gi)||[]).length,imageMacroCount:(originalHtml.match(/\[##_Image\|/g)||[]).length});
   if(!originalHtml.trim())throw Error('E_UPDATE_ORIGINAL_EMPTY');
-  await selectMode(page,'basic');
-  await open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG');
-  const after=await observe(page);
+  await step('mode-basic',()=>selectMode(page,'basic'));
+  await step('dialog-open',()=>open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG'));
+  const after=await step('metadata-after',()=>observe(page));
   assertObservedMetadataPreserved(before,after);
-  await cancelAltDialog(page);
-  return {draft:draftAltSnapshot(originalHtml,before.metadata,patch),originalHtml,metadata:before.metadata};
+  await step('dialog-cancel',()=>cancelAltDialog(page));
+  return {originalHtml,metadata:before.metadata};
 }
 export function sealAltSnapshot(value,key=randomBytes(32),iv=randomBytes(12)){
   const cipher=createCipheriv('aes-256-gcm',key,iv);
   const bytes=Buffer.concat([cipher.update(JSON.stringify(value),'utf8'),cipher.final()]);
   return {key,encrypted:JSON.stringify({algorithm:'AES-256-GCM',iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ciphertext:bytes.toString('base64')})};
+}
+export async function writeAltObservationCheckpoint(directory,runId,records){
+  const target=join(directory,'observation-checkpoint.private.json'),temporary=target+'.tmp';
+  await writeFile(temporary,JSON.stringify({version:'alt-observation-checkpoint-v1',runId,readOnly:true,finalSubmitCount:0,complete:false,processedCount:records.length,records},null,2));
+  await rename(temporary,target);
 }
 export async function runAltSnapshot(env=process.env){
   // Standard read-only workflow only. Never enable update or obtain a GitHub write token.
@@ -77,12 +84,13 @@ export async function runAltSnapshot(env=process.env){
         assertCurrentSource();page=await freshEditorPage(connection.context);
         await ensureEditorRendering(connection.context,page);await installLightweightRouting(page);
         page.on('dialog',d=>{void(d.type()==='confirm'?d.accept():d.dismiss()).catch(()=>{});});
-        const observed=await observeAltEditor(page,patch);
+        const observed=await observeAltEditor(page,patch,{progress:event=>console.log('ALT_SNAPSHOT_STAGE '+JSON.stringify(event))});
         // Raw editor HTML and signed representative URLs stay on this local runner only.
         await writeFile(join(privateDirectory,`${patch.articleId}.raw.private.json`),JSON.stringify(observed),{flag:'wx'});
-        records.push({articleId:patch.articleId,status:'DRAFT_CONDITIONS_CAPTURED',draft:observed.draft,license:'UNKNOWN',semanticVerification:'alt-visual-review-only'});
+        const draft=draftAltSnapshot(observed.originalHtml,observed.metadata,patch);
+        records.push({articleId:patch.articleId,status:'DRAFT_CONDITIONS_CAPTURED',draft,license:'UNKNOWN',semanticVerification:'alt-visual-review-only'});
       }catch(error){records.push({articleId:patch.articleId,status:'OBSERVATION_UNCONFIRMED',code:/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_ALT_SNAPSHOT_RUNTIME'});}
-      finally{if(page)await page.close().catch(()=>{});}
+      finally{await writeAltObservationCheckpoint(privateDirectory,env.GITHUB_RUN_ID,records);if(page){console.log('ALT_SNAPSHOT_STAGE '+JSON.stringify({articleId:patch.articleId,stage:'page-close',state:'start'}));await page.close().catch(()=>{});console.log('ALT_SNAPSHOT_STAGE '+JSON.stringify({articleId:patch.articleId,stage:'page-close',state:'done'}));}}
     }
     assertCurrentSource();
     const snapshot={version:'alt-condition-snapshot-v1',runId:env.GITHUB_RUN_ID,readOnly:true,finalSubmitCount:0,records};
@@ -93,6 +101,9 @@ export async function runAltSnapshot(env=process.env){
     await writeFile(join(privateDirectory,'artifact.key'),sealed.key,{flag:'wx'});
     await writeFile(join(artifactDirectory,'conditions.enc.json'),sealed.encrypted,{flag:'wx'});
     console.log('ALT_SNAPSHOT_READ_ONLY '+JSON.stringify({runId:env.GITHUB_RUN_ID,captured:records.filter(x=>x.status==='DRAFT_CONDITIONS_CAPTURED').length,unconfirmed:records.filter(x=>x.status!=='DRAFT_CONDITIONS_CAPTURED').length,finalSubmitCount:0,approved:false}));
-  }finally{await closeEditorConnection(connection);}
+  }finally{console.log('ALT_SNAPSHOT_STAGE '+JSON.stringify({stage:'connection-close',state:'start'}));await closeEditorConnection(connection);console.log('ALT_SNAPSHOT_STAGE '+JSON.stringify({stage:'connection-close',state:'done'}));}
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)runAltSnapshot().catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_ALT_SNAPSHOT_RUNTIME');process.exitCode=1;});
+// This dedicated read-only CLI owns only its Node process, never the managed Chrome.
+// All private files and connection cleanup have been awaited before this boundary.
+export function exitSnapshotCli(code){process.stdout.write('',()=>process.stderr.write('',()=>process.exit(code)));}
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)runAltSnapshot().then(()=>exitSnapshotCli(0)).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_ALT_SNAPSHOT_RUNTIME');exitSnapshotCli(1);});
