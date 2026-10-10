@@ -1,3 +1,4 @@
+import {cancelAltDialog} from './alt-maintenance-dialog-controls.mjs';
 import {pathToFileURL} from 'node:url';
 import {resolve,join} from 'node:path';
 import {mkdir,writeFile} from 'node:fs/promises';
@@ -32,11 +33,7 @@ export function draftAltSnapshot(originalHtml,metadata,patch){
   return {id:`repair-alt-${patch.articleId}-20261010`,articleId:patch.articleId,targetUrl:`https://nhunnhun.tistory.com/${patch.articleId}`,
     expectedCurrentTitle:metadata.title,title:metadata.title,status:'draft',approved:false,operation:ALT_OPERATION,maintenance};
 }
-async function cancelDialog(page){
-  const cancel=page.getByRole('button',{name:'취소',exact:true}).and(page.locator('.publish_editor button:visible'));
-  if(await cancel.count()!==1)throw Error('E_ALT_CANCEL_CONTROL');
-  await cancel.click();await page.locator('.publish_editor').waitFor({state:'hidden',timeout:10000});
-}
+
 export async function observeAltEditor(page,patch,{selectMode=selectEditorMode,open=openPublishDialog,observe=observeAltMetadata,probe=probeManagedPost}={}){
   await page.goto(`https://nhunnhun.tistory.com/manage/newpost/${patch.articleId}`,{waitUntil:'domcontentloaded',timeout:30000});
   const current=new URL(page.url());
@@ -47,7 +44,7 @@ export async function observeAltEditor(page,patch,{selectMode=selectEditorMode,o
   await open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG');
   const before=await observe(page);
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
-  await cancelDialog(page);
+  await cancelAltDialog(page);
   await selectMode(page,'html');
   const originalHtml=await page.locator('.CodeMirror:visible').evaluate(el=>el?.CodeMirror?.getValue?.()||'');
   if(!originalHtml.trim())throw Error('E_UPDATE_ORIGINAL_EMPTY');
@@ -55,7 +52,7 @@ export async function observeAltEditor(page,patch,{selectMode=selectEditorMode,o
   await open(page,{title},()=>{},'E_ALT_SNAPSHOT_DIALOG');
   const after=await observe(page);
   assertObservedMetadataPreserved(before,after);
-  await cancelDialog(page);
+  await cancelAltDialog(page);
   return {draft:draftAltSnapshot(originalHtml,before.metadata,patch),originalHtml,metadata:before.metadata};
 }
 export function sealAltSnapshot(value,key=randomBytes(32),iv=randomBytes(12)){

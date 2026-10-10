@@ -1,3 +1,4 @@
+import {cancelAltDialog,altDialogControl} from './alt-maintenance-dialog-controls.mjs';
 import {applyAltMaintenance,maintenanceHash} from './alt-maintenance-contract.mjs';
 import {observeAltMetadata,assertObservedMetadataPreserved} from './alt-maintenance-observe.mjs';
 import {altFingerprint} from './alt-maintenance-source.mjs';
@@ -15,10 +16,7 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   // Only existing public articles are in scope. Protected/private never become public.
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
   const changed=applyAltMaintenance(originalHtml,before.metadata,source.maintenance);
-  const cancel=page.getByRole('button',{name:'취소',exact:true}).and(page.locator('.publish_editor button:visible'));
-  if(await cancel.count()!==1)throw Error('E_ALT_CANCEL_CONTROL');
-  await cancel.click();
-  await page.locator('.publish_editor').waitFor({state:'hidden',timeout:10000});
+  await cancelAltDialog(page);
   // Anonymous baseline is collected before any content staging, not inferred from HTTP 200.
   const baseline=await capturePublicBaseline(originalHtml,source,before.metadata);
   await selectMode(page,'html');
@@ -33,8 +31,7 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   await open(page,{title:source.title},log,'E_ALT_DIALOG');
   const after=await observe(page);
   assertObservedMetadataPreserved(before,after);
-  const submit=page.getByRole('button',{name:'공개 발행',exact:true}).and(page.locator('.publish_editor button:visible'));
-  if(await submit.count()!==1||!await submit.isEnabled())throw Error('E_ALT_SUBMIT_CONTROL');
+  const submit=await altDialogControl(page,'submit');
   const sourceCommit=assertSource();
   // Re-read immediately before checkpoint; no re-submit when a previous run exists.
   if(await ledger.read(source.id))throw Error('E_UPDATE_EXISTING_STATE_REQUIRES_REVIEW');
