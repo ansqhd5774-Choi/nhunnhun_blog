@@ -53,18 +53,18 @@ export async function preparePublishEditor(page, expected, report = console.log,
   throw new Error('E_PUBLISH_EDITOR_NOT_READY');
 }
 export async function openPublishDialog(page, expected, report = console.log,
-  errorCode = 'E_PUBLISH_DIALOG_UNAVAILABLE') {
+  errorCode = 'E_PUBLISH_DIALOG_UNAVAILABLE', {observe = async (_,action)=>action(),clickTimeoutMs=null} = {}) {
   const panel = page.locator('.publish_editor');
-  if (await panel.isVisible()) return;
-  const state = await editorReadiness(page, expected);
+  if (await observe('dialog-existing-visible',()=>panel.isVisible(),{safeReadOnly:true,timeoutMs:15000})) return;
+  const state = await observe('dialog-readiness',()=>editorReadiness(page,expected),{safeReadOnly:true,timeoutMs:15000});
   if (!isEditorReady(state)) {
     report('PUBLISH_EDITOR_NOT_READY ' + JSON.stringify(state));
     throw new Error('E_PUBLISH_EDITOR_NOT_READY');
   }
-  await page.locator('#publish-layer-btn').click();
-  try { await panel.waitFor({state:'visible', timeout:30000}); }
+  await observe('dialog-open-click',()=>page.locator('#publish-layer-btn').click(clickTimeoutMs===null?{}:{timeout:clickTimeoutMs}));
+  try { await observe('dialog-visible-wait',()=>panel.waitFor({state:'visible',timeout:30000}),{safeReadOnly:true,timeoutMs:35000}); }
   catch {
-    report('PUBLISH_DIALOG_SAFE_DIAG ' + JSON.stringify(await editorReadiness(page, expected).catch(() => ({unavailable:true}))));
+    report('PUBLISH_DIALOG_SAFE_DIAG ' + JSON.stringify(await observe('dialog-failure-readiness',()=>editorReadiness(page,expected),{safeReadOnly:true,timeoutMs:15000}).catch(()=>({unavailable:true}))));
     // No blind reopening, and never retry the irreversible final publish click.
     throw new Error(errorCode);
   }
