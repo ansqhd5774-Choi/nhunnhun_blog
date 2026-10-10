@@ -1,0 +1,296 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "기존 /129 제목 약속과 영양 설명 교정",
+    "topic": "수박",
+    "meaning": "식품의 실제 영양 표시와 식사 선택·손질·보관",
+    "entityId": "food:watermelon",
+    "status": "resolved",
+    "reason": "기존 주제와 URL을 유지하고 검증 가능한 자료 범위로 건강정보를 정리한다."
+  },
+  "sourceDigest": "17208bca8e19bb3f4626c41ed319b09b429e8090ba0b98d00388d325a95c3f35",
+  "intent": {
+    "primaryQuestion": "수박의 영양·분량·선택 기준은 무엇인가?",
+    "readerSituation": "식품을 식사와 간식에 활용하는 독자",
+    "nextActions": [
+      "실제 분량과 제품의 영양 기준을 확인한다.",
+      "원료·손질·보관 조건을 확인한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "longTerm 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "comparison 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "combinations 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "products 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "foodReplacement 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "essentialNutrient 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "cultivars 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "origins 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "seasonality 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "cost 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "folkRemedies 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "selfCheck 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "exercise 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "diet 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "vulnerableGroups 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "discontinuation 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "missedDose 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "myths 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "latest 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 수박의 특징과 먹는 부분",
+      "answerQuote": "수박은 껍질을 제거한 과육을 분량 기준으로 읽습니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "2. 가식부 영양과 분량 기준",
+      "answerQuote": "FDA 표의 수박 280g은 잘게 썬 과육 2컵 기준입니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 식사에서 수박을 활용하는 역할",
+      "answerQuote": "수박은 단맛과 수분감이 있는 과일을 식사에 더하는 선택지입니다.",
+      "sourceIds": [
+        "source-1",
+        "source-4"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 음식 조합과 간단한 섭취 방법",
+      "answerQuote": "수박 조합은 과일과 함께 더하는 식재료를 기준으로 선택합니다.",
+      "sourceIds": [
+        "source-1",
+        "source-4"
+      ]
+    },
+    {
+      "module": "preparation",
+      "heading": "4. 음식 조합과 간단한 섭취 방법",
+      "answerQuote": "수박 조합은 과일과 함께 더하는 식재료를 기준으로 선택합니다.",
+      "sourceIds": [
+        "source-1",
+        "source-4"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "6. 고르는 법과 잘라 둔 수박 보관",
+      "answerQuote": "잘라 판매하는 수박은 냉장 진열 상태를 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "6. 고르는 법과 잘라 둔 수박 보관",
+      "answerQuote": "잘라 판매하는 수박은 냉장 진열 상태를 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "5. 자르기 전 세척과 위생",
+      "answerQuote": "수박은 껍질을 먹지 않아도 자르기 전에 씻습니다.",
+      "sourceIds": [
+        "source-2"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "6. 고르는 법과 잘라 둔 수박 보관",
+      "answerQuote": "잘라 판매하는 수박은 냉장 진열 상태를 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "nutrient는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "medicine는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "disease는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    }
+  },
+  "sources": [
+    {
+      "id": "source-1",
+      "url": "https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/raw-fruits-poster-text-version-accessible-version",
+      "title": "FDA 생과일 영양표",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-2",
+      "url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely",
+      "title": "FDA 농산물 선택·손질·보관 안내",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-3",
+      "url": "https://www.fda.gov/consumers/consumer-updates/are-you-storing-food-safely",
+      "title": "FDA 식품 냉장 보관",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-4",
+      "url": "https://www.fda.gov/food/nutrition-facts-label/added-sugars-nutrition-facts-label",
+      "title": "FDA 첨가당 표시",
+      "kind": "official",
+      "role": "nutrition",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "name": "Codex 원문·공식자료·실제사진 검토",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "Commons API의 작가·라이선스 및 실제사진을 시각 확인하고 명시했다. 사진만으로 제품 영양과 임상 효과를 판단하지 않는다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      }
+    },
+    "warningResolutions": [
+      {
+        "code": "W_CONTENT_TOPIC_EXTENSION_OMITTED",
+        "note": "생략 검토 항목은 cultivars·seasonality·comparison·diet이다. 국내 품종별 수치와 전국 공통 제철을 검증할 원천이 없어 추가하지 않았다. 다른 과일보다 우수하다는 비교와 체중감량 효능은 제목 약속에서 제거하고, 일반 식사 분량 활용만 설명한다. 사진의 품종과 FDA 참고표를 동일 품종 수치로 확정하지 않는다."
+      }
+    ]
+  }
+}

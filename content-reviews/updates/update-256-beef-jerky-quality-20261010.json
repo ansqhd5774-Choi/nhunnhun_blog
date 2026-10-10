@@ -1,0 +1,292 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "기존 /256 제목 약속과 영양 설명 교정",
+    "topic": "육포",
+    "meaning": "식품의 실제 영양 표시와 식사 선택·손질·보관",
+    "entityId": "food:beef-jerky",
+    "status": "resolved",
+    "reason": "기존 주제와 URL을 유지하고 검증 가능한 자료 범위로 건강정보를 정리한다."
+  },
+  "sourceDigest": "ffabacc60ee87eca93100e77e32add82c2595ac09be6e0edd82324706473b135",
+  "intent": {
+    "primaryQuestion": "육포의 영양·분량·선택 기준은 무엇인가?",
+    "readerSituation": "식품을 식사와 간식에 활용하는 독자",
+    "nextActions": [
+      "실제 분량과 제품의 영양 기준을 확인한다.",
+      "원료·손질·보관 조건을 확인한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "longTerm 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "comparison 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "combinations 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "products 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "foodReplacement 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "essentialNutrient 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "cultivars 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "origins 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "seasonality 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "cost 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "folkRemedies 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "selfCheck 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "exercise 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "diet 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "vulnerableGroups 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "discontinuation 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "missedDose 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "myths 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "latest 확장으로 질병 예방·고정 권장량·확인되지 않은 시너지를 추가하지 않고 실제 식품 표시와 선택에 집중한다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 육포의 특징과 제품명 확인",
+      "answerQuote": "육포는 고기를 말려 만든 식품이며 제조 방식은 제품마다 다릅니다.",
+      "sourceIds": [
+        "source-2"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "2. 단백질과 영양표를 분량으로 읽기",
+      "answerQuote": "육포의 단백질과 영양은 구입한 제품의 영양표를 기준으로 읽습니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 간식으로 활용할 때 기대할 역할",
+      "answerQuote": "육포는 휴대하기 편한 고기 간식으로 식사에 활용할 수 있습니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 음식 조합과 먹는 양",
+      "answerQuote": "음식 조합은 육포에 더하는 맛과 식사 구성으로 선택합니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "preparation",
+      "heading": "4. 음식 조합과 먹는 양",
+      "answerQuote": "음식 조합은 육포에 더하는 맛과 식사 구성으로 선택합니다.",
+      "sourceIds": [
+        "source-1"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "고를 때는 영양표·원재료·보관 안내를 함께 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3",
+        "source-4"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "고를 때는 영양표·원재료·보관 안내를 함께 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3",
+        "source-4"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "5. 건조 제품의 안전과 원료 확인",
+      "answerQuote": "육포는 말렸다는 사실만으로 모든 공정의 안전이 보장되는 것은 아닙니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "6. 고르는 법과 개봉 후 보관",
+      "answerQuote": "고를 때는 영양표·원재료·보관 안내를 함께 확인합니다.",
+      "sourceIds": [
+        "source-2",
+        "source-3",
+        "source-4"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "nutrient는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "medicine는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "disease는 식사 조건과 표시 확인에 연결하며 임의 처방·효능 우열로 확대하지 않는다."
+    }
+  },
+  "sources": [
+    {
+      "id": "source-1",
+      "url": "https://www.jacklinks.eu/products/beef-jerky-original",
+      "title": "Jack Links EU Original Beef Jerky 표시",
+      "kind": "manufacturer",
+      "role": "nutrition",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-2",
+      "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-fish/jerky",
+      "title": "USDA FSIS 육포와 식품 안전",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-3",
+      "url": "https://www.fda.gov/consumers/consumer-updates/have-food-allergies-read-label",
+      "title": "FDA 식품 알레르기 표시",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    },
+    {
+      "id": "source-4",
+      "url": "https://www.fda.gov/consumers/consumer-updates/are-you-storing-food-safely",
+      "title": "FDA 식품 보관 안내",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 공식·원문 자료에서 읽은 표시·식품안전·조건부 연구 범위만 사용한다. 제품 예시는 전체 식품의 고정값이나 치료 효과로 확대하지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "name": "Codex 원문·공식자료·실제사진 검토",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "Commons API의 작가·라이선스 및 실제사진을 시각 확인하고 명시했다. 사진만으로 제품 영양과 임상 효과를 판단하지 않는다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "제목 약속에 실제 본문이 답하며 기준 중량·원료·출처·보관 조건을 구분한다. 확인되지 않은 질병 치료·보충제 대체·임상 시너지를 추가하지 않는다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
