@@ -1,3 +1,4 @@
+import {isNativeTextMaintenance,checkNativeTextSource,nativeTextFingerprint} from './native-text-contract.mjs';
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
@@ -7,6 +8,7 @@ import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-
 const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard'];
 
 export function checkUpdateSource(update, filename){
+  if(isNativeTextMaintenance(update))return checkNativeTextSource(update,filename);
   if(isAltMaintenance(update))return checkAltSource(update,filename);
   if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');
   if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
@@ -29,6 +31,7 @@ export function checkUpdateSource(update, filename){
   return update;
 }
 export function updateFingerprint(update){
+  if(isNativeTextMaintenance(update))return nativeTextFingerprint(update);
   if(isAltMaintenance(update))return altFingerprint(update);
   return createHash('sha256').update(JSON.stringify([
     update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml,

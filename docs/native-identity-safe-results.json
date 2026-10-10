@@ -1,0 +1,44 @@
+[
+  {
+    "id": 236,
+    "patches": 754,
+    "images": 8,
+    "originalTextLength": 4938,
+    "targetTextLength": 1103,
+    "assetReferencesPreserved": true,
+    "captionTokensChanged": 1,
+    "cleanupWrapperTokens": 80,
+    "restoration": "PASS",
+    "status": "draft",
+    "approved": false,
+    "contract": "PASS_IN_MEMORY_REVIEW_COPY"
+  },
+  {
+    "id": 233,
+    "patches": 636,
+    "images": 9,
+    "originalTextLength": 4688,
+    "targetTextLength": 1119,
+    "assetReferencesPreserved": true,
+    "captionTokensChanged": 0,
+    "cleanupWrapperTokens": 84,
+    "restoration": "PASS",
+    "status": "draft",
+    "approved": false,
+    "contract": "PASS_IN_MEMORY_REVIEW_COPY"
+  },
+  {
+    "id": 200,
+    "patches": 57,
+    "images": 11,
+    "originalTextLength": 5803,
+    "targetTextLength": 5725,
+    "assetReferencesPreserved": true,
+    "captionTokensChanged": 0,
+    "cleanupWrapperTokens": 0,
+    "restoration": "PASS",
+    "status": "draft",
+    "approved": false,
+    "contract": "PASS_IN_MEMORY_REVIEW_COPY"
+  }
+]

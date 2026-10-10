@@ -7,6 +7,7 @@ import {maintenanceHash} from './alt-maintenance-contract.mjs';
 import {verificationContext} from './verification-context.mjs';
 import {altFingerprint} from './alt-maintenance-source.mjs';
 import {ogAsset} from './verify-updated-public.mjs';
+import {nativeTextStructureHash} from './native-text-structure.mjs';
 
 export function assertAltBaselineMetadata(publicMetadata,editorMetadata){
   const match=editorMetadata.representativeImage.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
@@ -40,7 +41,7 @@ export function assertAltDeliveredRender(delivered,rendered){
    if(image.src!==provider.src||image.alt!==provider.alt&&!filenameFallback)throw Error('E_ALT_PUBLIC_SOURCE_RENDER_MISMATCH');
  });
 }
-export async function captureAltSnapshot(browser,source,width,originalHtml,{log=console.log}={}){
+export async function captureAltSnapshot(browser,source,width,originalHtml,{log=console.log,includeTextSnapshot=false}={}){
   const step=(name,action,options={})=>observeUpdateStage('public-'+width+'-'+name,action,{...options,log});
   const context=await step('context-create',()=>verificationContext(browser,{viewport:{width,height:1000}}));
   try{
@@ -51,7 +52,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
     await step('body-visible',()=>page.locator('.contents_style').waitFor({state:'visible',timeout:15000}),{safeReadOnly:true,timeoutMs:20000});
     await step('font-wait',()=>page.evaluate(waitAltPublicAssets,{phase:'font'}),{safeReadOnly:true,timeoutMs:20000});
     await step('images-wait',()=>loadAltPublicImages(page,{log}));
-    const observed=await step('dom-observe',()=>page.evaluate(({original,responseHtml})=>{
+    const observed=await step('dom-observe',()=>page.evaluate(({original,responseHtml,includeTextSnapshot})=>{
       const bodies=[...document.querySelectorAll('.contents_style')].filter(x=>x.getClientRects().length);
       if(bodies.length!==1)return null;
       const body=bodies[0];
@@ -69,12 +70,19 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
       const categoryLinks=[...document.querySelectorAll('.hd .meta-cate a')];
       const category=categoryLinks.length===1?[categoryLinks[0].textContent.trim(),categoryLinks[0].getAttribute('href')]:null;
       const tags=[...document.querySelectorAll('.entry-tag a')].map(a=>[a.textContent.trim(),a.getAttribute('href')]);
-      return {body:clone.innerHTML,metadata:{title,representative,category,tags},
+      let text,textStructure;
+      if(includeTextSnapshot){
+        const textClone=clone.cloneNode(true);textClone.querySelectorAll('style,script').forEach(x=>x.remove());
+        const structureClone=clone.cloneNode(true);
+        const removeText=node=>{for(const child of [...node.childNodes]){if(child.nodeType===3){if(!['STYLE','SCRIPT'].includes(node.nodeName))child.remove();}else removeText(child);}};
+        removeText(structureClone);text=textClone.textContent.replace(/\s+/g,'').normalize('NFC');textStructure=structureClone.innerHTML;
+      }
+      return {body:clone.innerHTML,text,textStructure,metadata:{title,representative,category,tags},
         deliveredImages,
         images:images.map(x=>({src:x.getAttribute('src'),alt:x.getAttribute('alt'),loaded:x.complete&&x.naturalWidth>0})),
         editorImages:original?[...new DOMParser().parseFromString(original,'text/html').querySelectorAll('img')].map(x=>({src:x.getAttribute('src')})):null,
         overflowPx:Math.max(0,document.documentElement.scrollWidth-innerWidth)};
-    },{original:originalHtml||null,responseHtml}),{safeReadOnly:true,timeoutMs:15000});
+    },{original:originalHtml||null,responseHtml,includeTextSnapshot}),{safeReadOnly:true,timeoutMs:15000});
     // Missing metadata is unknown, not evidence of preservation.
     if(!observed?.metadata.title||!observed.metadata.representative||!observed.metadata.category||!observed.metadata.tags.length||!observed.images.length)throw Error('E_ALT_PUBLIC_OBSERVATION_UNCONFIRMED');
     if(observed.metadata.title!==source.title)throw Error('E_ALT_PUBLIC_TITLE');
@@ -82,7 +90,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
     return {bodySha256:maintenanceHash(observed.body),metadataSha256:maintenanceHash(JSON.stringify(observed.metadata)),
       observedMetadata:observed.metadata,
       images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded,...(source.operation===ALT_MACRO_OPERATION?{assetSha256:maintenanceHash(publicAssetIdentity(x.src))}:{})})),
-      editorImages:observed.editorImages?.map(x=>maintenanceHash(x.src||'')),overflowPx:observed.overflowPx};
+      editorImages:observed.editorImages?.map(x=>maintenanceHash(x.src||'')),overflowPx:observed.overflowPx,...(includeTextSnapshot?{providerBody:observed.body,publicTextSha256:maintenanceHash(observed.text),publicTextStructureSha256:nativeTextStructureHash(observed.textStructure)}:{})};
   }catch(error){throw normalizeAltObservationError(error);}finally{await step('context-close',()=>context.close());}
 }
 export async function captureAltBaseline(browser,originalHtml,source,editorMetadata){
