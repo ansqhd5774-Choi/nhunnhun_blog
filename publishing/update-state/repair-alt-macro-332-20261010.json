@@ -1,5 +1,5 @@
 {
-  "phase": "submitting",
+  "phase": "updated",
   "operation": "image-alt-macro-only-v1",
   "fingerprint": "73d1109324c949e2c1c751d5a8ee33cd324026074eb98b067d791c9eb3b7e14a",
   "url": "https://nhunnhun.tistory.com/332",
@@ -154,5 +154,24 @@
   "targetBodySha256": "c9d63ac72c7b4d29ced5a394287d4b949a494d8a15bc00b71be85f5a69a4c567",
   "metadataSha256": "efa131637899b61a536557c92ceee0481e988075e5b4f6bb5e0fbe1822d111b6",
   "timestamp": "2026-10-10T01:42:14.986Z",
-  "semanticVerification": "alt-visual-review-only"
+  "semanticVerification": "alt-visual-review-only",
+  "verification": {
+    "desktop": {
+      "images": 9,
+      "changedAlt": 1,
+      "overflowPx": 0,
+      "semanticVerification": "alt-visual-review-only"
+    },
+    "mobile": {
+      "images": 9,
+      "changedAlt": 1,
+      "overflowPx": 0,
+      "semanticVerification": "alt-visual-review-only"
+    }
+  },
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "checkedAt": "2026-10-10T01:42:22.113Z",
+    "semanticVerification": "alt-visual-review-only"
+  }
 }
