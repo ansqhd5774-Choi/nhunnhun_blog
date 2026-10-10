@@ -2,10 +2,12 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
 import {assertDirectEmphasis} from './direct-emphasis.mjs';
+import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-source.mjs';
 
 const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard'];
 
 export function checkUpdateSource(update, filename){
+  if(isAltMaintenance(update))return checkAltSource(update,filename);
   if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');
   if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
   if(update.contentStandard!==undefined&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
@@ -27,6 +29,7 @@ export function checkUpdateSource(update, filename){
   return update;
 }
 export function updateFingerprint(update){
+  if(isAltMaintenance(update))return altFingerprint(update);
   return createHash('sha256').update(JSON.stringify([
     update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml,
     ...(update.contentStandard ? [update.contentStandard,update.category] : [])
@@ -39,7 +42,7 @@ export async function loadUpdates(directory='updates',sourceId=null){
     out.push(checkUpdateSource(JSON.parse(await readFile(`${directory}/${name}`,'utf8')),name));
   }
   if(sourceId&&out.length!==1)throw Error('E_UPDATE_TARGET_SOURCE_NOT_FOUND');
-  if(sourceId)assertDirectEmphasis(out[0]);
+  if(sourceId&&!isAltMaintenance(out[0]))assertDirectEmphasis(out[0]);
   if(new Set(out.map(x=>x.articleId)).size!==out.length) throw new Error('E_UPDATE_DUPLICATE_ARTICLE');
   return out;
 }
