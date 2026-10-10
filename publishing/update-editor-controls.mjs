@@ -118,7 +118,12 @@ export async function probeManagedPost(page,update){
     if(result.status!==200) throw new Error('E_UPDATE_TARGET_PROBE');
     if(!result.found) throw new Error('E_UPDATE_TARGET_NOT_FOUND');
     if((result.title||'').trim()===update.title&&update.title!==update.expectedCurrentTitle) throw new Error('E_UPDATE_TARGET_ALREADY_CHANGED');
-    if((result.title||'').trim()!==update.expectedCurrentTitle) throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
+    if((result.title||'').trim()!==update.expectedCurrentTitle) {
+      // Public title of the exact numeric article, returned by the authenticated read-only probe.
+      // Preserve the mismatch gate and expose only this non-secret field for source correction.
+      console.log('UPDATE_CURRENT_TITLE_EVIDENCE '+JSON.stringify({articleId:String(update.articleId),currentTitle:String(result.title||'').trim().slice(0,150)}));
+      throw new Error('E_UPDATE_CURRENT_TITLE_MISMATCH');
+    }
     return result;
   }catch(error){
     if(error?.message==='E_LOGIN_REQUIRED'||/^E_UPDATE_/.test(String(error?.message||''))) throw error;
