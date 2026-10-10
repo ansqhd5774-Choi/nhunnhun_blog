@@ -1,3 +1,4 @@
+import {captureSp1LegacySnapshot,assertSp1LegacySnapshot} from './sp1-legacy-public-contract.mjs';
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { verificationContext } from './verification-context.mjs';
 import {assertDirectPublicSnapshot} from './direct-public-contract.mjs';
@@ -30,13 +31,14 @@ export function ogAsset(value) {
   }
   throw new Error('E_QA_OG_HOST');
 }
-export function checkMeasurements(m,e) {
+export function checkMeasurements(m,e,{sp1Legacy=false}={}) {
+  if(sp1Legacy&&e.version!=='SP1')throw Error('E_QA_SP1_LEGACY_CONTRACT');
   if(m.overflowPx!==0 || m.wideImages!==0) throw new Error('E_QA_OVERFLOW');
   if(m.images!==e.images || m.images<3 || m.missingAlt || m.brokenImages || m.nonNativeImages) throw new Error('E_QA_IMAGES');
   if(m.h2!==e.h2 || m.h3!==e.h3 || m.badHeadingStyles) throw new Error('E_QA_HEADINGS');
   if(m.tables!==e.tables || m.badTableWraps) throw new Error('E_QA_TABLES');
-  if(m.highlights!==e.highlights || (m.highlightColors < (e.minimumHighlightColors ?? (e.highlights>=2?2:e.highlights))) || m.hiddenHighlights) throw new Error('E_QA_HIGHLIGHTS');
-  if(m.faqQ!==e.faq || m.faqA!==e.faq || !m.heroPriority || m.badLazyImages) throw new Error('E_QA_STRUCTURE');
+  if(!sp1Legacy&&(m.highlights!==e.highlights || (m.highlightColors < (e.minimumHighlightColors ?? (e.highlights>=2?2:e.highlights))) || m.hiddenHighlights)) throw new Error('E_QA_HIGHLIGHTS');
+  if((!sp1Legacy&&(m.faqQ!==e.faq || m.faqA!==e.faq)) || !m.heroPriority || m.badLazyImages) throw new Error('E_QA_STRUCTURE');
   return true;
 }
 export function assertImagePayload(contentType,b) {
@@ -171,6 +173,9 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
       assertDirectPublicSnapshot(snapshot,update.bodyHtml);
       if(metrics.overflowPx||metrics.wideImages||metrics.brokenImages||metrics.missingAlt||metrics.nonNativeImages||metrics.badTableWraps)throw Error('E_QA_DIRECT_LAYOUT');
       metrics.direct=snapshot;
+    } else if(update.contentStandard==='SP1'){
+      const legacy=await root.evaluate(captureSp1LegacySnapshot);
+      assertSp1LegacySnapshot(legacy,rendered);checkMeasurements(metrics,expected,{sp1Legacy:true});metrics.sp1Legacy=legacy;
     } else checkMeasurements(metrics,expected);
     if(update.contentStandard==='R1') assertEmphasisContract(await root.innerHTML(),update.bodyHtml);
     if(assetChecks) {

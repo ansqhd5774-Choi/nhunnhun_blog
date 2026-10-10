@@ -38,6 +38,6 @@ USDA 공식 SR Legacy 다운로드의 FDC172467 조리 템페와 172475 특정 �
 
 ## 후보 검증·원장 적용 경계
 
-두 생성 스크립트의 현재 해시·exact 변경·update source·image review 계약 검사 PASS. /405 원문 HTML의 strong/mark/u/img 개수는 보존된다. 기존 공개 SP1 렌더 strong54와 수정 대상 메타가 있는 SP1 렌더 strong67 차이는 renderer 경로 차이이며 **수치 수정으로 인한 차이가 아니다**. 같은 수정 메타를 가진 교정 전후 구조 비교 PASS. /381 legacy28→SP136 차이도 기존 검토서대로 기록한다.
+두 생성 스크립트의 현재 해시·exact 변경·update source·image review 계약 검사 PASS. /405 후보는 `direct-evidence-dates-405-usda-precision-fix-20261010`으로 변경해 기존 `direct-*` 렌더 경로를 유지했다. 이전 준비 ID가 direct 접두사를 잃어 렌더 strong54→67로 바뀌던 문제를 공개 제출 전에 교정했다. 현재 원본 source 렌더와 신규 후보 렌더는 **공식 수치 7곳만 치환하면 전체 문자열이 정확히 동일**하다. strong/mark/u/img 개수·사진·서식이 모두 보존된다. /381 legacy28→SP136 차이는 기존 검토서대로 별도 기록한다.
 
 정식 CLI --check는 두 SP1의 CONTENT_VALIDATION_SKIPPED / semanticVerification=not-performed / failed0이다. R1 의미 검사 PASS로 표현하지 않는다. 검토 JSON의 prepared digest는 준비 파일의 정확 bytes SHA256이다. 부모가 기존 URL 수정과 실제 최종 source를 확인한 뒤 exact sourceId/URL/digest 조건으로 운영 원장에 연결할 수 있는 후보이다. 현 시점 자동 연결·140→138 감소는 하지 않았다.
