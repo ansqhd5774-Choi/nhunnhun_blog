@@ -1,0 +1,158 @@
+{
+  "phase": "submitting",
+  "operation": "image-alt-macro-only-v1",
+  "fingerprint": "419082ce7e9d78204c135189c6fe6e2face8eb0c5de21f63454af2b078863b54",
+  "url": "https://nhunnhun.tistory.com/334",
+  "articleId": "334",
+  "sourceCommit": "06443e5121601209732a98d50d667cfe1ef6c311",
+  "baseline": {
+    "version": "alt-public-baseline-v1",
+    "desktop": {
+      "bodySha256": "62d4ba39bd0f74f3ed82338cb77efd3b8adb13745740795510afe7dd096ed326",
+      "metadataSha256": "05aded8aa4c2365eca20a5e5a746760d7978845464d916ab766562b55c8f85da",
+      "images": [
+        {
+          "srcSha256": "ccfc0db4c297293366c1cd2b0e47dace7b96f0d6cc821fd71391e725c8bedc22",
+          "altSha256": "c50eecc4f4497cd5d308a589e7e237b9313549c346c3e41135d0bbceb647446e",
+          "loaded": true,
+          "assetSha256": "1c961abe453813ec071d244d0869dbe8d22d10c4e295142463c1ec5587d2bb72"
+        },
+        {
+          "srcSha256": "ca73e909fcca914f06c59a6aa23fd9817c0423f7e4e33e7e3592460ef5c7b95e",
+          "altSha256": "e0666f5e060bcfa6c4fbed1fe0a4e96b47d04b6016032be1f53d816cdf9762ff",
+          "loaded": true,
+          "assetSha256": "8c5a87eb48aeb7b62fb4a24eccb80a250bf9c4968bcdc6e49122f78775c74bb0"
+        },
+        {
+          "srcSha256": "96b9c0bf05e011da35ae7d952478330ef17107d59e0dd830193f5d663a3a311e",
+          "altSha256": "1be843a4b628bebdf732729c9c462567b9bc16221d7260a3ff3a21c8f095e412",
+          "loaded": true,
+          "assetSha256": "7aa6b8ada986c22fdb903927a4c4aff63d55f5b394edbf7b00a9047f03fe7898"
+        },
+        {
+          "srcSha256": "d097de30fd760c8cc3efbf95997a941d1a68d7c83aa9f1711ac84dd91164b316",
+          "altSha256": "5ba9f2839f48aa677cac79a48bbe655bc048c6fcd020e4200c981feb1ea6fcd8",
+          "loaded": true,
+          "assetSha256": "0883de86e499a50c3157d840dfb96280998be2dd4eca825976a09dfea64b30fc"
+        },
+        {
+          "srcSha256": "a974e08190ce426cc83a204b4fc7f2ec35382dd9ff40aadfdb7474182ed01cf9",
+          "altSha256": "187c24cfbdd7e4024405d8daa2a5e5321ac9c0bb4d5d335afc9714a03333fb56",
+          "loaded": true,
+          "assetSha256": "229911c97b80e78f592de95d8764d363e22143d3dc4c96badf62f33d8f4936e5"
+        },
+        {
+          "srcSha256": "77811b6f7e2274c5af5bc94d62dc73bb32de590fd8fe3373dc4048ca3e18fca0",
+          "altSha256": "86f5b4ef651a75a04848357f80faf09d276968364062fba5491ae89f23091838",
+          "loaded": true,
+          "assetSha256": "6650b388960d4fa8374a4b0a83eed64e8228b4bd7ec0b1d986f4b304e4221f2c"
+        },
+        {
+          "srcSha256": "b65e0107648ddea213089fc2e55036a3a659c8f72335fb88a7962b1001c6018e",
+          "altSha256": "edd40c6aaa3afb927db133833bbe2d0b786d4dbd1c327945e7565b7adc231347",
+          "loaded": true,
+          "assetSha256": "6f2be60422d4871d694c8c48806edb9c25dd67bd33cda58afca71e6e84e7e0d3"
+        },
+        {
+          "srcSha256": "d64a152aa80753a0db67f71d74c280bfeefca2b55537b0e022671c47cd12d640",
+          "altSha256": "19e9cb9c566e0a6c29d8a55b367b0ed063824f13f20fc884cf7fe75f30fb2a9a",
+          "loaded": true,
+          "assetSha256": "914e577eac5dbc4780f30378723ec88a948c145e9fd6b3a63f6770c40128e47b"
+        },
+        {
+          "srcSha256": "1e69e60cf3dbec5cbf617f5d5fc05d791e78aeaea79251be4ff08384e311f46f",
+          "altSha256": "c44571727f38bcfea7ec2ab887106dd70cc7ed98241c0446c0558bbc6e6f997a",
+          "loaded": true,
+          "assetSha256": "db8221881e5ce2380a42134699b92c1f88aadec11011e0b4ab882f2535ce5e11"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "mobile": {
+      "bodySha256": "62d4ba39bd0f74f3ed82338cb77efd3b8adb13745740795510afe7dd096ed326",
+      "metadataSha256": "05aded8aa4c2365eca20a5e5a746760d7978845464d916ab766562b55c8f85da",
+      "images": [
+        {
+          "srcSha256": "ccfc0db4c297293366c1cd2b0e47dace7b96f0d6cc821fd71391e725c8bedc22",
+          "altSha256": "c50eecc4f4497cd5d308a589e7e237b9313549c346c3e41135d0bbceb647446e",
+          "loaded": true,
+          "assetSha256": "1c961abe453813ec071d244d0869dbe8d22d10c4e295142463c1ec5587d2bb72"
+        },
+        {
+          "srcSha256": "ca73e909fcca914f06c59a6aa23fd9817c0423f7e4e33e7e3592460ef5c7b95e",
+          "altSha256": "e0666f5e060bcfa6c4fbed1fe0a4e96b47d04b6016032be1f53d816cdf9762ff",
+          "loaded": true,
+          "assetSha256": "8c5a87eb48aeb7b62fb4a24eccb80a250bf9c4968bcdc6e49122f78775c74bb0"
+        },
+        {
+          "srcSha256": "96b9c0bf05e011da35ae7d952478330ef17107d59e0dd830193f5d663a3a311e",
+          "altSha256": "1be843a4b628bebdf732729c9c462567b9bc16221d7260a3ff3a21c8f095e412",
+          "loaded": true,
+          "assetSha256": "7aa6b8ada986c22fdb903927a4c4aff63d55f5b394edbf7b00a9047f03fe7898"
+        },
+        {
+          "srcSha256": "d097de30fd760c8cc3efbf95997a941d1a68d7c83aa9f1711ac84dd91164b316",
+          "altSha256": "5ba9f2839f48aa677cac79a48bbe655bc048c6fcd020e4200c981feb1ea6fcd8",
+          "loaded": true,
+          "assetSha256": "0883de86e499a50c3157d840dfb96280998be2dd4eca825976a09dfea64b30fc"
+        },
+        {
+          "srcSha256": "a974e08190ce426cc83a204b4fc7f2ec35382dd9ff40aadfdb7474182ed01cf9",
+          "altSha256": "187c24cfbdd7e4024405d8daa2a5e5321ac9c0bb4d5d335afc9714a03333fb56",
+          "loaded": true,
+          "assetSha256": "229911c97b80e78f592de95d8764d363e22143d3dc4c96badf62f33d8f4936e5"
+        },
+        {
+          "srcSha256": "77811b6f7e2274c5af5bc94d62dc73bb32de590fd8fe3373dc4048ca3e18fca0",
+          "altSha256": "86f5b4ef651a75a04848357f80faf09d276968364062fba5491ae89f23091838",
+          "loaded": true,
+          "assetSha256": "6650b388960d4fa8374a4b0a83eed64e8228b4bd7ec0b1d986f4b304e4221f2c"
+        },
+        {
+          "srcSha256": "b65e0107648ddea213089fc2e55036a3a659c8f72335fb88a7962b1001c6018e",
+          "altSha256": "edd40c6aaa3afb927db133833bbe2d0b786d4dbd1c327945e7565b7adc231347",
+          "loaded": true,
+          "assetSha256": "6f2be60422d4871d694c8c48806edb9c25dd67bd33cda58afca71e6e84e7e0d3"
+        },
+        {
+          "srcSha256": "d64a152aa80753a0db67f71d74c280bfeefca2b55537b0e022671c47cd12d640",
+          "altSha256": "19e9cb9c566e0a6c29d8a55b367b0ed063824f13f20fc884cf7fe75f30fb2a9a",
+          "loaded": true,
+          "assetSha256": "914e577eac5dbc4780f30378723ec88a948c145e9fd6b3a63f6770c40128e47b"
+        },
+        {
+          "srcSha256": "1e69e60cf3dbec5cbf617f5d5fc05d791e78aeaea79251be4ff08384e311f46f",
+          "altSha256": "c44571727f38bcfea7ec2ab887106dd70cc7ed98241c0446c0558bbc6e6f997a",
+          "loaded": true,
+          "assetSha256": "db8221881e5ce2380a42134699b92c1f88aadec11011e0b4ab882f2535ce5e11"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "patches": [
+      {
+        "publicIndex": 4,
+        "newAlt": "백내장 수술의 네 단계를 나타낸 도식"
+      }
+    ],
+    "macroMapping": {
+      "version": "macro-asset-map-v1",
+      "assetSha256s": [
+        "1c961abe453813ec071d244d0869dbe8d22d10c4e295142463c1ec5587d2bb72",
+        "8c5a87eb48aeb7b62fb4a24eccb80a250bf9c4968bcdc6e49122f78775c74bb0",
+        "7aa6b8ada986c22fdb903927a4c4aff63d55f5b394edbf7b00a9047f03fe7898",
+        "0883de86e499a50c3157d840dfb96280998be2dd4eca825976a09dfea64b30fc",
+        "229911c97b80e78f592de95d8764d363e22143d3dc4c96badf62f33d8f4936e5",
+        "6650b388960d4fa8374a4b0a83eed64e8228b4bd7ec0b1d986f4b304e4221f2c",
+        "6f2be60422d4871d694c8c48806edb9c25dd67bd33cda58afca71e6e84e7e0d3",
+        "914e577eac5dbc4780f30378723ec88a948c145e9fd6b3a63f6770c40128e47b",
+        "db8221881e5ce2380a42134699b92c1f88aadec11011e0b4ab882f2535ce5e11"
+      ]
+    }
+  },
+  "originalBodySha256": "ade5969e481ac26ab7dd4c842643b0291b50ead78adfbb3cabd1da63c83e42c4",
+  "targetBodySha256": "d10165c7bec8f0cc8f2535df928723c2ad5fc3cc37b5df6174eb328d70bf75ae",
+  "metadataSha256": "84cd3eb2ee01b22def9e0a1527dde8cbad4c5558ab05ee2fd9fae06f8fa8915c",
+  "timestamp": "2026-10-10T01:46:31.075Z",
+  "semanticVerification": "alt-visual-review-only"
+}
