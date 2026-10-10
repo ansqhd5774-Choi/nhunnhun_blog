@@ -260,7 +260,7 @@
     "renderSha256": "431cfa847acf882d7caa02f09dfe6d40dc94771a95d3342b012a1ef67c608347"
   },
   {
-    "path": "updates/update-275-roxithromycin-safety-20261004.json",
+    "path": "authoring/update-source-archive/update-275-roxithromycin-safety-20261004.json",
     "sourceSha256": "b28d459631f2dcea09d1ad1a6c3329fce7e902617098b54a15372be3d077a0ca",
     "renderSha256": "4a740096248f1617295e70c36c4437cf6342f332709c42b891ffbaa5bf9d917b"
   },

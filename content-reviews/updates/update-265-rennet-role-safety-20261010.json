@@ -1,0 +1,288 @@
+{
+  "version": "R1",
+  "domain": "food",
+  "classification": {
+    "rawInput": "기존 /265 렌넷 원료·효능 오류 교정",
+    "topic": "렌넷",
+    "meaning": "치즈 제조용 식품효소의 원료·역할과 소비자 표시 판단",
+    "entityId": "food:rennet",
+    "status": "resolved",
+    "reason": "EFSA 식품효소 평가로 우유 응고와 제4위 원료를 확인한다."
+  },
+  "sourceDigest": "972fe1437fa3cf4a488c119aef673f9a892caeccbd3f4458580aae109ea521ff",
+  "intent": {
+    "primaryQuestion": "렌넷의 역할은 무엇이며 유당·치즈 영양과 어떻게 구분하는가?",
+    "readerSituation": "치즈 원재료와 본인 식사 조건을 확인하는 독자",
+    "nextActions": [
+      "효소 원료와 제품 영양표를 나누어 확인한다.",
+      "유당·우유 알레르기와 보관 정보를 제품에서 확인한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "longTerm를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "comparison를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "combinations를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "products를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "foodReplacement를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "essentialNutrient를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "cultivars를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "origins를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "seasonality를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "cost를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "folkRemedies를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "selfCheck를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "exercise를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "diet를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "vulnerableGroups를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "discontinuation를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "missedDose를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "myths를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "latest를 효소 복용량·질병 예방·산지 우열로 확장하지 않고 제조 역할과 소비자 표시 확인에 집중한다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 렌넷이란? 치즈 응고를 돕는 식품 효소",
+      "answerQuote": "렌넷은 우유를 커드와 유청으로 나누는 응고에 쓰이는 식품 효소입니다.",
+      "sourceIds": [
+        "efsa"
+      ]
+    },
+    {
+      "module": "nutrition",
+      "heading": "2. 영양성분은 렌넷과 완성 치즈를 나누어 읽기",
+      "answerQuote": "완성 치즈의 영양성분은 실제 치즈의 영양표를 기준으로 읽습니다.",
+      "sourceIds": [
+        "efsa"
+      ]
+    },
+    {
+      "module": "benefits",
+      "heading": "3. 렌넷과 락타아제는 역할이 다릅니다",
+      "answerQuote": "렌넷의 우유 응고 역할과 락타아제의 유당 분해 역할을 구분하면 유제품 선택이 쉬워집니다.",
+      "sourceIds": [
+        "efsa",
+        "lactase"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "6. 표시를 보고 고르는 법과 보관",
+      "answerQuote": "효소의 제조용 투입량은 제품 안내의 용도와 농도를 따라야 하며 건강을 위한 하루 권장량으로 바꾸지 않습니다.",
+      "sourceIds": [
+        "efsa"
+      ]
+    },
+    {
+      "module": "preparation",
+      "heading": "4. 치즈와 함께 먹는 음식과 활용",
+      "answerQuote": "치즈와 음식의 조합은 맛과 식사 구성을 기준으로 선택합니다.",
+      "sourceIds": [
+        "niddk"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "6. 표시를 보고 고르는 법과 보관",
+      "answerQuote": "구입한 용기의 보관 온도·개봉 후 안내를 우선하고 깨끗한 도구로 필요한 양을 덜어 사용하세요.",
+      "sourceIds": [
+        "efsa"
+      ]
+    },
+    {
+      "module": "selection",
+      "heading": "6. 표시를 보고 고르는 법과 보관",
+      "answerQuote": "제품을 고를 때는 효소 원료와 완성 치즈의 표시를 함께 확인하세요.",
+      "sourceIds": [
+        "efsa",
+        "fda"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "5. 우유 알레르기와 유당불내증 구별",
+      "answerQuote": "우유 알레르기와 유당불내증은 같은 조건이 아닙니다.",
+      "sourceIds": [
+        "fda",
+        "lactase"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "6. 표시를 보고 고르는 법과 보관",
+      "answerQuote": "치즈의 종류나 국가 이름만으로 원료와 건강효과의 우열을 정하지 않습니다.",
+      "sourceIds": [
+        "efsa"
+      ]
+    }
+  ],
+  "connections": {
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "nutrient 연결은 표시·원료 확인만 안내하며 처방·치료 효과로 확대하지 않는다."
+    },
+    "medicine": {
+      "status": "not-applicable",
+      "reason": "medicine 연결은 표시·원료 확인만 안내하며 처방·치료 효과로 확대하지 않는다."
+    },
+    "disease": {
+      "status": "not-applicable",
+      "reason": "disease 연결은 표시·원료 확인만 안내하며 처방·치료 효과로 확대하지 않는다."
+    }
+  },
+  "sources": [
+    {
+      "id": "efsa",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9716715/",
+      "title": "EFSA 동물성 렌넷 평가",
+      "kind": "official",
+      "role": "context",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "공식 자료의 효소 역할·식사 선택·표시 확인 범위로 제한하며 렌넷 복용 효능을 주장하지 않는다."
+    },
+    {
+      "id": "niddk",
+      "url": "https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance/eating-diet-nutrition",
+      "title": "NIDDK 유당불내증 식사",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "공식 자료의 효소 역할·식사 선택·표시 확인 범위로 제한하며 렌넷 복용 효능을 주장하지 않는다."
+    },
+    {
+      "id": "lactase",
+      "url": "https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance",
+      "title": "NIDDK 유당불내증 원리",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "공식 자료의 효소 역할·식사 선택·표시 확인 범위로 제한하며 렌넷 복용 효능을 주장하지 않는다."
+    },
+    {
+      "id": "fda",
+      "url": "https://www.fda.gov/consumers/consumer-updates/have-food-allergies-read-label",
+      "title": "FDA 식품 알레르기 표시",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "공식 자료의 효소 역할·식사 선택·표시 확인 범위로 제한하며 렌넷 복용 효능을 주장하지 않는다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "name": "Codex 공식자료·사진 검토",
+      "kind": "ai",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "Commons 원문 작가·라이선스와 실제 사진3장 확인. 사진은 제품·응고 현장·치즈 예시로 캡션 제한."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "제조 효소·완성 치즈·유당 분해 역할을 구분하고 직접 건강효과·고정 복용량을 만들지 않는다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
