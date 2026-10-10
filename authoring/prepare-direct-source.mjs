@@ -13,14 +13,14 @@ export function prepareDirectSource(source) {
   else {checkPost(source,source.id+'.json');checkPublishHtml(source);}
   const observation=observeEmphasis(source.bodyHtml);
   return {
-    report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml),
+    report:{sourceId:source.id,...observation,pairingReview:pairingReview(source.bodyHtml,source.category),
       editorialReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[
-        '건강·영양 중심 제목인가? 조리법 일부만으로 만들기를 주된 약속으로 삼지 않았는가?',
+        '분야에 맞는 건강·영양 중심 제목인가? 제목이 약속한 중심 질문에 직접 답하는가?',
         '제목·소제목이 본문의 중심 답과 비중에 맞는가?',
-        '소개·효능·궁합은 장점을 먼저 설명하고 불필요한 반박을 반복하지 않는가?',
+        '소개·역할·효과·활용은 확인된 도움을 먼저 설명하고 불필요한 반박을 반복하지 않는가?',
         '흡수·상호작용·효과 크기의 구체적인 주장에 해당 원문 출처를 연결했는가?',
         '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?',
-        '조리·보관 안내에 행동·시간·온도·조건을 명확하게 표시했는가?'
+        '분야별 섭취·복용·생활 관리에 필요한 행동·양·시간·조건과 실제 안전 경고를 명확하게 표시했는가?'
       ]}},
     preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'
   };
