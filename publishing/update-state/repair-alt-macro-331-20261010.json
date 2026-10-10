@@ -1,0 +1,145 @@
+{
+  "phase": "submitting",
+  "operation": "image-alt-macro-only-v1",
+  "fingerprint": "a9f6ff5f0651d04014e0aa202dd08258a8c4c4530943c8168ef571221abc244d",
+  "url": "https://nhunnhun.tistory.com/331",
+  "articleId": "331",
+  "sourceCommit": "4ea59d2fe5d99655c491393b8bf3c76a172f5c65",
+  "baseline": {
+    "version": "alt-public-baseline-v1",
+    "desktop": {
+      "bodySha256": "a0a9bbdd1ab75618d6ef03228f9c68b1f5f05503dd1c332da336a4c9106e9653",
+      "metadataSha256": "65c458ce6aee10c708a3260c8597f6d06a7adb26be9a61cc9db10f894ae808fc",
+      "images": [
+        {
+          "srcSha256": "d2692ce929a5f0311eb777f912ba4e6f4f280e85968eb6e018ae78fad5f64c2c",
+          "altSha256": "42f3dcab8990d1099e673c774536ff36d1c7b602e9e2216d1240ebc12774e2e6",
+          "loaded": true,
+          "assetSha256": "c82e836afa5972820f47d89f545d4c03ccd2c3460451e1b0365eef6ead528e58"
+        },
+        {
+          "srcSha256": "0d6b0ea938442b040e5a20cb2a532e4b141ba63fbbe69b1ddcb13960b22dfcf5",
+          "altSha256": "ec4e7f973c0756f0c40d54dd50bc2743abe0589b7218598aba7d1638d2bcc852",
+          "loaded": true,
+          "assetSha256": "c289442695ebe79ed77150746a13a3804f27a22cb032bb293480438184b54950"
+        },
+        {
+          "srcSha256": "f9c52aad9911926c2b98b7e87be4f64ac3b4e6011eda3996c748d257378a179c",
+          "altSha256": "b3ce315571d88ad994ce9ee59b635875d3b09ef8595eb6a760e6f5a945b91d8b",
+          "loaded": true,
+          "assetSha256": "0cbddd3f1c1173e48f8260a12444912514c0f48c290322fa01ccdd02519eb1ef"
+        },
+        {
+          "srcSha256": "31b00330d2bac73f76598de681a59fddeafd2ea92eb9f3686f90a9dcdebd45cb",
+          "altSha256": "2a4366a3a8d6d154764f4d1ce06e65f6796cee6cf1ac3129b5af3b02b664c1f5",
+          "loaded": true,
+          "assetSha256": "b7d29a040f89bc55b8cb1022baf05cefddc3b1ef33dee3bf78f659f347a864a1"
+        },
+        {
+          "srcSha256": "277b5e483fa1eac2d9bd896e3810274d1d5b435cead9e571f70fa31babaf313b",
+          "altSha256": "b573e3c9733fc89df1181e4181c64c873f89e05a66931981d1f02790772c4a1d",
+          "loaded": true,
+          "assetSha256": "bac4bc8f41b747364b0c4b94fcee026a9014fb73b51226420f4fb8bbdeae0466"
+        },
+        {
+          "srcSha256": "b4ea26f85aaac117b61b616e2ef9dbdcc5eeb73ee989a1ddb50fd174eb74317f",
+          "altSha256": "8c566ccb504f3428ae387e654873bf1094e451e78e52f1daa753d04fe2926f68",
+          "loaded": true,
+          "assetSha256": "1044c68d23d61ddcbcac66f224ddae869a7f71c8138a7762844d82178de25013"
+        },
+        {
+          "srcSha256": "5a8b2959afbc320642a72238a1b483becaa9c05bf0d5e92eaeb6564e8c00f149",
+          "altSha256": "835c716e46e70253eba6ec974795fe80737d3309f45573ceb4c302924e7e0f41",
+          "loaded": true,
+          "assetSha256": "48db59ee003008f031d6151a77c567a1e57dcca711240998e51a1ef35f9d4d77"
+        },
+        {
+          "srcSha256": "e80538a301345d174edc10a0754b95ce2d0e9bd8c74c7cbd7b71d9b831ecdc49",
+          "altSha256": "ba0fba94d2b790ff8b64b4fc434c19badb65358af5672a4b3d84e75cc25ac85b",
+          "loaded": true,
+          "assetSha256": "74ef1ee774b42b501d526de4f1f4985a11d47f84ac01a2130832545d0f268a3b"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "mobile": {
+      "bodySha256": "a0a9bbdd1ab75618d6ef03228f9c68b1f5f05503dd1c332da336a4c9106e9653",
+      "metadataSha256": "65c458ce6aee10c708a3260c8597f6d06a7adb26be9a61cc9db10f894ae808fc",
+      "images": [
+        {
+          "srcSha256": "d2692ce929a5f0311eb777f912ba4e6f4f280e85968eb6e018ae78fad5f64c2c",
+          "altSha256": "42f3dcab8990d1099e673c774536ff36d1c7b602e9e2216d1240ebc12774e2e6",
+          "loaded": true,
+          "assetSha256": "c82e836afa5972820f47d89f545d4c03ccd2c3460451e1b0365eef6ead528e58"
+        },
+        {
+          "srcSha256": "0d6b0ea938442b040e5a20cb2a532e4b141ba63fbbe69b1ddcb13960b22dfcf5",
+          "altSha256": "ec4e7f973c0756f0c40d54dd50bc2743abe0589b7218598aba7d1638d2bcc852",
+          "loaded": true,
+          "assetSha256": "c289442695ebe79ed77150746a13a3804f27a22cb032bb293480438184b54950"
+        },
+        {
+          "srcSha256": "f9c52aad9911926c2b98b7e87be4f64ac3b4e6011eda3996c748d257378a179c",
+          "altSha256": "b3ce315571d88ad994ce9ee59b635875d3b09ef8595eb6a760e6f5a945b91d8b",
+          "loaded": true,
+          "assetSha256": "0cbddd3f1c1173e48f8260a12444912514c0f48c290322fa01ccdd02519eb1ef"
+        },
+        {
+          "srcSha256": "31b00330d2bac73f76598de681a59fddeafd2ea92eb9f3686f90a9dcdebd45cb",
+          "altSha256": "2a4366a3a8d6d154764f4d1ce06e65f6796cee6cf1ac3129b5af3b02b664c1f5",
+          "loaded": true,
+          "assetSha256": "b7d29a040f89bc55b8cb1022baf05cefddc3b1ef33dee3bf78f659f347a864a1"
+        },
+        {
+          "srcSha256": "277b5e483fa1eac2d9bd896e3810274d1d5b435cead9e571f70fa31babaf313b",
+          "altSha256": "b573e3c9733fc89df1181e4181c64c873f89e05a66931981d1f02790772c4a1d",
+          "loaded": true,
+          "assetSha256": "bac4bc8f41b747364b0c4b94fcee026a9014fb73b51226420f4fb8bbdeae0466"
+        },
+        {
+          "srcSha256": "b4ea26f85aaac117b61b616e2ef9dbdcc5eeb73ee989a1ddb50fd174eb74317f",
+          "altSha256": "8c566ccb504f3428ae387e654873bf1094e451e78e52f1daa753d04fe2926f68",
+          "loaded": true,
+          "assetSha256": "1044c68d23d61ddcbcac66f224ddae869a7f71c8138a7762844d82178de25013"
+        },
+        {
+          "srcSha256": "5a8b2959afbc320642a72238a1b483becaa9c05bf0d5e92eaeb6564e8c00f149",
+          "altSha256": "835c716e46e70253eba6ec974795fe80737d3309f45573ceb4c302924e7e0f41",
+          "loaded": true,
+          "assetSha256": "48db59ee003008f031d6151a77c567a1e57dcca711240998e51a1ef35f9d4d77"
+        },
+        {
+          "srcSha256": "e80538a301345d174edc10a0754b95ce2d0e9bd8c74c7cbd7b71d9b831ecdc49",
+          "altSha256": "ba0fba94d2b790ff8b64b4fc434c19badb65358af5672a4b3d84e75cc25ac85b",
+          "loaded": true,
+          "assetSha256": "74ef1ee774b42b501d526de4f1f4985a11d47f84ac01a2130832545d0f268a3b"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "patches": [
+      {
+        "publicIndex": 7,
+        "newAlt": "딸기와 블루베리, 견과류와 곡물을 올린 컵 디저트"
+      }
+    ],
+    "macroMapping": {
+      "version": "macro-asset-map-v1",
+      "assetSha256s": [
+        "c82e836afa5972820f47d89f545d4c03ccd2c3460451e1b0365eef6ead528e58",
+        "c289442695ebe79ed77150746a13a3804f27a22cb032bb293480438184b54950",
+        "0cbddd3f1c1173e48f8260a12444912514c0f48c290322fa01ccdd02519eb1ef",
+        "b7d29a040f89bc55b8cb1022baf05cefddc3b1ef33dee3bf78f659f347a864a1",
+        "bac4bc8f41b747364b0c4b94fcee026a9014fb73b51226420f4fb8bbdeae0466",
+        "1044c68d23d61ddcbcac66f224ddae869a7f71c8138a7762844d82178de25013",
+        "48db59ee003008f031d6151a77c567a1e57dcca711240998e51a1ef35f9d4d77",
+        "74ef1ee774b42b501d526de4f1f4985a11d47f84ac01a2130832545d0f268a3b"
+      ]
+    }
+  },
+  "originalBodySha256": "970b8899457301e051e3336ac1b32a2ededa1dd3de8f222509aff905f8ce3782",
+  "targetBodySha256": "4937c28331a78ad837db446e638efcc860d78a35ad52572c224547524d7874a9",
+  "metadataSha256": "dbd4dee01b9df65ef7eddc8a318780997fb324dcd368377eef5b36fe73c7bf57",
+  "timestamp": "2026-10-10T01:40:27.034Z",
+  "semanticVerification": "alt-visual-review-only"
+}
