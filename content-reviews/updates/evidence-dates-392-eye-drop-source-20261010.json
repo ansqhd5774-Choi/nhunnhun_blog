@@ -1,0 +1,387 @@
+{
+  "version": "R1",
+  "domain": "medicine",
+  "classification": {
+    "status": "resolved",
+    "rawInput": "인공눈물",
+    "topic": "무방부제·방부제 인공눈물",
+    "meaning": "안구건조 윤활점안액의 제형·사용·폐기 기준",
+    "entityId": "medicine:artificial-tears",
+    "reason": "녹내장약 출처를 실제 윤활제품 근거로 바꾼다."
+  },
+  "sourceDigest": "045b46b9c3f3b4650e9dce2e8753eb1859c1cf685baee5c46a2b65748e7fac26",
+  "intent": {
+    "primaryQuestion": "인공눈물의 방부제 유무와 사용 횟수·일회용 폐기는 어떻게 확인하는가?",
+    "readerSituation": "윤활점안액을 비교하는 독자",
+    "nextActions": [
+      "실제 제품 설명서와 증상에 따라 선택한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "comparison": {
+      "applies": true,
+      "reason": "같은 안구건조 사용목적에서 포장·보존방식을 비교한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "products": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "별도 확장 질문 아님."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 무방부제 vs 방부제 인공눈물 차이표",
+      "answerQuote": "일회용 또는 특수 다회용 용기",
+      "sourceIds": [
+        "tfos",
+        "mayo"
+      ]
+    },
+    {
+      "module": "indications",
+      "heading": "4. 인공눈물은 하루 몇 번까지 넣어도 되나요?",
+      "answerQuote": "필요시 증상이 있는 눈에 1~2방울",
+      "sourceIds": [
+        "mfds"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "7. 방부제 제품을 쓰면 안 되는 사람은 누구인가요?",
+      "answerQuote": "중등도 또는 중증 안구건조증",
+      "sourceIds": [
+        "tfos"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 인공눈물은 하루 몇 번까지 넣어도 되나요?",
+      "answerQuote": "눈앤0.5%는 카르복시메틸셀룰로오스나트륨5mg/mL 점안액",
+      "sourceIds": [
+        "mfds"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "5. 일회용 인공눈물은 한 번 쓰고 바로 버려야 하나요?",
+      "answerQuote": "사용 후 남은 액과 용기를 버리도록 합니다.",
+      "sourceIds": [
+        "mfds",
+        "emc"
+      ]
+    },
+    {
+      "module": "timeline",
+      "heading": "9. 여러 안약과 인공눈물을 같이 쓰면 어떻게 하나요?",
+      "answerQuote": "적어도15분 간격을 안내합니다.",
+      "sourceIds": [
+        "mfds",
+        "emc"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "7. 방부제 제품을 쓰면 안 되는 사람은 누구인가요?",
+      "answerQuote": "심한 통증·시력저하에72시간을 기다리라는 뜻은 아닙니다.",
+      "sourceIds": [
+        "mfds"
+      ]
+    },
+    {
+      "module": "contraindications",
+      "heading": "7. 방부제 제품을 쓰면 안 되는 사람은 누구인가요?",
+      "answerQuote": "이 약의 과민증 환자에게 금기",
+      "sourceIds": [
+        "mfds"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "9. 여러 안약과 인공눈물을 같이 쓰면 어떻게 하나요?",
+      "answerQuote": "각 설명서를 확인하세요.",
+      "sourceIds": [
+        "mfds",
+        "emc"
+      ]
+    },
+    {
+      "module": "medical_help",
+      "heading": "12. 언제 안과 진료가 필요한가요?",
+      "answerQuote": "시력이 떨어지거나 뿌옇게 보이는 증상이 지속되는 경우",
+      "sourceIds": [
+        "mfds",
+        "emc"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "10. 보관과 오염을 줄이는 방법은?",
+      "answerQuote": "기밀용기, 상온15~25℃ 보관입니다.",
+      "sourceIds": [
+        "mfds"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "11. 어떤 인공눈물을 고르면 되나요?",
+      "answerQuote": "안구건조의 원인에 따라 다른 치료가 필요한지 안과에서 평가",
+      "sourceIds": [
+        "mayo"
+      ]
+    },
+    {
+      "module": "comparison",
+      "heading": "1. 무방부제 vs 방부제 인공눈물 차이표",
+      "answerQuote": "빈번한 사용에 더 적합",
+      "sourceIds": [
+        "tfos",
+        "mayo"
+      ]
+    },
+    {
+      "module": "alternatives",
+      "heading": "11. 어떤 인공눈물을 고르면 되나요?",
+      "answerQuote": "무방부제로 바꾸는 것만으로 모든 원인이 해결되는 것은 아닙니다.",
+      "sourceIds": [
+        "mayo"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "not-applicable",
+      "reason": "점안용 윤활제이며 음식으로 약효 상승을 주장하지 않는다."
+    },
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "영양소 섭취 효과를 새로 다루지 않는다."
+    },
+    "disease": {
+      "status": "included",
+      "relationship": "risk-context",
+      "reason": "건조와 통증·시력저하를 구분한다.",
+      "heading": "7. 방부제 제품을 쓰면 안 되는 사람은 누구인가요?",
+      "answerQuote": "심한 통증·시력저하에72시간을 기다리라는 뜻은 아닙니다.",
+      "sourceIds": [
+        "mfds"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "mfds",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200710762",
+      "title": "mfds",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "emc",
+      "url": "https://www.medicines.org.uk/emc/product/1430/smpc",
+      "title": "emc",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "mayo",
+      "url": "https://www.mayoclinic.org/diseases-conditions/dry-eyes/diagnosis-treatment/drc-20371869",
+      "title": "mayo",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "cleveland",
+      "url": "https://my.clevelandclinic.org/health/treatments/24804-artificial-tears",
+      "title": "cleveland",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "tfos",
+      "url": "https://tfosdewsreport.org/report-management_and_therapy/147_36/en/",
+      "title": "tfos",
+      "kind": "guideline",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "forever",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40259827/",
+      "title": "forever",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "review",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39921541/",
+      "title": "review",
+      "kind": "article",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    },
+    {
+      "id": "expert",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40937610/",
+      "title": "expert",
+      "kind": "guideline",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제 기관 페이지·제품허가·PubMed 초록을 읽었다. 국가·제품차이를 구분한다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [
+    {
+      "goal": "같은 건조감의 윤활제 보존방식 선택",
+      "basis": "빈도·안구표면 민감도와 보관방식",
+      "left": "무방부제",
+      "right": "방부제",
+      "directness": "indirect",
+      "limitations": "모든 성분·농도의 직접임상 우위가 아니며 제품별 허가를 확인한다.",
+      "heading": "1. 무방부제 vs 방부제 인공눈물 차이표",
+      "answerQuote": "빈번한 사용에 더 적합",
+      "sourceIds": [
+        "tfos",
+        "mayo"
+      ]
+    }
+  ],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "kind": "ai",
+      "name": "Codex evidence reviewer",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "images": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "공식 실제윤활제·국내허가·기관안내·연구초록을 대조하고 기존3이미지 유효검토를 재사용했다. 독립의료인감수 아님."
+      }
+    },
+    "warningResolutions": []
+  }
+}
