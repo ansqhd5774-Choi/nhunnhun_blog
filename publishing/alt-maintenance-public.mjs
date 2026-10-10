@@ -1,4 +1,5 @@
 import {observeUpdateStage} from './update-observation.mjs';
+import {loadAltPublicImages,normalizeAltObservationError} from './alt-public-image-load.mjs';
 import {waitAltPublicAssets} from './alt-public-assets.mjs';
 import {ALT_MACRO_OPERATION,parsePlainImageMacros,publicAssetIdentity} from './alt-macro-contract.mjs';
 import {maintenanceHash} from './alt-maintenance-contract.mjs';
@@ -39,7 +40,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
     const responseHtml=await step('response-text',()=>response.text(),{safeReadOnly:true,timeoutMs:15000});
     await step('body-visible',()=>page.locator('.contents_style').waitFor({state:'visible',timeout:15000}),{safeReadOnly:true,timeoutMs:20000});
     await step('font-wait',()=>page.evaluate(waitAltPublicAssets,{phase:'font'}),{safeReadOnly:true,timeoutMs:20000});
-    await step('images-wait',()=>page.evaluate(waitAltPublicAssets,{phase:'images'}),{safeReadOnly:true,timeoutMs:25000});
+    await step('images-wait',()=>loadAltPublicImages(page,{log}));
     const observed=await step('dom-observe',()=>page.evaluate(({original,responseHtml})=>{
       const bodies=[...document.querySelectorAll('.contents_style')].filter(x=>x.getClientRects().length);
       if(bodies.length!==1)return null;
@@ -72,7 +73,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
       observedMetadata:observed.metadata,
       images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded,...(source.operation===ALT_MACRO_OPERATION?{assetSha256:maintenanceHash(publicAssetIdentity(x.src))}:{})})),
       editorImages:observed.editorImages?.map(x=>maintenanceHash(x.src||'')),overflowPx:observed.overflowPx};
-  }finally{await step('context-close',()=>context.close());}
+  }catch(error){throw normalizeAltObservationError(error);}finally{await step('context-close',()=>context.close());}
 }
 export async function captureAltBaseline(browser,originalHtml,source,editorMetadata){
   const desktop=await captureAltSnapshot(browser,source,1440,originalHtml);
