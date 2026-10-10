@@ -1,3 +1,4 @@
+import {isNativeTextMaintenance} from './native-text-contract.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { loadUpdates } from './update-core.mjs';
 import { renderEditorialPost, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
@@ -7,6 +8,7 @@ import {isAltMaintenance} from './alt-maintenance-source.mjs';
 try{
   const updates=await loadUpdates('updates',process.env.UPDATE_SOURCE_ID || null);
   for(const update of updates){
+    if(isNativeTextMaintenance(update)){console.log('PASS_NATIVE_TEXT_SOURCE: '+update.id+'; exact runtime preconditions required');continue;}
     if(isAltMaintenance(update)){
       console.log('PASS_ALT_MAINTENANCE_SOURCE: '+update.id+'; runtime preconditions required; existing content not recertified');
       continue;

@@ -1,3 +1,6 @@
+import {isNativeTextMaintenance} from './native-text-contract.mjs';
+import {runNativeTextMaintenance} from './native-text-runner.mjs';
+import {captureNativeTextBaseline} from './native-text-public.mjs';
 import {observeUpdateStage} from './update-observation.mjs';
 import {selectEditorMode,probeManagedPost} from './update-editor-controls.mjs';
 import { assertContentStandard } from './content-standards.mjs';
@@ -162,7 +165,7 @@ try{
     for(const update of await loadUpdates('updates',sourceId)){
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
-        if(!isAltMaintenance(update)&&update.contentStandard!=='SP1') {
+        if(!isNativeTextMaintenance(update)&&!isAltMaintenance(update)&&update.contentStandard!=='SP1') {
           if(!isPublishedProductLinkRepair(update)) assertContentStandard(update);
           assertImageReview(update);
         }
@@ -224,7 +227,12 @@ try{
       stage='restore-basic-ready';
       await page.locator('#attach-image, #attach-layer-btn').first().waitFor({state:'attached',timeout:15000});
 
-      if(isAltMaintenance(update)){
+      if(isNativeTextMaintenance(update)){
+        stage='native-text-maintenance';
+        const publicResult=await runNativeTextMaintenance({page,source:update,originalHtml,selectMode:selectEditorMode,ledger,assertSource:assertCurrentSource,
+          capturePublicBaseline:async(html,source,metadata)=>{const anonymous=await openPublicBrowser(browserConfig);try{return await captureNativeTextBaseline(anonymous,html,source,metadata);}finally{await anonymous.close();}},finalize:finalizeSelectedUpdate});
+        console.log('UPDATE_PUBLIC_RESULT '+JSON.stringify(publicResult));if(publicResult.status!=='PUBLIC_VERIFIED')process.exitCode=1;
+      }else if(isAltMaintenance(update)){
         stage='alt-only-maintenance';
         const publicResult=await runAltMaintenance({page,source:update,originalHtml,selectMode:selectEditorMode,ledger,assertSource:assertCurrentSource,
           capturePublicBaseline:async(html,source,metadata)=>{

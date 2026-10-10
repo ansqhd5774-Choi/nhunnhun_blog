@@ -1,0 +1,366 @@
+{
+  "id": "repair-native-identity-200-20261010",
+  "articleId": "200",
+  "targetUrl": "https://nhunnhun.tistory.com/200",
+  "expectedCurrentTitle": "스피루리나(Spirulina) 다이어트!! 체중 감량과 영양 공급을 동시에!!",
+  "title": "스피루리나 원료·영양｜클로렐라와 차이·섭취 시 확인할 점",
+  "status": "draft",
+  "approved": false,
+  "operation": "native-text-surgical-v1",
+  "maintenance": {
+    "operation": "native-text-surgical-v1",
+    "articleId": "200",
+    "expectedTitle": "스피루리나(Spirulina) 다이어트!! 체중 감량과 영양 공급을 동시에!!",
+    "targetTitle": "스피루리나 원료·영양｜클로렐라와 차이·섭취 시 확인할 점",
+    "expectedBodySha256": "744cd7387008500dac05968446a4caea4ae5b9d392c28e184b28da7b0f273e39",
+    "expectedMetadataSha256": "c71f3349b6def0b18b4d1680f2999f7904474bc3f03c351ac8dc866cb627e428",
+    "expectedPublicTextSha256": "cb2baf668e6486a687f06e5c62753c8bc683a59bf85b2526976dd67959c6a9bf",
+    "targetPublicTextSha256": "05ede3c8cf790c91220c60143dfa62f7df19695bf836c5554b77abe8c8eaf032",
+    "patches": [
+      {
+        "start": 1823,
+        "length": 20,
+        "expectedTextSha256": "8ce788aac1db77be3fb848b5b637a291114c1cafb2dc95b126bfb8778c268830",
+        "newText": "스피루리나 원료·영양｜클로렐라와 차이·섭취 시 확인할 점"
+      },
+      {
+        "start": 1849,
+        "length": 14,
+        "expectedTextSha256": "5ff354498a821f3840a63ca246336495de78dbd3622a38363ffe891f0fbd6776",
+        "newText": ""
+      },
+      {
+        "start": 3028,
+        "length": 5,
+        "expectedTextSha256": "eadef027e571564d1b3c9a70ef6279663211f5d006e2f7389afe48eae47add53",
+        "newText": "스피루리나 원료는 광합성을 하는 남세균(시아노박테리아)의 생물량을 이용한 것입니다. 식품 원료로 쓰이는 Arthrospira platensis 및 관련 종은 녹조류인 클로렐라(Chlorella)와 구분되는 원료입니다. NIH LiverTox와 NCBI 분류 자료에서 원료의 이름을 따로 확인할 수 있습니다."
+      },
+      {
+        "start": 3037,
+        "length": 15,
+        "expectedTextSha256": "4b4623a0eafc0dc95c7088d5ef623145a55922acd045b59c6ec52bb17c4ef3f2",
+        "newText": ""
+      },
+      {
+        "start": 3058,
+        "length": 11,
+        "expectedTextSha256": "c2618a5cb7ae5ddce275a82cf00e019a6239aee19619a1e957701db5ef88a13e",
+        "newText": ""
+      },
+      {
+        "start": 3076,
+        "length": 6,
+        "expectedTextSha256": "d1e77fa2f35105169dffb936470a89b90c9e4bf78ce9b8ac0456652db9fdcdc4",
+        "newText": ""
+      },
+      {
+        "start": 3088,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3100,
+        "length": 10,
+        "expectedTextSha256": "9dbcd1c37fce4bcd64e4cf721c047b31eb25bfd02123749c8c02334ce69ddd60",
+        "newText": ""
+      },
+      {
+        "start": 3114,
+        "length": 37,
+        "expectedTextSha256": "a9967117e4bc431a79dbc2265a66cfd7423e06378bd94950edaab3d0b30f8e01",
+        "newText": ""
+      },
+      {
+        "start": 3157,
+        "length": 2,
+        "expectedTextSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+        "newText": ""
+      },
+      {
+        "start": 3166,
+        "length": 3,
+        "expectedTextSha256": "4ca872ed4966e25ab2603e0d5584e169b52f8cee57226ebc835bbbaabbc93e39",
+        "newText": ""
+      },
+      {
+        "start": 3172,
+        "length": 17,
+        "expectedTextSha256": "00263949cdfdd8bc3367d9f832bcba1651681a7139fa831c733a40b88a45dacf",
+        "newText": ""
+      },
+      {
+        "start": 3193,
+        "length": 2,
+        "expectedTextSha256": "23ce2a3d738f6ad23ce7b90addcb256d7ddb409a6b444251205e90ea6fc314dc",
+        "newText": ""
+      },
+      {
+        "start": 3201,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3210,
+        "length": 19,
+        "expectedTextSha256": "e04300ba3e0c39f20be61a411c815dff8b274c7e8ee8d771e4bb886ecd900791",
+        "newText": ""
+      },
+      {
+        "start": 3232,
+        "length": 4,
+        "expectedTextSha256": "40e85274d60450e8ad943888d1b468b8ac51c79981c40deb0f46e1cca1390d19",
+        "newText": ""
+      },
+      {
+        "start": 3240,
+        "length": 3,
+        "expectedTextSha256": "904c53d405cb80dbc1e5d9ac94f4bae21bed2bcc8a416b888b3787d736286cbf",
+        "newText": ""
+      },
+      {
+        "start": 3249,
+        "length": 1,
+        "expectedTextSha256": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+        "newText": ""
+      },
+      {
+        "start": 3287,
+        "length": 20,
+        "expectedTextSha256": "ef665b572c1f8b10a336cc6eac397090937e5c281b9b20a4b0408edfd895f6d7",
+        "newText": "스피루리나는 멕시코와 중앙아메리카 등에서 식품과 영양 공급원으로 이용되어 왔으며, 현재는 분말 등 보충제 원료로도 유통됩니다."
+      },
+      {
+        "start": 3313,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3325,
+        "length": 1,
+        "expectedTextSha256": "2a9db5dfd1480367dc36b5e40a11081f46c23e85160cbd0785589265853bc5b7",
+        "newText": ""
+      },
+      {
+        "start": 3332,
+        "length": 3,
+        "expectedTextSha256": "28702be07d36651e33f796ff37b1ed8dff1d8312deca0bed8c5cdbccf486b7d8",
+        "newText": ""
+      },
+      {
+        "start": 3342,
+        "length": 5,
+        "expectedTextSha256": "f9c2390399b1da68fe303ae707dd9c4e34b9688e33af8c7134f15ab083b8de7d",
+        "newText": ""
+      },
+      {
+        "start": 3351,
+        "length": 17,
+        "expectedTextSha256": "c2a2669d11cbc1d8d855d23abe99d8a0aae202cc1054d8354d9a12efab52e808",
+        "newText": ""
+      },
+      {
+        "start": 3374,
+        "length": 2,
+        "expectedTextSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+        "newText": ""
+      },
+      {
+        "start": 3386,
+        "length": 19,
+        "expectedTextSha256": "e9c50cfca4fcf268a2d27ca644782bc2b161fdebb9c68970080006957e4fd4f4",
+        "newText": ""
+      },
+      {
+        "start": 3409,
+        "length": 2,
+        "expectedTextSha256": "91f07a70f10cd41eabf626c26c589863fa28d37d0bcd2d99e06487b21b48d448",
+        "newText": ""
+      },
+      {
+        "start": 3417,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3426,
+        "length": 34,
+        "expectedTextSha256": "1f1ad478df24dd273a7273f1e74e0171f5a8daa625847881c2e466dc509a4b9e",
+        "newText": ""
+      },
+      {
+        "start": 3466,
+        "length": 2,
+        "expectedTextSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+        "newText": ""
+      },
+      {
+        "start": 3475,
+        "length": 14,
+        "expectedTextSha256": "55e21c4aef814e52c2d10bd29f4a04d5b1ef65f5d1034a0b3ad954ef61f7edaa",
+        "newText": ""
+      },
+      {
+        "start": 3492,
+        "length": 6,
+        "expectedTextSha256": "8b47478e0cd8c8829b54bf9e5ef08702a6b2212506bb4297c815619292390934",
+        "newText": ""
+      },
+      {
+        "start": 3502,
+        "length": 20,
+        "expectedTextSha256": "468999ad4b4258756362aef49d482d68cdf686417fdc0287b03c6382b3c6fb6d",
+        "newText": ""
+      },
+      {
+        "start": 3528,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3537,
+        "length": 5,
+        "expectedTextSha256": "b9858c66b8d9cdc88ce1dff71478fef422e352c2ef5bd0f342fd544997d4297a",
+        "newText": ""
+      },
+      {
+        "start": 3545,
+        "length": 4,
+        "expectedTextSha256": "1cab88359f9dc125deb90f4cc603bc43086effd14fdb8362af5bebb132b0de12",
+        "newText": ""
+      },
+      {
+        "start": 3559,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3571,
+        "length": 2,
+        "expectedTextSha256": "0e146993d01decb1a471c77286aa8db36f912ae2153dc0a6b7fd870a125a1ea2",
+        "newText": ""
+      },
+      {
+        "start": 3583,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 3595,
+        "length": 6,
+        "expectedTextSha256": "89d99dc8498d5fcd3cb4657fc28137382d8e16b1f49fac59ea1534ae3cd3534f",
+        "newText": ""
+      },
+      {
+        "start": 3605,
+        "length": 26,
+        "expectedTextSha256": "7e8a3bf9c6378a83c47721ef6ec811511e6af9d76d5fba9ad1e0a577da36f674",
+        "newText": ""
+      },
+      {
+        "start": 3637,
+        "length": 1,
+        "expectedTextSha256": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+        "newText": ""
+      },
+      {
+        "start": 4124,
+        "length": 22,
+        "expectedTextSha256": "1cbb6353bf1d87ef4ecdc13904f832e42923329f27e8596a6405ca50ed8f5a1c",
+        "newText": "스피루리나는 남세균 유래 원료이지만, 식품 보충제나 건강식품으로 이용되는 제품은 생산 과정과 원료의 품질에 따라 다를 수 있습니다. 따라서 구매 시에는 신뢰할 수 있는 브랜드의 제품을 선택하고, 제품에 대한 정보와 함께 원산지와 생산 과정에 대한 투명성이 중요한 요소입니다. 스피루리나 제품을 구매할 때는 식품 안전 관련 기관이나 식품 관련 웹사이트에서 제공하는 정보를 참고하여 신중하게 선택하는 것이 좋습니다."
+      },
+      {
+        "start": 4152,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 4161,
+        "length": 24,
+        "expectedTextSha256": "850fd8d1a4668433aed9c3e0833c293d21c8ab2f758dd99e5f534d0912910ed4",
+        "newText": ""
+      },
+      {
+        "start": 4188,
+        "length": 27,
+        "expectedTextSha256": "2edda3da4c9e5d4cd0b52c6f4cc4ff729d2c14f6a5ca3c9d07927d73f1608d59",
+        "newText": ""
+      },
+      {
+        "start": 4225,
+        "length": 2,
+        "expectedTextSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+        "newText": ""
+      },
+      {
+        "start": 4234,
+        "length": 11,
+        "expectedTextSha256": "775d7353bfe586ac7562455fa44e361079ab88676a6659d0d3e4525507f93f0e",
+        "newText": ""
+      },
+      {
+        "start": 4248,
+        "length": 20,
+        "expectedTextSha256": "ed25d366188cee3f9d6361d6a9a189f5aed7c75dfac3b35f17e6470c70a74d31",
+        "newText": ""
+      },
+      {
+        "start": 4272,
+        "length": 2,
+        "expectedTextSha256": "1a7140c02481d065b2671985fff7c4440263489476a816901918e294d0977ff2",
+        "newText": ""
+      },
+      {
+        "start": 4280,
+        "length": 2,
+        "expectedTextSha256": "0a07f659461970d8d8dcefe4fff96a1745599810dc7d47391e95c803b7b2072c",
+        "newText": ""
+      },
+      {
+        "start": 4289,
+        "length": 14,
+        "expectedTextSha256": "0341d3be1aca1808aa21fc7164ef8ba7716f36878f480b45525e09c0b700858f",
+        "newText": ""
+      },
+      {
+        "start": 4306,
+        "length": 18,
+        "expectedTextSha256": "e87cb1dc69ee1ecf9fd17ee436f426b556baca61226ca5758fdc3b3e9a48f0ff",
+        "newText": ""
+      },
+      {
+        "start": 4328,
+        "length": 11,
+        "expectedTextSha256": "d581f4bb3808fc49735507bbf5d98f832c322a7f83aac41c20d40ac12abab0c1",
+        "newText": ""
+      },
+      {
+        "start": 4345,
+        "length": 2,
+        "expectedTextSha256": "8dccf256f6d5783e62bba717ef04a6cfcea41d9befffa5ade55235e0b6a0eeb0",
+        "newText": ""
+      },
+      {
+        "start": 4354,
+        "length": 75,
+        "expectedTextSha256": "4c76b45e684e4bcb1bac8c26b0b85eda8390b75a45ab5edf0f859f274fc143d3",
+        "newText": ""
+      },
+      {
+        "start": 4435,
+        "length": 1,
+        "expectedTextSha256": "cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8",
+        "newText": ""
+      }
+    ],
+    "cleanupPatches": [],
+    "captionPatches": []
+  }
+}

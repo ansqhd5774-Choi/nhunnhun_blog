@@ -1,3 +1,5 @@
+import {isNativeTextMaintenance} from './native-text-contract.mjs';
+import {finalizeNativeTextMaintenance} from './native-text-public.mjs';
 import {pathToFileURL} from 'node:url';
 import {resolve} from 'node:path';
 import {loadUpdates,updateFingerprint} from './update-core.mjs';
@@ -35,6 +37,7 @@ export async function finalizeSelectedUpdate(sourceId) {
   const [source]=await loadUpdates('updates',sourceId);
   let browser;
   try {
+    if(isNativeTextMaintenance(source)){browser=await openPublicBrowser(await localBrowserConfig());return await finalizeNativeTextMaintenance(source,{ledger:new UpdateLedger(),browser});}
     if(isAltMaintenance(source)){
       browser=await openPublicBrowser(await localBrowserConfig());
       return await finalizeAltMaintenance(source,{ledger:new UpdateLedger(),browser});

@@ -1,3 +1,4 @@
+import {isNativeTextMaintenance,checkNativeTextSource} from './native-text-contract.mjs';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { resolve, basename } from 'node:path';
@@ -86,6 +87,7 @@ export function runContentCli(args = process.argv.slice(2), env = process.env) {
       const source = JSON.parse(readFileSync(path, 'utf8'));
       const kind = path.split('/')[0];
       if (kind === 'posts') checkPost(source, basename(path)); else checkUpdateSource(source, basename(path));
+      if(kind==='updates'&&isNativeTextMaintenance(source)){checkNativeTextSource(source,source.id+'.json');console.log('PASS_NATIVE_TEXT_SOURCE: '+source.id);checked++;continue;}
       if(kind==='updates'&&isAltMaintenance(source)){
         console.log('MAINTENANCE_CONTRACT_PASS '+JSON.stringify({path,scope:'image-alt-only',semanticVerification:'existing-content-not-recertified',runtimePreconditions:'required-before-submission'}));
         checked++;
