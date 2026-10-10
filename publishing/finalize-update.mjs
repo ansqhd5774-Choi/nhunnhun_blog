@@ -5,6 +5,8 @@ import {UpdateLedger} from './update-ledger.mjs';
 import {localBrowserConfig,openPublicBrowser} from './local-browser.mjs';
 import {renderEditorialPost,editorialExpectations,editorialVersionFor} from './editorial.mjs';
 import {verifyUpdatedPage} from './verify-updated-public.mjs';
+import {isAltMaintenance} from './alt-maintenance-source.mjs';
+import {finalizeAltMaintenance} from './alt-maintenance-public.mjs';
 
 export function publicFailureState(error) {
   const code=/^E_(?:QA|DIRECT_PUBLIC|PUBLIC_TITLE)_[A-Z_]+$/.test(error?.message||'')?error.message:'E_QA_ACCESS';
@@ -33,6 +35,10 @@ export async function finalizeSelectedUpdate(sourceId) {
   const [source]=await loadUpdates('updates',sourceId);
   let browser;
   try {
+    if(isAltMaintenance(source)){
+      browser=await openPublicBrowser(await localBrowserConfig());
+      return await finalizeAltMaintenance(source,{ledger:new UpdateLedger(),browser});
+    }
     return await finalizeUpdate(source,{ledger:new UpdateLedger(),verify:async update=>{
       browser=await openPublicBrowser(await localBrowserConfig());
       const rendered=renderEditorialPost(update),expected=editorialExpectations(update.bodyHtml,{version:editorialVersionFor(update)});

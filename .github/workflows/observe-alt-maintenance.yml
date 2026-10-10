@@ -1,0 +1,41 @@
+name: Read-only alt maintenance condition snapshot
+run-name: Observe six reviewed alt conditions
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-alt-read-only-observation
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: nhunnhun-tistory-mutation
+      cancel-in-progress: false
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Standard runner and source gate
+        run: node publishing/runner-gate.mjs
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: call maintenance\check-tistory-chrome.cmd
+      - name: Read existing body and metadata, cancel dialog, never stage or submit
+        run: node publishing/alt-maintenance-snapshot.mjs
+        env:
+          ALT_SNAPSHOT_READ_ONLY: 'true'
+          UPDATE_ENABLED: 'false'
+      - name: Preserve encrypted condition artifact only
+        uses: actions/upload-artifact@v4
+        with:
+          name: alt-conditions-encrypted-${{ github.run_id }}
+          path: ${{ runner.temp }}/health-alt-snapshot-encrypted-${{ github.run_id }}/conditions.enc.json
+          if-no-files-found: error
+          retention-days: 3

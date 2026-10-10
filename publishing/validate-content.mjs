@@ -6,6 +6,7 @@ import { assertContentStandard, contentDigest, todayInSeoul, DOMAIN_RULES } from
 import { EXTENSIONS, REVIEW_CHECKS, DOMAINS, SITE_CATEGORIES } from './standards/common.mjs';
 import { checkPost, fingerprint } from './core.mjs';
 import { checkUpdateSource } from './update-core.mjs';
+import {isAltMaintenance} from './alt-maintenance-source.mjs';
 import { renderEditorialPost } from './editorial.mjs';
 
 const sourcePath = value => /^(posts|updates)\/[a-z0-9][a-z0-9-]{2,79}\.json$/.test(value);
@@ -85,6 +86,11 @@ export function runContentCli(args = process.argv.slice(2), env = process.env) {
       const source = JSON.parse(readFileSync(path, 'utf8'));
       const kind = path.split('/')[0];
       if (kind === 'posts') checkPost(source, basename(path)); else checkUpdateSource(source, basename(path));
+      if(kind==='updates'&&isAltMaintenance(source)){
+        console.log('MAINTENANCE_CONTRACT_PASS '+JSON.stringify({path,scope:'image-alt-only',semanticVerification:'existing-content-not-recertified',runtimePreconditions:'required-before-submission'}));
+        checked++;
+        continue;
+      }
       if(source.contentStandard==='SP1'){
         console.log('CONTENT_VALIDATION_SKIPPED '+JSON.stringify({path,reason:'ollama-user-policy',semanticVerification:'not-performed'}));
         continue;
