@@ -12,15 +12,15 @@ const changes=[['19.91','19.9'],['11.38','11.4'],['17.27','17.3']];
 let body=source.bodyHtml;
 const counts={};
 for(const [old,value] of changes){counts[old]=body.split(old).length-1;assert(counts[old]>0);body=body.replaceAll(old,value);assert(!body.includes(old));}
-const draft={...source,id:'evidence-dates-405-usda-precision-fix-20261010',articleId:'405',targetUrl:'https://nhunnhun.tistory.com/405',expectedCurrentTitle:source.title,contentStandard:'SP1',bodyHtml:body};
+const draft={...source,id:'direct-evidence-dates-405-usda-precision-fix-20261010',articleId:'405',targetUrl:'https://nhunnhun.tistory.com/405',expectedCurrentTitle:source.title,contentStandard:'SP1',bodyHtml:body};
 delete draft.tags;
 assertImageReview(draft);checkUpdateSource(draft,draft.id+'.json');
 assert.deepEqual(draft.imageReview,source.imageReview);assert.equal(draft.title,source.title);
-// Article target metadata changes SP1 renderer branch; compare source with same target
-// metadata to isolate the three precision substitutions, and independently preserve HTML.
+// Preserve the original direct-* rendering branch as well as explicit source markup.
 for(const tag of ['strong','mark','u','img']){
  assert.equal((source.bodyHtml.match(new RegExp('<'+tag+'[ >]','g'))??[]).length,(draft.bodyHtml.match(new RegExp('<'+tag+'[ >]','g'))??[]).length);
- assert.equal((renderEditorialPost({...draft,bodyHtml:source.bodyHtml}).match(new RegExp('<'+tag+'[ >]','g'))??[]).length,(renderEditorialPost(draft).match(new RegExp('<'+tag+'[ >]','g'))??[]).length);
+ assert.equal((renderEditorialPost(source).match(new RegExp('<'+tag+'[ >]','g'))??[]).length,(renderEditorialPost(draft).match(new RegExp('<'+tag+'[ >]','g'))??[]).length);
 }
+assert.equal(renderEditorialPost(source).replaceAll('19.91','19.9').replaceAll('11.38','11.4').replaceAll('17.27','17.3'),renderEditorialPost(draft));
 fs.writeFileSync('updates/'+draft.id+'.json',JSON.stringify(draft,null,2)+'\n');
 console.log(JSON.stringify({status:'PASS',counts,titleImagesEmphasisPreserved:true,scope:'USDA official SR Legacy displayed precision only'}));
