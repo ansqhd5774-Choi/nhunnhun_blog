@@ -1,0 +1,379 @@
+{
+  "version": "R1",
+  "domain": "medicine",
+  "classification": {
+    "status": "resolved",
+    "rawInput": "이부프로펜 vs 덱시부프로펜",
+    "topic": "이부프로펜과 덱시부프로펜",
+    "meaning": "국내 NSAID 경구 정제의 비교와 안전정보",
+    "entityId": "medicine:ibuprofen-dexibuprofen",
+    "reason": "실제 공개글의 임신 및 제품별 금기 조건 누락을 최신 공식허가로 보완한다."
+  },
+  "sourceDigest": "d6f9061b8dbb40eb8cb4ffa883884aeb4135b2f328331ff5b92f1e9d2304ba2f",
+  "intent": {
+    "primaryQuestion": "두 NSAID는 효과와 용량 및 안전 조건에서 어떻게 다른가?",
+    "readerSituation": "해열·진통제를 비교하며 실제 복용 전 금기와 중복을 확인하는 독자",
+    "nextActions": [
+      "제품 설명서와 임신주수·병용약·병력을 의료진에게 알려 선택한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "comparison": {
+      "applies": true,
+      "reason": "동일 목적의 NSAID 임상효과와 대체치료 검토를 비교한다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "이번 정제 안전 보완에서 별도의 확장 질문으로 다루지 않는다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "1. 이부프로펜과 덱시부프로펜은 무엇이 다른가요?",
+      "answerQuote": "덱시부프로펜은 이 S(+)형만 분리해 사용한 성분입니다.",
+      "sourceIds": [
+        "fever"
+      ]
+    },
+    {
+      "module": "indications",
+      "heading": "4. 성인 용량은 어떻게 다른가요?",
+      "answerQuote": "경증·중등도 통증·감기: 성인 1회 200~400mg, 1일 3~4회",
+      "sourceIds": [
+        "ibu"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "5. 어린이 해열에는 어떤 차이가 있나요?",
+      "answerQuote": "연령·체중과 제품 농도에 맞춘 소아용 허가사항을 따라야 합니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "4. 성인 용량은 어떻게 다른가요?",
+      "answerQuote": "성인 1회 300mg, 1일 2~4회",
+      "sourceIds": [
+        "dex"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "7. 공복에 먹어도 되나요?",
+      "answerQuote": "위장장애가 있는 사람은 공복 복용을 피하는 편이 실용적입니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "timeline",
+      "heading": "2. 해열 효과는 어느 쪽이 더 좋은가요?",
+      "answerQuote": "4시간 뒤 겨드랑이 체온 감소가 각각 약 1.3℃와 1.4℃였습니다.",
+      "sourceIds": [
+        "fever"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "6. 부작용은 덱시부프로펜이 더 적나요?",
+      "answerQuote": "두 약 모두 같은 NSAID 계열 위험을 가집니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "contraindications",
+      "heading": "9. 어떤 사람은 복용 전 확인이 더 필요한가요?",
+      "answerQuote": "부루펜정은 임신 말기 3개월, 디프로펜정은 임신 6개월 이상에서 금기입니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "8. 두 약을 같이 먹으면 더 잘 듣나요?",
+      "answerQuote": "제품 이름이 달라도 성분이 겹치면 중복복용입니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "medical_help",
+      "heading": "9. 어떤 사람은 복용 전 확인이 더 필요한가요?",
+      "answerQuote": "빠르게 의료기관 평가를 받아야 합니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "11. 정제 보관과 복용 기간은 어떻게 확인하나요?",
+      "answerQuote": "부루펜정200mg은 밀폐용기, 실온보관",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "10. 결국 어느 쪽을 고르면 되나요?",
+      "answerQuote": "필요한 최소 용량을 짧게 쓰고, 같은 계열 약을 중복하지 않는 것입니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    {
+      "module": "comparison",
+      "heading": "3. 진통 효과는 덱시부프로펜이 더 강한가요?",
+      "answerQuote": "덱시부프로펜 800mg/일과 이부프로펜 1,600mg/일을 최대 14일 비교",
+      "sourceIds": [
+        "pain"
+      ]
+    },
+    {
+      "module": "alternatives",
+      "heading": "10. 결국 어느 쪽을 고르면 되나요?",
+      "answerQuote": "NSAID가 아닌 대체 치료의 필요성을 의료진과 검토하세요.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "included",
+      "relationship": "interaction",
+      "reason": "식사와 복용 편의가 출혈위험 제거와 같지 않음을 설명한다.",
+      "heading": "7. 공복에 먹어도 되나요?",
+      "answerQuote": "음식과 함께 먹는다고 위장관 출혈 같은 NSAID의 중대한 위험이 사라지는 것은 아닙니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    },
+    "nutrient": {
+      "status": "not-applicable",
+      "reason": "영양소나 영양제의 대체효과를 주장할 근거가 없어 추가하지 않는다."
+    },
+    "disease": {
+      "status": "included",
+      "relationship": "risk-context",
+      "reason": "임신·신장질환·궤양 및 출혈 조건을 금기와 상담으로 구분한다.",
+      "heading": "9. 어떤 사람은 복용 전 확인이 더 필요한가요?",
+      "answerQuote": "부루펜정은 임신 말기 3개월, 디프로펜정은 임신 6개월 이상에서 금기입니다.",
+      "sourceIds": [
+        "ibu",
+        "dex"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "ibu",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=197700120",
+      "title": "식약처 부루펜정200mg 허가사항",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    },
+    {
+      "id": "dex",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200201329",
+      "title": "식약처 디프로펜정300mg 허가사항",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    },
+    {
+      "id": "fda",
+      "url": "https://www.fda.gov/drugs/drug-safety-and-availability/fda-recommends-avoiding-use-nsaids-pregnancy-20-weeks-or-later-because-they-can-result-low-amniotic",
+      "title": "FDA NSAID 임신20주 이후 안전공지",
+      "kind": "official",
+      "role": "safety",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    },
+    {
+      "id": "fever",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39760655/",
+      "title": "2025 소아 발열 덱시부프로펜 직접 비교",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    },
+    {
+      "id": "child",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/19032727/",
+      "title": "2008 소아 발열 덱시부프로펜 직접 비교",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    },
+    {
+      "id": "pain",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/24740137/",
+      "title": "2014 골관절염 덱시부프로펜 직접 비교",
+      "kind": "trial",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "직접 읽은 공식 허가·안전 원문과 임상 초록에 연결한 주장만 확인했다."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [
+    {
+      "goal": "같은 골관절염에서 총mg이 다른 두약의 효과 비교",
+      "basis": "489명에서 14일까지 경구 현탁용 분말을 직접 비교한 임상",
+      "left": "덱시부프로펜",
+      "right": "이부프로펜",
+      "directness": "head-to-head",
+      "limitations": "정량비를 다른 제형·적응증에 자동 환산하거나 개인 안전을 보장하지 않는다.",
+      "heading": "3. 진통 효과는 덱시부프로펜이 더 강한가요?",
+      "answerQuote": "덱시부프로펜 800mg/일과 이부프로펜 1,600mg/일을 최대 14일 비교",
+      "sourceIds": [
+        "pain"
+      ]
+    }
+  ],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "kind": "ai",
+      "name": "Codex evidence dates reviewer",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "기존 비교 제목과 URL을 유지하며 제품별 금기 질문을 보완했다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "두 국내 제품 허가·FDA 안전공지 및 인용 임상 초록을 직접 읽고 대조했다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "적은 총mg이 모든환자의 더높은효과·안전을 보장하지 않음을 설명했다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "같은목적 직접비교의 질환·기간·제형과 자동환산 한계를 보존했다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "동일NSAID 중복과 저용량아스피린 임의중단을 권하지 않았다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "식사 편의와 출혈예방을 구분하고 질환별 상담을 연결했다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "일반상담과 복용금기를 구분하고 임신주수의 정확한제품조건을 추가했다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "실제 금기와 안전 상담에 한정하고 불필요한 안전 불안을 추가하지 않았다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "비교·행동·주의 핵심을 의미있는 짧은구절로 강조했다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "기존 공개3사진과 기존 이미지 검토·라이선스를 그대로 보존했다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "기존 비교 검색의도를 유지하고 공식원문 번호링크를 연결했다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
