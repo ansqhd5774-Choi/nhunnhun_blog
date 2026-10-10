@@ -1,0 +1,25 @@
+{
+  "id": "repair-alt-macro-352-20261010",
+  "articleId": "352",
+  "targetUrl": "https://nhunnhun.tistory.com/352",
+  "expectedCurrentTitle": "가을 별미 전어 효능·영양 가이드 : 오메가3·단백질 풍부! 안전 섭취법 총정리!",
+  "title": "가을 별미 전어 효능·영양 가이드 : 오메가3·단백질 풍부! 안전 섭취법 총정리!",
+  "status": "ready",
+  "approved": true,
+  "operation": "image-alt-macro-only-v1",
+  "maintenance": {
+    "operation": "image-alt-macro-only-v1",
+    "articleId": "352",
+    "expectedTitle": "가을 별미 전어 효능·영양 가이드 : 오메가3·단백질 풍부! 안전 섭취법 총정리!",
+    "expectedBodySha256": "d8a09087025e076cb70bfebc3ac23796d49565c40edbbb8fe1c5178b33147dec",
+    "expectedMetadataSha256": "b910c5619691a4fbb3e6ed2f2d7d8decda2e4c556eaa635011e4e0c0733da41d",
+    "patches": [
+      {
+        "imageIndex": 1,
+        "expectedSrcSha256": "0656a2eddb7018b778685492609de0b8ee2be8ff620f1890daa3b4f0942257e5",
+        "expectedAltRaw": null,
+        "newAlt": "유리그릇에 담긴 노란색 소프트젤 캡슐"
+      }
+    ]
+  }
+}

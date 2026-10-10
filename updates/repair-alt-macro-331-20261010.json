@@ -1,0 +1,25 @@
+{
+  "id": "repair-alt-macro-331-20261010",
+  "articleId": "331",
+  "targetUrl": "https://nhunnhun.tistory.com/331",
+  "expectedCurrentTitle": "그래놀라(granola)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "title": "그래놀라(granola)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "status": "ready",
+  "approved": true,
+  "operation": "image-alt-macro-only-v1",
+  "maintenance": {
+    "operation": "image-alt-macro-only-v1",
+    "articleId": "331",
+    "expectedTitle": "그래놀라(granola)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+    "expectedBodySha256": "970b8899457301e051e3336ac1b32a2ededa1dd3de8f222509aff905f8ce3782",
+    "expectedMetadataSha256": "dbd4dee01b9df65ef7eddc8a318780997fb324dcd368377eef5b36fe73c7bf57",
+    "patches": [
+      {
+        "imageIndex": 7,
+        "expectedSrcSha256": "d228db3091875e095464a13622d388d8280120b0a1866d3a45893ad942cd0c01",
+        "expectedAltRaw": null,
+        "newAlt": "딸기와 블루베리, 견과류와 곡물을 올린 컵 디저트"
+      }
+    ]
+  }
+}

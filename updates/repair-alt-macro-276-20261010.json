@@ -1,0 +1,25 @@
+{
+  "id": "repair-alt-macro-276-20261010",
+  "articleId": "276",
+  "targetUrl": "https://nhunnhun.tistory.com/276",
+  "expectedCurrentTitle": "당신이 몰랐던 토마틴(Tomatine)의 놀라운 효과!!!!",
+  "title": "당신이 몰랐던 토마틴(Tomatine)의 놀라운 효과!!!!",
+  "status": "ready",
+  "approved": true,
+  "operation": "image-alt-macro-only-v1",
+  "maintenance": {
+    "operation": "image-alt-macro-only-v1",
+    "articleId": "276",
+    "expectedTitle": "당신이 몰랐던 토마틴(Tomatine)의 놀라운 효과!!!!",
+    "expectedBodySha256": "8a9b10054de101abf2a10e33ef3c508980cc64778790e1a51c12fd517e430ef8",
+    "expectedMetadataSha256": "bded044501783d5b2aa802586e7d788733d3bc380aa789c63f5352fb6775ea22",
+    "patches": [
+      {
+        "imageIndex": 7,
+        "expectedSrcSha256": "49fa6ed1239825b9da3677dbf8223ed20628ba071256808070476d12dd089526",
+        "expectedAltRaw": null,
+        "newAlt": "Doctor's Best 라이코펜 10mg 보충제 제품 용기"
+      }
+    ]
+  }
+}
