@@ -1,0 +1,25 @@
+{
+  "id": "repair-alt-grid-334-20261010",
+  "articleId": "334",
+  "targetUrl": "https://nhunnhun.tistory.com/334",
+  "expectedCurrentTitle": "백내장(Cataract) 증상, 예방, 치료, 수술, ...",
+  "title": "백내장(Cataract) 증상, 예방, 치료, 수술, ...",
+  "status": "ready",
+  "approved": true,
+  "operation": "image-alt-macro-only-v1",
+  "maintenance": {
+    "operation": "image-alt-macro-only-v1",
+    "articleId": "334",
+    "expectedTitle": "백내장(Cataract) 증상, 예방, 치료, 수술, ...",
+    "expectedBodySha256": "ade5969e481ac26ab7dd4c842643b0291b50ead78adfbb3cabd1da63c83e42c4",
+    "expectedMetadataSha256": "84cd3eb2ee01b22def9e0a1527dde8cbad4c5558ab05ee2fd9fae06f8fa8915c",
+    "patches": [
+      {
+        "imageIndex": 4,
+        "expectedSrcSha256": "16cc073a3e2764c871b6d0fdedab02e5965449cc7300a925e1a575622e8cd196",
+        "expectedAltRaw": null,
+        "newAlt": "백내장 수술의 네 단계를 나타낸 도식"
+      }
+    ]
+  }
+}
