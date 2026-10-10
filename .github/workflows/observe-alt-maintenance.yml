@@ -1,7 +1,13 @@
 name: Read-only alt maintenance condition snapshot
-run-name: Observe six reviewed alt conditions
+run-name: Read-only condition observation (${{ inputs.scope || 'alt-six' }})
 on:
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Read-only reviewed condition scope
+        type: choice
+        default: alt-six
+        options: [alt-six, native-identity3]
 permissions:
   contents: read
 concurrency:
@@ -31,11 +37,21 @@ jobs:
         run: node publishing/alt-maintenance-snapshot.mjs
         env:
           ALT_SNAPSHOT_READ_ONLY: 'true'
+          ALT_OBSERVATION_SCOPE: ${{ inputs.scope || 'alt-six' }}
           UPDATE_ENABLED: 'false'
       - name: Preserve encrypted condition artifact only
+        if: always() && inputs.scope != 'native-identity3'
         uses: actions/upload-artifact@v4
         with:
           name: alt-conditions-encrypted-${{ github.run_id }}
           path: ${{ runner.temp }}/health-alt-snapshot-encrypted-${{ github.run_id }}/conditions.enc.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: Preserve native preflight safe comparison results only
+        if: always() && inputs.scope == 'native-identity3'
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-preflight-safe-${{ github.run_id }}
+          path: ${{ runner.temp }}/health-native-preflight-${{ github.run_id }}/safe-results.json
           if-no-files-found: error
           retention-days: 3

@@ -106,4 +106,8 @@ export async function runAltSnapshot(env=process.env){
 // This dedicated read-only CLI owns only its Node process, never the managed Chrome.
 // All private files and connection cleanup have been awaited before this boundary.
 export function exitSnapshotCli(code){process.stdout.write('',()=>process.stderr.write('',()=>process.exit(code)));}
-if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)runAltSnapshot().then(()=>exitSnapshotCli(0)).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_ALT_SNAPSHOT_RUNTIME');exitSnapshotCli(1);});
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
+  const failed=error=>{console.error(/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_ALT_SNAPSHOT_RUNTIME');exitSnapshotCli(1);};
+  if(process.env.ALT_OBSERVATION_SCOPE==='native-identity3')import('./native-text-preflight.mjs').then(m=>m.runNativePreflight()).then(()=>exitSnapshotCli(process.exitCode||0)).catch(failed);
+  else runAltSnapshot().then(()=>exitSnapshotCli(0)).catch(failed);
+}
