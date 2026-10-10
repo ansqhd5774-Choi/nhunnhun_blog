@@ -6,6 +6,7 @@ import {assertCurrentSource} from './runner-gate.mjs';
 import {maintenanceHash as hash} from './alt-maintenance-contract.mjs';
 import {checkNativeTextSource,nativePlainText,applyNativeTextMaintenance} from './native-text-contract.mjs';
 import {captureNativeTextBaseline} from './native-text-public.mjs';
+import {diagnoseNativeModeDifference} from './native-text-mode-diagnostic.mjs';
 
 export const NATIVE_PREFLIGHT_IDS=['236','233','200'];
 const safeCode=e=>/^E_[A-Z0-9_]+$/.test(e?.message||'')?e.message:'E_NATIVE_PREFLIGHT_OBSERVATION';
@@ -40,7 +41,12 @@ export async function runNativePreflight(env=process.env){
    page=await freshEditorPage(connection.context);await ensureEditorRendering(connection.context,page);await installLightweightRouting(page);
    page.on('dialog',d=>{void(d.type()==='confirm'?d.accept():d.dismiss()).catch(()=>{});});
    const observed=await observeAltEditor(page,{articleId},{progress:e=>console.log('NATIVE_PREFLIGHT_STAGE '+JSON.stringify({articleId,stage:e.stage,state:e.state}))});
-   const result=await inspectNativePreflight(source,observed,{captureBaseline:async(html,s,metadata)=>{const browser=await openPublicBrowser(config);try{return await captureNativeTextBaseline(browser,html,s,metadata);}finally{await browser.close();}}});records.push(result);
+   const result=await inspectNativePreflight(source,observed,{captureBaseline:async(html,s,metadata)=>{const browser=await openPublicBrowser(config);try{return await captureNativeTextBaseline(browser,html,s,metadata);}finally{await browser.close();}}});
+   if(result.code==='E_TEXT_BODY_DRIFT'){
+    try{if(!env.LOCALAPPDATA)throw Error('E_NATIVE_MODE_REFERENCE_DIRECTORY');const original=await readFile(join(env.LOCALAPPDATA,'NHUNNHUN','alt-snapshots',`${articleId}-editor-current.private.html`),'utf8');result.modeDiagnostic=diagnoseNativeModeDifference(original,observed.originalHtml,source);}
+    catch(error){result.modeDiagnostic={status:'UNCONFIRMED',code:safeCode(error),publicationEnabled:false,sourceRewritten:false};}
+   }
+   records.push(result);
   }catch(error){records.push({articleId,status:'FAIL',stage:'observation',code:safeCode(error),readOnly:true,editorInputCount:0,finalSubmitCount:0});}
   finally{if(page)await page.close().catch(()=>{});}
   const summary={version:'native-preflight-v1',runId:env.GITHUB_RUN_ID,processedCount:records.length,complete:records.length===NATIVE_PREFLIGHT_IDS.length,readOnly:true,editorInputCount:0,finalSubmitCount:0,records};await writeFile(join(directory,'safe-results.json'),JSON.stringify(summary,null,2));console.log('NATIVE_PREFLIGHT_RESULT '+JSON.stringify(records.at(-1)));

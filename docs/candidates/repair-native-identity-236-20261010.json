@@ -15,7 +15,7 @@
     "expectedBodySha256": "498f1c547c72f01cc8010e46113a60f70a6f306b80465f710b19ad4424020737",
     "expectedMetadataSha256": "1b15618867b231fae09e4d3094a45ea79934f39bb117ea71ad2f52fb791acbea",
     "expectedPublicTextSha256": "a1a626f8a49bac061510de75dd8a7ef92ee4eb08b38dbc395b453dd0f95f41b2",
-    "targetPublicTextSha256": "e137c5111336e3c814ac05c8f671ab5bc35e2338fe06e0dc465dd11789e6c518",
+    "targetPublicTextSha256": "5949d3fddcc913ff1d1c6b169f05e2103e7d8cd88064aaf1846d39961680f405",
     "patches": [
       {
         "start": 1847,
@@ -4503,7 +4503,7 @@
         "start": 21802,
         "length": 10,
         "expectedTextSha256": "9234ef5aab000fa656e6c4e3065b1bde58256b15661ae96aae540caaa181a74e",
-        "newText": "티몰(Thymol)에 대해서&nbsp; 알아보았습니다!"
+        "newText": "티몰(Thymol)에 대해서  알아보았습니다!"
       },
       {
         "start": 21816,
@@ -4515,7 +4515,7 @@
         "start": 21912,
         "length": 22,
         "expectedTextSha256": "f91261a1ad844c6de02de8e50e2ef992831568eb9bd7c707ca67ee939aa9b3de",
-        "newText": "궁금한것이 있다면 댓글로 남겨주세요~💕DDoRI&nbsp;와&nbsp;함께&nbsp;해주셔서&nbsp;감사합니다💕💕💕"
+        "newText": "궁금한것이 있다면 댓글로 남겨주세요~💕DDoRI 와 함께 해주셔서 감사합니다💕💕💕"
       },
       {
         "start": 21985,
