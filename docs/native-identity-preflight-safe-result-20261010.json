@@ -1,0 +1,84 @@
+{
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38017438823",
+  "readOnly": true,
+  "complete": true,
+  "editorInputCount": 0,
+  "finalSubmitCount": 0,
+  "records": [
+    {
+      "articleId": "236",
+      "sourceId": "repair-native-identity-236-20261010",
+      "status": "FAIL",
+      "stage": "body",
+      "code": "E_TEXT_BODY_DRIFT",
+      "checks": {
+        "source": "PASS",
+        "body": "FAIL",
+        "metadata": "NOT_CHECKED",
+        "publicText": "NOT_CHECKED",
+        "assets": "NOT_CHECKED",
+        "targetDOM": "NOT_CHECKED"
+      },
+      "proof": {
+        "body": {
+          "expected": "498f1c547c72f01cc8010e46113a60f70a6f306b80465f710b19ad4424020737",
+          "actual": "9bcbefcfffaf4c8d97c0d34ed4aa262a41de6476a1b9a2ff12c7e06a36a58bd6",
+          "bytes": 28962
+        }
+      },
+      "readOnly": true,
+      "editorInputCount": 0,
+      "finalSubmitCount": 0
+    },
+    {
+      "articleId": "233",
+      "sourceId": "repair-native-identity-233-20261010",
+      "status": "FAIL",
+      "stage": "body",
+      "code": "E_TEXT_BODY_DRIFT",
+      "checks": {
+        "source": "PASS",
+        "body": "FAIL",
+        "metadata": "NOT_CHECKED",
+        "publicText": "NOT_CHECKED",
+        "assets": "NOT_CHECKED",
+        "targetDOM": "NOT_CHECKED"
+      },
+      "proof": {
+        "body": {
+          "expected": "f05857cbed49af199a47d1c86c7c1c79118000149393c3cbd6ad1c98166869f3",
+          "actual": "bb84d00ef4e58e5b2649acdc2ffd0b41fe6cb350695dbe052495c13651936f0d",
+          "bytes": 28070
+        }
+      },
+      "readOnly": true,
+      "editorInputCount": 0,
+      "finalSubmitCount": 0
+    },
+    {
+      "articleId": "200",
+      "sourceId": "repair-native-identity-200-20261010",
+      "status": "FAIL",
+      "stage": "body",
+      "code": "E_TEXT_BODY_DRIFT",
+      "checks": {
+        "source": "PASS",
+        "body": "FAIL",
+        "metadata": "NOT_CHECKED",
+        "publicText": "NOT_CHECKED",
+        "assets": "NOT_CHECKED",
+        "targetDOM": "NOT_CHECKED"
+      },
+      "proof": {
+        "body": {
+          "expected": "744cd7387008500dac05968446a4caea4ae5b9d392c28e184b28da7b0f273e39",
+          "actual": "debc92ef346d869a386d6ca2344c9d0c02a098834cde28616f2cb341d814defc",
+          "bytes": 33850
+        }
+      },
+      "readOnly": true,
+      "editorInputCount": 0,
+      "finalSubmitCount": 0
+    }
+  ]
+}
