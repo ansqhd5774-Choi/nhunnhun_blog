@@ -60,4 +60,3 @@ snapshot은 기본모드 발행창 읽기·취소 → HTML mode 원본문 읽기
 원본문과 signed 대표 주소는 `%LOCALAPPDATA%/NHUNNHUN/alt-snapshots/<runId>/<articleId>.raw.private.json`에만 보관한다. 공유할 조건은 원본문/대표/이미지 URL 자체를 포함하지 않는 SHA 기반 draft이다. status=draft, approved=false로 생성하여 root의 실제 조건·권리·문맥 검토를 대신하지 않는다.
 
 GitHub repository가 public일 수 있으므로 artifact는 공개 평문으로 올리지 않는다. 조건 draft 묶음을 AES-256-GCM으로 암호화한 `conditions.enc.json` 한 파일만 upload-artifact에 전달하고 보존 기간을 3일로 한정한다. 무작위 256-bit key는 같은 local private 폴더의 `artifact.key`에만 보관하며 로그·Git·artifact에 포함하지 않는다. 로컬 root는 `conditions.private.json`을 직접 읽어 검토할 수 있고 key를 사용자에게 노출·복사 요청할 필요가 없다. workflow가 원격에서 실행돼 성공한 증거는 아직 없으며 조건 snapshot 확보 완료로 보고하지 않는다.
-
