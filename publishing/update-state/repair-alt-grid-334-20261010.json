@@ -154,5 +154,10 @@
   "targetBodySha256": "d10165c7bec8f0cc8f2535df928723c2ad5fc3cc37b5df6174eb328d70bf75ae",
   "metadataSha256": "84cd3eb2ee01b22def9e0a1527dde8cbad4c5558ab05ee2fd9fae06f8fa8915c",
   "timestamp": "2026-10-10T01:46:31.075Z",
-  "semanticVerification": "alt-visual-review-only"
+  "semanticVerification": "alt-visual-review-only",
+  "publicResult": {
+    "status": "PUBLIC_VERIFICATION_MISMATCH",
+    "code": "E_ALT_PUBLIC_BODY_DRIFT",
+    "checkedAt": "2026-10-10T01:46:35.723Z"
+  }
 }
