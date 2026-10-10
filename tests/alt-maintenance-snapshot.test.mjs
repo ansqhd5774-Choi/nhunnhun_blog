@@ -31,7 +31,7 @@ test('encrypted artifact can only be decoded using separately retained local key
 });
 test('readonly editor observation contains no content input or final submit',async()=>{
   const events=[];const html='<p>기존</p><img src="https://example.org/photo" alt="">';
-  const locator=selector=>({waitFor:async()=>{},inputValue:async()=>metadata.title,evaluate:async()=>html,count:async()=>1,and(){return this;},click:async()=>events.push(selector)});
+  const locator=selector=>({waitFor:async()=>{},inputValue:async()=>metadata.title,evaluate:async()=>html,count:async()=>1,isEnabled:async()=>true,and(){return this;},click:async()=>events.push(selector)});
   const page={goto:async()=>events.push('goto'),url:()=> 'https://nhunnhun.tistory.com/manage/newpost/331',locator,getByRole:(_,{name})=>locator(name)};
   const r=await observeAltEditor(page,{articleId:'331',imageIndex:0,newAlt:'과일과 곡물을 올린 컵 디저트'},
     {selectMode:async(_,mode)=>events.push(mode),open:async()=>events.push('open-dialog'),observe:async()=>({metadata,sha256:maintenanceHash(JSON.stringify(metadata))}),probe:async()=>events.push('probe')});
