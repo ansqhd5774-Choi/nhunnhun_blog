@@ -1,3 +1,4 @@
+import {ALT_MACRO_OPERATION,parsePlainImageMacros,publicAssetIdentity} from './alt-macro-contract.mjs';
 import {maintenanceHash} from './alt-maintenance-contract.mjs';
 import {verificationContext} from './verification-context.mjs';
 import {altFingerprint} from './alt-maintenance-source.mjs';
@@ -20,7 +21,7 @@ export function assertAltPublicSnapshot(actual,baseline,patches){
   const changed=new Map(patches.map(p=>[p.publicIndex,p.newAlt]));
   if(changed.size!==patches.length)throw Error('E_ALT_PUBLIC_MAPPING');
   actual.images.forEach((image,i)=>{
-    if(!image.loaded||image.srcSha256!==baseline.images[i].srcSha256)throw Error('E_ALT_PUBLIC_IMAGE_DRIFT');
+    if(!image.loaded||image.srcSha256!==baseline.images[i].srcSha256||image.assetSha256!==baseline.images[i].assetSha256)throw Error('E_ALT_PUBLIC_IMAGE_DRIFT');
     const expected=changed.has(i)?maintenanceHash(JSON.stringify(changed.get(i))):baseline.images[i].altSha256;
     if(image.altSha256!==expected)throw Error('E_ALT_PUBLIC_ALT_MISMATCH');
   });
@@ -66,7 +67,7 @@ async function capture(browser,source,width,originalHtml){
     if(observed.deliveredImages.length!==observed.images.length||observed.images.some((x,i)=>x.src!==observed.deliveredImages[i].src||x.alt!==observed.deliveredImages[i].alt))throw Error('E_ALT_PUBLIC_SOURCE_RENDER_MISMATCH');
     return {bodySha256:maintenanceHash(observed.body),metadataSha256:maintenanceHash(JSON.stringify(observed.metadata)),
       observedMetadata:observed.metadata,
-      images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded})),
+      images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded,...(source.operation===ALT_MACRO_OPERATION?{assetSha256:maintenanceHash(publicAssetIdentity(x.src))}:{})})),
       editorImages:observed.editorImages?.map(x=>maintenanceHash(x.src||'')),overflowPx:observed.overflowPx};
   }finally{await context.close();}
 }
@@ -78,7 +79,12 @@ export async function captureAltBaseline(browser,originalHtml,source,editorMetad
   // Fail closed on unstable provider markup or metadata before staging.
   assertAltPublicSnapshot(await capture(browser,source,1440),desktop,[]);
   assertAltPublicSnapshot(await capture(browser,source,390),mobile,[]);
+  const macroImages=source.operation===ALT_MACRO_OPERATION?parsePlainImageMacros(originalHtml):null;
+  if(macroImages)for(const snapshot of [desktop,mobile]){
+    if(macroImages.length!==snapshot.images.length||new Set(snapshot.images.map(x=>x.assetSha256)).size!==macroImages.length||macroImages.some((x,i)=>maintenanceHash(x.asset)!==snapshot.images[i].assetSha256))throw Error('E_ALT_MACRO_PUBLIC_MAPPING');
+  }
   const patches=source.maintenance.patches.map(p=>{
+    if(macroImages){if(!macroImages[p.imageIndex])throw Error('E_ALT_PUBLIC_MAPPING');return {publicIndex:p.imageIndex,newAlt:p.newAlt};}
     const src=desktop.editorImages?.[p.imageIndex];
     const matches=desktop.images.flatMap((x,i)=>x.srcSha256===src?[i]:[]);
     if(!src||matches.length!==1||mobile.images[matches[0]]?.srcSha256!==src)throw Error('E_ALT_PUBLIC_MAPPING');
@@ -89,7 +95,7 @@ export async function captureAltBaseline(browser,originalHtml,source,editorMetad
     delete snap.editorImages;
     delete snap.observedMetadata;
   }
-  return {version:'alt-public-baseline-v1',desktop,mobile,patches};
+  return {version:'alt-public-baseline-v1',desktop,mobile,patches,...(macroImages?{macroMapping:{version:'macro-asset-map-v1',assetSha256s:desktop.images.map(x=>x.assetSha256)}}:{})};
 }
 export async function finalizeAltMaintenance(source,{ledger,browser,now=()=>new Date().toISOString(),captureSnapshot=capture}){
   const state=await ledger.read(source.id);
@@ -98,6 +104,7 @@ export async function finalizeAltMaintenance(source,{ledger,browser,now=()=>new 
     !/^[a-f0-9]{64}$/.test(state.targetBodySha256||'')||
     state.baseline.patches?.length!==source.maintenance.patches.length||
     state.baseline.patches.some((p,i)=>p.newAlt!==source.maintenance.patches[i].newAlt))throw Error('E_ALT_LEDGER_CONDITIONS');
+  if(source.operation===ALT_MACRO_OPERATION){const map=state.baseline.macroMapping;if(map?.version!=='macro-asset-map-v1'||!Array.isArray(map.assetSha256s)||map.assetSha256s.length!==state.baseline.desktop.images.length||state.baseline.patches.some((p,i)=>p.publicIndex!==source.maintenance.patches[i].imageIndex)||[state.baseline.desktop,state.baseline.mobile].some(s=>s.images.some((x,i)=>x.assetSha256!==map.assetSha256s[i])))throw Error('E_ALT_LEDGER_CONDITIONS');}
   const {sha,...record}=state;
   let verification;
   try{
