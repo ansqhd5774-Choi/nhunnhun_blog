@@ -23,3 +23,11 @@ canonical 비교는 모든 JSON 필드를 보존하고 알려진 dimension의 �
 검증: 신규 진단 회귀10 PASS, 관련 preflight와 합계19 PASS, 프로젝트 등록 전체 **469 PASS**. 실제 러너 진단은 미실행이다. 실행과 조건별 판정 수집은 루트 담당이다.
 
 별도 NBSP 초안 교정: /236의 알려진 newText 2개에 있던 literal entity 5개를 Unicode NBSP로만 교체했다. 원문 expectedBody/metadata 조건은 유지했고 targetPublicText hash를 다시 계산했다. cleanup 80개 토큰을 재계산해 기존 배열과 정확히 같음을 확인했다. 초안은 draft/approved:false다. tests/native-text-entity.test.mjs 1 PASS로 일반 HTML escaping 보호를 유지하면서 literal entity 노출을 막는다. 기존 private provider와 target DOM 대조는 mappedBlocks 77 PASS이며 새 target HTML은 저장하지 않았다.
+
+## 실제 러너 진단 결과
+
+표준 읽기 전용 Run 38018210028에서 세 글 모두 E_TEXT_BODY_DRIFT로 중단했다. 전체 텍스트 hash, 이미지 asset·caption 순서는 동일하다. HTML 모드의 이미지 dimension number/string 차이는 각각 30/36/44개지만, 매크로를 제외한 HTML도 byte가 다르고 텍스트 슬롯은 각 1개 늘었다. 기존 교정 offset·raw hash 일치 슬롯은 모두 0개다. 따라서 이미지 직렬화만의 차이로 확정할 수 없으며 기존 후보를 승인하거나 hash gate를 완화하지 않았다.
+
+본문 입력 0회·최종 제출 0회. 안전 결과는 native-identity-mode-diagnostic-safe-result-20261010.json에 보존한다. 실제 교정 전 HTML 모드 원문 기준의 위치 재작성·원본 보존·내용 및 화면 검증이 필요하다. 이번 읽기 전용 진단 완료를 본문 수정 완료로 보고하지 않는다.
+
+루트 검사: 469 PASS. PR162 병합 a61c31a, CI38018143621 SUCCESS. 공개 변경은 없음.
