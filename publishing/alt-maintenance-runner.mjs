@@ -1,5 +1,6 @@
 import {observeUpdateStage} from './update-observation.mjs';
-import {ALT_MACRO_OPERATION,applyMappedMacroAlt} from './alt-macro-contract.mjs';
+import {ALT_MACRO_OPERATION} from './alt-macro-contract.mjs';
+import {applyMappedImageGridAlt as applyMappedMacroAlt} from './alt-image-grid-contract.mjs';
 import {cancelAltDialog,altDialogControl} from './alt-maintenance-dialog-controls.mjs';
 import {applyAltMaintenance,maintenanceHash} from './alt-maintenance-contract.mjs';
 import {observeAltMetadata,assertObservedMetadataPreserved} from './alt-maintenance-observe.mjs';

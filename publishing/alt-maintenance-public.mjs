@@ -1,7 +1,8 @@
 import {observeUpdateStage} from './update-observation.mjs';
 import {loadAltPublicImages,normalizeAltObservationError} from './alt-public-image-load.mjs';
 import {waitAltPublicAssets} from './alt-public-assets.mjs';
-import {ALT_MACRO_OPERATION,parsePlainImageMacros,publicAssetIdentity} from './alt-macro-contract.mjs';
+import {ALT_MACRO_OPERATION,publicAssetIdentity} from './alt-macro-contract.mjs';
+import {parseImageGridMacros as parsePlainImageMacros} from './alt-image-grid-contract.mjs';
 import {maintenanceHash} from './alt-maintenance-contract.mjs';
 import {verificationContext} from './verification-context.mjs';
 import {altFingerprint} from './alt-maintenance-source.mjs';

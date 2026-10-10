@@ -1,0 +1,25 @@
+{
+  "id": "repair-alt-grid-342-20261010",
+  "articleId": "342",
+  "targetUrl": "https://nhunnhun.tistory.com/342",
+  "expectedCurrentTitle": "호박씨(Pumpkin Seeds)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "title": "호박씨(Pumpkin Seeds)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+  "status": "ready",
+  "approved": true,
+  "operation": "image-alt-macro-only-v1",
+  "maintenance": {
+    "operation": "image-alt-macro-only-v1",
+    "articleId": "342",
+    "expectedTitle": "호박씨(Pumpkin Seeds)의 효능, 성분, 섭취시 신체 변화, 치료 질병, …",
+    "expectedBodySha256": "8929cebce12ba7cf06e6020d1352cefdb7035dd158393d2757cde42688862321",
+    "expectedMetadataSha256": "749dcc9584ad0c691fdeab43565dd7437d70ee5952687a18e255a12f0caf0bb5",
+    "patches": [
+      {
+        "imageIndex": 9,
+        "expectedSrcSha256": "2b27e19aadb7343bb3f9750a90e390ba800ca9d3321d289f83ad57d4c86832ce",
+        "expectedAltRaw": null,
+        "newAlt": "냉장고 사용과 식품 보관 안내를 담은 파란색 그림"
+      }
+    ]
+  }
+}
