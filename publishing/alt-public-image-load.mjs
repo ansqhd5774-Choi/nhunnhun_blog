@@ -17,7 +17,7 @@ export async function loadAltPublicImages(page,{log=console.log,budgetMs=90000,i
  const read=(stage,action)=>observeUpdateStage(stage,action,{log,safeReadOnly:true,timeoutMs:remaining()});
  const body=page.locator('.contents_style:visible');if(await read('image-body-count',()=>body.count())!==1)throw Error('E_ALT_PUBLIC_OBSERVATION_UNCONFIRMED');
  const images=body.locator('img');const count=await read('image-count',()=>images.count());
- const original=await read('image-scroll-position',()=>page.evaluate(()=>({x:scrollX,y:scrollY}))); 
+ const original=await read('image-scroll-position',()=>page.evaluate(()=>({x:scrollX,y:scrollY})));
  try{for(let index=0;index<count;index++){
    const image=images.nth(index);log('ALT_IMAGE_OBSERVATION '+JSON.stringify({index,count,state:'start'}));
    await observeUpdateStage('image-scroll',()=>image.scrollIntoViewIfNeeded({timeout:remaining()}),{log});
