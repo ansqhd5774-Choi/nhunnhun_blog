@@ -30,6 +30,15 @@ export function assertAltPublicSnapshot(actual,baseline,patches){
   });
   return {images:actual.images.length,changedAlt:patches.length,overflowPx:0,semanticVerification:'alt-visual-review-only'};
 }
+// Legacy skin fills only an absent/empty alt with provider data-filename.
+// Preserve exact src and every explicit provider alt; this is not asset equivalence.
+export function assertAltDeliveredRender(delivered,rendered){
+ if(delivered.length!==rendered.length)throw Error('E_ALT_PUBLIC_SOURCE_RENDER_MISMATCH');
+ rendered.forEach((image,index)=>{const provider=delivered[index];
+   const filenameFallback=(provider.alt===null||provider.alt==='')&&typeof provider.filename==='string'&&provider.filename.length>0&&image.alt===provider.filename;
+   if(image.src!==provider.src||image.alt!==provider.alt&&!filenameFallback)throw Error('E_ALT_PUBLIC_SOURCE_RENDER_MISMATCH');
+ });
+}
 export async function captureAltSnapshot(browser,source,width,originalHtml,{log=console.log}={}){
   const step=(name,action,options={})=>observeUpdateStage('public-'+width+'-'+name,action,{...options,log});
   const context=await step('context-create',()=>verificationContext(browser,{viewport:{width,height:1000}}));
@@ -52,7 +61,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
       const deliveredBodies=[...delivered.querySelectorAll('.contents_style')];
       if(deliveredBodies.length!==1)return null;
       const clone=deliveredBodies[0].cloneNode(true);
-      const deliveredImages=[...clone.querySelectorAll('img')].map(x=>({src:x.getAttribute('src'),alt:x.getAttribute('alt')}));
+      const deliveredImages=[...clone.querySelectorAll('img')].map(x=>({src:x.getAttribute('src'),alt:x.getAttribute('alt'),filename:x.getAttribute('data-filename')}));
       clone.querySelectorAll('img').forEach(x=>x.removeAttribute('alt'));
       const title=document.querySelector('meta[property="og:title"]')?.content;
       const representative=document.querySelector('meta[property="og:image"]')?.content;
@@ -68,7 +77,7 @@ export async function captureAltSnapshot(browser,source,width,originalHtml,{log=
     // Missing metadata is unknown, not evidence of preservation.
     if(!observed?.metadata.title||!observed.metadata.representative||!observed.metadata.category||!observed.metadata.tags.length||!observed.images.length)throw Error('E_ALT_PUBLIC_OBSERVATION_UNCONFIRMED');
     if(observed.metadata.title!==source.title)throw Error('E_ALT_PUBLIC_TITLE');
-    if(observed.deliveredImages.length!==observed.images.length||observed.images.some((x,i)=>x.src!==observed.deliveredImages[i].src||x.alt!==observed.deliveredImages[i].alt))throw Error('E_ALT_PUBLIC_SOURCE_RENDER_MISMATCH');
+    assertAltDeliveredRender(observed.deliveredImages,observed.images);
     return {bodySha256:maintenanceHash(observed.body),metadataSha256:maintenanceHash(JSON.stringify(observed.metadata)),
       observedMetadata:observed.metadata,
       images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded,...(source.operation===ALT_MACRO_OPERATION?{assetSha256:maintenanceHash(publicAssetIdentity(x.src))}:{})})),
