@@ -121,7 +121,8 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
   );
 
   let sectionNumber=0;
-  out=out.replace(/<h2>/g,()=>version==='SP1'?'<h2 style="margin:36px 0 16px;padding:16px 0 0;border:0;border-top:1px solid #e2e5e9;background:none;font-size:24px;line-height:1.45;font-weight:800;color:#243142;">'+(++sectionNumber)+'. ':ACCENT+H2);
+  if(version==='SP1')out=out.replace(/<h2>(\s*\d+\.\s+)?/g,(_match,existingNumber)=>'<h2 style="margin:36px 0 16px;padding:16px 0 0;border:0;border-top:1px solid #e2e5e9;background:none;font-size:24px;line-height:1.45;font-weight:800;color:#243142;">'+(existingNumber?(++sectionNumber,existingNumber):(++sectionNumber)+'. '));
+  else out=out.replace(/<h2>/g,()=>ACCENT+H2);
   out=out.replace(/<h3>/g,version==='SP1'?'<h3 style="margin:24px 0 12px;font-size:19px;line-height:1.5;color:#243142;font-weight:700;">':H3);
 
   out=out.replace(/<table>\s*([\s\S]*?)\s*<\/table>/g,(_m,inner)=>styleTable(inner,{fluid:version==='SP1'}));
