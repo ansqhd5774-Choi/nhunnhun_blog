@@ -1,0 +1,340 @@
+{
+  "version": "R1",
+  "domain": "medicine",
+  "classification": {
+    "status": "resolved",
+    "rawInput": "록시마이신",
+    "topic": "록시트로마이신",
+    "meaning": "국내 처방 항생제의 안전한 정보 확인",
+    "entityId": "medicine:roxithromycin",
+    "reason": "국내제품 금기를 일반상담과 구분한다."
+  },
+  "sourceDigest": "b72c957acd9f67ccb169c1487ece1cec9922631817ae19b3f42bc45188b2b083",
+  "intent": {
+    "primaryQuestion": "록시마이신의 복용과 병용금기 및 긴급 증상은 어떻게 확인하는가?",
+    "readerSituation": "처방 항생제 제품정보를 확인하는 독자",
+    "nextActions": [
+      "약 목록과 제품 설명서를 처방 의료진에게 확인한다."
+    ]
+  },
+  "extensions": {
+    "longTerm": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "comparison": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "combinations": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "products": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "foodReplacement": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "essentialNutrient": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "cultivars": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "origins": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "seasonality": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "cost": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "folkRemedies": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "selfCheck": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "exercise": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "diet": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "vulnerableGroups": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "discontinuation": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "missedDose": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "myths": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    },
+    "latest": {
+      "applies": false,
+      "reason": "이번 제품 안전정보 보완에서 별도 확장 질문이 아니다."
+    }
+  },
+  "coverage": [
+    {
+      "module": "identity",
+      "heading": "록시마이신과 록시트로마이신은 무엇인가요?",
+      "answerQuote": "록시마이신은 제품명이고 유효성분은 록시트로마이신입니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "indications",
+      "heading": "어떤 감염에 사용할 수 있나요?",
+      "answerQuote": "국내 록시마이신정은 감수성 세균에 의한 인후두염·편도염·부비동염",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "audience",
+      "heading": "복용 전에 확인할 실용 체크리스트",
+      "answerQuote": "간질환, 부정맥, 임신·수유 여부가 있다면 반드시 상담합니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "amount",
+      "heading": "복용량과 복용 시간은 어떻게 봐야 하나요?",
+      "answerQuote": "150mg을 하루 2회 식전에 투여",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "use",
+      "heading": "복용량과 복용 시간은 어떻게 봐야 하나요?",
+      "answerQuote": "실제 약 봉투·제품설명서·처방 지시를 우선하세요.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "timeline",
+      "heading": "복용량과 복용 시간은 어떻게 봐야 하나요?",
+      "answerQuote": "복용을 잊었다면 다음 복용 시간이 가까운 경우 두 배로 보충하지 않는 것이 일반 원칙입니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "safety",
+      "heading": "흔한 부작용과 바로 확인해야 할 증상",
+      "answerQuote": "투여 중지와 즉시 평가를 안내합니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "contraindications",
+      "heading": "함께 복용할 약이 있다면 무엇을 확인해야 하나요?",
+      "answerQuote": "투여하지 않도록 허가돼 있습니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "interactions",
+      "heading": "함께 복용할 약이 있다면 무엇을 확인해야 하나요?",
+      "answerQuote": "와파린을 복용 중이면 출혈 위험과 INR 모니터링",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "medical_help",
+      "heading": "흔한 부작용과 바로 확인해야 할 증상",
+      "answerQuote": "즉시 의료진에게 연락하고 긴급평가를 받으세요.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "storage",
+      "heading": "록시마이신정은 어떻게 보관하나요?",
+      "answerQuote": "국내 록시마이신정은 밀폐용기, 실온보관입니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    {
+      "module": "decision",
+      "heading": "복용 전에 확인할 실용 체크리스트",
+      "answerQuote": "약 봉투에 적힌 성분명·용량·하루 횟수·복용 기간을 먼저 확인합니다.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    }
+  ],
+  "connections": {
+    "food": {
+      "status": "included",
+      "relationship": "interaction",
+      "reason": "제품별 공복 복용과 식품상호작용을 구분한다.",
+      "heading": "복용량과 복용 시간은 어떻게 봐야 하나요?",
+      "answerQuote": "실제 약 봉투·제품설명서·처방 지시를 우선하세요.",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    },
+    "nutrient": {
+      "status": "included",
+      "relationship": "interaction",
+      "reason": "소규모 제산제 AUC 결과를 칼슘 전반으로 확대하지 않는다.",
+      "heading": "칼슘이나 영양제가 약효를 높이거나 떨어뜨리나요?",
+      "answerQuote": "AUC에 유의한 차이를 만들지 않은 10명 규모의 연구",
+      "sourceIds": [
+        "diet"
+      ]
+    },
+    "disease": {
+      "status": "included",
+      "relationship": "risk-context",
+      "reason": "심장리듬과 간장애를 제품허가에 맞게 설명한다.",
+      "heading": "함께 복용할 약이 있다면 무엇을 확인해야 하나요?",
+      "answerQuote": "와파린을 복용 중이면 출혈 위험과 INR 모니터링",
+      "sourceIds": [
+        "mfds",
+        "cmi"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "mfds",
+      "url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199700945",
+      "title": "식약처 록시마이신정 현행허가",
+      "kind": "official",
+      "role": "authorization",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제읽은 제품허가·공식기관 안내·문헌 Table3범위."
+    },
+    {
+      "id": "cmi",
+      "url": "https://www.safetyandquality.gov.au/medicine-finder/apx-roxithromycin-tablets",
+      "title": "Australian Commission APX CMI",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제읽은 제품허가·공식기관 안내·문헌 Table3범위."
+    },
+    {
+      "id": "who",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance",
+      "title": "WHO 항미생물내성2026",
+      "kind": "official",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제읽은 제품허가·공식기관 안내·문헌 Table3범위."
+    },
+    {
+      "id": "diet",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11531826/",
+      "title": "2024약물식품 체계적문헌",
+      "kind": "systematic-review",
+      "role": "health",
+      "checkedAt": "2026-10-10",
+      "scopeNote": "실제읽은 제품허가·공식기관 안내·문헌 Table3범위."
+    }
+  ],
+  "glossary": [],
+  "comparisons": [],
+  "combinations": [],
+  "selectionCriteria": [],
+  "review": {
+    "status": "approved",
+    "checkedAt": "2026-10-10",
+    "reviewer": {
+      "kind": "ai",
+      "name": "Codex evidence reviewer",
+      "independence": "same-author"
+    },
+    "checks": {
+      "readerIntent": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "accuracy": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "expectations": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "comparison": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "combinations": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "crossDomain": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "safety": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "tone": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "emphasis": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "images": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      },
+      "linksAndSearch": {
+        "status": "pass",
+        "note": "국내허가와 공식설명서·문헌을 실제 대조하고 제품별 금기와 긴급증상, 기존 이미지3장의 시각·라이선스를 확인했다. 독립 의료인 감수는 아니다."
+      }
+    },
+    "warningResolutions": []
+  }
+}
