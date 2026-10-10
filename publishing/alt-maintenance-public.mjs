@@ -1,3 +1,5 @@
+import {observeUpdateStage} from './update-observation.mjs';
+import {waitAltPublicAssets} from './alt-public-assets.mjs';
 import {ALT_MACRO_OPERATION,parsePlainImageMacros,publicAssetIdentity} from './alt-macro-contract.mjs';
 import {maintenanceHash} from './alt-maintenance-contract.mjs';
 import {verificationContext} from './verification-context.mjs';
@@ -27,21 +29,22 @@ export function assertAltPublicSnapshot(actual,baseline,patches){
   });
   return {images:actual.images.length,changedAlt:patches.length,overflowPx:0,semanticVerification:'alt-visual-review-only'};
 }
-async function capture(browser,source,width,originalHtml){
-  const context=await verificationContext(browser,{viewport:{width,height:1000}});
+export async function captureAltSnapshot(browser,source,width,originalHtml,{log=console.log}={}){
+  const step=(name,action,options={})=>observeUpdateStage('public-'+width+'-'+name,action,{...options,log});
+  const context=await step('context-create',()=>verificationContext(browser,{viewport:{width,height:1000}}));
   try{
-    const page=await context.newPage();
-    const response=await page.goto(source.targetUrl,{waitUntil:'domcontentloaded',timeout:30000});
+    const page=await step('page-create',()=>context.newPage());
+    const response=await step('navigation',()=>page.goto(source.targetUrl,{waitUntil:'domcontentloaded',timeout:30000}));
     if(!response?.ok()||new URL(page.url()).pathname!==`/${source.articleId}`)throw Error('E_ALT_PUBLIC_ACCESS');
-    const responseHtml=await response.text();
-    await page.locator('.contents_style').waitFor({state:'visible',timeout:15000});
-    const observed=await page.evaluate(async({original,responseHtml})=>{
-      await document.fonts?.ready;
+    const responseHtml=await step('response-text',()=>response.text(),{safeReadOnly:true,timeoutMs:15000});
+    await step('body-visible',()=>page.locator('.contents_style').waitFor({state:'visible',timeout:15000}),{safeReadOnly:true,timeoutMs:20000});
+    await step('font-wait',()=>page.evaluate(waitAltPublicAssets,{phase:'font'}),{safeReadOnly:true,timeoutMs:20000});
+    await step('images-wait',()=>page.evaluate(waitAltPublicAssets,{phase:'images'}),{safeReadOnly:true,timeoutMs:25000});
+    const observed=await step('dom-observe',()=>page.evaluate(({original,responseHtml})=>{
       const bodies=[...document.querySelectorAll('.contents_style')].filter(x=>x.getClientRects().length);
       if(bodies.length!==1)return null;
       const body=bodies[0];
       const images=[...body.querySelectorAll('img')];
-      await Promise.all(images.map(image=>image.decode().catch(()=>null)));
       // Compare provider-delivered article markup, not skin/advertising DOM inserted later.
       // Rendered image loading and alt/src are independently checked below.
       const delivered=new DOMParser().parseFromString(responseHtml,'text/html');
@@ -60,7 +63,7 @@ async function capture(browser,source,width,originalHtml){
         images:images.map(x=>({src:x.getAttribute('src'),alt:x.getAttribute('alt'),loaded:x.complete&&x.naturalWidth>0})),
         editorImages:original?[...new DOMParser().parseFromString(original,'text/html').querySelectorAll('img')].map(x=>({src:x.getAttribute('src')})):null,
         overflowPx:Math.max(0,document.documentElement.scrollWidth-innerWidth)};
-    },{original:originalHtml||null,responseHtml});
+    },{original:originalHtml||null,responseHtml}),{safeReadOnly:true,timeoutMs:15000});
     // Missing metadata is unknown, not evidence of preservation.
     if(!observed?.metadata.title||!observed.metadata.representative||!observed.metadata.category||!observed.metadata.tags.length||!observed.images.length)throw Error('E_ALT_PUBLIC_OBSERVATION_UNCONFIRMED');
     if(observed.metadata.title!==source.title)throw Error('E_ALT_PUBLIC_TITLE');
@@ -69,16 +72,16 @@ async function capture(browser,source,width,originalHtml){
       observedMetadata:observed.metadata,
       images:observed.images.map(x=>({srcSha256:maintenanceHash(x.src||''),altSha256:maintenanceHash(JSON.stringify(x.alt)),loaded:x.loaded,...(source.operation===ALT_MACRO_OPERATION?{assetSha256:maintenanceHash(publicAssetIdentity(x.src))}:{})})),
       editorImages:observed.editorImages?.map(x=>maintenanceHash(x.src||'')),overflowPx:observed.overflowPx};
-  }finally{await context.close();}
+  }finally{await step('context-close',()=>context.close());}
 }
 export async function captureAltBaseline(browser,originalHtml,source,editorMetadata){
-  const desktop=await capture(browser,source,1440,originalHtml);
-  const mobile=await capture(browser,source,390,originalHtml);
+  const desktop=await captureAltSnapshot(browser,source,1440,originalHtml);
+  const mobile=await captureAltSnapshot(browser,source,390,originalHtml);
   assertAltBaselineMetadata(desktop.observedMetadata,editorMetadata);
   assertAltBaselineMetadata(mobile.observedMetadata,editorMetadata);
   // Fail closed on unstable provider markup or metadata before staging.
-  assertAltPublicSnapshot(await capture(browser,source,1440),desktop,[]);
-  assertAltPublicSnapshot(await capture(browser,source,390),mobile,[]);
+  assertAltPublicSnapshot(await captureAltSnapshot(browser,source,1440),desktop,[]);
+  assertAltPublicSnapshot(await captureAltSnapshot(browser,source,390),mobile,[]);
   const macroImages=source.operation===ALT_MACRO_OPERATION?parsePlainImageMacros(originalHtml):null;
   if(macroImages)for(const snapshot of [desktop,mobile]){
     if(macroImages.length!==snapshot.images.length||new Set(snapshot.images.map(x=>x.assetSha256)).size!==macroImages.length||macroImages.some((x,i)=>maintenanceHash(x.asset)!==snapshot.images[i].assetSha256))throw Error('E_ALT_MACRO_PUBLIC_MAPPING');
@@ -97,7 +100,7 @@ export async function captureAltBaseline(browser,originalHtml,source,editorMetad
   }
   return {version:'alt-public-baseline-v1',desktop,mobile,patches,...(macroImages?{macroMapping:{version:'macro-asset-map-v1',assetSha256s:desktop.images.map(x=>x.assetSha256)}}:{})};
 }
-export async function finalizeAltMaintenance(source,{ledger,browser,now=()=>new Date().toISOString(),captureSnapshot=capture}){
+export async function finalizeAltMaintenance(source,{ledger,browser,now=()=>new Date().toISOString(),captureSnapshot=captureAltSnapshot}){
   const state=await ledger.read(source.id);
   if(!state||!['submitting','updated'].includes(state.phase)||state.operation!==source.operation||state.fingerprint!==altFingerprint(source)||state.url!==source.targetUrl||state.baseline?.version!=='alt-public-baseline-v1')throw Error('E_ALT_LEDGER');
   if(state.originalBodySha256!==source.maintenance.expectedBodySha256||state.metadataSha256!==source.maintenance.expectedMetadataSha256||

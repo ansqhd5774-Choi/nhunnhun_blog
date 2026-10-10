@@ -14,13 +14,13 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   if(await ledger.read(source.id))throw Error('E_UPDATE_EXISTING_STATE_REQUIRES_REVIEW');
   await prepare(page,{title:source.title});
   await open(page,{title:source.title},log,'E_ALT_DIALOG',{clickTimeoutMs:25000,observe:(stage,action,options)=>observeUpdateStage(stage,action,{...options,log})});
-  const before=await observe(page);
+  const before=await observeUpdateStage('alt-metadata-before',()=>observe(page),{log,safeReadOnly:true,timeoutMs:15000});
   // Only existing public articles are in scope. Protected/private never become public.
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
 
-  await cancelAltDialog(page);
+  await observeUpdateStage('alt-dialog-cancel',()=>cancelAltDialog(page,{observe:(stage,action,options)=>observeUpdateStage(stage,action,{...options,log})}),{log});
   // Anonymous baseline is collected before any content staging, not inferred from HTTP 200.
-  const baseline=await capturePublicBaseline(originalHtml,source,before.metadata);
+  const baseline=await observeUpdateStage('alt-public-baseline',()=>capturePublicBaseline(originalHtml,source,before.metadata),{log});
   const changed=source.operation===ALT_MACRO_OPERATION?applyMappedMacroAlt(originalHtml,before.metadata,source.maintenance,baseline.macroMapping):applyAltMaintenance(originalHtml,before.metadata,source.maintenance);
   await selectMode(page,'html');
   const code=page.locator('.CodeMirror:visible .CodeMirror-code');
@@ -32,7 +32,7 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   if(maintenanceHash(staged)!==changed.targetBodySha256)throw Error('E_ALT_STAGED_BODY_DRIFT');
   await prepare(page,{title:source.title});
   await open(page,{title:source.title},log,'E_ALT_DIALOG');
-  const after=await observe(page);
+  const after=await observeUpdateStage('alt-metadata-after',()=>observe(page),{log,safeReadOnly:true,timeoutMs:15000});
   assertObservedMetadataPreserved(before,after);
   const submit=await altDialogControl(page,'submit');
   const sourceCommit=assertSource();

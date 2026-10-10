@@ -1,3 +1,4 @@
+import {observeUpdateStage} from './update-observation.mjs';
 import {selectEditorMode,probeManagedPost} from './update-editor-controls.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { isPublishedProductLinkRepair } from './validate-content.mjs';
@@ -227,8 +228,8 @@ try{
         stage='alt-only-maintenance';
         const publicResult=await runAltMaintenance({page,source:update,originalHtml,selectMode:selectEditorMode,ledger,assertSource:assertCurrentSource,
           capturePublicBaseline:async(html,source,metadata)=>{
-            const anonymous=await openPublicBrowser(browserConfig);
-            try{return await captureAltBaseline(anonymous,html,source,metadata);}finally{await anonymous.close();}
+            const anonymous=await observeUpdateStage('alt-anonymous-launch',()=>openPublicBrowser(browserConfig));
+            try{return await captureAltBaseline(anonymous,html,source,metadata);}finally{await observeUpdateStage('alt-anonymous-close',()=>anonymous.close());}
           },finalize:finalizeSelectedUpdate});
         console.log('UPDATE_PUBLIC_RESULT '+JSON.stringify(publicResult));
         if(publicResult.status!=='PUBLIC_VERIFIED')process.exitCode=1;
