@@ -1,0 +1,119 @@
+{
+  "phase": "submitting",
+  "operation": "image-alt-macro-only-v1",
+  "fingerprint": "492930108e5baf687be9f4cd15009eb98cc2de54c97b77c2125e4ee9e9302168",
+  "url": "https://nhunnhun.tistory.com/352",
+  "articleId": "352",
+  "sourceCommit": "ce7b3382cb0ff2b35774d2d32fd76fbd86f8a83e",
+  "baseline": {
+    "version": "alt-public-baseline-v1",
+    "desktop": {
+      "bodySha256": "d079a4297573d154f4bb82cf83485ec28f097aed2e4a7e01cb621638c439c779",
+      "metadataSha256": "feac4f53535b7555c0e39ff70350758177690776143cbe8def31c242af76b847",
+      "images": [
+        {
+          "srcSha256": "3bd0dae7346d60c2cec49759a9c16ce2d83744b466c145fea154060053d72f3b",
+          "altSha256": "ac51f157374b3b746dcf49a4eb368a94d9a069363a683c768e8b12b33c9e48fb",
+          "loaded": true,
+          "assetSha256": "4eef30ec9adce8f49e28fc7b3a2dce29efdb872c4c01e4ba2d9673579de72d18"
+        },
+        {
+          "srcSha256": "f428d5ae47cf8a23f8e392d6ba2615a2bbbdb21ce2980a0ecb43a8ab8072272a",
+          "altSha256": "a17ab6bbdafe9120b7b91f84576a935dcb223d4d08f83ad32d1f95aee768e0e8",
+          "loaded": true,
+          "assetSha256": "867b259d884bb8a74f91e4e0a78c5b06602fc2f260232ef62b59e05ef335a762"
+        },
+        {
+          "srcSha256": "85f6291d6b016c952bc62ab9992ba7bef833db3f1b9259f934cf9f4387167f16",
+          "altSha256": "a78683f0d714a32134b5a4e51d31497b0f3a043ce430597fd4f6f512faa1c754",
+          "loaded": true,
+          "assetSha256": "8ed774cd8ccd5c12dd95cb76d3f382a41028611ab26a16084cc14934b187c135"
+        },
+        {
+          "srcSha256": "56de0d85fd131a7d87db0084c1ae9daaa10928c49cac32acda0379fe2571e996",
+          "altSha256": "bb7fb5a0fe532f747f21d2da12e401971993360b116aeefe86bc79d181e1c8eb",
+          "loaded": true,
+          "assetSha256": "9faaa72ff359d3a7edd494ee0f0ea889d5ce7f78d66f1fa4de3005271fbbc8d9"
+        },
+        {
+          "srcSha256": "36baaedd494c842878f7a2f7745a67b47458fefd13f3f43734139a099114b985",
+          "altSha256": "fcafde7a63fcdf94fed4bf8c89c01b8d48aa26065dda110f21f671ce4734377e",
+          "loaded": true,
+          "assetSha256": "2e81a36cd2dc553c65fb464ca248873b1cd9c220c4b88163a6541b4c53c57afe"
+        },
+        {
+          "srcSha256": "6586d243df7628cb55a0072ef6c74c0fb15ecb28466535bbb5a1b29883bb731c",
+          "altSha256": "f7cd26b34948a7bfe4d870ca701e1687a5ee474e82ac8d0400d396aebf849aa3",
+          "loaded": true,
+          "assetSha256": "cf76bb0dbb1d1d6b29f9a00c5e89bc68084a9553bc01de9bd079b7567c986c45"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "mobile": {
+      "bodySha256": "d079a4297573d154f4bb82cf83485ec28f097aed2e4a7e01cb621638c439c779",
+      "metadataSha256": "feac4f53535b7555c0e39ff70350758177690776143cbe8def31c242af76b847",
+      "images": [
+        {
+          "srcSha256": "3bd0dae7346d60c2cec49759a9c16ce2d83744b466c145fea154060053d72f3b",
+          "altSha256": "ac51f157374b3b746dcf49a4eb368a94d9a069363a683c768e8b12b33c9e48fb",
+          "loaded": true,
+          "assetSha256": "4eef30ec9adce8f49e28fc7b3a2dce29efdb872c4c01e4ba2d9673579de72d18"
+        },
+        {
+          "srcSha256": "f428d5ae47cf8a23f8e392d6ba2615a2bbbdb21ce2980a0ecb43a8ab8072272a",
+          "altSha256": "a17ab6bbdafe9120b7b91f84576a935dcb223d4d08f83ad32d1f95aee768e0e8",
+          "loaded": true,
+          "assetSha256": "867b259d884bb8a74f91e4e0a78c5b06602fc2f260232ef62b59e05ef335a762"
+        },
+        {
+          "srcSha256": "85f6291d6b016c952bc62ab9992ba7bef833db3f1b9259f934cf9f4387167f16",
+          "altSha256": "a78683f0d714a32134b5a4e51d31497b0f3a043ce430597fd4f6f512faa1c754",
+          "loaded": true,
+          "assetSha256": "8ed774cd8ccd5c12dd95cb76d3f382a41028611ab26a16084cc14934b187c135"
+        },
+        {
+          "srcSha256": "56de0d85fd131a7d87db0084c1ae9daaa10928c49cac32acda0379fe2571e996",
+          "altSha256": "bb7fb5a0fe532f747f21d2da12e401971993360b116aeefe86bc79d181e1c8eb",
+          "loaded": true,
+          "assetSha256": "9faaa72ff359d3a7edd494ee0f0ea889d5ce7f78d66f1fa4de3005271fbbc8d9"
+        },
+        {
+          "srcSha256": "36baaedd494c842878f7a2f7745a67b47458fefd13f3f43734139a099114b985",
+          "altSha256": "fcafde7a63fcdf94fed4bf8c89c01b8d48aa26065dda110f21f671ce4734377e",
+          "loaded": true,
+          "assetSha256": "2e81a36cd2dc553c65fb464ca248873b1cd9c220c4b88163a6541b4c53c57afe"
+        },
+        {
+          "srcSha256": "6586d243df7628cb55a0072ef6c74c0fb15ecb28466535bbb5a1b29883bb731c",
+          "altSha256": "f7cd26b34948a7bfe4d870ca701e1687a5ee474e82ac8d0400d396aebf849aa3",
+          "loaded": true,
+          "assetSha256": "cf76bb0dbb1d1d6b29f9a00c5e89bc68084a9553bc01de9bd079b7567c986c45"
+        }
+      ],
+      "overflowPx": 0
+    },
+    "patches": [
+      {
+        "publicIndex": 1,
+        "newAlt": "유리그릇에 담긴 노란색 소프트젤 캡슐"
+      }
+    ],
+    "macroMapping": {
+      "version": "macro-asset-map-v1",
+      "assetSha256s": [
+        "4eef30ec9adce8f49e28fc7b3a2dce29efdb872c4c01e4ba2d9673579de72d18",
+        "867b259d884bb8a74f91e4e0a78c5b06602fc2f260232ef62b59e05ef335a762",
+        "8ed774cd8ccd5c12dd95cb76d3f382a41028611ab26a16084cc14934b187c135",
+        "9faaa72ff359d3a7edd494ee0f0ea889d5ce7f78d66f1fa4de3005271fbbc8d9",
+        "2e81a36cd2dc553c65fb464ca248873b1cd9c220c4b88163a6541b4c53c57afe",
+        "cf76bb0dbb1d1d6b29f9a00c5e89bc68084a9553bc01de9bd079b7567c986c45"
+      ]
+    }
+  },
+  "originalBodySha256": "d8a09087025e076cb70bfebc3ac23796d49565c40edbbb8fe1c5178b33147dec",
+  "targetBodySha256": "45a6ce478c324ffd8ba6d9dc00224e44dea87d95d03f280e4954ea1c123b9cca",
+  "metadataSha256": "b910c5619691a4fbb3e6ed2f2d7d8decda2e4c556eaa635011e4e0c0733da41d",
+  "timestamp": "2026-10-10T01:37:00.352Z",
+  "semanticVerification": "alt-visual-review-only"
+}
