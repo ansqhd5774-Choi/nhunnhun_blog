@@ -1,3 +1,4 @@
+import {observeUpdateStage} from './update-observation.mjs';
 import {ALT_MACRO_OPERATION,applyMappedMacroAlt} from './alt-macro-contract.mjs';
 import {cancelAltDialog,altDialogControl} from './alt-maintenance-dialog-controls.mjs';
 import {applyAltMaintenance,maintenanceHash} from './alt-maintenance-contract.mjs';
@@ -12,7 +13,7 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   prepare=preparePublishEditor,open=openPublishDialog,observe=observeAltMetadata}){
   if(await ledger.read(source.id))throw Error('E_UPDATE_EXISTING_STATE_REQUIRES_REVIEW');
   await prepare(page,{title:source.title});
-  await open(page,{title:source.title},log,'E_ALT_DIALOG');
+  await open(page,{title:source.title},log,'E_ALT_DIALOG',{clickTimeoutMs:25000,observe:(stage,action,options)=>observeUpdateStage(stage,action,{...options,log})});
   const before=await observe(page);
   // Only existing public articles are in scope. Protected/private never become public.
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
