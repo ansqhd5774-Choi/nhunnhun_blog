@@ -1,3 +1,4 @@
+import {ALT_MACRO_OPERATION,applyMappedMacroAlt} from './alt-macro-contract.mjs';
 import {cancelAltDialog,altDialogControl} from './alt-maintenance-dialog-controls.mjs';
 import {applyAltMaintenance,maintenanceHash} from './alt-maintenance-contract.mjs';
 import {observeAltMetadata,assertObservedMetadataPreserved} from './alt-maintenance-observe.mjs';
@@ -15,10 +16,11 @@ export async function runAltMaintenance({page,source,originalHtml,selectMode,led
   const before=await observe(page);
   // Only existing public articles are in scope. Protected/private never become public.
   if(before.metadata.visibility!=='20')throw Error('E_ALT_PUBLIC_VISIBILITY_REQUIRED');
-  const changed=applyAltMaintenance(originalHtml,before.metadata,source.maintenance);
+
   await cancelAltDialog(page);
   // Anonymous baseline is collected before any content staging, not inferred from HTTP 200.
   const baseline=await capturePublicBaseline(originalHtml,source,before.metadata);
+  const changed=source.operation===ALT_MACRO_OPERATION?applyMappedMacroAlt(originalHtml,before.metadata,source.maintenance,baseline.macroMapping):applyAltMaintenance(originalHtml,before.metadata,source.maintenance);
   await selectMode(page,'html');
   const code=page.locator('.CodeMirror:visible .CodeMirror-code');
   await code.waitFor({state:'visible'});
