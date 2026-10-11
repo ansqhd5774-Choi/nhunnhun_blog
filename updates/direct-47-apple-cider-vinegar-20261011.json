@@ -19,16 +19,6 @@
       "visualChecked": true
     },
     {
-      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Apple%20Cider%20Vinegar%20%284108653248%29.jpg?width=960",
-      "alt": "주방에서 병에 담긴 애플사이다비니거를 보여주는 모습",
-      "role": "context",
-      "composition": "context",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Apple_Cider_Vinegar_(4108653248).jpg",
-      "author": "Veganbaking.net",
-      "license": "CC BY-SA 2.0",
-      "visualChecked": true
-    },
-    {
       "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Making%20apple%20cider%20vinegar.jpg?width=960",
       "alt": "유리 용기에서 사과식초가 발효되는 과정",
       "role": "process",
@@ -36,6 +26,16 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Making_apple_cider_vinegar.jpg",
       "author": "Zenyrgarden",
       "license": "CC BY-SA 4.0",
+      "visualChecked": true
+    },
+    {
+      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Apple%20Cider%20Vinegar%20%284108653248%29.jpg?width=960",
+      "alt": "주방에서 병에 담긴 애플사이다비니거를 보여주는 모습",
+      "role": "context",
+      "composition": "context",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Apple_Cider_Vinegar_(4108653248).jpg",
+      "author": "Veganbaking.net",
+      "license": "CC BY-SA 2.0",
       "visualChecked": true
     }
   ],
