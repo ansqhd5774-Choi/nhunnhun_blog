@@ -104,6 +104,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
       - run: call maintenance\check-tistory-chrome.cmd
+      - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
+        run: node publishing/auth-preflight.mjs
       - run: pnpm run publish
         env:
           PUBLISH_ENABLED: "true"
