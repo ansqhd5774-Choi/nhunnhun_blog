@@ -1,5 +1,11 @@
 import {parseDocument} from 'htmlparser2';
 
+export const DIRECT_EMPHASIS_MINIMUMS=Object.freeze({
+  bold:18,
+  highlight:8,
+  underline:2,
+});
+
 // Structural omission guard only; the author still chooses meaningful phrases.
 export function assertDirectEmphasis(source) {
   if(!source.id?.startsWith('direct-'))return;
@@ -29,14 +35,20 @@ export function assertDirectSubmissionEmphasis(source) {
   assertDirectEmphasis(source);
   let currentHeading='';
   let primaryHighlights=0;
+  let boldCount=0;
+  let highlightCount=0;
+  let underlineCount=0;
   const visit=node=>{
     if(node.name==='h2')currentHeading=cleanText(nodeText(node));
+    if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
+      highlightCount++;
       const children=(node.children??[]).filter(n=>n.type!=='comment' && !(n.type==='text'&&!n.data.trim()));
       const inner=children[0];
       const underlined=inner?.name==='u';
       const boldChildren=underlined?(inner.children??[]).filter(n=>n.type!=='comment' && !(n.type==='text'&&!n.data.trim())):children;
       if(children.length!==1||boldChildren.length!==1||boldChildren[0].name!=='strong')throw Error('E_DIRECT_EMPHASIS_STRUCTURE');
+      if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
       if(LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text)))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!SAFETY_HEADING.test(currentHeading))primaryHighlights++;
@@ -45,4 +57,8 @@ export function assertDirectSubmissionEmphasis(source) {
   };
   visit(parseDocument(source.bodyHtml??''));
   if(!primaryHighlights)throw Error('E_DIRECT_PRIMARY_EMPHASIS_MISSING');
+  if(boldCount<DIRECT_EMPHASIS_MINIMUMS.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
+  if(highlightCount<DIRECT_EMPHASIS_MINIMUMS.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
+  if(underlineCount<DIRECT_EMPHASIS_MINIMUMS.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
+  return {boldCount,highlightCount,underlineCount};
 }
