@@ -1,12 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {assertDirectEmphasis,assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
+import {DIRECT_EMPHASIS_MINIMUMS,assertDirectEmphasis,assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
+
+const quotaBody=({plainBold=10,level2=6,level3=2,heading='2. 핵심 정보'}={})=>{
+  const plain=Array.from({length:plainBold},(_,i)=>`<strong>굵게${i+1}</strong>`).join('');
+  const l2=Array.from({length:level2},(_,i)=>`<mark><strong>하이라이트${i+1}</strong></mark>`).join('');
+  const l3=Array.from({length:level3},(_,i)=>`<mark><u><strong>최상위${i+1}</strong></u></mark>`).join('');
+  return `<h2>${heading}</h2>${plain}${l2}${l3}`;
+};
 
 test('direct submission rejects missing or standalone highlights',()=>{
   for(const bodyHtml of ['<strong>핵심</strong><u>조건</u>','<mark>핵심</mark>','<p>&lt;mark&gt;문자&lt;/mark&gt;</p>'])
     assert.throws(()=>assertDirectEmphasis({id:'direct-test',bodyHtml}),/E_DIRECT_EMPHASIS_MISSING/);
 });
-test('both approved emphasis levels pass without imposing quotas',()=>{
+test('both approved emphasis levels pass the legacy structural presence guard',()=>{
   for(const bodyHtml of ['<mark><strong>핵심</strong></mark>','<mark><u><strong>주의 행동</strong></u></mark>'])
     assert.doesNotThrow(()=>assertDirectEmphasis({id:'direct-test',bodyHtml}));
   assert.doesNotThrow(()=>assertDirectEmphasis({id:'legacy-test',bodyHtml:'<p>기존 원고</p>'}));
@@ -30,17 +37,40 @@ test('new submission rejects evidence-limit disclaimers as highlighted takeaways
 });
 
 test('new submission requires at least one core highlight outside safety-only sections',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:'<h2>5. 부작용과 주의사항</h2><mark><u><strong>호흡곤란이 생기면 즉시 진료를 받습니다.</strong></u></mark>'};
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({heading:'5. 부작용과 주의사항'})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_PRIMARY_EMPHASIS_MISSING/);
 });
 
-test('actionable safety warning can stay strong when core benefits are also highlighted',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:'<h2>2. 핵심 성분</h2><mark><strong>단백질은 근육과 조직을 유지하는 재료입니다.</strong></mark><h2>5. 부작용과 주의사항</h2><mark><u><strong>호흡곤란이 생기면 즉시 진료를 받습니다.</strong></u></mark>'};
+test('four categories share the same minimum emphasis quota',()=>{
+  assert.deepEqual(DIRECT_EMPHASIS_MINIMUMS,{bold:18,highlight:8,underline:2});
+  for(const category of ['음식','영양소','약학','질병']){
+    const source={id:`direct-${category}-test`,category,contentStandard:'SP1',bodyHtml:quotaBody()};
+    assert.deepEqual(assertDirectSubmissionEmphasis(source),{boldCount:18,highlightCount:8,underlineCount:2});
+  }
+});
+
+test('new submission rejects fewer than 18 bold effects',()=>{
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:9,level2:6,level3:2})};
+  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_BOLD_MIN/);
+});
+
+test('new submission rejects fewer than 8 highlight effects',()=>{
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:11,level2:5,level3:2})};
+  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
+});
+
+test('new submission rejects fewer than 2 underline highlight effects',()=>{
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:10,level2:7,level3:1})};
+  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_UNDERLINE_MIN/);
+});
+
+test('actionable safety warning can stay strong when core benefits and common quotas are satisfied',()=>{
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody()+'<h2>5. 부작용과 주의사항</h2><mark><u><strong>호흡곤란이 생기면 즉시 진료를 받습니다.</strong></u></mark>'};
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
 test('submission preserves valid emphasis and leaves historical loading unchanged',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:'<strong>성분</strong><mark><strong>수치</strong></mark><mark><u><strong>행동</strong></u></mark>'};
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody()};
   const before=JSON.stringify(source);
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
   assert.equal(JSON.stringify(source),before);
