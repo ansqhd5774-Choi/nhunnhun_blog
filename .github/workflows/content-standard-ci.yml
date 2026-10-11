@@ -15,6 +15,7 @@ on:
       - publishing/update-core.mjs
       - publishing/publish.mjs
       - publishing/update.mjs
+      - publishing/auth-preflight.mjs
       - publishing/verify-updated-public.mjs
       - tests/**
       - package.json
@@ -38,6 +39,7 @@ on:
       - publishing/update-core.mjs
       - publishing/publish.mjs
       - publishing/update.mjs
+      - publishing/auth-preflight.mjs
       - publishing/verify-updated-public.mjs
       - tests/**
       - package.json
