@@ -49,6 +49,7 @@ test('mutation workflows require authenticated Tistory preflight after Chrome re
  assert.match(preflight,/\/manage\/posts/);
  assert.match(preflight,/E_TISTORY_AUTH_REQUIRED_PRECHECK/);
  assert.match(preflight,/TISTORY_AUTH_READY/);
+ assert.match(preflight,/setTimeout\(\(\) => process\.exit\(process\.exitCode \?\? 0\), 0\)/);
 });
 test('scheduled GPT contract isolates each article and distinguishes uncommitted writes',()=>{
  const contract=readFileSync('docs/GENERAL_CHAT_EXECUTION.md','utf8');
