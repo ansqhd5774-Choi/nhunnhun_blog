@@ -42,7 +42,15 @@ export async function runTistoryAuthPreflight() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  await runTistoryAuthPreflight();
+  const watchdog = setTimeout(() => {
+    console.error('TISTORY_AUTH_PREFLIGHT E_TISTORY_AUTH_PRECHECK_TIMEOUT');
+    process.exit(1);
+  }, 120000);
+  try {
+    await runTistoryAuthPreflight();
+  } finally {
+    clearTimeout(watchdog);
+  }
   // A completed read-only auth check must not keep the CDP client or Node event loop alive.
   setTimeout(() => process.exit(process.exitCode ?? 0), 0);
 }
