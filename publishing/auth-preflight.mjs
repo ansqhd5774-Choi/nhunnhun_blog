@@ -43,4 +43,6 @@ export async function runTistoryAuthPreflight() {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await runTistoryAuthPreflight();
+  // A completed read-only auth check must not keep the CDP client or Node event loop alive.
+  setTimeout(() => process.exit(process.exitCode ?? 0), 0);
 }
