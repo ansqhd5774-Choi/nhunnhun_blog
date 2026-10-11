@@ -11,13 +11,17 @@
 검색·유입·근거 갱신 작업은 [한입 건강 32개 운영 계약](docs/HEALTH_GROWTH_OPERATIONS.md)을 적용한다. 기존 작성·강조·발행 계약을 유지하고 검색 색인·유입을 매 글 발행 게이트로 추가하지 않는다. 32개 항목은 구현과 실제 운영 검증을 분리한다.
 
 ## 기준 우선순위 — GPT 직접 작성
-음식·영양소·약학·질병의 GPT 직접 작성 및 direct-* 원고 수정에는 `docs/content/DIRECT_AUTHORING_R1.md`의 최신 사용자 지시가 우선한다. 아래 R1/R4의 중첩 금지·짧은 구절 한정·강조 개수 기준은 이 경로에 적용하지 않는다. 직접 작성은 1단계 strong, 2단계 mark+strong, 3단계 mark+u+strong을 사용한다. 의학적 근거·인증·HTML 보안·중복 제출 보호는 유지한다. 기존 R1/R4 원고 경로와 변경 없는 과거 원고의 계약은 보존한다.
+음식·영양소·약학·질병의 GPT 직접 작성 및 `direct-*` SP1 원고에는 `docs/content/DIRECT_AUTHORING_R1.md`와 `docs/content/CATEGORY_CONTENT_PARITY.md`의 최신 사용자 지시가 **내용·문체·구성·강조의 최우선 기준**이다. `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`은 근거·안전·legacy 계약을 참고할 수 있지만, direct-*의 문체·소제목·강조·contentStandard를 덮어쓰지 않는다. 서로 충돌하면 DIRECT_AUTHORING_R1과 CATEGORY_CONTENT_PARITY를 적용한다.
 
-## ACTIVE — Content Standard R1 / Editorial R4 (2026-10-07)
+직접 작성 음식 글은 **확인된 특징·장점·영양소 역할·식사 활용을 먼저 충분히 설명**한다. 독자가 주장하지 않은 치료·예방 효과를 도입·효능·궁합·FAQ·핵심 정리에서 반복 반박하지 않는다. 실제 알레르기·독소·상호작용·보관 안전처럼 행동이 필요한 경고는 명확히 유지하되 원칙적으로 주의 항목에 집중한다. 즉시 필요한 안전 경고는 필요한 위치에도 둘 수 있다. 일반 효능 문단과 핵심 정리의 강한 강조를 부정·반박 문장으로 채우지 않는다.
 
-- 음식·영양소·약·질병의 신규 작성 및 앞으로의 전체 수정은 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 먼저 읽는다.
-- 내용·문체·새 강조 규칙은 위 R1/R4를 우선하며 기존 실행 규칙 R2의 인증·승인·CMD·발행·보안 규칙은 유지한다. 아래와 과거 문서의 R3 강조 지시는 변경 없는 legacy source에만 적용한다.
-- source의 contentStandard=R1과 실제 category, 같은 id의 content-reviews 검토서를 함께 작성한다. 본문·이미지·승인 상태 변경 후 실제 재검토 없이 해시만 바꾸지 않는다.
+직접 작성은 1단계 strong, 2단계 mark+strong, 3단계 mark+u+strong을 사용한다. 의학적 근거·인증·HTML 보안·중복 제출 보호는 유지한다. SP1 direct source는 `contentStandard=SP1`을 유지하며 R1 source/review 페어 계약을 강제하지 않는다. 기존 R1/R4 원고 경로와 변경 없는 과거 원고의 계약은 보존한다.
+
+## ACTIVE — Legacy Content Standard R1 / Editorial R4 (direct-* SP1 제외, 2026-10-07)
+
+- 아래 R1/R4 문서는 기존 R1/R4 경로와 변경 없는 legacy source의 계약을 보존하기 위한 기준이다. `direct-*` SP1 신규 작성·전체 수정의 내용·문체·강조 우선순위에는 사용하지 않는다.
+- 비-direct R1 경로의 신규 작성·수정은 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 따른다.
+- 비-direct R1 source는 contentStandard=R1과 실제 category, 같은 id의 content-reviews 검토서를 함께 작성한다. 본문·이미지·승인 상태 변경 후 실제 재검토 없이 해시만 바꾸지 않는다.
 - AI가 의미를 분류·검토하며 자동 게이트는 계약 검증만 한다. PASS를 의사 감수·의학적 진실·독자 만족도 측정이라고 보고하지 않는다.
 - 여러 GPT는 글/브랜치를 분리한다. ready 다중 pending과 실제 발행/수정은 기존 한 건 제한을 유지하며 신규/수정 브라우저는 공통 mutex를 사용한다. 자동 queue 구현으로 오인하지 않는다.
 - 새 규격을 이유로 기존 글·ledger·스킨·광고·카테고리를 일괄 수정하지 않는다.
@@ -49,6 +53,7 @@
 - 강조 선택과 내부링크를 본문 작성 중 함께 적용한다. 최신 직접 작성 기준의 1·2·3단계 중첩 태그를 사용하며 러너 출력의 항목별 강조 현황을 확인한다. 자동 내용 검사·재작성 루프·새 Actions 작업을 추가하지 않는다. 시작부터 최종 제출까지 단계별 시간을 기록한다.
 - 강조 범위는 핵심 단어에 한정하지 않는다. 각 항목의 핵심 수치·성분 역할·효과와 조건·궁합의 작용·주의 행동·선택과 보관 기준까지 넓혀, 강조 부분을 훑어도 핵심을 알 수 있게 작성한다. 표에도 적용하며 중요도별 중복 강조를 유지한다.
 - 궁합은 성분/구성 보완 또는 근거 있는 흡수·상호작용을 설명한다. 소량 고명은 풍미 역할로 설명하며 조합마다 한계·반박 문장을 덧붙이지 않는다. 소개·효능은 확인된 장점을 먼저 쓰고, 자료 기준은 영양표 앞에 간결하게 표시하며 실제 경고는 주의사항에 둔다. prepare-direct-source의 pairingReview 문장과 질문을 저장 전 검토하며 기술 CI를 내용 PASS로 보고하지 않는다.
+- 저장 전에는 **도입·소개·효능·궁합·FAQ·핵심 정리의 강한 강조가 독자가 얻을 장점·작용·실천 기준을 중심으로 되어 있는지** 확인한다. 반복 부정문·반박문이 핵심 메시지를 차지하면 main에 저장하지 않고 같은 작성 과정에서 고친다. 이 검토는 작성자 판단이며 자동 의미 게이트를 추가하지 않는다.
 - 저장 전 emphasis-summary의 항목별 현황과 standaloneHighlights 문구를 읽고 실제 핵심 조건에 맞춰 중첩 강조를 보완한다. 전체 태그 수만 보고 기준 적용 완료로 보고하지 않는다. 이 관찰은 러너 출력이며 자동 게이트·새 CI 작업으로 연결하지 않는다.
 
 ## 발행 요청의 완료 조건
