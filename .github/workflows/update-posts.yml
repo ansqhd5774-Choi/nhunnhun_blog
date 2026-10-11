@@ -62,6 +62,8 @@ jobs:
       - name: 선택 원고 준비와 강조 현황 — 러너 담당
         run: node authoring/prepare-selected-source.mjs updates
       - run: call maintenance\check-tistory-chrome.cmd
+      - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
+        run: node publishing/auth-preflight.mjs
       - run: pnpm run update
         env:
           UPDATE_ENABLED: 'true'
