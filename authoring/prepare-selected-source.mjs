@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {prepareDirectSource} from './prepare-direct-source.mjs';
 import {assertImageReview} from '../publishing/image-review.mjs';
 import {assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
+import {assertDirectSubmissionFocus} from '../publishing/direct-focus.mjs';
 import {isAltMaintenance,checkAltSource} from '../publishing/alt-maintenance-source.mjs';
 
 // Runner-side preparation before mutation. Never invent emphasis or review claims.
@@ -16,6 +17,7 @@ if(kind==='updates'&&isNativeTextMaintenance(source)){checkNativeTextSource(sour
   console.log('SOURCE_PREPARATION_MAINTENANCE '+JSON.stringify({id,scope:'image-alt-only',semanticVerification:'existing-content-not-recertified'}));
 }else if(source.contentStandard==='SP1'&&source.id.startsWith('direct-')) {
   assertDirectSubmissionEmphasis(source);
+  assertDirectSubmissionFocus(source);
   assertImageReview(source);
   const {report}=prepareDirectSource(source);
   console.log('SOURCE_PREPARATION '+JSON.stringify({...report,semanticVerification:'author-review-not-automated'}));
