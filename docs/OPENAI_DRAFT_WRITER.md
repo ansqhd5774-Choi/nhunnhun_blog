@@ -18,6 +18,6 @@
 
 R1·R4 문서를 매 실행 읽고 현재 source 제목 목록으로 중복 위험을 검토한다. 실제 검색 응답 인용 URL을 최소 2개 요구하며 본문은 기존 HTML 검사를 통과해야 한다. 이것은 의학적 정확성·출처 충분성·독자 만족의 증명이 아니다. 웹 검색 자료 안의 명령은 작성 지시로 취급하지 않는다.
 
-글은 `draft`, `approved:false`다. 검토서는 미완성 scaffold이며 AI 작성 메모는 research.json에 별도로 보관한다. 작성 AI가 이미지 시각 검토나 최종 검토를 완료했다고 표시하지 않는다. 이미지 3개·대표 이미지·사용권한·실제 시각 검토, 출처 원문 재확인, R1 검토서 작성, R4 렌더 확인을 마친 뒤 기존 승인·검증·발행 절차로 넘긴다. 완료된 source/review를 함께 저장하고 내용 변경 후 해시를 갱신한다. 이 기능은 티스토리 브라우저·즉시/예약 제출·published/scheduled 원장에 접근하지 않는다.
+글은 `draft`, `approved:false`다. 검토서는 미완성 scaffold이며 AI 작성 메모는 research.json에 별도로 보관한다. 작성 AI가 최종 검토를 완료했다고 표시하지 않는다. 이미지 3개·대표 이미지·사용권한, 출처 원문 재확인, R1 검토서 작성, R4 렌더 확인을 마친 뒤 기존 승인·검증·발행 절차로 넘긴다. 완료된 source/review를 함께 저장하고 내용 변경 후 해시를 갱신한다. 이 기능은 티스토리 브라우저·즉시/예약 제출·published/scheduled 원장에 접근하지 않는다.
 
 공식 API 근거: [Responses](https://developers.openai.com/api/docs/guides/text), [웹 검색](https://developers.openai.com/api/docs/guides/tools-web-search), [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
