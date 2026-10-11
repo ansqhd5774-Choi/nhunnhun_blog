@@ -23,6 +23,16 @@
 - 초안은 자동 발행 대상에 ready/approved로 저장하지 않는다. updates는 draft 계약을 지원하지 않으므로 초안은 별도 작업 경로/브랜치에 보존한다.
 - prepare-selected-source를 기존 러너 단계에서 실행해 보안·렌더 준비·강조 현황을 확인한다. 작성자는 출력된 문구를 실제 의미 검토 증거로 과장하지 않는다. 로컬 prepare 실행은 선택적인 운영자 보조 도구다.
 
+## 예약 GPT 작업 장애 격리와 사전검사
+
+- 여러 글을 미래 시각에 처리할 때는 **글 1건 = 독립 1회성 ChatGPT 예약 작업**으로 만든다. 서로 다른 글을 하나의 RRULE/COUNT 반복 작업에 묶지 않는다. 외부 앱 쓰기 승인·안전 검사에서 한 실행이 정지되더라도 이후 글의 예약까지 연쇄 중단되지 않아야 한다.
+- 예약 실행에서는 원고 전체를 완성하기 전에 사용할 사진의 실제 시각 확인 가능 여부, HTTPS, alt, 원출처·라이선스를 먼저 확인한다. 새 사진을 관찰하지 못하면 `visualChecked=true`로 만들지 않고 해당 원고를 승인 저장하지 않는다.
+- GitHub 쓰기 액션이 실제 커밋 생성 전에 연결 앱의 승인·안전 검사에서 거부되면 상태를 `WRITE_NOT_COMMITTED`로 구분한다. GitHub API 권한 오류·GitHub CI 실패·Tistory 실패와 같은 원인으로 합치지 않는다.
+- `WRITE_NOT_COMMITTED`에서는 저수준 Git/GitHub 객체 조작이나 수동 workflow_dispatch로 우회하지 않는다. 가능한 경우 완성 원고를 대화/파일 작업물로 보존하고, 독립된 다음 예약 작업은 그대로 진행되게 한다.
+- GitHub 저장 성공은 대상 파일 존재와 **새 main 커밋 SHA**를 실제 확인한 경우에만 선언한다. 원고 작성 완료나 쓰기 요청 시도만으로 저장 완료라고 하지 않는다.
+- push로 자동 Actions가 시작된 작업은 동일 source의 수동 workflow_dispatch를 겹쳐 호출하지 않는다.
+- `TISTORY_CHROME_READY`는 전용 Chrome/CDP가 연결 가능하다는 뜻일 뿐 로그인 성공 증거가 아니다. 신규·기존 mutation은 읽기 전용 사전검사에서 `TISTORY_AUTH_READY`가 확인된 뒤에만 시작한다. 로그인 페이지로 이동하거나 글쓰기 컨트롤을 확인하지 못하면 `E_TISTORY_AUTH_REQUIRED_PRECHECK`로 최종 제출 전에 중단한다.
+
 ## 검색·갱신 후속 운영
 
 [32개 운영 계약](HEALTH_GROWTH_OPERATIONS.md)은 작성/발행 계약을 대체하지 않는다. 일반 Chat에 로컬 검색 점검 CLI·브라우저 기능을 요구하지 않고, 운영자가 만든 결과와 연결된 공식 도구를 읽는다. Google·네이버·Bing 등록/색인/유입은 공개 검증과 별도 상태다.
