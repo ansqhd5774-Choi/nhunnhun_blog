@@ -35,3 +35,25 @@ test('general Chat pipeline has runner preparation and read-only recovery withou
  const verify=read('publishing/verify-updated-public.mjs');assert.doesNotMatch(verify,/SP1'\) return/);assert.match(verify,/assertDirectPublicSnapshot\(snapshot/);
  const finalize=read('publishing/finalize-update.mjs');assert.doesNotMatch(finalize,/submit\.click|openEditorConnection|UPDATE_ENABLED/);
 });
+test('mutation workflows require authenticated Tistory preflight after Chrome readiness',()=>{
+ const read=f=>readFileSync(f,'utf8');
+ const update=read('.github/workflows/update-posts.yml');
+ const publish=read('.github/workflows/publish-posts.yml');
+ for (const [workflow,mutation] of [[update,'pnpm run update'],[publish,'pnpm run publish']]) {
+   const chrome=workflow.indexOf('maintenance\\check-tistory-chrome.cmd');
+   const auth=workflow.indexOf('node publishing/auth-preflight.mjs');
+   const mutate=workflow.indexOf(mutation);
+   assert.ok(chrome>=0 && auth>chrome && mutate>auth, `${mutation} must follow Chrome and auth preflight`);
+ }
+ const preflight=read('publishing/auth-preflight.mjs');
+ assert.match(preflight,/\/manage\/posts/);
+ assert.match(preflight,/E_TISTORY_AUTH_REQUIRED_PRECHECK/);
+ assert.match(preflight,/TISTORY_AUTH_READY/);
+});
+test('scheduled GPT contract isolates each article and distinguishes uncommitted writes',()=>{
+ const contract=readFileSync('docs/GENERAL_CHAT_EXECUTION.md','utf8');
+ assert.match(contract,/글 1건 = 독립 1회성 ChatGPT 예약 작업/);
+ assert.match(contract,/WRITE_NOT_COMMITTED/);
+ assert.match(contract,/TISTORY_CHROME_READY/);
+ assert.match(contract,/TISTORY_AUTH_READY/);
+});
