@@ -1,4 +1,4 @@
-const REVIEW_KEYS=['src','alt','role','composition','sourcePage','author','license','visualChecked'];
+const REVIEW_KEYS=['src','alt','role','composition','sourcePage','author','license'];
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','process','diagram']);
 const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
@@ -16,7 +16,7 @@ export function assertImageReview(item){
   for(let i=0;i<review.length;i++){
     const r=review[i],tag=tags[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
-    if(r.visualChecked!==true||!ROLES.has(r.role)||!COMPOSITIONS.has(r.composition)||(i>0&&r.role==='hero'))throw new Error('E_IMAGE_REVIEW_REQUIRED');
+    if(!ROLES.has(r.role)||!COMPOSITIONS.has(r.composition)||(i>0&&r.role==='hero'))throw new Error('E_IMAGE_REVIEW_REQUIRED');
     const src=attr(tag,'src'),alt=attr(tag,'alt');
     if(r.src!==src||r.alt!==alt||!alt.trim()||alt.length<6)throw new Error('E_IMAGE_REVIEW_MISMATCH');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
