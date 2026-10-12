@@ -16,7 +16,7 @@ test('preparation exposes actual pairing paragraphs for author review without au
 
 test('food-axis review exposes six reader-question, H2 and first-answer pairs without semantic auto-pass',()=>{
   const source={bodyHtml:[
-    '<h2>1. 음식은 무엇일까?</h2><p>첫째 답변입니다.</p>',
+    '<h2>1. 음식은 무엇일까?</h2><p><img src="https://example.com/food.jpg" alt="음식"></p><p>첫째 답변입니다.</p>',
     '<h2>2. 효능은 어디까지 확인됐을까?</h2><p>둘째 효능 답변입니다.</p>',
     '<h2>3. 얼마나 먹을까?</h2><p>셋째 섭취 답변입니다.</p>',
     '<h2>4. 무엇과 먹을까?</h2><p>넷째 궁합 답변입니다.</p>',
@@ -29,6 +29,7 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs wi
   assert.equal(review.automatedSemanticVerdict,false);
   assert.equal(review.observedCoreH2Count,6);
   assert.equal(review.axes.length,6);
+  assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
   assert.equal(review.axes[1].heading,'2. 효능은 어디까지 확인됐을까?');
   assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
   assert.match(review.axes[1].readerQuestion,/핵심 효능/);
