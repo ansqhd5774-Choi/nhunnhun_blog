@@ -10,19 +10,21 @@ const RESEARCH_DETAIL_PATTERNS=[
   /(?:\d{2,5})명(?:을|의)?\s*대상/gu,
 ];
 const LIMITATION_PATTERNS=[
-  /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/gu,
-  /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/gu,
-  /단정(?:하기|할\s*수)?\s*어렵/gu,
-  /확립(?:(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)|(?:(?:돼|되어)\s*있지\s*않))/gu,
-  /(?:보장|장담)(?:할\s*수)?\s*없/gu,
-  /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/gu,
-  /(?:공식|비교\s*가능한)?\s*(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/gu,
-  /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|없)/gu,
+  /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
+  /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
+  /단정(?:하기|할\s*수)?\s*어렵/u,
+  /확립(?:(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)|(?:(?:돼|되어)\s*있지\s*않))/u,
+  /(?:보장|장담)(?:할\s*수)?\s*없/u,
+  /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/u,
+  /(?:공식|비교\s*가능한)?\s*(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
+  /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|없)/u,
 ];
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
-const collectMatches=(text,patterns)=>patterns.flatMap(pattern=>[...text.matchAll(new RegExp(pattern.source,pattern.flags))].map(match=>clean(match[0])));
+const countMatches=(text,patterns)=>patterns.reduce((sum,pattern)=>sum+([...text.matchAll(new RegExp(pattern.source,pattern.flags))].length),0);
+const limitationSentences=text=>(String(text).match(/[^.!?]+[.!?]?/gu)??[]).map(clean).filter(Boolean)
+  .filter(sentence=>LIMITATION_PATTERNS.some(pattern=>pattern.test(sentence)));
 
 export function directFocusReview(bodyHtml='') {
   const root=parseDocument(String(bodyHtml));
@@ -47,9 +49,9 @@ export function directFocusReview(bodyHtml='') {
   for(const section of sections){
     if(/^자료 출처$/u.test(section.heading))continue;
     const text=clean(section.text);
-    researchDetailHits+=collectMatches(text,RESEARCH_DETAIL_PATTERNS).length;
+    researchDetailHits+=countMatches(text,RESEARCH_DETAIL_PATTERNS);
     if(!PURE_SAFETY_HEADING.test(section.heading)){
-      const hits=collectMatches(text,LIMITATION_PATTERNS);
+      const hits=limitationSentences(text);
       limitationHits+=hits.length;
       limitationFindings.push(...hits.map(match=>({heading:section.heading,match})));
     }
