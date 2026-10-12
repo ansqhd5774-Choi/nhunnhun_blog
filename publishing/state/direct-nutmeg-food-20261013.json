@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "6d33aafe5fd00cbea8e28b1c15495da273bd889477dc1a45ccb862b3d6fda81d",
-  "sourceCommit": "850217a3762aac3253ec4506e4edc981f8e8c72f",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-12T19:54:31.732Z",
   "url": "https://nhunnhun.tistory.com/425",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-12T19:55:01.755Z",
+  "sourceCommit": "850217a3762aac3253ec4506e4edc981f8e8c72f",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38300490235",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-nutmeg-food-20261013",
+    "url": "https://nhunnhun.tistory.com/425",
+    "checkedAt": "2026-10-12T19:55:01.755Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
