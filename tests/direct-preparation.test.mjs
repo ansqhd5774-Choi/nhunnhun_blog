@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {prepareDirectSource} from '../authoring/prepare-direct-source.mjs';
 import {pairingReview} from '../authoring/pairing-review.mjs';
+import {buildFoodAxisReview} from '../authoring/food-axis-review.mjs';
 
 test('preparation exposes actual pairing paragraphs for author review without automatic meaning PASS',()=>{
  const html='<h2>소개</h2><h2>성분</h2><h2>효과</h2><h2>궁합</h2><ul><li><strong>은행 + 달걀</strong> 단백질을 보완합니다.</li></ul><h2>주의</h2><ul><li>주의 행동</li></ul>';
@@ -11,6 +12,27 @@ test('preparation exposes actual pairing paragraphs for author review without au
  assert.equal(review.assessment,'AUTHOR_REVIEW_REQUIRED');
  assert.equal(review.reviewQuestions.length,6);
  assert.equal(pairingReview('<h2>소개</h2>').combinations.length,0);
+});
+
+test('food-axis review exposes six reader-question, H2 and first-answer pairs without semantic auto-pass',()=>{
+  const source={bodyHtml:[
+    '<h2>1. 음식은 무엇일까?</h2><p>첫째 답변입니다.</p>',
+    '<h2>2. 효능은 어디까지 확인됐을까?</h2><p>둘째 효능 답변입니다.</p>',
+    '<h2>3. 얼마나 먹을까?</h2><p>셋째 섭취 답변입니다.</p>',
+    '<h2>4. 무엇과 먹을까?</h2><p>넷째 궁합 답변입니다.</p>',
+    '<h2>5. 부작용은?</h2><p>다섯째 주의 답변입니다.</p>',
+    '<h2>6. 어떻게 고르고 보관할까?</h2><p>여섯째 보관 답변입니다.</p>',
+    '<h2>핵심 정리</h2><p>보조 항목입니다.</p>'
+  ].join('')};
+  const review=buildFoodAxisReview(source);
+  assert.equal(review.assessment,'AUTHOR_REVIEW_REQUIRED');
+  assert.equal(review.automatedSemanticVerdict,false);
+  assert.equal(review.observedCoreH2Count,6);
+  assert.equal(review.axes.length,6);
+  assert.equal(review.axes[1].heading,'2. 효능은 어디까지 확인됐을까?');
+  assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
+  assert.match(review.axes[1].readerQuestion,/핵심 효능/);
+  assert.match(review.axes[1].reviewQuestion,/감각, 연구 한계, 안전, 맛 설명만으로/);
 });
 
 test('one local preparation uses publishing layout and retains author-selected emphasis',()=>{
@@ -23,6 +45,9 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.match(result.preview,/<mark><u><strong>중요한 행동<\/strong><\/u><\/mark>/);
   assert.equal(result.report.sections[3].level3,1);
   assert.equal(result.report.sourceId,source.id);
+  assert.equal(result.report.foodAxisReview.automatedSemanticVerdict,false);
+  assert.equal(result.report.foodAxisReview.axes[0].heading,'소개');
+  assert.equal(result.report.foodAxisReview.axes[0].firstAnswer,'소개');
   const evidenceQuestions=result.report.editorialReview.questions.join('\n');
   assert.match(evidenceQuestions,/정제 성분·추출물·오일·보충제·유사 종/);
   assert.match(evidenceQuestions,/항산화·항균·항염/);
