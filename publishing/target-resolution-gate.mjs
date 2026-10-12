@@ -37,6 +37,13 @@ export function identityDigest(identity){
   const clean={sourceId:identity.sourceId,operation:identity.operation,topic:identity.topic,aliases:identity.aliases,reviewed:identity.reviewed,...(identity.proposedTitle?{proposedTitle:identity.proposedTitle}:{})};
   return createHash('sha256').update(JSON.stringify(clean)).digest('hex');
 }
+export function validateResolutionProof(identity,resolution,{sourceId=identity?.sourceId}={}){
+  if(!resolution||typeof resolution!=='object'||Array.isArray(resolution))throw Error('E_TARGET_RESOLUTION_RESULT_REQUIRED');
+  if(resolution.sourceId!==sourceId||resolution.requestDigest!==identityDigest(identity))throw Error('E_TARGET_RESOLUTION_RESULT_MISMATCH');
+  if(resolution.decision==='existing_candidate')throw Error('E_TARGET_EXISTING_CANDIDATE');
+  if(resolution.decision!=='new'||!Number.isInteger(resolution.scanned)||resolution.scanned<1)throw Error('E_TARGET_RESOLUTION_RESULT_INVALID');
+  return resolution;
+}
 export function validateCreateIdentity(post,identity){
   const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
   if(!required)return null;
@@ -89,9 +96,7 @@ async function readIdentity(root,post){
   if(!required)return {identity:null,resolution:null};
   const identity=validateCreateIdentity(post,await readJson(resolve(root,'authoring','target-resolution',post.id+'.json'),'E_TARGET_IDENTITY_REQUIRED','E_TARGET_IDENTITY_READ'));
   const resolution=await readJson(resolve(root,'authoring','target-resolution-results',post.id+'.json'),'E_TARGET_RESOLUTION_RESULT_REQUIRED','E_TARGET_RESOLUTION_RESULT_READ');
-  if(resolution?.sourceId!==post.id||resolution?.requestDigest!==identityDigest(identity))throw Error('E_TARGET_RESOLUTION_RESULT_MISMATCH');
-  if(resolution?.decision==='existing_candidate')throw Error('E_TARGET_EXISTING_CANDIDATE');
-  if(resolution?.decision!=='new'||!Number.isInteger(resolution?.scanned)||resolution.scanned<1)throw Error('E_TARGET_RESOLUTION_RESULT_INVALID');
+  validateResolutionProof(identity,resolution,{sourceId:post.id});
   return {identity,resolution};
 }
 export async function runTargetResolutionGate({root=process.cwd(),sourceId=process.env.PUBLISH_SOURCE_ID}={}){
