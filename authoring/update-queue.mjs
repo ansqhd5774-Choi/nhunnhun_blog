@@ -8,7 +8,7 @@ const BLOG='https://nhunnhun.tistory.com';
 // R5.3 ACTIVE — simple writer
 // R5.3 PRODUCER TRIGGER
 // R5.3 BASELINE 2 TRIGGER
-const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food','영양소':'nutrient','약':'medicine','질병':'disease'});
+const DOMAIN_BY_CATEGORY=Object.freeze({'음식':'food'});
 const STATE_DIR='authoring/update-queue-state';
 export const QUEUE_POLICY_VERSION='R5.5';
 const LEGACY_BLOCKED_STATUSES=new Set(['BLOCKED','BLOCKED_CONTENT','BLOCKED_GENERATION','BLOCKED_EVIDENCE','BLOCKED_IMAGE','BLOCKED_ENTITY','BLOCKED_REVIEW']);
@@ -17,7 +17,7 @@ export function parseUpdateQueue(text){
   const rows=String(text).replace(/^\uFEFF/,'').split(/\r?\n/).map(s=>s.trim()).filter(s=>s&&!s.startsWith('#'));
   const out=[],seen=new Set();
   for(let i=0;i<rows.length;i++){
-    const m=rows[i].match(/^(음식|영양소|약|질병)\s+-\s+(.+?)\s+-\s+(https:\/\/nhunnhun\.tistory\.com\/(\d+))$/u);
+    const m=rows[i].match(/^(음식)\s+-\s+(.+?)\s+-\s+(https:\/\/nhunnhun\.tistory\.com\/(\d+))$/u);
     if(!m) throw new Error(`E_QUEUE_ROW_${i+1}`);
     const [,category,keyword,targetUrl,articleId]=m;
     if(seen.has(articleId)) throw new Error('E_QUEUE_DUPLICATE_ARTICLE');
