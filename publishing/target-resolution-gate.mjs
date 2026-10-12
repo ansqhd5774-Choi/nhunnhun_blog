@@ -1,12 +1,13 @@
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
 import {BLOG,loadPosts} from './core.mjs';
 import {assertTistoryAuthenticated} from './auth-preflight.mjs';
 import {localBrowserConfig,openEditorConnection,closeEditorConnection} from './local-browser.mjs';
 
 const MAX_MANAGER_PAGES=100;
-const IDENTITY_KEYS=new Set(['sourceId','operation','topic','aliases','reviewed']);
+const IDENTITY_KEYS=new Set(['sourceId','operation','topic','aliases','reviewed','proposedTitle']);
 
 export function normalizeIdentityText(value){
   return String(value??'').normalize('NFC').toLocaleLowerCase('ko-KR').replace(/\s+/g,' ').trim();
@@ -19,20 +20,32 @@ export function titleMatchesAlias(title,alias){
   const pattern=escapeRegExp(needle).replace(/\s+/g,'\\s+');
   return new RegExp(`(^|[^\\p{L}\\p{N}])${pattern}(?=$|[^\\p{L}\\p{N}])`,'iu').test(text);
 }
-export function validateCreateIdentity(post,identity){
-  const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
-  if(!required)return null;
+export function validateIdentityRequest(identity,{sourceId=null}={}){
   if(!identity||typeof identity!=='object'||Array.isArray(identity))throw Error('E_TARGET_IDENTITY_REQUIRED');
   if(Object.keys(identity).some(key=>!IDENTITY_KEYS.has(key)))throw Error('E_TARGET_IDENTITY_SCHEMA');
-  if(identity.sourceId!==post.id||identity.operation!=='create'||identity.reviewed!==true)throw Error('E_TARGET_IDENTITY_MISMATCH');
+  if(typeof identity.sourceId!=='string'||!/^[a-z0-9][a-z0-9-]{2,79}$/.test(identity.sourceId))throw Error('E_TARGET_IDENTITY_SOURCE');
+  if(sourceId&&identity.sourceId!==sourceId)throw Error('E_TARGET_IDENTITY_MISMATCH');
+  if(identity.operation!=='create'||identity.reviewed!==true)throw Error('E_TARGET_IDENTITY_MISMATCH');
   if(typeof identity.topic!=='string'||!identity.topic.trim()||identity.topic.length>80)throw Error('E_TARGET_IDENTITY_TOPIC');
   if(!Array.isArray(identity.aliases)||identity.aliases.length>12||identity.aliases.some(alias=>typeof alias!=='string'||!alias.trim()||alias.length>80))throw Error('E_TARGET_IDENTITY_ALIASES');
+  if(identity.proposedTitle!=null&&(typeof identity.proposedTitle!=='string'||!identity.proposedTitle.trim()||identity.proposedTitle.length>180))throw Error('E_TARGET_IDENTITY_TITLE');
   const keys=[identity.topic,...identity.aliases].map(normalizeIdentityText);
   if(new Set(keys).size!==keys.length)throw Error('E_TARGET_IDENTITY_ALIASES');
   return identity;
 }
+export function identityDigest(identity){
+  const clean={sourceId:identity.sourceId,operation:identity.operation,topic:identity.topic,aliases:identity.aliases,reviewed:identity.reviewed,...(identity.proposedTitle?{proposedTitle:identity.proposedTitle}:{})};
+  return createHash('sha256').update(JSON.stringify(clean)).digest('hex');
+}
+export function validateCreateIdentity(post,identity){
+  const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
+  if(!required)return null;
+  validateIdentityRequest(identity,{sourceId:post.id});
+  if(identity.proposedTitle&&normalizeIdentityText(identity.proposedTitle)!==normalizeIdentityText(post.title))throw Error('E_TARGET_IDENTITY_TITLE_MISMATCH');
+  return identity;
+}
 export function existingTargetCandidates(items,post,identity){
-  const expected=normalizeIdentityText(post?.title);
+  const expected=normalizeIdentityText(post?.title||identity?.proposedTitle);
   const aliases=identity?[identity.topic,...identity.aliases]:[];
   const matches=[];
   for(const item of items??[]){
@@ -67,18 +80,24 @@ export async function fetchManagedPosts(page,{maxPages=MAX_MANAGER_PAGES}={}){
   for(const item of result?.items??[]){if(item?.id!=null)byId.set(String(item.id),item);}
   return [...byId.values()];
 }
+async function readJson(path,missingCode,readCode){
+  try{return JSON.parse(await readFile(path,'utf8'));}
+  catch(error){if(error?.code==='ENOENT')throw Error(missingCode);throw Error(readCode);}
+}
 async function readIdentity(root,post){
   const required=post.category==='음식'&&post.contentStandard==='SP1'&&post.id.startsWith('direct-');
-  if(!required)return null;
-  let identity;
-  try{identity=JSON.parse(await readFile(resolve(root,'authoring','target-resolution',post.id+'.json'),'utf8'));}
-  catch(error){if(error?.code==='ENOENT')throw Error('E_TARGET_IDENTITY_REQUIRED');throw Error('E_TARGET_IDENTITY_READ');}
-  return validateCreateIdentity(post,identity);
+  if(!required)return {identity:null,resolution:null};
+  const identity=validateCreateIdentity(post,await readJson(resolve(root,'authoring','target-resolution',post.id+'.json'),'E_TARGET_IDENTITY_REQUIRED','E_TARGET_IDENTITY_READ'));
+  const resolution=await readJson(resolve(root,'authoring','target-resolution-results',post.id+'.json'),'E_TARGET_RESOLUTION_RESULT_REQUIRED','E_TARGET_RESOLUTION_RESULT_READ');
+  if(resolution?.sourceId!==post.id||resolution?.requestDigest!==identityDigest(identity))throw Error('E_TARGET_RESOLUTION_RESULT_MISMATCH');
+  if(resolution?.decision==='existing_candidate')throw Error('E_TARGET_EXISTING_CANDIDATE');
+  if(resolution?.decision!=='new'||!Number.isInteger(resolution?.scanned)||resolution.scanned<1)throw Error('E_TARGET_RESOLUTION_RESULT_INVALID');
+  return {identity,resolution};
 }
 export async function runTargetResolutionGate({root=process.cwd(),sourceId=process.env.PUBLISH_SOURCE_ID}={}){
   if(!sourceId)throw Error('E_TARGET_SOURCE_REQUIRED');
   const [post]=await loadPosts('posts',sourceId);
-  const identity=await readIdentity(root,post);
+  const {identity,resolution}=await readIdentity(root,post);
   let connection,page;
   try{
     connection=await openEditorConnection(await localBrowserConfig());
@@ -91,7 +110,7 @@ export async function runTargetResolutionGate({root=process.cwd(),sourceId=proce
       console.log('TARGET_RESOLUTION_CANDIDATES '+JSON.stringify({sourceId:post.id,topic:identity?.topic??null,count:candidates.length,candidates:candidates.slice(0,12)}));
       throw Error('E_TARGET_EXISTING_CANDIDATE');
     }
-    console.log('TARGET_RESOLUTION_NEW_CONFIRMED '+JSON.stringify({sourceId:post.id,topic:identity?.topic??null,scanned:items.length,exactTitleChecked:true}));
+    console.log('TARGET_RESOLUTION_NEW_CONFIRMED '+JSON.stringify({sourceId:post.id,topic:identity?.topic??null,preAuthoringDecision:resolution?.decision??null,preAuthoringScanned:resolution?.scanned??null,runtimeScanned:items.length,exactTitleChecked:true}));
   }finally{
     try{await page?.close({runBeforeUnload:false});}catch{}
     if(connection)await closeEditorConnection(connection);
