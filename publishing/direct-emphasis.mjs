@@ -17,12 +17,17 @@ export function assertDirectEmphasis(source) {
 }
 
 const LIMITATION_HIGHLIGHT_PATTERNS=[
-  /(?:근거|자료|연구|증거)(?:가|는|를)?\s*(?:부족|충분하지|제한적)/u,
-  /(?:확인|입증|검증)(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
+  /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
+  /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
   /단정(?:하기|할\s*수)?\s*어렵/u,
   /말할\s*만한[^.!?]{0,30}근거(?:가|는)?\s*부족/u,
+  /확립(?:(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)|(?:(?:돼|되어)\s*있지\s*않))/u,
+  /(?:보장|장담)(?:할\s*수)?\s*없/u,
+  /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/u,
+  /(?:공식|비교\s*가능한)?\s*(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
+  /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|없)/u,
 ];
-const SAFETY_HEADING=/(?:주의|부작용|금기|위험|응급|이상반응)/u;
+const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 
@@ -36,7 +41,7 @@ export function assertDirectSubmissionEmphasis(source) {
   let highlightCount=0;
   let underlineCount=0;
   const visit=node=>{
-    if(node.name==='h2')currentHeading=cleanText(nodeText(node));
+    if(node.name==='h2')currentHeading=cleanText(nodeText(node)).replace(/^\d+[.)]\s*/u,'');
     if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
       highlightCount++;
@@ -48,7 +53,7 @@ export function assertDirectSubmissionEmphasis(source) {
       if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
       if(LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text)))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
-      if(!SAFETY_HEADING.test(currentHeading))primaryHighlights++;
+      if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
     }
     for(const child of node.children??[])visit(child);
   };
