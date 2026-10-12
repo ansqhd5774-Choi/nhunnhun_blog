@@ -2,12 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import YAML from 'yaml';
-import {titleMatchesAlias,validateCreateIdentity,existingTargetCandidates} from '../publishing/target-resolution-gate.mjs';
+import {titleMatchesAlias,validateCreateIdentity,validateIdentityRequest,identityDigest,validateResolutionProof,existingTargetCandidates} from '../publishing/target-resolution-gate.mjs';
 
 test('food target identity is mandatory for new direct SP1 sources',()=>{
   const post={id:'direct-chenpi-20261013',category:'음식',contentStandard:'SP1',title:'진피 효능과 먹는 법'};
   assert.throws(()=>validateCreateIdentity(post,null),/E_TARGET_IDENTITY_REQUIRED/);
-  assert.doesNotThrow(()=>validateCreateIdentity(post,{sourceId:post.id,operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질','Chenpi'],reviewed:true}));
+  assert.doesNotThrow(()=>validateCreateIdentity(post,{sourceId:post.id,operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질','Chenpi'],reviewed:true,proposedTitle:post.title}));
+});
+
+test('pre-authoring proof must match the exact reviewed request and say new',()=>{
+  const identity=validateIdentityRequest({sourceId:'direct-chenpi-20261013',operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질'],reviewed:true,proposedTitle:'진피 효능과 먹는 법'});
+  const proof={sourceId:identity.sourceId,requestDigest:identityDigest(identity),decision:'new',scanned:374,candidates:[]};
+  assert.equal(validateResolutionProof(identity,proof).decision,'new');
+  assert.throws(()=>validateResolutionProof(identity,{...proof,requestDigest:'0'.repeat(64)}),/E_TARGET_RESOLUTION_RESULT_MISMATCH/);
+  assert.throws(()=>validateResolutionProof(identity,{...proof,decision:'existing_candidate',candidates:[{id:'427'}]}),/E_TARGET_EXISTING_CANDIDATE/);
 });
 
 test('topic matching uses boundaries so short food names do not collide with compounds',()=>{
@@ -28,7 +36,16 @@ test('existing candidates include exact title and reviewed topic aliases',()=>{
   assert.deepEqual(existingTargetCandidates(items,post,identity).map(x=>x.id),['12','13']);
 });
 
-test('publish workflow resolves create-vs-existing before the only submit attempt and recovers read-only',()=>{
+test('pre-authoring resolver workflow is read-only to Tistory and persists decision evidence',()=>{
+  const workflow=YAML.parse(readFileSync('.github/workflows/resolve-target.yml','utf8').replace(/^\uFEFF/,''));
+  assert.deepEqual(workflow.on.push.paths,['authoring/target-resolution/**']);
+  const steps=workflow.jobs.resolve.steps;
+  assert.ok(steps.some(step=>step.run==='node publishing/auth-preflight.mjs'));
+  assert.ok(steps.some(step=>step.run==='node publishing/resolve-target-readonly.mjs'));
+  assert.ok(!steps.some(step=>/publishing\/publish\.mjs|pnpm run publish|publishing\/update\.mjs|pnpm run update/.test(String(step.run||''))));
+});
+
+test('publish workflow requires target proof and runtime recheck before the only submit attempt',()=>{
   const workflow=YAML.parse(readFileSync('.github/workflows/publish-posts.yml','utf8').replace(/^\uFEFF/,''));
   const steps=workflow.jobs.publish.steps;
   const target=steps.findIndex(step=>step.run==='node publishing/target-resolution-gate.mjs');
