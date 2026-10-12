@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "71b0af26a868bd0f177442186bf4b21ab946060ada5ac1874443f3f9ebc9c183",
-  "sourceCommit": "8a47e78504e21181500519a019c09795f69b27c0",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-12T15:38:46.742Z",
   "url": "https://nhunnhun.tistory.com/422",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-12T15:39:16.237Z",
+  "sourceCommit": "8a47e78504e21181500519a019c09795f69b27c0",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38271575203",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-tarragon-food-20261013",
+    "url": "https://nhunnhun.tistory.com/422",
+    "checkedAt": "2026-10-12T15:39:16.237Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
