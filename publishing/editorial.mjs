@@ -1,6 +1,7 @@
 import {renderDirectArticle} from './direct-design.mjs';
 import {renderArticleCitations} from './article-citations.mjs';
 import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract } from './content-emphasis.mjs';
+import {insertAffiliateProductsBlock} from './affiliate-products.mjs';
 export const EDITORIAL_TEMPLATE_VERSION='R4';
 export const editorialVersionFor = post => post?.contentStandard === 'R1' ? 'R4' : post?.contentStandard === 'SP1' ? 'SP1' : 'R3';
 
@@ -206,9 +207,9 @@ export function assertEditorialContract(renderedHtml,sourceHtml,{version='R3'}={
 }
 
 export function renderEditorialPost(post){
-  if(post.contentStandard==='SP1'&&post.id?.startsWith('direct-'))return renderDirectArticle(post.bodyHtml);
+  if(post.contentStandard==='SP1'&&post.id?.startsWith('direct-'))return insertAffiliateProductsBlock(renderDirectArticle(post.bodyHtml),post.affiliateProducts);
   assertEditorialSource(post);
   const version=editorialVersionFor(post);
   const rendered=renderArticleCitations(applyEditorialTemplate(post.bodyHtml,{title:post.title,version}),post);
-  return assertEditorialContract(rendered,post.bodyHtml,{version});
+  return insertAffiliateProductsBlock(assertEditorialContract(rendered,post.bodyHtml,{version}),post.affiliateProducts);
 }

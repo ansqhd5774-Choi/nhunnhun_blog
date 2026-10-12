@@ -1,0 +1,52 @@
+name: Coupang Partners API lookup
+run-name: Coupang Partners ${{ inputs.operation }}
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'API 작업'
+        required: true
+        type: choice
+        options:
+          - search
+          - deeplink
+      keyword:
+        description: '상품 검색어 (search일 때 입력)'
+        required: false
+        type: string
+      product_urls:
+        description: 'Coupang 상품 URL (deeplink일 때 한 줄에 하나, 최대 3개)'
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-coupang-partners-api
+  queue: max
+  cancel-in-progress: false
+jobs:
+  lookup:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check required operation input
+        run: node scripts/coupang-api-input-check.mjs
+        env:
+          COUPANG_OPERATION: ${{ inputs.operation }}
+          COUPANG_SEARCH_KEYWORD: ${{ inputs.keyword }}
+          COUPANG_PRODUCT_URLS: ${{ inputs.product_urls }}
+      - name: Search candidates or create affiliate links
+        run: node scripts/coupang-partners.mjs
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          COUPANG_OPERATION: ${{ inputs.operation }}
+          COUPANG_SEARCH_KEYWORD: ${{ inputs.keyword }}
+          COUPANG_PRODUCT_URLS: ${{ inputs.product_urls }}

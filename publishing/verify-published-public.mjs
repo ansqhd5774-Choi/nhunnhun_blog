@@ -2,6 +2,7 @@ import { assertPublicTitle } from './public-title.mjs';
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { assertDirectPublicSnapshot } from './direct-public-contract.mjs';
 import { verificationContext } from './verification-context.mjs';
+import {COUPANG_DISCLOSURE,assertAffiliatePublicEvidence} from './affiliate-products.mjs';
 export async function verifyPublishedPublic({publicPage,publicBrowser,post,bodyHtml,sources,representativeSource,editorialExpected,url}) {
   assertPublicTitle(await publicPage.evaluate(() => ({title:document.title,og:document.querySelector('meta[property="og:title"]')?.content,heading:document.querySelector('h1')?.innerText})),post.title);
   const content = publicPage.locator('.contents_style');
@@ -22,6 +23,14 @@ export async function verifyPublishedPublic({publicPage,publicBrowser,post,bodyH
     return text;
   }, bodyHtml);
   if (!expectedText || actual !== expectedText) throw new Error('E_BODY_UNVERIFIED');
+  if(post.affiliateProducts){
+    const evidence=await content.evaluate((root,arg)=>({
+      disclosureCount:root.innerText.split(arg.disclosure).length-1,
+      linkCounts:arg.urls.map(url=>[...root.querySelectorAll('a')].filter(link=>link.href===url).length),
+      sponsored:arg.urls.map(url=>{const link=[...root.querySelectorAll('a')].find(item=>item.href===url);const rel=(link?.getAttribute('rel')||'').toLowerCase().split(/\s+/);return rel.includes('sponsored')&&rel.includes('nofollow');})
+    }),{disclosure:COUPANG_DISCLOSURE,urls:post.affiliateProducts.products.map(product=>product.landingUrl)});
+    assertAffiliatePublicEvidence(evidence,post.affiliateProducts);
+  }
   if (sources.length) {
     for (const image of await content.locator('img').all()) {
       await image.scrollIntoViewIfNeeded();
