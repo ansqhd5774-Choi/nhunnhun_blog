@@ -2,7 +2,7 @@ import {parseDocument} from 'htmlparser2';
 import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 const UTILITY_HEADING=/^(?:자주 묻는 질문|FAQ|핵심 정리|함께 보면 좋은 글|자료 출처)$/iu;
-const SAFETY_HEADING=/(?:주의|부작용|금기|위험|응급|이상반응)/u;
+const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
 const RESEARCH_DETAIL_PATTERNS=[
   /(?:연구에서는|논문에서는|시험에서는)/gu,
   /(?:무작위|이중맹검|대조군|표본\s*(?:수|크기)|통계적(?:으로)?\s*유의)/gu,
@@ -10,15 +10,19 @@ const RESEARCH_DETAIL_PATTERNS=[
   /(?:\d{2,5})명(?:을|의)?\s*대상/gu,
 ];
 const LIMITATION_PATTERNS=[
-  /(?:근거|자료|연구|증거)(?:가|는|를)?\s*(?:부족|충분하지|제한적)/gu,
-  /(?:확인|입증|검증)(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/gu,
+  /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/gu,
+  /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/gu,
   /단정(?:하기|할\s*수)?\s*어렵/gu,
-  /확립(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/gu,
+  /확립(?:(?:되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)|(?:(?:돼|되어)\s*있지\s*않))/gu,
+  /(?:보장|장담)(?:할\s*수)?\s*없/gu,
+  /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/gu,
+  /(?:공식|비교\s*가능한)?\s*(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/gu,
+  /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|없)/gu,
 ];
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
-const countMatches=(text,patterns)=>patterns.reduce((sum,pattern)=>sum+([...text.matchAll(new RegExp(pattern.source,pattern.flags))].length),0);
+const collectMatches=(text,patterns)=>patterns.flatMap(pattern=>[...text.matchAll(new RegExp(pattern.source,pattern.flags))].map(match=>clean(match[0])));
 
 export function directFocusReview(bodyHtml='') {
   const root=parseDocument(String(bodyHtml));
@@ -39,13 +43,18 @@ export function directFocusReview(bodyHtml='') {
   const coreHeadings=headings.filter(h=>!UTILITY_HEADING.test(h));
   const utilityHeadings=headings.filter(h=>UTILITY_HEADING.test(h));
   let researchDetailHits=0,limitationHits=0;
+  const limitationFindings=[];
   for(const section of sections){
     if(/^자료 출처$/u.test(section.heading))continue;
     const text=clean(section.text);
-    researchDetailHits+=countMatches(text,RESEARCH_DETAIL_PATTERNS);
-    if(!SAFETY_HEADING.test(section.heading))limitationHits+=countMatches(text,LIMITATION_PATTERNS);
+    researchDetailHits+=collectMatches(text,RESEARCH_DETAIL_PATTERNS).length;
+    if(!PURE_SAFETY_HEADING.test(section.heading)){
+      const hits=collectMatches(text,LIMITATION_PATTERNS);
+      limitationHits+=hits.length;
+      limitationFindings.push(...hits.map(match=>({heading:section.heading,match})));
+    }
   }
-  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits};
+  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12)};
 }
 
 // Deterministic structure guard only. It does not judge medical truth or rewrite prose.
