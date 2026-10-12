@@ -55,4 +55,7 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.match(evidenceQuestions,/전통 약재·민간 기록/);
   assert.match(evidenceQuestions,/종·부위·제형·용량/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
+
+  const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});
+  assert.equal('foodAxisReview' in nonFoodResult.report,false);
 });
