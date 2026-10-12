@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "e52119321656303d3fa147193652ffa2012520503959eee81008b6da78963e12",
-  "sourceCommit": "2df22256124532cfbed062f438639410a3fad94f",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-12T18:04:11.626Z",
   "url": "https://nhunnhun.tistory.com/424",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-12T18:04:41.794Z",
+  "sourceCommit": "2df22256124532cfbed062f438639410a3fad94f",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38288216068",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-huajiao-food-20261013",
+    "url": "https://nhunnhun.tistory.com/424",
+    "checkedAt": "2026-10-12T18:04:41.794Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
