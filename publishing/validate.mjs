@@ -1,3 +1,4 @@
+import {assertDirectPreflight} from './direct-preflight.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
@@ -31,6 +32,7 @@ try {
     if (eligible(post, state)) {
       checkPublishHtml(post);
       assertContentStandard(post);
+      assertDirectPreflight(post);
       assertImageReview(post);
       renderEditorialPost(post);
       pending++;

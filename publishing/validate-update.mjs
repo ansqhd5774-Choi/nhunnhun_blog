@@ -1,3 +1,4 @@
+import {assertDirectPreflight} from './direct-preflight.mjs';
 import {isNativeTextMaintenance} from './native-text-contract.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { loadUpdates } from './update-core.mjs';
@@ -14,7 +15,8 @@ try{
       continue;
     }
     if(update.contentStandard==='SP1') {
-      console.log(`CONTENT_VALIDATION_SKIPPED: ${update.id}`);
+      assertDirectPreflight(update);
+      console.log(`PASS_DIRECT_PREFLIGHT: ${update.id}`);
       continue;
     }
     if(update.contentStandard!==undefined) assertContentStandard(update,{enforceScanDensity:false});

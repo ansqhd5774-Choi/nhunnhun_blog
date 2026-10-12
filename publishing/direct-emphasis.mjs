@@ -1,10 +1,7 @@
 import {parseDocument} from 'htmlparser2';
+import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
-export const DIRECT_EMPHASIS_MINIMUMS=Object.freeze({
-  bold:18,
-  highlight:8,
-  underline:2,
-});
+export const DIRECT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.emphasisMinimums;
 
 // Structural omission guard only; the author still chooses meaningful phrases.
 export function assertDirectEmphasis(source) {

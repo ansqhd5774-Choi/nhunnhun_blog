@@ -1,3 +1,4 @@
+import {directFixture} from './direct-source-fixture.mjs';
 import './direct-emphasis-guard.test.mjs';
 import './direct-new-post.test.mjs';
 import test from 'node:test';
@@ -12,7 +13,7 @@ import {renderEditorialPost} from '../publishing/editorial.mjs';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
 import {startDirectPublish} from '../authoring/start-direct-publish.mjs';
-const source={id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg',bodyHtml:'<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Potatoes.jpg" alt="감자"></p><h2>소개</h2><p><mark><strong>소개 문장.</strong></mark></p><ul><li><strong>핵심:</strong> 설명 그대로.</li><li><strong>보관:</strong> 조건 그대로.</li></ul><table><tbody><tr><td>성분</td><td>값</td></tr></tbody></table>'};
+const source=directFixture();
 test('local publication entry reads remote main and starts one update without another writer job',()=>{
  let starts=0;
  const run=args=>{
@@ -43,7 +44,7 @@ test('varied renderer assigns layouts by section and preserves emphasis and imag
  const out=renderEditorialPost({...source,bodyHtml:source.bodyHtml.split('<h2>')[0]+sections});
  for(const name of ['effects','pairs','cautions','storage'])assert.ok(out.includes('class="'+name+'"'));
  assert.ok(!out.includes('card-grid'));assert.ok(out.includes('<small>03</small>'));
- assert.ok(out.includes('<mark><strong>중요 수치</strong></mark>'));assert.equal((out.match(/<img\b/g)||[]).length,1);
+ assert.ok(out.includes('<mark><strong>중요 수치</strong></mark>'));assert.equal((out.match(/<img\b/g)||[]).length,3);
  assert.ok(out.includes('font-size:23px'));assert.ok(out.includes('@media(max-width:600px)'));
 });
 test('workflow starts only from explicit prepared-source dispatch with no AI generation',async()=>{
@@ -56,8 +57,8 @@ test('workflow starts only from explicit prepared-source dispatch with no AI gen
 });
 test('direct dispatch requires existing approved source and calls existing publish dispatcher once',async()=>{
  const root=await mkdtemp(join(tmpdir(),'nh-direct-'));let calls=0;
- try{await mkdir(join(root,'updates'));await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));const dispatch=async args=>{calls++;assert.equal(args.sourceId,source.id);return {submitted:true};};
- await dispatchDirectSource({root,sourceId:source.id,commitSha:'a'.repeat(40),token:'fixture',dispatch});assert.equal(calls,1);
+ try{await mkdir(join(root,'updates'));await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));const confirmSource=async()=>({status:'GITHUB_SOURCE_CONFIRMED'});const dispatch=async args=>{calls++;assert.equal(args.sourceId,source.id);return {submitted:true};};
+ await dispatchDirectSource({root,sourceId:source.id,commitSha:'a'.repeat(40),token:'fixture',dispatch,confirmSource});assert.equal(calls,1);
  await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify({...source,bodyHtml:'<p><strong>핵심</strong></p>'}));
  await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_EMPHASIS_MISSING/);assert.equal(calls,1);
  await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify(source));

@@ -15,6 +15,7 @@ permissions:
   actions: write
 concurrency:
   group: nhunnhun-direct-source-dispatch-${{ github.ref }}
+  queue: max
   cancel-in-progress: false
 jobs:
   dispatch:

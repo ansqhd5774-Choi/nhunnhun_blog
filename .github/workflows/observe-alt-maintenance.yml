@@ -18,6 +18,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     concurrency:
       group: nhunnhun-tistory-mutation
+      queue: max
       cancel-in-progress: false
     runs-on: [self-hosted, windows, x64, tistory-publisher]
     timeout-minutes: 15
