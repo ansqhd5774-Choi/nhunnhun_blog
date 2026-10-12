@@ -86,7 +86,7 @@ export function editorialExpectations(sourceHtml,{version='R3'}={}){
 
 export function applyEditorialTemplate(html,{title='',version='R3'}={}){
   let out=html;
-  const topic=topicFromTitle(title);
+  const topic=topicFromTitle(version==='R4'?title.replace(/\([^)]*\)/gu,''):title);
 
   // Restrained multi-color highlighter: source <u> marks only short key phrases.
   out=version==='R4'?renderSemanticEmphasis(out):version==='SP1'?out.replace(/<mark>/g,'<mark style="background:#fff1a8;color:inherit;padding:0 .06em;">').replace(/<u>/g,'<u style="text-decoration:underline;text-underline-offset:3px;">'):applyHighlights(out);
@@ -148,7 +148,11 @@ export function applyEditorialTemplate(html,{title='',version='R3'}={}){
 
   out=out.replace(
     /<p><strong>Q\.\s*([^<]+)<\/strong><br\/?>([\s\S]*?)<\/p>/g,
-    '<div style="margin:0 0 24px;padding:16px 18px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;"><p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#111827;"><span style="display:inline-block;margin-right:6px;color:#2563eb;">Q.</span>$1</p><p style="margin:0;color:#374151;line-height:1.75;"><span style="font-weight:700;color:#6b7280;margin-right:6px;">A.</span>$2</p></div>'
+    (_match,question,answer)=>{
+      // R4 source may already carry the answer label. Preserve legacy R3 output.
+      const body=version==='R4'?answer.replace(/^\s*A\.\s*/u,''):answer;
+      return '<div style="margin:0 0 24px;padding:16px 18px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;"><p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#111827;"><span style="display:inline-block;margin-right:6px;color:#2563eb;">Q.</span>'+question+'</p><p style="margin:0;color:#374151;line-height:1.75;"><span style="font-weight:700;color:#6b7280;margin-right:6px;">A.</span>'+body+'</p></div>';
+    }
   );
 
   out=out.replace(

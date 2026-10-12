@@ -24,8 +24,9 @@ import '../authoring/update-producer.mjs';
 import '../authoring/update-queue-finalize.mjs';
 
 test('queue parses category keyword and canonical existing URL in order',()=>{
-  const rows=parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n영양소 - 아연 - https://nhunnhun.tistory.com/314\n약 - CPC - https://nhunnhun.tistory.com/277\n');
-  assert.deepEqual(rows.map(x=>[x.order,x.domain,x.keyword,x.articleId]),[[1,'food','가지','327'],[2,'nutrient','아연','314'],[3,'medicine','CPC','277']]);
+  const rows=parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 수박 - https://nhunnhun.tistory.com/129\n');
+  assert.deepEqual(rows.map(x=>[x.order,x.domain,x.keyword,x.articleId]),[[1,'food','가지','327'],[2,'food','수박','129']]);
+  for(const category of ['영양소','약','약학','질병'])assert.throws(()=>parseUpdateQueue(category+' - 별도 카테고리 - https://nhunnhun.tistory.com/314'),/E_QUEUE_ROW_1/);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https://nhunnhun.tistory.com/327\n음식 - 가지2 - https://nhunnhun.tistory.com/327'),/E_QUEUE_DUPLICATE_ARTICLE/);
   assert.throws(()=>parseUpdateQueue('음식 - 가지 - https:\\//nhunnhun.tistory.com/327'),/E_QUEUE_ROW_1/);
 });
