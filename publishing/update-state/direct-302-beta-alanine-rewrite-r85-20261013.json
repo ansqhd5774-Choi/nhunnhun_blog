@@ -6,5 +6,16 @@
   "sourceCommit": "b70428df8635de7d4caa2660c0d324c3942a595b",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-12T22:18:18.361Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38315555171"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38315555171",
+  "publicResult": {
+    "sourceId": "direct-302-beta-alanine-rewrite-r85-20261013",
+    "url": "https://nhunnhun.tistory.com/302",
+    "sourceCommit": "b70428df8635de7d4caa2660c0d324c3942a595b",
+    "fingerprint": "ba3d71bf52c41bfb7ee4d732eeea7934492f8c5b18af9edb01a205b33eb08c66",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38315555171",
+    "checkedAt": "2026-10-12T22:18:19.875Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38315555171",
+    "status": "PUBLIC_VERIFICATION_UNAVAILABLE",
+    "code": "E_QA_ACCESS"
+  }
 }
