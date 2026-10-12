@@ -9,6 +9,7 @@
 ### 일반 Chat
 - 최신 main SHA와 음식 전용 지침을 확인한다.
 - 기존 음식 글과 검색 의도 중복을 확인한다.
+- **원고를 `posts/` 또는 `updates/`에 넣기 전에 신규/기존 대상을 먼저 판정한다.**
 - 공식 자료와 원문 연구를 조사한다.
 - 쉬운 한국어 본문, 3단계 강조, 관련 음식 내부링크, 이미지 근거를 함께 준비한다.
 - 저장 전 음식 6개 H2와 첫 문장 답변을 직접 검토한다.
@@ -19,6 +20,7 @@
 ### 공통 러너
 - direct preflight
 - 기존 인증 세션 사용
+- **신규 발행 전 인증된 관리자 글 목록 전체를 읽기 전용으로 조회해 신규/기존 대상을 다시 확인**
 - 티스토리 최종 제출
 - 익명 공개 확인
 - 제목·본문·이미지·대표 이미지·강조·PC1440·모바일390 렌더 검증
@@ -39,8 +41,12 @@
 1. 최신 main SHA를 확인한다.
 2. 음식 프로젝트 지침과 현재 direct/SP1 기술 계약을 읽는다.
 3. GitHub 음식 원고·기존 글 목록·허용된 공개 검색으로 중복을 확인한다.
-4. 독자의 실제 검색 질문을 정한다.
-5. 음식 6개 축에 맞춰 최대 6개 핵심 H2를 확정한다.
+4. **같은 검색 의도의 기존 글이 있으면 숫자 URL을 유지하는 `updates/direct-*.json` 작업으로 확정한다. 기존 후보가 없을 때만 신규 작업으로 진행한다.**
+5. 신규 direct/SP1 음식은 `authoring/target-resolution/<sourceId>.json`을 먼저 저장한다. 이 파일은 `sourceId`, `operation:"create"`, 대표 음식명 `topic`, 제목에서 기존 글을 찾는 데 필요한 `aliases`, `reviewed:true`를 가진다.
+6. 독자의 실제 검색 질문을 정한다.
+7. 음식 6개 축에 맞춰 최대 6개 핵심 H2를 확정한다.
+
+`target-resolution` 기록은 일반 Chat의 의미 판정을 저장하는 영수증이며 자동 의미 판정기가 아니다. 실제 신규 mutation 직전 러너는 인증된 `/manage/posts.json` 전체 목록을 다시 조회한다. 정확히 같은 제목 또는 `topic/aliases`와 일치하는 기존 제목 후보가 하나라도 나오면 `E_TARGET_EXISTING_CANDIDATE`로 **새 글 편집기 진입 전에 중단**한다. 이 경우 신규 재시도를 하지 않고 후보의 숫자 articleId·현재 제목을 확인해 기존 수정 source로 다시 준비한다.
 
 비음식 source·비음식 큐·다른 카테고리 편집 문서는 음식 원고의 기준이나 예시로 읽지 않는다. 음식 기준에서 필요한 내용이 없으면 다른 분야 자료로 보충하지 않고 미확인으로 처리한다.
 
@@ -58,6 +64,7 @@
 ## Gate 0·GitHub 저장
 
 - 완성 원고 전체 JSON과 sourceId·articleId·title·digest·검사 상태를 자동 발행 경로 밖에 먼저 보존한다.
+- 신규 음식이면 target-resolution 판정 기록도 source와 함께 보존한다.
 - GitHub 쓰기 성공 문구만으로 저장 완료라고 하지 않는다.
 - 실제 커밋 SHA에 고정한 파일을 다시 읽고 전체 JSON digest가 일치해야 `GITHUB_SOURCE_CONFIRMED`다.
 - 실제 보안 거절은 `WRITE_BLOCKED`로 구분하고 우회하지 않는다.
@@ -65,7 +72,7 @@
 
 ## 표준 실행
 
-- 신규: `posts/*.json → publish-posts.yml`
+- 신규: `target-resolution → posts/*.json → publish-posts.yml → 관리자 대상 식별 Gate → 단일 제출`
 - 기존 수정: `updates/direct-*.json → direct-author-update.yml → update-posts.yml`
 - direct source는 `contentStandard=SP1`을 유지한다.
 - 자동 실행이 있으면 그 실행을 관찰하고 수동 실행을 겹치지 않는다.
@@ -77,7 +84,9 @@
 - HTTP200, SUBMIT_CLICKED, Actions SUCCESS만으로 완료라고 하지 않는다.
 - 해당 source의 `PUBLIC_VERIFIED`와 신규 `published` 또는 기존 `updated` 원장을 확인한다.
 - PUBLIC_VERIFIED는 공개 반영·렌더 검증이며 의학적 또는 편집 의미 인증이 아니다.
-- 제출 후 상태가 불명확하면 재제출하지 않는다.
+- 제출 후 상태가 불명확하면 **발행 버튼을 다시 누르지 않는다.**
+- 신규 제출 직후 본문·이미지·대표 이미지·모바일 본문·제목 메타가 아직 전파되지 않아 검증이 실패한 경우에는 **같은 숫자 URL만 제한 횟수 재조회**한다. 이 재검증은 mutation을 수행하지 않는다.
+- 제한 재검증으로도 실패하면 `submitting`을 유지하고 원인을 보고한다.
 - 기존 수정은 `update=false + source_id`, 신규는 `recover-publication + source_id + 확인된 public_url`로 읽기 전용 확인을 수행한다.
 
 ## 보고
