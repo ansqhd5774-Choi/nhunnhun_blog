@@ -8,6 +8,7 @@ import {validateIdentityRequest,identityDigest,existingTargetCandidates,fetchMan
 
 const REPO='ansqhd5774-Choi/nhunnhun_blog';
 function encode(value){return Buffer.from(JSON.stringify(value,null,2)+'\n').toString('base64');}
+function exitCli(code){process.stdout.write('',()=>process.stderr.write('',()=>process.exit(code)));}
 async function githubJson(url,options={}){
   const response=await fetch(url,{...options,headers:{Authorization:`Bearer ${process.env.GITHUB_TOKEN}`,Accept:'application/vnd.github+json','Content-Type':'application/json',...(options.headers||{})},signal:AbortSignal.timeout(20000)});
   if(response.status===404)return null;
@@ -62,5 +63,5 @@ export async function resolveTargetReadonly({root=process.cwd(),sourceId=process
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  resolveTargetReadonly().catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');process.exitCode=1;});
+  resolveTargetReadonly().then(()=>exitCli(0)).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');exitCli(1);});
 }
