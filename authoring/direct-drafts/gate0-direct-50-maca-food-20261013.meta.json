@@ -62,9 +62,15 @@
       }
     ]
   },
-  "githubSourceStatus": "NOT_CONFIRMED",
-  "runStatus": "NOT_STARTED",
-  "publicStatus": "NOT_VERIFIED",
+  "githubSourceStatus": "GITHUB_SOURCE_CONFIRMED",
+  "runStatus": "SUCCESS",
+  "publicStatus": "PUBLIC_VERIFIED",
   "publicUrl": "https://nhunnhun.tistory.com/50",
-  "ledger": "NOT_FINALIZED"
+  "ledger": "updated",
+  "expectedGitBlob": "eae3abaee4c5c1408e90b9715f5657a10db52ff7",
+  "gate0SourceCommit": "6eafae47d4d131d6954c920cf7f86f165bd38d16",
+  "gate0MetaCommit": "9e268e81a2cc10ab2606421f4f2d7566b8939563",
+  "sourceCommit": "40e15dd5542c8dc7cfd127ef8c716559f281f44d",
+  "executionSourceCommit": "47a05c016ca638e7c9f1cee7968ae5269a2de2ab",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38296190705"
 }
