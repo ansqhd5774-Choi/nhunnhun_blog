@@ -1,0 +1,38 @@
+name: Recover submitted Tistory update without resubmission
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/update-recovery-request.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nhunnhun-tistory-mutation
+  queue: max
+  cancel-in-progress: false
+
+jobs:
+  verify-existing:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          enable-cache: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Parse source-scoped recovery request
+        run: node --input-type=module -e "const fs=await import('node:fs');const lines=fs.readFileSync('automation/update-recovery-request.txt','utf8').split(/\r?\n/);const id=(lines[0]||'').trim();if(!/^direct-[a-z0-9-]{2,70}$/.test(id))throw Error('E_RECOVERY_SOURCE_ID');fs.appendFileSync(process.env.GITHUB_ENV,'UPDATE_SOURCE_ID='+id+'\n');console.log('READ_ONLY_RECOVERY_REQUEST '+id);"
+      - name: Existing submission public verification — no editor, no resubmission
+        run: node publishing/finalize-update.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
