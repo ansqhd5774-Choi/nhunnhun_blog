@@ -14,7 +14,7 @@ test('preparation exposes actual pairing paragraphs for author review without au
  assert.equal(pairingReview('<h2>소개</h2>').combinations.length,0);
 });
 
-test('food-axis review exposes six reader-question, H2 and first-answer pairs without semantic auto-pass',()=>{
+test('food-axis review exposes six reader-question, H2 and first-answer pairs plus value-first balance questions without semantic auto-pass',()=>{
   const source={bodyHtml:[
     '<h2>1. 음식은 무엇일까?</h2><p><img src="https://example.com/food.jpg" alt="음식"></p><p>첫째 답변입니다.</p>',
     '<h2>2. 효능은 어디까지 확인됐을까?</h2><p>둘째 효능 답변입니다.</p>',
@@ -35,7 +35,15 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs wi
   assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
   assert.equal(review.axes[2].heading,'3. 얼마나 먹을까?');
   assert.match(review.axes[1].readerQuestion,/핵심 효능/);
-  assert.match(review.axes[1].reviewQuestion,/감각, 연구 한계, 안전, 맛 설명만으로/);
+  assert.match(review.axes[1].reviewQuestion,/부정 설명을 첫 답변으로/);
+  assert.match(review.axes[2].reviewQuestion,/⑤에서 다룰 독성·고용량 경고/);
+  assert.match(review.axes[4].reviewQuestion,/독성·고용량·금기·응급 행동을 이 축에 집중/);
+  assert.equal(review.balanceReview.status,'AUTHOR_REVIEW_REQUIRED');
+  assert.equal(review.balanceReview.automatedSemanticVerdict,false);
+  assert.equal(review.balanceReview.questions.length,5);
+  assert.match(review.balanceReview.questions.join('\n'),/첫 인상/);
+  assert.match(review.balanceReview.questions.join('\n'),/동일 의미/);
+  assert.match(review.balanceReview.questions.join('\n'),/⑤에 집중/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -67,11 +75,15 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.equal(result.report.foodAxisReview.automatedSemanticVerdict,false);
   assert.equal(result.report.foodAxisReview.axes[0].heading,'소개');
   assert.equal(result.report.foodAxisReview.axes[0].firstAnswer,'소개');
+  assert.equal(result.report.foodAxisReview.balanceReview.questions.length,5);
   const evidenceQuestions=result.report.editorialReview.questions.join('\n');
   assert.match(evidenceQuestions,/정제 성분·추출물·오일·보충제·유사 종/);
   assert.match(evidenceQuestions,/항산화·항균·항염/);
   assert.match(evidenceQuestions,/전통 약재·민간 기록/);
   assert.match(evidenceQuestions,/종·부위·제형·용량/);
+  assert.match(evidenceQuestions,/경고·부정 표현을 첫 인상/);
+  assert.match(evidenceQuestions,/동일 의미를 반복하지 않았는가/);
+  assert.match(evidenceQuestions,/⑤ 부작용·주의 대상에 집중/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});
