@@ -57,7 +57,28 @@ export async function selectEditorMode(page,mode){
     await diagnostic();
     throw Object.assign(Error('E_UPDATE_EDITOR_MODE_OPTION'),{cause:error});
   });
-  await option.click({timeout:10000}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});});
+  await option.click({timeout:10000}).catch(async error=>{
+    // Tistory can leave the mode option visibly rendered but temporarily
+    // unclickable after image uploads. Fall back only to the known mode IDs,
+    // then keep the existing CodeMirror transition check as the hard gate.
+    const ids=mode==='html'
+      ? ['editor-mode-html','editor-mode-html-text','editor-mode-html-tistory']
+      : ['editor-mode-kakao','editor-mode-kakao-text','editor-mode-kakao-tistory'];
+    const used=await page.evaluate(ids=>{
+      for(const id of ids){
+        const control=document.getElementById(id);
+        if(!control)continue;
+        control.click();
+        return id;
+      }
+      return null;
+    },ids).catch(()=>null);
+    if(!used){
+      await diagnostic();
+      throw Object.assign(Error('E_UPDATE_EDITOR_MODE_CLICK'),{cause:error});
+    }
+    console.log('UPDATE_EDITOR_MODE_DOM_CLICK_FALLBACK '+JSON.stringify({mode,id:used}));
+  });
   await page.waitForFunction(expected=>{
     const visibleEditors=[...document.querySelectorAll('.CodeMirror')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
     return expected==='html'?visibleEditors.some(el=>typeof el.CodeMirror?.getValue==='function'):visibleEditors.length===0;
