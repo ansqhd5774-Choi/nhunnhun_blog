@@ -2,11 +2,15 @@
 
 # ChatGPT에서 블로그 작업 이어가기
 
-## ACTIVE 인수인계 — 2026-10-07
+## ACTIVE 인수인계 — 음식 전용
 
-작성 시작 전 최신 main에서 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`를 읽는다. 음식·영양소·약·질병 중 주 분류와 다른 세 분야 연결을 구분하며 장기 사용·비교·병용·제품·산지·민간요법·자가 점검을 관련성에 맞게 검토한다.
+작성 시작 전 최신 main에서 [PROJECT_INSTRUCTIONS_FOOD_R8.1](project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt), [DIRECT_AUTHORING_R1](content/DIRECT_AUTHORING_R1.md), [공통 검사·저장 계약](content/DIRECT_AUTHORING_CONTRACT_20261012.md), GENERAL_CHAT_EXECUTION과 AGENTS.md를 확인한다. 음식 내용·소주제는 음식 전용 지침과 최신 사용자 지시로 정한다. 공통 문서의 다른 카테고리 예시는 기술 지원 범위이며 음식 편집 기준이 아니다. 직접 작성 SP1과 기존 R1 source/review 경로를 구분한다.
 
-source + 같은 id의 content-reviews를 한 변경으로 저장하고 실제 검토 후 해시를 일치시킨다. 코드 PASS는 의미 검토를 대체하지 않는다. 실제 발행/수정 대상은 R1 필수이며 legacy 글은 일괄 수정하지 않는다. 한 건 실행·공통 브라우저 mutex·Windows self-hosted CMD를 유지한다. 아래의 과거 클라우드 발행 연결 기록을 현재 운영 상태로 사용하지 않는다. 현재 실행 경로는 README와 실제 YAML을 읽는다.
+## Legacy 인수인계 — 2026-10-07
+
+기존 비-direct R1 경로의 계약은 `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`에서 확인한다. 과거 네 분야 분류·연결 안내로 현재 음식 전용 범위와 편집 기준을 덮어쓰지 않는다.
+
+비-direct R1 source는 같은 id의 content-reviews를 함께 저장하고 실제 검토 후 해시를 일치시킨다. 코드 PASS는 의미 검토를 대체하지 않는다. 직접 작성 SP1에 R1 필수를 강제하지 않으며 legacy 글은 일괄 수정하지 않는다. 아래의 과거 클라우드 발행 연결 기록을 현재 운영 상태로 사용하지 않는다. 현재 실행 경로는 GENERAL_CHAT_EXECUTION과 실제 YAML을 읽는다.
 
 대상 블로그: https://nhunnhun.tistory.com/
 저장소: https://github.com/ansqhd5774-Choi/nhunnhun_blog

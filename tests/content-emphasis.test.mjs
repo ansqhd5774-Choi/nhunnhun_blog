@@ -4,10 +4,25 @@ import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { renderSemanticEmphasis, emphasisExpectations, assertEmphasisContract, inspectScanDensity, scanDensityReport, SCAN_DENSITY_POLICY, EMPHASIS_PALETTE, CALLOUTS } from '../publishing/content-emphasis.mjs';
 import { inspectHtml } from '../publishing/content-html.mjs';
-import { renderEditorialPost, editorialExpectations, assertEditorialContract } from '../publishing/editorial.mjs';
+import { renderEditorialPost, applyEditorialTemplate, editorialExpectations, assertEditorialContract } from '../publishing/editorial.mjs';
 import { checkPublishHtml } from '../publishing/core.mjs';
 import { checkMeasurements } from '../publishing/verify-updated-public.mjs';
 import { fixture } from './fixtures/content-r1/factory.mjs';
+
+test('R4 FAQ renders one answer label whether source already includes A. or not',()=>{
+  for(const prefix of ['A. ','']){
+    const out=applyEditorialTemplate('<p><strong>Q. 질문인가요?</strong><br>'+prefix+'검증한 답변입니다.</p>',{version:'R4'});
+    assert.equal((out.match(/>A\.<\/span>/g)||[]).length,1);
+    assert.doesNotMatch(out,/>A\.<\/span>\s*A\./);
+    assert.match(out,/>A\.<\/span>검증한 답변입니다\./);
+  }
+});
+
+test('R4 quick summary does not truncate a multiword parenthetical food name',()=>{
+  const out=applyEditorialTemplate('<blockquote><strong>핵심만 먼저:</strong>확인한 핵심 답변입니다.</blockquote>',{title:'육포(Beef Jerky) 단백질·영양',version:'R4'});
+  assert.match(out,/육포, 이것만 먼저 보세요/);
+  assert.doesNotMatch(out,/육포\(Beef,/);
+});
 
 test('R4 preserves real underline separately from highlighting',()=>{const html='<p>표시의 <u>일회분과 전체 용량</u> 차이를 살펴봅니다.</p>';const out=renderSemanticEmphasis(html);assert.match(out,/<u style=/);assert.doesNotMatch(out,/linear-gradient/);assert.doesNotThrow(()=>assertEmphasisContract(out,html));});
 test('same-meaning highlights use the same color',()=>{const html='<p><mark data-tone="key">실제 함량</mark>을 확인하고 <mark data-tone="key">일회분</mark>을 비교합니다.</p>';const out=renderSemanticEmphasis(html);assert.equal(emphasisExpectations(html).minimumHighlightColors,1);assert.equal((out.match(/#fff1a8/g)||[]).length,2);assert.doesNotThrow(()=>assertEmphasisContract(out,html));});
@@ -29,7 +44,25 @@ test('R3 still uses rotating highlights for legacy source',()=>{const p=fixture(
 function luminance(hex){const rgb=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4);return rgb[0]*0.2126+rgb[1]*0.7152+rgb[2]*0.0722;}
 function contrast(a,b){const values=[luminance(a),luminance(b)].sort((x,y)=>y-x);return (values[0]+0.05)/(values[1]+0.05);}
 for(const [name,p]of Object.entries(EMPHASIS_PALETTE))test(`palette ${name}: minimum 4.5:1 text contrast`,()=>{assert.ok(contrast(p.color,p.background)>=4.5);assert.ok(contrast(p.color,'#ffffff')>=4.5);assert.ok(contrast('#111827',p.background)>=4.5);});
-test('unchanged historical source retains its original R3 output hash',()=>{const path=new URL('./fixtures/content-r1/legacy-render-hashes.json',import.meta.url);assert.ok(existsSync(path));const data=JSON.parse(readFileSync(path,'utf8'));let count=0;for(const item of data){const rawSource=readFileSync(new URL('../'+item.path,import.meta.url),'utf8');const source=rawSource.replace(/\r\n/g,'\n');const inputHash=createHash('sha256').update(source).digest('hex');if(inputHash!==item.sourceSha256)continue;const p=JSON.parse(source);if(item.error){assert.throws(()=>renderEditorialPost(p),new RegExp(item.error));}else{assert.equal(createHash('sha256').update(renderEditorialPost(p)).digest('hex'),item.renderSha256,item.path);}count++;}assert.ok(count>0);});
+test('unchanged historical source retains its original R3 output hash',()=>{
+  const path=new URL('./fixtures/content-r1/legacy-render-hashes.json',import.meta.url);
+  assert.ok(existsSync(path));
+  const data=JSON.parse(readFileSync(path,'utf8'));let count=0;
+  for(const item of data){
+    const current=new URL('../'+item.path,import.meta.url);
+    const archived=!existsSync(current);
+    const file=archived?new URL('./fixtures/legacy-render/'+item.path,import.meta.url):current;
+    const source=readFileSync(file,'utf8').replace(/\r\n/g,'\n');
+    const inputHash=createHash('sha256').update(source).digest('hex');
+    if(archived)assert.equal(inputHash,item.sourceSha256,item.path+' archived source');
+    if(inputHash!==item.sourceSha256)continue;
+    const p=JSON.parse(source);
+    if(item.error)assert.throws(()=>renderEditorialPost(p),new RegExp(item.error));
+    else assert.equal(createHash('sha256').update(renderEditorialPost(p)).digest('hex'),item.renderSha256,item.path);
+    count++;
+  }
+  assert.ok(count>0);
+});
 
 
 test('scan density requires both bold and highlight for a normal 120+ character section',()=>{

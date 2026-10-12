@@ -41,5 +41,11 @@ for(const [file,job,kind]of [['publish-posts.yml','publish','posts'],['update-po
 test('publish and update share the physical-browser mutex',()=>assert.equal(workflow('publish-posts.yml').jobs.publish.concurrency.group,workflow('update-posts.yml').jobs.update.concurrency.group));
 test('quality CI is read-only on the standard hosted Windows runner and cannot invoke publisher',()=>{const w=workflow('content-standard-ci.yml');assert.deepEqual(w.permissions,{contents:'read'});for(const job of Object.values(w.jobs)){assert.equal(job['runs-on'],'windows-latest');assert.equal(job.defaults.run.shell,'cmd');assert.ok(job.steps.every(s=>!/(pnpm run (publish|update)\b|publishing\/(publish|update)\.mjs|workflow_dispatch.*publish)/.test(s.run??'')));}assert.ok(w.on.pull_request);});
 test('no AI API or paid content service is required by quality modules',()=>{for(const f of ['content-standards','content-tone','content-emphasis','content-decisions','cross-domain'])assert.doesNotMatch(read(`publishing/${f}.mjs`),/OPENAI_API_KEY|ANTHROPIC_API_KEY|api\.openai\.com|api\.anthropic\.com|fetch\(/);});
-test('writer instructions and onboarding point to active standards',()=>{for(const p of ['AGENTS.md','README.md','docs/CHATGPT_HANDOFF.md'])assert.match(read(p),/CONTENT_STANDARD_R1/);});
+test('writer instructions and onboarding point to food editing and shared execution standards',()=>{
+  for(const p of ['AGENTS.md','README.md','docs/CHATGPT_HANDOFF.md']){
+    assert.match(read(p),/PROJECT_INSTRUCTIONS_FOOD_R8\.1/);
+    assert.match(read(p),/DIRECT_AUTHORING_(?:R1|CONTRACT_20261012)/);
+  }
+  assert.match(read('docs/CONTENT_STANDARD_R1.md'),/R1/);
+});
 

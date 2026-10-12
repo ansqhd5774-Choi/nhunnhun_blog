@@ -1,5 +1,7 @@
 # 음식 direct/SP1 직접 작성 기술 기준 — 2026-10-12
 
+공유 렌더링·강조·이미지·제출·검증의 기술 계약은 [CATEGORY_CONTENT_PARITY.md](CATEGORY_CONTENT_PARITY.md)를 참조한다. 음식 내용·소주제는 음식 전용 지침에서 정하며 다른 분야의 편집 예시는 가져오지 않는다.
+
 이 문서는 `nhunnhun_blog`의 **음식 direct/SP1 원고 작성 기술**만 다룬다. 음식의 실제 질문·6개 소주제·효능·궁합·문체는 `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`가 결정한다. 다른 카테고리의 편집 기준·질문·예시는 이 문서에 두지 않는다.
 
 ## 역할

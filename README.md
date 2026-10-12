@@ -2,13 +2,17 @@
 
 # nhunnhun_blog
 
-## ACTIVE — 건강 콘텐츠 품질 기준 R1
+## ACTIVE — 음식 전용 작성 기준
 
-새 글과 앞으로 수정하는 글은 [CONTENT_STANDARD_R1](docs/CONTENT_STANDARD_R1.md)의 네 분야 질문·선택·연결·문체 기준과 [Editorial R4](docs/EDITORIAL_PUBLISH_STANDARD_R4.md)의 의미형 강조를 적용한다. [작성 GPT 지침](docs/CONTENT_WRITER_PROMPT_R1.md) → [분야별 상세](docs/content/DOMAIN_GUIDES_R1.md) → [검토서 형식](docs/CONTENT_REVIEW_FORMAT_R1.md) 순서로 읽는다.
+새 음식 원고의 내용·문체·여섯 소주제는 [PROJECT_INSTRUCTIONS_FOOD_R8.1](docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt)과 최신 사용자 지시를 따른다. 직접 작성은 [DIRECT_AUTHORING_R1](docs/content/DIRECT_AUTHORING_R1.md)과 [공통 검사·저장 계약](docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md)의 기술 기준을 적용한다. 이 저장소에서 다른 카테고리의 편집 기준을 음식에 가져오지 않는다. 일반 Chat 실행 역할은 GENERAL_CHAT_EXECUTION이 정한다.
+
+## Legacy — 건강 콘텐츠 품질 기준 R1
+
+기존 비-direct R1 경로는 [CONTENT_STANDARD_R1](docs/CONTENT_STANDARD_R1.md)과 [Editorial R4](docs/EDITORIAL_PUBLISH_STANDARD_R4.md)의 계약을 보존한다. [작성 GPT 지침](docs/CONTENT_WRITER_PROMPT_R1.md)·[분야별 상세](docs/content/DOMAIN_GUIDES_R1.md)·[검토서 형식](docs/CONTENT_REVIEW_FORMAT_R1.md)의 과거 네 분야 편집 예시를 새 음식 원고의 기준으로 사용하지 않는다.
 
 `contentStandard: "R1"` source와 같은 id의 `content-reviews/posts|updates/*.json`을 함께 검증한다. `npm run test:content`, `npm run validate:content`, `node publishing/validate-content.mjs --check posts/<id>.json`을 제공한다. GitHub Actions는 AI가 아니라 작성·검토 증거를 확인하는 자동화다. 의학적 의미·정확성은 실제 근거를 읽는 편집 검토가 필요하다.
 
-기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당하며 새 내용·강조는 R1/R4가 우선한다. 인증·Windows CMD·one-item·source drift·ledger·공개 검증은 유지한다. 자동 queue나 유료 AI API는 추가하지 않았다.
+기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당한다. 직접 작성의 내용·강조 우선순위는 위 ACTIVE 기준을 따른다. 인증·source drift·ledger·공개 검증의 현재 동작은 실제 실행 계약과 YAML에서 확인한다.
 
 사용자 티스토리 블로그 https://nhunnhun.tistory.com/ 의 반복 관리용 프로젝트.
 GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
