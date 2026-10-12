@@ -18,6 +18,7 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs wi
   const source={bodyHtml:[
     '<h2>1. 음식은 무엇일까?</h2><p><img src="https://example.com/food.jpg" alt="음식"></p><p>첫째 답변입니다.</p>',
     '<h2>2. 효능은 어디까지 확인됐을까?</h2><p>둘째 효능 답변입니다.</p>',
+    '<h2>함께 보면 좋은 글</h2><p>보조 링크 설명입니다.</p>',
     '<h2>3. 얼마나 먹을까?</h2><p>셋째 섭취 답변입니다.</p>',
     '<h2>4. 무엇과 먹을까?</h2><p>넷째 궁합 답변입니다.</p>',
     '<h2>5. 부작용은?</h2><p>다섯째 주의 답변입니다.</p>',
@@ -32,8 +33,25 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs wi
   assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
   assert.equal(review.axes[1].heading,'2. 효능은 어디까지 확인됐을까?');
   assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
+  assert.equal(review.axes[2].heading,'3. 얼마나 먹을까?');
   assert.match(review.axes[1].readerQuestion,/핵심 효능/);
   assert.match(review.axes[1].reviewQuestion,/감각, 연구 한계, 안전, 맛 설명만으로/);
+});
+
+test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
+  const source={bodyHtml:[
+    '<h2>1. 소개</h2><p>첫 답변</p>',
+    '<h2>2. 효능</h2><p>둘 답변</p>',
+    '<h2>3. 섭취</h2><p>셋 답변</p>',
+    '<h2>4. 궁합</h2><p>넷 답변</p>',
+    '<h2>5. 주의</h2><p>다섯 답변</p>',
+    '<h2>6. 보관</h2><p>여섯 답변</p>',
+    '<h2>7. 추가 핵심 질문</h2><p>일곱 답변</p>'
+  ].join('')};
+  const review=buildFoodAxisReview(source);
+  assert.equal(review.observedCoreH2Count,7);
+  assert.equal(review.axes.length,6);
+  assert.equal(review.axes[5].heading,'6. 보관');
 });
 
 test('one local preparation uses publishing layout and retains author-selected emphasis',()=>{
