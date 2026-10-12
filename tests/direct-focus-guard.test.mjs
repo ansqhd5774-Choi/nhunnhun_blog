@@ -42,7 +42,8 @@ test('focus guard catches guarantee no-effect no-database and universal-negation
   assert.equal(review.limitationHits,4);
   assert.equal(review.limitationFindings.length,4);
   assert.ok(review.limitationFindings.some(f=>/보장할 수 없습니다/.test(f.match)));
-  assert.ok(review.limitationFindings.some(f=>/데이터베이스는 없습니다/.test(f.match)));
+  assert.ok(review.limitationFindings.some(f=>/비교 가능한 공식 데이터베이스는 없습니다/.test(f.match)));
+  assert.ok(review.limitationFindings.some(f=>/모든 사람이 보충제를 먹어야 하는 것은 아닙니다/.test(f.match)));
   assert.throws(()=>assertDirectSubmissionFocus(source(html)),/E_DIRECT_FOCUS_LIMITATION_OVERLOAD/);
 });
 
