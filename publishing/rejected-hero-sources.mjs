@@ -1,7 +1,8 @@
 // Manually curated after actual visual inspection. This is not an AI/semantic gate.
 // Only sources that were explicitly judged unsuitable as a representative/hero image belong here.
 export const REJECTED_HERO_SOURCE_PAGES=new Set([
-  'https://commons.wikimedia.org/wiki/File:Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg'
+  'https://commons.wikimedia.org/wiki/File:Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg',
+  'https://commons.wikimedia.org/wiki/File:Macae2.JPG'
 ]);
 
 export function isRejectedHeroSource(sourcePage){
