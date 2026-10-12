@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import YAML from 'yaml';
+import {titleMatchesAlias,validateCreateIdentity,existingTargetCandidates} from '../publishing/target-resolution-gate.mjs';
+
+test('food target identity is mandatory for new direct SP1 sources',()=>{
+  const post={id:'direct-chenpi-20261013',category:'음식',contentStandard:'SP1',title:'진피 효능과 먹는 법'};
+  assert.throws(()=>validateCreateIdentity(post,null),/E_TARGET_IDENTITY_REQUIRED/);
+  assert.doesNotThrow(()=>validateCreateIdentity(post,{sourceId:post.id,operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질','Chenpi'],reviewed:true}));
+});
+
+test('topic matching uses boundaries so short food names do not collide with compounds',()=>{
+  assert.equal(titleMatchesAlias('밤 칼로리·보관법','밤'),true);
+  assert.equal(titleMatchesAlias('밤고구마 칼로리','밤'),false);
+  assert.equal(titleMatchesAlias('진피차 먹는 법','진피차'),true);
+  assert.equal(titleMatchesAlias('Chenpi 효능과 먹는 법','chenpi'),true);
+});
+
+test('existing candidates include exact title and reviewed topic aliases',()=>{
+  const post={title:'진피 효능과 먹는 법'};
+  const identity={topic:'진피',aliases:['진피차','말린 귤껍질']};
+  const items=[
+    {id:11,title:'생강 효능과 먹는 법',visibility:'PUBLIC'},
+    {id:12,title:'진피차 효능·먹는 법',visibility:'PUBLIC'},
+    {id:13,title:'진피 효능과 먹는 법',visibility:'PRIVATE'}
+  ];
+  assert.deepEqual(existingTargetCandidates(items,post,identity).map(x=>x.id),['12','13']);
+});
+
+test('publish workflow resolves create-vs-existing before the only submit attempt and recovers read-only',()=>{
+  const workflow=YAML.parse(readFileSync('.github/workflows/publish-posts.yml','utf8').replace(/^\uFEFF/,''));
+  const steps=workflow.jobs.publish.steps;
+  const target=steps.findIndex(step=>step.run==='node publishing/target-resolution-gate.mjs');
+  const publish=steps.findIndex(step=>step.id==='publish-attempt');
+  const recover=steps.findIndex(step=>step.run==='node publishing/recover-publication.mjs');
+  assert.ok(target>=0&&publish>target&&recover>publish);
+  assert.equal(steps[publish]['continue-on-error'],true);
+  assert.match(String(steps[recover].if),/publish-attempt\.outcome == 'failure'/);
+});
