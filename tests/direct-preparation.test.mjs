@@ -23,4 +23,10 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.match(result.preview,/<mark><u><strong>중요한 행동<\/strong><\/u><\/mark>/);
   assert.equal(result.report.sections[3].level3,1);
   assert.equal(result.report.sourceId,source.id);
+  const evidenceQuestions=result.report.editorialReview.questions.join('\n');
+  assert.match(evidenceQuestions,/정제 성분·추출물·오일·보충제·유사 종/);
+  assert.match(evidenceQuestions,/항산화·항균·항염/);
+  assert.match(evidenceQuestions,/전통 약재·민간 기록/);
+  assert.match(evidenceQuestions,/종·부위·제형·용량/);
+  assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 });
