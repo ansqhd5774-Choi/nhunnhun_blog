@@ -1,0 +1,70 @@
+{
+  "sourceId": "direct-50-maca-food-20261013",
+  "articleId": "50",
+  "title": "마카 효능과 먹는 법｜성욕·테스토스테론·하루 섭취량·부작용",
+  "sourceSha256": "1a09b19c8f575a3b46ba4f036a4be52d1541b456aa77c00eaa81eb25bceffb53",
+  "baseMainSha": "aba3370888c7cf7220a3e24176469442c188dec3",
+  "checks": {
+    "contentReview": "PASS",
+    "strong": 60,
+    "mark": 15,
+    "markUnderlineStrong": 2,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS"
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {
+        "axis": 1,
+        "expectedAxis": "정의·주요 성분·작용",
+        "readerQuestion": "이 음식은 무엇이고, 주요 성분·작용은 무엇인가?",
+        "heading": "1. 마카란?｜말린 뿌리의 영양과 마카마이드",
+        "firstAnswer": "마카( Lepidium meyenii )는 배추·무와 같은 십자화과 에 속합니다. 국제 식물 자료에서는 남부 페루부터 볼리비아·칠레 북부·아르헨티나 북서부까지가 자생 범위로 정리됩니다. 식용 부위는 땅속에서 굵어진 부분이며 말려 분말로 만들거나 익혀 먹습니다. 식물 분류 자료"
+      },
+      {
+        "axis": 2,
+        "expectedAxis": "핵심 효능·예방 효과",
+        "readerQuestion": "이 음식의 핵심 효능은 무엇이며, 사람에게 어디까지 확인됐는가?",
+        "heading": "2. 마카 효능은 어디까지 확인됐을까?｜성욕·남성 증상과 테스토스테론",
+        "firstAnswer": "현재 사람 대상 자료를 종합하면 성욕과 일부 성기능 지표에서 개선 신호 가 관찰됐습니다. 여러 임상시험을 함께 살펴본 결과도 가능성을 제시했지만, 포함된 시험 수와 규모가 작아 결론의 강도는 높지 않았습니다. 사람 대상 종합 자료"
+      },
+      {
+        "axis": 3,
+        "expectedAxis": "섭취법·권장량",
+        "readerQuestion": "얼마나·어떻게 먹는가? 공식 권장량이 있는가?",
+        "heading": "3. 마카는 얼마나·어떻게 먹을까?｜분말·젤라틴화 제품과 연구 용량",
+        "firstAnswer": "마카에 정해진 공식 하루 권장 섭취량은 없습니다. 성욕을 본 오래된 사람 자료에서는 1.5g/일과 3g/일, 2023년 특정 남성 대상 자료에서는 약 5g/일이 사용됐습니다. 이 숫자는 시험에서 사용한 양이지 일반인을 위한 권장량이 아닙니다."
+      },
+      {
+        "axis": 4,
+        "expectedAxis": "궁합·상호작용",
+        "readerQuestion": "무엇과 먹으면 좋고, 실제 상호작용인지 단순 풍미 조합인지?",
+        "heading": "4. 마카는 무엇과 먹으면 좋을까?｜요거트·오트밀·바나나 조합",
+        "firstAnswer": "마카 분말은 단독으로 먹기보다 요거트·오트밀·바나나 처럼 익숙한 식품에 섞는 방법이 현실적입니다. 다만 아래 조합은 치료 효과를 키우는 ‘시너지’라기보다 맛과 식사 구성을 보완하는 조합 입니다."
+      },
+      {
+        "axis": 5,
+        "expectedAxis": "부작용·주의 대상",
+        "readerQuestion": "부작용은 무엇이고 누가 주의해야 하는가?",
+        "heading": "5. 마카 부작용은?｜소화 불편과 장기 섭취 주의",
+        "firstAnswer": "12주 동안 약 5g/일의 젤라틴화 마카를 사용한 사람 자료에서는 마카군 2명이 가벼운 위장관 불편 을 호소했지만 계속 참여했고, 치료와 관련된 심각한 이상반응은 기록되지 않았습니다. 짧은 기간의 사람 자료에서는 대체로 잘 견딘 편이지만, 모든 제품과 장기 섭취의 안전성을 뜻하지는 않습니다. 안전성 자료"
+      },
+      {
+        "axis": 6,
+        "expectedAxis": "신선도·보관·조리 팁",
+        "readerQuestion": "신선한 것을 어떻게 고르고, 보관·조리하면 좋은가?",
+        "heading": "6. 좋은 마카 고르는 법과 보관법｜원재료·가공 형태·습기 확인",
+        "firstAnswer": "마카 제품은 원재료와 가공 형태가 분명한지 먼저 봅니다. ‘마카 100% 분말’인지, 다른 당류·향료·추출물이 섞였는지, 생분말인지 젤라틴화 분말인지 확인하면 실제 섭취량을 판단하기 쉽습니다."
+      }
+    ]
+  },
+  "githubSourceStatus": "NOT_CONFIRMED",
+  "runStatus": "NOT_STARTED",
+  "publicStatus": "NOT_VERIFIED",
+  "publicUrl": "https://nhunnhun.tistory.com/50",
+  "ledger": "NOT_FINALIZED"
+}
