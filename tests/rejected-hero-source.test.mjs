@@ -3,15 +3,22 @@ import assert from 'node:assert/strict';
 import {assertImageReview} from '../publishing/image-review.mjs';
 import {isRejectedHeroSource} from '../publishing/rejected-hero-sources.mjs';
 
-const rejected='https://commons.wikimedia.org/wiki/File:Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg';
+const rejectedSources=[
+  {
+    page:'https://commons.wikimedia.org/wiki/File:Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg',
+    src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg?width=960'
+  },
+  {
+    page:'https://commons.wikimedia.org/wiki/File:Macae2.JPG',
+    src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Macae2.JPG?width=960'
+  }
+];
 
-function fixture({heroPage='https://commons.wikimedia.org/wiki/File:Retinol_fixture.jpg'}={}){
+function fixture({heroPage='https://commons.wikimedia.org/wiki/File:Retinol_fixture.jpg',heroSrc='https://commons.wikimedia.org/wiki/Special:Redirect/file/Retinol_fixture.jpg?width=960'}={}){
   const review=[
     {
-      src:heroPage===rejected
-        ? 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Beef_liver_nicely_cooked_at_Phakwe_Cattle_post.jpg?width=960'
-        : 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Retinol_fixture.jpg?width=960',
-      alt:'레티놀 주제를 직접 보여 주는 대표 이미지',role:'hero',composition:'closeup',
+      src:heroSrc,
+      alt:'주제를 직접 보여 주는 대표 이미지',role:'hero',composition:'closeup',
       sourcePage:heroPage,author:'fixture',license:'CC BY 4.0'
     },
     {
@@ -30,9 +37,11 @@ function fixture({heroPage='https://commons.wikimedia.org/wiki/File:Retinol_fixt
   return {representativeImageUrl:review[0].src,imageReview:review,bodyHtml};
 }
 
-test('actual visual rejection registry blocks the known unsuitable retinol hero',()=>{
-  assert.equal(isRejectedHeroSource(rejected),true);
-  assert.throws(()=>assertImageReview(fixture({heroPage:rejected})),/E_IMAGE_HERO_REJECTED/);
+test('actual visual rejection registry blocks every known unsuitable hero',()=>{
+  for(const rejected of rejectedSources){
+    assert.equal(isRejectedHeroSource(rejected.page),true);
+    assert.throws(()=>assertImageReview(fixture({heroPage:rejected.page,heroSrc:rejected.src})),/E_IMAGE_HERO_REJECTED/);
+  }
 });
 
 test('hero rejection registry does not make visualChecked mandatory',()=>{
