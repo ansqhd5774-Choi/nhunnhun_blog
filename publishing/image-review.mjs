@@ -4,19 +4,27 @@ const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','process','diagram']);
 const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
+const NUTRIENT_ABSTRACT_HERO=/(?:structure|skeletal|formula|molecule|molecular|crystal|kristall|microscop|polarized|polarised|polariseeritud|chemical[_ -]?structure)/i;
 function imageTags(html=''){return [...String(html).matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]);}
 function attr(tag,name){return (tag.match(new RegExp('\\b'+name+'=(["\\\'])(.*?)\\1','i'))||[])[2]||'';}
 function sourceBlock(html=''){return (String(html).match(/<h2>자료 출처<\/h2>\s*<ul>([\s\S]*?)<\/ul>/)||[])[1]||'';}
 // Match the closing delimiter to its opening quote; file names may contain apostrophes.
 function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/.*?)\1/gi)].map(m=>m[2].replace(/&amp;/g,'&')));}
 function assertHttps(value,code){let u;try{u=new URL(value);}catch{throw new Error(code);}if(u.protocol!=='https:'||u.username||u.password)throw new Error(code);return u;}
+function isAbstractNutrientHero(item,review){
+  if(String(item?.category??'').trim()!=='영양소')return false;
+  let pathname='';
+  try{pathname=decodeURIComponent(new URL(review?.sourcePage??'').pathname);}catch{return false;}
+  return NUTRIENT_ABSTRACT_HERO.test(pathname);
+}
 export function assertImageReview(item){
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
   if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||review[0]?.src!==item.representativeImageUrl)throw new Error('E_IMAGE_HERO_REVIEW');
-  // A source that was explicitly rejected after real visual inspection must not silently return as a hero.
-  // This is a deterministic manual reject registry, not a semantic/AI image judgment and not a visualChecked gate.
-  if(isRejectedHeroSource(review[0]?.sourcePage))throw new Error('E_IMAGE_HERO_REJECTED');
+  // Sources explicitly rejected after visual inspection must not silently return as a hero.
+  // Nutrient hero images also reject deterministic abstract-science filename patterns so molecular structures,
+  // microscopy and crystal images cannot become the representative image merely because licensing metadata passes.
+  if(isRejectedHeroSource(review[0]?.sourcePage)||isAbstractNutrientHero(item,review[0]))throw new Error('E_IMAGE_HERO_REJECTED');
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i],tag=tags[i];
