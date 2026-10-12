@@ -194,9 +194,14 @@ export function buildLengthReport(article,scope){
   };
 }
 
+function reusableImageMetadata(image){
+  if(!image?.src||!image.sourcePage||!image.author||!image.license)return null;
+  const {visualChecked,...metadata}=image;
+  return metadata;
+}
 function validReusableImageSet(source){
   if(!Array.isArray(source?.imageReview))return null;
-  const images=source.imageReview.filter(x=>x?.src&&x.sourcePage&&x.author&&x.license).slice(0,3);
+  const images=source.imageReview.map(reusableImageMetadata).filter(Boolean).slice(0,3);
   if(images.length)return images;
   return null;
 }
@@ -204,7 +209,7 @@ async function jsonFiles(root,dir){
   try{return (await readdir(resolve(root,dir))).filter(n=>n.endsWith('.json')).sort().reverse();}catch(error){if(error?.code==='ENOENT')return [];throw error;}
 }
 export async function reusableImages(root,item){
-  // 1) Exact article update/archive evidence always wins.
+  // 1) Exact article update/archive evidence always wins, but per-source visual observations never carry forward.
   for(const dir of ['updates','authoring/update-source-archive']){
     for(const file of await jsonFiles(root,dir)){
       let source;try{source=JSON.parse(await readFile(resolve(root,dir,file),'utf8'));}catch{continue;}
@@ -212,7 +217,8 @@ export async function reusableImages(root,item){
       const images=validReusableImageSet(source);if(images)return images;
     }
   }
-  // 2) Reuse already visually reviewed Commons assets from a newer post about the same named subject.
+  // 2) Reuse Commons asset and attribution metadata from a newer post about the same named subject.
+  // visualChecked is an observation about the source that performed the check, not reusable asset metadata.
   // Avoid one-character keywords because substring matching would be too broad.
   if(String(item.keyword??'').trim().length>=2){
     for(const file of await jsonFiles(root,'posts')){

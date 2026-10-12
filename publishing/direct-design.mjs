@@ -3,13 +3,25 @@ const BASE_CSS=".nh-direct-v2 *{box-sizing:border-box}.nh-direct-v2 .article-bod
 const LINK_CSS="/* Body links are recognisable independently of bold emphasis. */\n.nh-direct-v2 .article-body a[href] {color:#176b82!important;text-decoration:underline!important;text-decoration-color:#65aabc!important;text-decoration-thickness:2px!important;text-underline-offset:4px;background:#eef8fa;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .15s,color .15s;}\n.nh-direct-v2 .article-body a[href]:hover {color:#114d62!important;background:#d9eff4;text-decoration-color:currentColor!important;}\n.nh-direct-v2 .article-body a[href]:focus-visible {outline:2px solid #176b82;outline-offset:3px;}\n.nh-direct-v2 .article-body a[href] strong {color:inherit!important;}\n";
 const CSS=BASE_CSS+LINK_CSS+"/* Item number badges: distinct from the large section heading numbers. */\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article {\n  display:grid!important;grid-template-columns:32px minmax(0,1fr);column-gap:12px!important;row-gap:10px;align-items:center;\n}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article > .badge {\n  grid-column:1;grid-row:1;display:inline-flex!important;align-items:center;justify-content:center;\n  width:32px;height:32px;padding:0!important;border-radius:9px;background:#fff0e1;color:#a54b1c!important;\n  font-size:14px!important;font-weight:800!important;line-height:1;box-shadow:inset 0 0 0 1px #f4d5b8;\n}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article > div {display:contents!important;}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article h3 {grid-column:2;grid-row:1;margin:0!important;font-size:19px;line-height:1.5;}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article p {grid-column:1 / -1;margin:0!important;}\n\n.nh-direct-v2 .storage > article > .badge {background:#eaf3eb;color:#3e6b49!important;box-shadow:inset 0 0 0 1px #cddfcf;font-size:18px!important;} \n";
 const EFFECTS_CSS='.nh-direct-v2 .effects{background:#f7f9fc;border:1px solid #dce4ec;border-radius:12px;padding:4px 24px;margin:22px 0}.nh-direct-v2 .effects article:last-child{border-bottom:0}@media(max-width:600px){.nh-direct-v2 .effects{padding:4px 16px}}';
+const FALLBACK_SECTION_KIND={3:'effects',4:'pairs',5:'cautions',6:'storage'};
+const headingText=value=>String(value??'').replace(/<[^>]+>/g,'').replace(/^\d+[.)]\s*/u,'').replace(/\s+/gu,' ').trim();
+function sectionKind(title,section){
+ const heading=headingText(title);
+ if(/(?:TOP\s*7|풍부한\s*식품|평균\s*함유량)/iu.test(heading))return null;
+ if(/(?:함께\s*섭취|궁합|상호작용|병용)/u.test(heading))return 'pairs';
+ if(/(?:부작용|과다|금기|위험|응급|이상반응)/u.test(heading))return 'cautions';
+ if(/(?:한\s*달|기대(?:되는)?[^.]{0,20}변화|핵심\s*효능|주요\s*적응증)/u.test(heading))return 'effects';
+ if(/(?:(?:일일|하루)[^.]{0,20}(?:섭취량|권장량)|섭취법|복용법|먹는\s*법|보관|조리\s*팁)/u.test(heading))return 'storage';
+ return FALLBACK_SECTION_KIND[section]??null;
+}
 export function renderDirectArticle(html){
  let n=0;
- let body=html.replace(/<h2>([\s\S]*?)<\/h2>/g,(_,title)=>{n++;return '<h2 id="direct-section-'+n+'"><small>'+String(n).padStart(2,'0')+'</small>'+title.replace(/^\d+[.)]\s*/,'')+'</h2>';});
+ const kinds={};
+ let body=html.replace(/<h2>([\s\S]*?)<\/h2>/g,(_,title)=>{n++;kinds[n]=sectionKind(title,n);return '<h2 id="direct-section-'+n+'"><small>'+String(n).padStart(2,'0')+'</small>'+title.replace(/^\d+[.)]\s*/,'')+'</h2>';});
  let section=0;
  body=body.split(/(?=<h2 id=)/).map(chunk=>{
   if(chunk.startsWith('<h2'))section++;
-  const kind=({3:'effects',4:'pairs',5:'cautions',6:'storage'})[section];
+  const kind=kinds[section];
   if(!kind)return chunk;
   return chunk.replace(/<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/g,(_,inside)=>{let i=0;return '<div class="'+kind+'">'+inside.replace(/<li><strong>([\s\S]*?)<\/strong>([\s\S]*?)<\/li>/g,(_,label,text)=>'<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label.replace(/[:：]\s*$/,'')+'</h3><p>'+text+'</p></div></article>')+'</div>';});
  }).join('');

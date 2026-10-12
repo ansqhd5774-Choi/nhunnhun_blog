@@ -1,4 +1,5 @@
 import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
+import {isRejectedHeroSource} from './rejected-hero-sources.mjs';
 const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','process','diagram']);
@@ -13,6 +14,9 @@ export function assertImageReview(item){
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
   if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||review[0]?.src!==item.representativeImageUrl)throw new Error('E_IMAGE_HERO_REVIEW');
+  // A source that was explicitly rejected after real visual inspection must not silently return as a hero.
+  // This is a deterministic manual reject registry, not a semantic/AI image judgment and not a visualChecked gate.
+  if(isRejectedHeroSource(review[0]?.sourcePage))throw new Error('E_IMAGE_HERO_REJECTED');
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i],tag=tags[i];
