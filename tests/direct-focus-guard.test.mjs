@@ -47,6 +47,12 @@ test('focus guard catches guarantee no-effect no-database and universal-negation
   assert.throws(()=>assertDirectSubmissionFocus(source(html)),/E_DIRECT_FOCUS_LIMITATION_OVERLOAD/);
 });
 
+test('focus review recognizes Korean negative-copula wording as one caveat sentence',()=>{
+  const review=directFocusReview('<h2>권장 대상</h2><p>모든 사람이 보충제를 먹어야 하는 것은 아닙니다.</p>');
+  assert.equal(review.limitationHits,1);
+  assert.match(review.limitationFindings[0].match,/아닙니다/);
+});
+
 test('mixed risk heading is not treated as a pure safety exemption',()=>{
   const html='<h2>효능</h2><p>근거가 부족합니다. 자료가 제한적입니다.</p>'+
     '<h2>결핍·과다 복용의 위험, 예방 가능한 질병과 추천 제품</h2><p>효과를 보장할 수 없습니다.</p>';
