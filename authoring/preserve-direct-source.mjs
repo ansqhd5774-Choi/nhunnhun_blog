@@ -10,6 +10,7 @@ export function preservedSourceBundle(source){
   return {version:'direct-handoff-20261012',source,
     receipt:{sourceId:source.id,articleId:source.articleId??null,title:source.title,sourceDigest:sourceDigest(source),
       authorState:'AUTHOR_COMPLETE',githubState:'NOT_CONFIRMED',preflight:prepared.report.preflight,
+      foodAxisReview:prepared.report.foodAxisReview,
       workflowState:'NOT_STARTED',finalSubmitCount:0}};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
