@@ -6,5 +6,16 @@
   "sourceCommit": "15a6d3c1a3dcd97e301d88bb27b9439464deed78",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-12T11:26:26.489Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38242525890"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38242525890",
+  "publicResult": {
+    "sourceId": "direct-154-rosehip-r2-20261012",
+    "url": "https://nhunnhun.tistory.com/154",
+    "sourceCommit": "15a6d3c1a3dcd97e301d88bb27b9439464deed78",
+    "fingerprint": "8d01a47d951ad3c21299ed039beb3ff30197bf69a26719e44a41f92035be7148",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38242525890",
+    "checkedAt": "2026-10-12T11:26:28.171Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38242525890",
+    "status": "PUBLIC_VERIFICATION_UNAVAILABLE",
+    "code": "E_QA_INTERNAL_LINK"
+  }
 }
