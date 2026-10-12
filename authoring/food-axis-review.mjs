@@ -31,7 +31,8 @@ const FOOD_AXES = [
   }
 ];
 
-const AUX_HEADING_RE=/(FAQ|자주\s*묻|핵심\s*정리|자료\s*출처|출처)/i;
+// Keep this utility set aligned with publishing/direct-focus.mjs.
+const UTILITY_HEADING_RE=/^(?:자주\s*묻는\s*질문|FAQ|핵심\s*정리|함께\s*보면\s*좋은\s*글|자료\s*출처)$/iu;
 
 function decodeHtml(text){
   return String(text??'')
@@ -52,6 +53,10 @@ function textOnly(html){
     .trim();
 }
 
+function normalizedHeading(value){
+  return String(value??'').replace(/^\d+[.)]\s*/u,'').trim();
+}
+
 function firstAnswer(segment){
   const blocks=String(segment??'').matchAll(/<(p|blockquote|li)\b[^>]*>([\s\S]*?)<\/\1>/gi);
   for(const match of blocks){
@@ -63,14 +68,20 @@ function firstAnswer(segment){
 
 export function buildFoodAxisReview(source={}){
   const html=String(source.bodyHtml??'');
-  const coreHeadings=[...html.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/gi)]
-    .map(match=>({index:match.index??0,end:(match.index??0)+match[0].length,heading:textOnly(match[1])}))
-    .filter(item=>item.heading&&!AUX_HEADING_RE.test(item.heading))
-    .slice(0,6);
+  const allHeadings=[...html.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/gi)]
+    .map((match,order)=>({
+      order,
+      index:match.index??0,
+      end:(match.index??0)+match[0].length,
+      heading:textOnly(match[1])
+    }))
+    .filter(item=>item.heading);
+  const coreHeadings=allHeadings.filter(item=>!UTILITY_HEADING_RE.test(normalizedHeading(item.heading)));
+  const reviewHeadings=coreHeadings.slice(0,6);
 
   const axes=FOOD_AXES.map((definition,index)=>{
-    const item=coreHeadings[index];
-    const next=coreHeadings[index+1];
+    const item=reviewHeadings[index];
+    const next=item?allHeadings.find(heading=>heading.order>item.order):null;
     const segment=item?html.slice(item.end,next?.index??html.length):'';
     return {
       axis:index+1,
