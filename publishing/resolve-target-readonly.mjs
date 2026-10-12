@@ -1,5 +1,6 @@
 import {readFile} from 'node:fs/promises';
-import {resolve,pathToFileURL} from 'node:path';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {BLOG} from './core.mjs';
 import {assertTistoryAuthenticated} from './auth-preflight.mjs';
 import {localBrowserConfig,openEditorConnection,closeEditorConnection} from './local-browser.mjs';
