@@ -9,7 +9,7 @@ test('preparation exposes actual pairing paragraphs for author review without au
  assert.equal(review.heading,'궁합');
  assert.deepEqual(review.combinations,['은행 + 달걀 단백질을 보완합니다.']);
  assert.equal(review.assessment,'AUTHOR_REVIEW_REQUIRED');
- assert.equal(review.reviewQuestions.length,4);
+ assert.equal(review.reviewQuestions.length,6);
  assert.equal(pairingReview('<h2>소개</h2>').combinations.length,0);
 });
 
