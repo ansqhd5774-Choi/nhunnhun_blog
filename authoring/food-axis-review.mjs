@@ -53,13 +53,9 @@ function textOnly(html){
 }
 
 function firstAnswer(segment){
-  for(const pattern of [
-    /<p\b[^>]*>([\s\S]*?)<\/p>/i,
-    /<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/i,
-    /<li\b[^>]*>([\s\S]*?)<\/li>/i
-  ]){
-    const match=String(segment??'').match(pattern);
-    const answer=match?textOnly(match[1]):'';
+  const blocks=String(segment??'').matchAll(/<(p|blockquote|li)\b[^>]*>([\s\S]*?)<\/\1>/gi);
+  for(const match of blocks){
+    const answer=textOnly(match[2]);
     if(answer)return answer;
   }
   return '';
