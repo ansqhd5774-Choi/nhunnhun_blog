@@ -4,8 +4,9 @@ import { readdir, readFile } from 'node:fs/promises';
 import { BLOG, checkPublishHtml, plainText } from './core.mjs';
 import {assertDirectEmphasis} from './direct-emphasis.mjs';
 import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-source.mjs';
+import {validateAffiliateProducts} from './affiliate-products.mjs';
 
-const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard'];
+const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts'];
 
 export function checkUpdateSource(update, filename){
   if(isNativeTextMaintenance(update))return checkNativeTextSource(update,filename);
@@ -20,6 +21,7 @@ export function checkUpdateSource(update, filename){
     if(typeof update[key]!=='string' || !update[key].trim() || update[key].length>150 || /[\r\n]/.test(update[key])) throw new Error('E_UPDATE_TITLE');
   }
   if(update.status!=='ready' || update.approved!==true) throw new Error('E_UPDATE_APPROVAL');
+  validateAffiliateProducts(update.affiliateProducts);
   if(typeof update.bodyHtml!=='string' || !plainText(update.bodyHtml)) throw new Error('E_UPDATE_BODY');
   if(update.contentStandard!=='SP1'||update.representativeImageUrl!==undefined){
   if(typeof update.representativeImageUrl!=='string' || !update.representativeImageUrl.trim()) throw new Error('E_UPDATE_REPRESENTATIVE');
@@ -35,7 +37,8 @@ export function updateFingerprint(update){
   if(isAltMaintenance(update))return altFingerprint(update);
   return createHash('sha256').update(JSON.stringify([
     update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml,
-    ...(update.contentStandard ? [update.contentStandard,update.category] : [])
+    ...(update.contentStandard ? [update.contentStandard,update.category] : []),
+    ...(update.affiliateProducts ? [update.affiliateProducts] : [])
   ])).digest('hex');
 }
 export async function loadUpdates(directory='updates',sourceId=null){

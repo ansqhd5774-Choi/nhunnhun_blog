@@ -3,10 +3,11 @@ import { readdir, readFile } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
 import {parseDocument} from 'htmlparser2';
 import {assertDirectEmphasis} from './direct-emphasis.mjs';
+import {validateAffiliateProducts} from './affiliate-products.mjs';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
-  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard'];
+  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard', 'affiliateProducts'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
   if (post.contentStandard !== undefined && post.contentStandard !== 'R1' && !(post.contentStandard==='SP1'&&post.id?.startsWith('direct-'))) throw new Error('E_CONTENT_STANDARD_VERSION');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
@@ -14,6 +15,7 @@ export function checkPost(post, filename) {
   if (typeof post.category !== 'string' || !post.category.trim()) throw new Error('E_CATEGORY');
   if (!['draft', 'ready'].includes(post.status) || typeof post.approved !== 'boolean') throw new Error('E_STATUS');
   if (post.status === 'ready' && !post.approved) throw new Error('E_APPROVAL');
+  validateAffiliateProducts(post.affiliateProducts);
   if (!Array.isArray(post.tags) || post.tags.length > 10 || post.tags.some(t => typeof t !== 'string' || !t.trim() || t.length > 40 || /[,#\r\n]/.test(t))) throw new Error('E_TAGS');
   if (typeof post.bodyHtml !== 'string' || post.bodyHtml.length > 200000 || !plainText(post.bodyHtml)) throw new Error('E_BODY');
   if (post.scheduledAt !== undefined) {
@@ -67,6 +69,7 @@ export function fingerprint(post) {
   if (post.representativeImageUrl) parts.push(post.representativeImageUrl);
   if (post.scheduledAt) parts.push(post.scheduledAt);
   if (post.contentStandard) parts.push(post.contentStandard);
+  if (post.affiliateProducts) parts.push(post.affiliateProducts);
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
 }
 export async function loadPosts(directory = 'posts', sourceId = process.env.PUBLISH_SOURCE_ID || null) {

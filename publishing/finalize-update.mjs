@@ -11,7 +11,7 @@ import {isAltMaintenance} from './alt-maintenance-source.mjs';
 import {finalizeAltMaintenance} from './alt-maintenance-public.mjs';
 
 export function publicFailureState(error) {
-  const code=/^E_(?:QA|DIRECT_PUBLIC|PUBLIC_TITLE)_[A-Z_]+$/.test(error?.message||'')?error.message:'E_QA_ACCESS';
+  const code=/^(?:E_(?:QA|DIRECT_PUBLIC|PUBLIC_TITLE)_[A-Z_]+|E_AFFILIATE_PUBLIC_UNVERIFIED)$/.test(error?.message||'')?error.message:'E_QA_ACCESS';
   return {status:/RESPONSE|FETCH|ACCESS|RATE_LIMIT|INTERNAL_LINK/.test(code)?'PUBLIC_VERIFICATION_UNAVAILABLE':'PUBLIC_VERIFICATION_MISMATCH',code};
 }
 // Read-only browser verification; this module never opens an editor or submits.

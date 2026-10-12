@@ -4,6 +4,7 @@ import { verificationContext } from './verification-context.mjs';
 import {assertDirectPublicSnapshot} from './direct-public-contract.mjs';
 import {assertPublicTitle} from './public-title.mjs';
 import {publicBodiesMatch} from './public-body.mjs';
+import {COUPANG_DISCLOSURE,assertAffiliatePublicEvidence} from './affiliate-products.mjs';
 // Read-only, anonymous quality audit. No editor, credential export or ledger writes.
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -124,6 +125,14 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
     const actualBody=await root.evaluate(el=>({text:el.innerText,
       headings:[...el.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'')}));
     if(!publicBodiesMatch(actualBody,expectedBody)) throw new Error('E_QA_BODY');
+    if(update.affiliateProducts){
+      const evidence=await root.evaluate((el,arg)=>({
+        disclosureCount:el.innerText.split(arg.disclosure).length-1,
+        linkCounts:arg.urls.map(url=>[...el.querySelectorAll('a')].filter(link=>link.href===url).length),
+        sponsored:arg.urls.map(url=>{const link=[...el.querySelectorAll('a')].find(item=>item.href===url);const rel=(link?.getAttribute('rel')||'').toLowerCase().split(/\s+/);return rel.includes('sponsored')&&rel.includes('nofollow');})
+      }),{disclosure:COUPANG_DISCLOSURE,urls:update.affiliateProducts.products.map(product=>product.landingUrl)});
+      assertAffiliatePublicEvidence(evidence,update.affiliateProducts);
+    }
     const images=root.locator('img');
     for(let n=0;n<await images.count();n++) {
       const img=images.nth(n);
