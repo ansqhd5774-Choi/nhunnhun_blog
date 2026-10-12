@@ -1,15 +1,17 @@
 import {parseDocument} from 'htmlparser2';
 
 const text=node=>node.type==='text'?node.data:(node.children??[]).map(text).join('');
+const pairingSectionByCategory={'영양소':5};
 export function pairingReview(bodyHtml, category='음식') {
+  const targetSection=pairingSectionByCategory[category]??4;
   const nodes=parseDocument(bodyHtml).children;
   let section=0,heading='',content=[];
   for(const node of nodes){
     if(node.name==='h2'){
       section++;
-      if(section>4)break;
-      if(section===4)heading=text(node).trim();
-    } else if(section===4)content.push(node);
+      if(section>targetSection)break;
+      if(section===targetSection)heading=text(node).trim();
+    } else if(section===targetSection)content.push(node);
   }
   const combinations=[];
   const visit=node=>{
@@ -37,7 +39,7 @@ export function pairingReview(bodyHtml, category='음식') {
       '필요한 위험·응급 행동을 유지하며 불필요한 반박을 반복하지 않았는가?'
     ]
   };
-  return {heading,combinations,reviewQuestions:categoryQuestions[category]??[
+  return {heading,combinations,targetSection,reviewQuestions:categoryQuestions[category]??[
     '각 조합이 어떤 성분·식사 구성을 어떻게 보완하는지 실제 문장으로 설명했는가?',
     '영양 보완, 흡수·상호작용 연구, 맛·조리 활용을 구분하고 근거 수준을 밝혔는가?',
     '소량 고명은 풍미 역할로 설명하고, 각 조합에 불필요한 한계·반박 문장을 반복하지 않았는가?',
