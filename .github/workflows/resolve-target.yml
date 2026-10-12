@@ -13,7 +13,7 @@ concurrency:
 jobs:
   resolve:
     runs-on: [ self-hosted, windows, x64, tistory-publisher ]
-    timeout-minutes: 8
+    timeout-minutes: 4
     defaults:
       run:
         shell: cmd
