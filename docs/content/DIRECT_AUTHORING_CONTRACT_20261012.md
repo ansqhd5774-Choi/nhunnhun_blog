@@ -9,6 +9,7 @@
 - 이미지: 최소3개, 대표 이미지·본문 순서/alt 일치, 원출처·저작자·라이선스·출처 링크·중복 검사 유지.
 - 허용 키: src, alt, role, composition, sourcePage, author, license, visualChecked.
 - visualChecked는 **선택적 boolean 관찰 기록**이다. 누락/false 때문에 제출을 막지 않는다. true를 자동 생성하거나 사진 내용 확인으로 위장하지 않는다. 문자열이나 임의 키는 거부한다. 최근 사용자가 제거한 시각 확인 필수 게이트를 복원하지 않는다.
+- visualChecked는 **현재 source/revision에서 실제 이미지 원본을 열어 확인한 관찰값**이다. 기존 원고·archive·같은 주제 글에서 이미지를 재사용할 때 `src`, `alt`, `role`, `composition`, `sourcePage`, `author`, `license` 같은 자산·귀속 메타데이터만 재사용하고 `visualChecked`는 승계하지 않는다. 새 source에서 실제로 다시 확인한 경우에만 true를 새로 기록한다. 이 규칙은 시각 확인을 발행 필수 게이트로 만들지 않는다.
 - 강조: strong18·mark8·mark>u>strong2 이상. 단독 mark·근거 한계 강조·안전 문구만의 강조를 기존 규칙으로 차단한다.
 - 핵심 H2 최대6개; FAQ·핵심 정리·자료 출처 등 기존 보조 항목 제외. 기존 연구 세부 과다·근거 한계 반복 검사는 유지한다.
 - preflight는 모든 실패 코드를 수집한다. FAIL인 원고는 같은 작성 과정에서 보완하고 저장·제출하지 않는다. 문장·강조·사진을 자동 변조하지 않는다. PREFLIGHT_PASS는 구조 검사이며 의학적 감수나 사진의 시각 확인을 뜻하지 않는다.
