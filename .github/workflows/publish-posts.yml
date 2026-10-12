@@ -108,7 +108,17 @@ jobs:
       - run: call maintenance\check-tistory-chrome.cmd
       - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
         run: node publishing/auth-preflight.mjs
-      - run: pnpm run publish
+      - name: 신규·기존 대상 식별 — 관리자 목록 읽기 전용
+        run: node publishing/target-resolution-gate.mjs
+      - name: 신규 글 단일 제출 시도
+        id: publish-attempt
+        continue-on-error: true
+        run: pnpm run publish
         env:
           PUBLISH_ENABLED: "true"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 제출 후 불명확 상태 공개 재검증 — 재제출 없음
+        if: steps.publish-attempt.outcome == 'failure'
+        run: node publishing/recover-publication.mjs
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
