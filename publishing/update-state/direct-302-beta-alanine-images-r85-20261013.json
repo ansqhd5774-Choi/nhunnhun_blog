@@ -6,5 +6,16 @@
   "sourceCommit": "fce5a1ec6cc1e072632aa863ac6f18d42a8899d8",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-12T21:34:04.203Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38311257113"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38311257113",
+  "publicResult": {
+    "sourceId": "direct-302-beta-alanine-images-r85-20261013",
+    "url": "https://nhunnhun.tistory.com/302",
+    "sourceCommit": "fce5a1ec6cc1e072632aa863ac6f18d42a8899d8",
+    "fingerprint": "f7dd209be9fab13968623ead5c48f63c0049e0ea793d38070dc5efb94c26ac12",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38311257113",
+    "checkedAt": "2026-10-12T21:34:07.362Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38311257113",
+    "status": "PUBLIC_VERIFICATION_UNAVAILABLE",
+    "code": "E_QA_ACCESS"
+  }
 }
