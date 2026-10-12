@@ -16,8 +16,9 @@ export function prepareDirectSource(source) {
   else {checkPost(source,source.id+'.json');checkPublishHtml(source);}
   const observation=observeEmphasis(source.bodyHtml);
   const focusReview=directFocusReview(source.bodyHtml);
+  const foodAxisReview=source.category==='음식'?buildFoodAxisReview(source):null;
   return {
-    report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),foodAxisReview:buildFoodAxisReview(source),
+    report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),...(foodAxisReview?{foodAxisReview}:{}),
       editorialReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[
         '이 키워드를 검색한 독자가 가장 먼저 알고 싶은 핵심 질문을 6개 이내로 정리했는가?',
         '각 핵심 소제목이 독자의 질문 하나에 직접 답하며 세부 설명 때문에 별도 대주제를 불필요하게 만들지 않았는가?',
