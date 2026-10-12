@@ -1,6 +1,6 @@
 > 최신 공통 검사·저장 계약: [2026-10-12 작성·저장·제출 계약](docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md). 이미지 visualChecked는 선택적 boolean 기록이며 필수 게이트가 아니다. 작성 준비와 제출은 동일 preflight를 사용하고, 저장은 실제 커밋 파일 내용 확인 후 성공으로 판정한다.
 
-> 네 카테고리 공통 기반: [음식 기반 공통 작성 계약](docs/content/CATEGORY_CONTENT_PARITY.md)을 적용한다. 내용과 소제목만 분야에 맞게 바꾸며 강조·디자인·러너·발행·공개 검증은 동일하게 유지한다. 신규와 기존 전체 수정에 공통 적용한다.
+> 이 저장소는 음식 카테고리 원고만 작성·수정한다. [음식 전용 프로젝트 지침](docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt)이 소제목과 편집 내용을 정한다. [공통 작성 계약](docs/content/CATEGORY_CONTENT_PARITY.md)은 공유 렌더링·강조·이미지·검증·발행 기반에만 적용하며 다른 분야의 편집 구조를 이 저장소에 가져오지 않는다.
 
 > 블로그 방향·제목: 한입 건강은 건강·영양 정보 블로그이며 조리·레시피 전문 블로그가 아니다. 음식 제목은 본문의 중심인 영양·칼로리·섭취·궁합·주의·선택·보관에 맞춘다. 조리법은 안전한 섭취·활용을 돕는 보조 내용이며, 사용자의 명시적 조리법 요청 없이 ‘만들기’를 제목의 주된 약속으로 선택하지 않는다. 제목·본문의 중심이 어긋나면 건강정보 방향에 맞게 제목을 먼저 조정한다. 상세 기준: [제목 선정 계약](docs/content/HEALTH_TITLE_SCOPE.md).
 
@@ -13,7 +13,7 @@
 검색·유입·근거 갱신 작업은 [한입 건강 32개 운영 계약](docs/HEALTH_GROWTH_OPERATIONS.md)을 적용한다. 기존 작성·강조·발행 계약을 유지하고 검색 색인·유입을 매 글 발행 게이트로 추가하지 않는다. 32개 항목은 구현과 실제 운영 검증을 분리한다.
 
 ## 기준 우선순위 — GPT 직접 작성
-음식·영양소·약학·질병의 GPT 직접 작성 및 `direct-*` SP1 원고에는 `docs/content/DIRECT_AUTHORING_R1.md`와 `docs/content/CATEGORY_CONTENT_PARITY.md`의 최신 사용자 지시가 **내용·문체·구성·강조의 최우선 기준**이다. `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`은 근거·안전·legacy 계약을 참고할 수 있지만, direct-*의 문체·소제목·강조·contentStandard를 덮어쓰지 않는다. 서로 충돌하면 DIRECT_AUTHORING_R1과 CATEGORY_CONTENT_PARITY를 적용한다.
+이 저장소에서 GPT가 직접 작성하는 `direct-*` SP1 원고는 [음식 전용 프로젝트 지침](docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt)이 내용·문체·소제목을 정한다. `docs/content/DIRECT_AUTHORING_R1.md`와 `docs/content/CATEGORY_CONTENT_PARITY.md`는 공통 기술·안전·강조·발행 계약에만 적용한다. 이 저장소에서 영양소·약학·질병 원고를 작성하지 않는다. `docs/CONTENT_STANDARD_R1.md`, `docs/CONTENT_WRITER_PROMPT_R1.md`, `docs/content/DOMAIN_GUIDES_R1.md`, `docs/EDITORIAL_PUBLISH_STANDARD_R4.md`, `docs/CONTENT_REVIEW_FORMAT_R1.md`은 근거·안전·legacy 계약을 참고하되 음식 전용 소제목을 덮어쓰지 않는다.
 
 직접 작성 음식 글은 **확인된 특징·장점·영양소 역할·식사 활용을 먼저 충분히 설명**한다. 독자가 주장하지 않은 치료·예방 효과를 도입·효능·궁합·FAQ·핵심 정리에서 반복 반박하지 않는다. 실제 알레르기·독소·상호작용·보관 안전처럼 행동이 필요한 경고는 명확히 유지하되 원칙적으로 주의 항목에 집중한다. 즉시 필요한 안전 경고는 필요한 위치에도 둘 수 있다. 일반 효능 문단과 핵심 정리의 강한 강조를 부정·반박 문장으로 채우지 않는다.
 
@@ -39,7 +39,7 @@
 - 비밀번호, 쿠키, 토큰, 인증 헤더, 비공개 개인정보를 파일·출력·커밋에 남기지 않는다.
 - UI는 공식 브라우저 도구와 기존 로그인 세션을 사용한다. 로그인 필요 시에만 사용자에게 요청한다.
 - 업무는 SEO / AdSense / categories / posts로 분리한다. 담당 범위 밖의 변경은 하지 않는다.
-- 콘텐츠 운영 범위는 음식 / 영양소 / 약학 / 질병 4개 카테고리 전체다. 특정 1개 카테고리 전용으로 축소하지 않는다.
+- 이 저장소의 편집 범위는 음식 카테고리만이다. 공유 발행 코드는 네 카테고리의 기존 JSON을 처리할 수 있지만, 그 기술 지원 범위는 이 저장소의 편집 허용 범위를 넓히지 않는다.
 - 약학·질병은 공식 허가사항·정부/전문기관·진료지침·원문 연구를 우선하고, 개인별 진단·처방 변경·복용 중단을 자동으로 제시하지 않는다.
 - 실제로 수행한 구현, 테스트, 백업, 적용, 운영 검수를 구분한다. 자동화 접근 실패를 서비스 실패로 쓰지 않는다.
 - GitHub의 skin/reference/skin.html은 인증·광고 식별자를 제거한 검토용이다. REDACTED 상태의 사본을 배포하지 않는다. 최신 원본에 검증된 변경분만 반영한다.
@@ -51,7 +51,7 @@
 
 ## GPT 직접 작성 — 2026-10-09 최신 사용자 지시
 작성자는 원고를 준비하고, 러너의 prepare-selected-source가 제출 원고의 준비 검사를 수행한다. 로컬 prepare 명령은 운영자 선택 도구다. 이 명령으로 실제 발행 렌더러의 미리보기와 항목별 강조 현황을 함께 준비하고, GPT가 의미·디자인을 확인·보완한 완성본만 updates/direct-*.json에 저장하여 제출한다. 초안부터 main에 넣어 자동 발행한 뒤 강조를 덧붙이는 순서를 기본 작업으로 사용하지 않는다. 도구가 자동으로 의미를 판단하거나 누락 강조를 만들어 준다고 보고하지 않는다.
-음식·영양소·약학·질병 및 기존 URL 수정은 docs/content/DIRECT_AUTHORING_R1.md를 우선한다. Ollama 작성·강조 호출은 운영 경로에서 사용하지 않는다. GPT가 원고와 사진을 준비하고 direct-* source를 기존 발행 러너에 전달한다.
+음식 신규·기존 URL 수정은 docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt의 내용 기준과 docs/content/DIRECT_AUTHORING_R1.md의 공통 기술 기준을 적용한다. Ollama 작성·강조 호출은 운영 경로에서 사용하지 않는다. GPT가 원고와 사진을 준비하고 direct-* source를 기존 발행 러너에 전달한다.
 - 강조 선택과 내부링크를 본문 작성 중 함께 적용한다. 최신 직접 작성 기준의 1·2·3단계 중첩 태그를 사용하며 러너 출력의 항목별 강조 현황을 확인한다. 자동 내용 검사·재작성 루프·새 Actions 작업을 추가하지 않는다. 시작부터 최종 제출까지 단계별 시간을 기록한다.
 - 강조 범위는 핵심 단어에 한정하지 않는다. 각 항목의 핵심 수치·성분 역할·효과와 조건·궁합의 작용·주의 행동·선택과 보관 기준까지 넓혀, 강조 부분을 훑어도 핵심을 알 수 있게 작성한다. 표에도 적용하며 중요도별 중복 강조를 유지한다.
 - 궁합은 성분/구성 보완 또는 근거 있는 흡수·상호작용을 설명한다. 소량 고명은 풍미 역할로 설명하며 조합마다 한계·반박 문장을 덧붙이지 않는다. 소개·효능은 확인된 장점을 먼저 쓰고, 자료 기준은 영양표 앞에 간결하게 표시하며 실제 경고는 주의사항에 둔다. prepare-direct-source의 pairingReview 문장과 질문을 저장 전 검토하며 기술 CI를 내용 PASS로 보고하지 않는다.
