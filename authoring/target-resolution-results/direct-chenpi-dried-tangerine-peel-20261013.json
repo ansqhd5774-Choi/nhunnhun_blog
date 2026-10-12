@@ -1,6 +1,6 @@
 {
   "sourceId": "direct-chenpi-dried-tangerine-peel-20261013",
-  "requestDigest": "0f10284f2aa14871cee5c538bb61421eb57743dffc2dc7550b9627980ffd873c",
+  "requestDigest": "a771049252c216ae898fdcf066f86fd79bdc999898b601ee218c1eed9bc2de98",
   "decision": "existing_candidate",
   "scanned": 374,
   "candidates": [
@@ -12,7 +12,7 @@
       "aliasHit": true
     }
   ],
-  "resolvedAt": "2026-10-12T22:09:16.073Z",
-  "requestCommit": "82c85f098f58caf4f85ea475a875e86a01570e6d",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38314903639"
+  "resolvedAt": "2026-10-12T22:19:36.505Z",
+  "requestCommit": "4f918bdb728f9812d0ca280bf4080b53837cb13f",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38315249515"
 }
