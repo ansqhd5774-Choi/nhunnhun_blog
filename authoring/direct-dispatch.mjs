@@ -4,6 +4,8 @@ import {pathToFileURL} from 'node:url';
 import {checkUpdateSource,updateFingerprint} from '../publishing/update-core.mjs';
 import {assertDirectEmphasis} from '../publishing/direct-emphasis.mjs';
 import {dispatchQueuedUpdate} from './update-queue-dispatch.mjs';
+import {assertDirectPreflight} from '../publishing/direct-preflight.mjs';
+import {confirmGithubSource} from './source-confirmation.mjs';
 
 // A push may include several commits. Never guess which update should be mutated.
 export function sourceIdForEvent({eventName,sourceId,eventPayload}={}) {
@@ -41,7 +43,7 @@ export async function resolveDirectSourceId({eventName,sourceId,eventPayload,tok
   }
 }
 
-export async function dispatchDirectSource({sourceId,commitSha,token,root=process.cwd(),dispatch=dispatchQueuedUpdate}={}){
+export async function dispatchDirectSource({sourceId,commitSha,token,root=process.cwd(),dispatch=dispatchQueuedUpdate,confirmSource=confirmGithubSource}={}){
   if(!/^direct-[a-z0-9-]{2,70}$/.test(sourceId??''))throw Error('E_DIRECT_SOURCE_ID');
   const source=JSON.parse(await readFile(resolve(root,'updates',sourceId+'.json'),'utf8'));
   checkUpdateSource(source,sourceId+'.json');
@@ -55,6 +57,9 @@ export async function dispatchDirectSource({sourceId,commitSha,token,root=proces
   // A submitting record may already have a successful final click. Inspect its run,
   // rather than spending another runner job on a duplicate/uncertain submission.
   if(ledger)throw Error('E_DIRECT_ALREADY_ATTEMPTED');
+  assertDirectPreflight(source);
+  const confirmation=await confirmSource({kind:'updates',source,commitSha,token});
+  if(confirmation?.status!=='GITHUB_SOURCE_CONFIRMED')throw Error('E_SOURCE_NOT_CONFIRMED');
   return dispatch({token,commitSha,sourceId});
 }
 

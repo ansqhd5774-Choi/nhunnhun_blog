@@ -1,4 +1,5 @@
-const REVIEW_KEYS=['src','alt','role','composition','sourcePage','author','license'];
+import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
+const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','process','diagram']);
 const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
@@ -10,12 +11,14 @@ function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhre
 function assertHttps(value,code){let u;try{u=new URL(value);}catch{throw new Error(code);}if(u.protocol!=='https:'||u.username||u.password)throw new Error(code);return u;}
 export function assertImageReview(item){
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
-  if(!Array.isArray(review)||review.length!==tags.length||tags.length<3)throw new Error('E_IMAGE_REVIEW_REQUIRED');
+  if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
   if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||review[0]?.src!==item.representativeImageUrl)throw new Error('E_IMAGE_HERO_REVIEW');
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i],tag=tags[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
+    // Optional observation only. Never synthesize true or restore the removed mandatory gate.
+    if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
     if(!ROLES.has(r.role)||!COMPOSITIONS.has(r.composition)||(i>0&&r.role==='hero'))throw new Error('E_IMAGE_REVIEW_REQUIRED');
     const src=attr(tag,'src'),alt=attr(tag,'alt');
     if(r.src!==src||r.alt!==alt||!alt.trim()||alt.length<6)throw new Error('E_IMAGE_REVIEW_MISMATCH');

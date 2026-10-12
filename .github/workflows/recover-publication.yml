@@ -12,6 +12,7 @@ permissions:
   contents: write
 concurrency:
   group: nhunnhun-tistory-mutation
+  queue: max
   cancel-in-progress: false
 jobs:
   verify:

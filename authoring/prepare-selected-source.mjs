@@ -1,10 +1,9 @@
 import {isNativeTextMaintenance,checkNativeTextSource} from '../publishing/native-text-contract.mjs';
 import {readFileSync} from 'node:fs';
 import {prepareDirectSource} from './prepare-direct-source.mjs';
-import {assertImageReview} from '../publishing/image-review.mjs';
-import {assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
-import {assertDirectSubmissionFocus} from '../publishing/direct-focus.mjs';
+import {assertDirectPreflight} from '../publishing/direct-preflight.mjs';
 import {isAltMaintenance,checkAltSource} from '../publishing/alt-maintenance-source.mjs';
+import {confirmGithubSource} from './source-confirmation.mjs';
 
 // Runner-side preparation before mutation. Never invent emphasis or review claims.
 const kind=process.argv[2];
@@ -16,9 +15,8 @@ if(kind==='updates'&&isNativeTextMaintenance(source)){checkNativeTextSource(sour
   checkAltSource(source,`${id}.json`);
   console.log('SOURCE_PREPARATION_MAINTENANCE '+JSON.stringify({id,scope:'image-alt-only',semanticVerification:'existing-content-not-recertified'}));
 }else if(source.contentStandard==='SP1'&&source.id.startsWith('direct-')) {
-  assertDirectSubmissionEmphasis(source);
-  assertDirectSubmissionFocus(source);
-  assertImageReview(source);
+  if(process.env.GITHUB_ACTIONS==='true')console.log('SOURCE_CONFIRMED '+JSON.stringify(await confirmGithubSource({kind,source,commitSha:process.env.GITHUB_SHA,token:process.env.GITHUB_TOKEN})));
+  assertDirectPreflight(source);
   const {report}=prepareDirectSource(source);
   console.log('SOURCE_PREPARATION '+JSON.stringify({...report,semanticVerification:'author-review-not-automated'}));
 } else console.log('SOURCE_PREPARATION_EXISTING_STANDARD '+id);

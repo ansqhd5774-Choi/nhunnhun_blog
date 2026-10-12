@@ -24,11 +24,13 @@ permissions:
   contents: read
 concurrency:
   group: nhunnhun-tistory-update
+  queue: max
   cancel-in-progress: false
 jobs:
   update:
     concurrency:
       group: nhunnhun-tistory-mutation
+      queue: max
       cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && inputs.update == true &&
       vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
@@ -61,6 +63,8 @@ jobs:
       - run: pnpm run validate:update
       - name: 선택 원고 준비와 강조 현황 — 러너 담당
         run: node authoring/prepare-selected-source.mjs updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: call maintenance\check-tistory-chrome.cmd
       - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
         run: node publishing/auth-preflight.mjs
@@ -73,6 +77,7 @@ jobs:
   verify-existing:
     concurrency:
       group: nhunnhun-tistory-mutation
+      queue: max
       cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && inputs.update == false && github.ref == 'refs/heads/main'
     runs-on: [ self-hosted, windows, x64, tistory-publisher ]

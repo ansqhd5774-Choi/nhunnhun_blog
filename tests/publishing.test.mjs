@@ -379,7 +379,7 @@ test('existing-post update workflow is separated from new publication on the Win
   assert.equal(w.jobs.update.steps.find(step=>step.uses==='actions/checkout@v5').with.ref,'${{ github.sha }}');
 });
 
-test('image review gate requires visually checked close-up hero and exact attribution', () => {
+test('image review preserves optional visual observation and requires close-up hero and exact attribution', () => {
   const body='<p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_A.jpg?width=960" alt="잘라 놓은 과일 단면과 통과일"></p><p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_B.jpg?width=960" alt="과일 내부 구조를 보여주는 단면"></p><p><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_C.jpg?width=960" alt="과수원에서 자라는 과일나무"></p><h2>자료 출처</h2><ul><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_A.jpg">A</a></li><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_B.jpg">B</a></li><li><a href="https://commons.wikimedia.org/wiki/File:Fruit_C.jpg">C</a></li></ul>';
   const review=[
     {src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Fruit_A.jpg?width=960',alt:'잘라 놓은 과일 단면과 통과일',role:'hero',composition:'closeup',sourcePage:'https://commons.wikimedia.org/wiki/File:Fruit_A.jpg',author:'A',license:'CC BY-SA 4.0',visualChecked:true},
@@ -390,7 +390,8 @@ test('image review gate requires visually checked close-up hero and exact attrib
   assert.doesNotThrow(()=>assertImageReview(item));
   assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,composition:'context'})}),/E_IMAGE_HERO_REVIEW/);
   assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,alt:'실제와 다른 설명'})}),/E_IMAGE_REVIEW_MISMATCH/);
-  assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:false})}),/E_IMAGE_REVIEW_REQUIRED/);
+  assert.doesNotThrow(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:false})}));
+  assert.throws(()=>assertImageReview({...item,imageReview:review.map((x,i)=>i?x:{...x,visualChecked:'true'})}),/E_IMAGE_REVIEW_SCHEMA/);
 });
 
 test('image attribution accepts an apostrophe in a double-quoted file URL without relaxing exact matching', () => {

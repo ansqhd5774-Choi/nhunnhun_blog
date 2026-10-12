@@ -1,3 +1,4 @@
+import {assertDirectPreflight} from './direct-preflight.mjs';
 import { verifyPublishedPublic } from './verify-published-public.mjs';
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { assertContentStandard } from './content-standards.mjs';
@@ -118,6 +119,7 @@ try {
       if (eligible(post, state)) {
         checkPublishHtml(post);
         assertContentStandard(post);
+        assertDirectPreflight(post);
         assertImageReview(post);
         queue.push({post, previousStateSha: state?.phase === 'failed' ? state.sha : undefined});
       }

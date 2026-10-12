@@ -1,4 +1,5 @@
 import {parseDocument} from 'htmlparser2';
+import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 const UTILITY_HEADING=/^(?:자주 묻는 질문|FAQ|핵심 정리|함께 보면 좋은 글|자료 출처)$/iu;
 const SAFETY_HEADING=/(?:주의|부작용|금기|위험|응급|이상반응)/u;
@@ -51,7 +52,7 @@ export function directFocusReview(bodyHtml='') {
 export function assertDirectSubmissionFocus(source) {
   if(source?.contentStandard!=='SP1'||!source?.id?.startsWith('direct-'))return;
   const review=directFocusReview(source.bodyHtml??'');
-  if(review.coreHeadings.length>6)throw Error('E_DIRECT_FOCUS_SECTION_OVERLOAD');
+  if(review.coreHeadings.length>DIRECT_AUTHORING_CONTRACT.coreHeadingMaximum)throw Error('E_DIRECT_FOCUS_SECTION_OVERLOAD');
   if(review.researchDetailHits>2)throw Error('E_DIRECT_FOCUS_RESEARCH_OVERLOAD');
   if(review.limitationHits>2)throw Error('E_DIRECT_FOCUS_LIMITATION_OVERLOAD');
   return review;

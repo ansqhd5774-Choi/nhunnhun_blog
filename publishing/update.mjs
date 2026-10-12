@@ -1,3 +1,4 @@
+import {assertDirectPreflight} from './direct-preflight.mjs';
 import {isNativeTextMaintenance} from './native-text-contract.mjs';
 import {runNativeTextMaintenance} from './native-text-runner.mjs';
 import {captureNativeTextBaseline} from './native-text-public.mjs';
@@ -165,6 +166,7 @@ try{
     for(const update of await loadUpdates('updates',sourceId)){
       const state=await ledger.read(update.id);
       if(eligibleUpdate(update,state)) {
+        assertDirectPreflight(update);
         if(!isNativeTextMaintenance(update)&&!isAltMaintenance(update)&&update.contentStandard!=='SP1') {
           if(!isPublishedProductLinkRepair(update)) assertContentStandard(update);
           assertImageReview(update);
