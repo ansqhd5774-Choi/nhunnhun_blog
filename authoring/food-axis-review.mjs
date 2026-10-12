@@ -7,12 +7,12 @@ const FOOD_AXES = [
   {
     expectedAxis:'핵심 효능·예방 효과',
     readerQuestion:'이 음식의 핵심 효능은 무엇이며, 사람에게 어디까지 확인됐는가?',
-    reviewQuestion:'제목·검색 의도가 효능·건강 효과를 약속한다면 H2와 첫 문장이 그 효능과 확인 범위를 직접 답하는가? ‘확인된 작용’, 감각, 연구 한계, 안전, 맛 설명만으로 이 축을 대신하지 않았는가?'
+    reviewQuestion:'제목·검색 의도가 효능·건강 효과를 약속한다면 H2와 첫 문장이 확인된 이점·식품 가치와 사람에게 확인된 범위를 먼저 직접 답하는가? 연구 한계·안전·맛 설명만으로 이 축을 대신하거나 부정 설명을 첫 답변으로 세우지 않았는가?'
   },
   {
     expectedAxis:'섭취법·권장량',
     readerQuestion:'얼마나·어떻게 먹는가? 공식 권장량이 있는가?',
-    reviewQuestion:'H2와 첫 문장이 실제 섭취 방법·양·공식 권장량 유무를 직접 답하는가?'
+    reviewQuestion:'H2와 첫 문장이 실제 섭취 방법·양·공식 권장량 유무를 직접 답하는가? ⑤에서 다룰 독성·고용량 경고를 이 축에 반복하지 않고 실제 섭취 행동에 필요한 최소 주의만 남겼는가?'
   },
   {
     expectedAxis:'궁합·상호작용',
@@ -22,13 +22,21 @@ const FOOD_AXES = [
   {
     expectedAxis:'부작용·주의 대상',
     readerQuestion:'부작용은 무엇이고 누가 주의해야 하는가?',
-    reviewQuestion:'H2와 첫 문장이 정상 반응·부작용·주의 대상을 구분해 직접 답하는가?'
+    reviewQuestion:'H2와 첫 문장이 정상 반응·부작용·주의 대상을 구분해 직접 답하며, 독성·고용량·금기·응급 행동을 이 축에 집중해 다른 축의 반복 경고를 줄였는가?'
   },
   {
     expectedAxis:'신선도·보관·조리 팁',
     readerQuestion:'신선한 것을 어떻게 고르고, 보관·조리하면 좋은가?',
     reviewQuestion:'H2와 첫 문장이 고르는 기준과 보관·조리 행동을 구체적으로 답하는가?'
   }
+];
+
+const BALANCE_REVIEW_QUESTIONS=[
+  '도입·핵심 요약이 음식의 정체·확인된 장점·실제 활용을 먼저 보여주고, 일반 안전 경고를 첫 인상으로 만들지 않았는가? 단, 즉시 위험 행동이 검색 의도의 중심이면 예외다.',
+  '② 효능의 첫 문단이 확인된 이점·작용 또는 실제 식품 가치를 먼저 설명한 뒤 필요한 근거 한계를 짧게 두는가? 없는 효능을 만들지는 않았는가?',
+  '사람 연구 부족·미확인·공식 권장량 없음·고용량 위험 같은 동일 의미를 도입·②·③·⑤·FAQ·요약에 반복하지 않았는가?',
+  '독성·고용량·금기·응급 행동은 원칙적으로 ⑤에 집중하고, 다른 축에는 그 자리의 행동 결정에 꼭 필요한 최소 주의만 남겼는가?',
+  '강한 강조가 부정·반박·근거 부족보다 확인된 장점·성분 역할·실제 활용·행동 기준을 중심으로 배치됐는가?'
 ];
 
 // Keep this utility set aligned with publishing/direct-focus.mjs.
@@ -95,6 +103,11 @@ export function buildFoodAxisReview(source={}){
     assessment:'AUTHOR_REVIEW_REQUIRED',
     automatedSemanticVerdict:false,
     observedCoreH2Count:coreHeadings.length,
-    axes
+    axes,
+    balanceReview:{
+      status:'AUTHOR_REVIEW_REQUIRED',
+      automatedSemanticVerdict:false,
+      questions:[...BALANCE_REVIEW_QUESTIONS]
+    }
   };
 }
