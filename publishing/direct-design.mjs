@@ -3,6 +3,7 @@ const BASE_CSS=".nh-direct-v2 *{box-sizing:border-box}.nh-direct-v2 .article-bod
 const LINK_CSS="/* Body links are recognisable independently of bold emphasis. */\n.nh-direct-v2 .article-body a[href] {color:#176b82!important;text-decoration:underline!important;text-decoration-color:#65aabc!important;text-decoration-thickness:2px!important;text-underline-offset:4px;background:#eef8fa;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background-color .15s,color .15s;}\n.nh-direct-v2 .article-body a[href]:hover {color:#114d62!important;background:#d9eff4;text-decoration-color:currentColor!important;}\n.nh-direct-v2 .article-body a[href]:focus-visible {outline:2px solid #176b82;outline-offset:3px;}\n.nh-direct-v2 .article-body a[href] strong {color:inherit!important;}\n";
 const CSS=BASE_CSS+LINK_CSS+"/* Item number badges: distinct from the large section heading numbers. */\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article {\n  display:grid!important;grid-template-columns:32px minmax(0,1fr);column-gap:12px!important;row-gap:10px;align-items:center;\n}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article > .badge {\n  grid-column:1;grid-row:1;display:inline-flex!important;align-items:center;justify-content:center;\n  width:32px;height:32px;padding:0!important;border-radius:9px;background:#fff0e1;color:#a54b1c!important;\n  font-size:14px!important;font-weight:800!important;line-height:1;box-shadow:inset 0 0 0 1px #f4d5b8;\n}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article > div {display:contents!important;}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article h3 {grid-column:2;grid-row:1;margin:0!important;font-size:19px;line-height:1.5;}\n.nh-direct-v2 :is(.effects,.pairs,.cautions,.storage) > article p {grid-column:1 / -1;margin:0!important;}\n\n.nh-direct-v2 .storage > article > .badge {background:#eaf3eb;color:#3e6b49!important;box-shadow:inset 0 0 0 1px #cddfcf;font-size:18px!important;} \n";
 const EFFECTS_CSS='.nh-direct-v2 .effects{background:#f7f9fc;border:1px solid #dce4ec;border-radius:12px;padding:4px 24px;margin:22px 0}.nh-direct-v2 .effects article:last-child{border-bottom:0}@media(max-width:600px){.nh-direct-v2 .effects{padding:4px 16px}}';
+const QUICK_SUMMARY_CSS='.nh-direct-v2 .quick-summary{margin:26px 0 40px;border:1px solid #dfe5e1;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(39,54,45,.06)}.nh-direct-v2 .quick-summary-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;background:#f6f8f5;border-bottom:1px solid #e5e9e6}.nh-direct-v2 .quick-summary-title{display:flex;align-items:baseline;gap:10px}.nh-direct-v2 .quick-summary-title strong{font-size:20px;color:#23352b}.nh-direct-v2 .quick-summary-kicker{font-size:11px;letter-spacing:.08em;font-weight:800;color:#a95325}.nh-direct-v2 .quick-summary-note{font-size:12px;color:#75817a}.nh-direct-v2 .quick-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#e8ece9}.nh-direct-v2 .quick-summary-item{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;padding:18px 20px;background:#fff;min-height:118px}.nh-direct-v2 .quick-summary-index{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:#fff0e1;color:#a54b1c;font-size:12px;font-weight:800;box-shadow:inset 0 0 0 1px #f2d4b8}.nh-direct-v2 .quick-summary-label{font-size:13px;font-weight:800;color:#476050;margin:1px 0 5px}.nh-direct-v2 .quick-summary-item p{margin:0;font-size:15px;line-height:1.68;color:#2d3b33}.nh-direct-v2 .quick-summary-item mark{padding:0 2px}@media(max-width:600px){.nh-direct-v2 .quick-summary{margin:20px 0 32px;border-radius:13px}.nh-direct-v2 .quick-summary-head{display:block;padding:16px}.nh-direct-v2 .quick-summary-note{display:block;margin-top:3px}.nh-direct-v2 .quick-summary-grid{grid-template-columns:1fr}.nh-direct-v2 .quick-summary-item{min-height:0;padding:16px;grid-template-columns:32px minmax(0,1fr)}.nh-direct-v2 .quick-summary-title strong{font-size:18px}}';
 const FALLBACK_SECTION_KIND={3:'effects',4:'pairs',5:'cautions',6:'storage'};
 const headingText=value=>String(value??'').replace(/<[^>]+>/g,'').replace(/^\d+[.)]\s*/u,'').replace(/\s+/gu,' ').trim();
 function sectionKind(title,section){
@@ -14,10 +15,22 @@ function sectionKind(title,section){
  if(/(?:(?:일일|하루)[^.]{0,20}(?:섭취량|권장량)|섭취법|복용법|먹는\s*법|보관|조리\s*팁)/u.test(heading))return 'storage';
  return FALLBACK_SECTION_KIND[section]??null;
 }
+function renderQuickSummary(html){
+ return String(html).replace(/<blockquote>\s*<strong>핵심만 먼저:<\/strong>\s*([\s\S]*?)<\/blockquote>/iu,(full,inside)=>{
+  const rows=inside.split(/<br\s*\/?>/iu).map(value=>value.trim()).filter(Boolean).map(line=>{
+   const match=line.match(/^<strong>([^<]+)<\/strong>\s*([\s\S]+)$/u);
+   return match?{label:match[1].trim(),text:match[2].trim()}:null;
+  });
+  if(rows.length<3||rows.some(row=>!row))return full;
+  const cards=rows.map((row,index)=>'<article class="quick-summary-item"><span class="quick-summary-index">'+String(index+1).padStart(2,'0')+'</span><div><div class="quick-summary-label">'+row.label+'</div><p>'+row.text+'</p></div></article>').join('');
+  return '<section class="quick-summary" aria-label="핵심 요약"><div class="quick-summary-head"><div class="quick-summary-title"><span class="quick-summary-kicker">QUICK GUIDE</span><strong>핵심 요약</strong></div><span class="quick-summary-note">30초 안에 보는 핵심 기준</span></div><div class="quick-summary-grid">'+cards+'</div></section>';
+ });
+}
 export function renderDirectArticle(html){
  let n=0;
  const kinds={};
- let body=html.replace(/<h2>([\s\S]*?)<\/h2>/g,(_,title)=>{n++;kinds[n]=sectionKind(title,n);return '<h2 id="direct-section-'+n+'"><small>'+String(n).padStart(2,'0')+'</small>'+title.replace(/^\d+[.)]\s*/,'')+'</h2>';});
+ let body=renderQuickSummary(html);
+ body=body.replace(/<h2>([\s\S]*?)<\/h2>/g,(_,title)=>{n++;kinds[n]=sectionKind(title,n);return '<h2 id="direct-section-'+n+'"><small>'+String(n).padStart(2,'0')+'</small>'+title.replace(/^\d+[.)]\s*/,'')+'</h2>';});
  let section=0;
  body=body.split(/(?=<h2 id=)/).map(chunk=>{
   if(chunk.startsWith('<h2'))section++;
@@ -26,5 +39,5 @@ export function renderDirectArticle(html){
   return chunk.replace(/<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/g,(_,inside)=>{let i=0;return '<div class="'+kind+'">'+inside.replace(/<li><strong>([\s\S]*?)<\/strong>([\s\S]*?)<\/li>/g,(_,label,text)=>'<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label.replace(/[:：]\s*$/,'')+'</h3><p>'+text+'</p></div></article>')+'</div>';});
  }).join('');
  body=body.replace(/<table>/g,'<div class="table-scroll"><table>').replace(/<\/table>/g,'</table></div>');
- return '<style>'+CSS+EFFECTS_CSS+'</style><div class="nh-direct-v2"><div class="article-body">'+body+'</div></div>';
+ return '<style>'+CSS+EFFECTS_CSS+QUICK_SUMMARY_CSS+'</style><div class="nh-direct-v2"><div class="article-body">'+body+'</div></div>';
 }
