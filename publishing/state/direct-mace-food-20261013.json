@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "ed3a2b053dd4556b93e5ff83b6781aabbfdb6f067413786efe4e13156efe4b7c",
-  "sourceCommit": "02dfffbc78829cb3acc4d60787cfc4ad80692a19",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-12T21:12:02.997Z",
   "url": "https://nhunnhun.tistory.com/426",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-12T21:12:41.612Z",
+  "sourceCommit": "02dfffbc78829cb3acc4d60787cfc4ad80692a19",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38308886374",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-mace-food-20261013",
+    "url": "https://nhunnhun.tistory.com/426",
+    "checkedAt": "2026-10-12T21:12:41.612Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
