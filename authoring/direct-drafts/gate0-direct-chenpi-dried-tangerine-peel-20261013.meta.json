@@ -1,0 +1,61 @@
+{
+  "sourceId": "direct-chenpi-dried-tangerine-peel-20261013",
+  "articleId": null,
+  "title": "진피 효능과 먹는 법｜말린 귤껍질·진피차·주요 성분·부작용·보관법",
+  "sourceSha256": "b2df7ad2824babbfae344d214a4425ed7e7977b368c3cfacced770e30ad10b74",
+  "baseMainSha": "fce5a1ec6cc1e072632aa863ac6f18d42a8899d8",
+  "checks": {
+    "contentReview": "PASS",
+    "strong": 43,
+    "mark": 13,
+    "markUnderlineStrong": 3,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS",
+    "duplicateIntentReview": "NEW_INTENT",
+    "visualChecked": 0,
+    "preflight": "NOT_RUN"
+  },
+  "researchScope": {
+    "readerIntent": "진피가 무엇인지, 어떤 성분과 실제 식품 가치가 있는지, 진피차와 요리에 어떻게 쓰고 무엇과 잘 맞으며 어떤 제품을 골라 보관해야 하는지",
+    "duplicateCheck": "repo search: 진피/Chenpi/귤껍질 exact topic not found; related citrus content does not cover dried tangerine peel intent",
+    "evidenceBoundary": [
+      "약재 규격 진피와 집에서 말린 일반 귤껍질을 같은 것으로 일반화하지 않음",
+      "추출물·실험 연구를 일반 진피차의 임상 효능으로 일반화하지 않음",
+      "공식 하루 권장량을 만들지 않음",
+      "보관은 건조식품 안전 원칙과 해당 제품 상태 중심으로 안내"
+    ]
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {"axis":1,"expectedAxis":"정의·주요 성분·작용","readerQuestion":"진피는 무엇이고 일반 말린 귤껍질과 어떻게 다른가?","heading":"1. 진피란?｜말린 귤껍질과 약재 진피의 차이·주요 성분","firstAnswer":"진피는 만다린 계열 감귤의 성숙한 껍질을 말린 재료입니다."},
+      {"axis":2,"expectedAxis":"핵심 효능·예방 효과","readerQuestion":"진피의 실제 식품 가치는 무엇이고 건강 효과는 어디까지 확인됐는가?","heading":"2. 진피 효능은 어디까지 확인됐을까?｜플라보노이드와 식품으로서의 장점","firstAnswer":"진피의 가장 분명한 식품 가치는 감귤 껍질의 향과 여러 플라보노이드를 함께 활용할 수 있다는 점입니다."},
+      {"axis":3,"expectedAxis":"섭취법·권장량","readerQuestion":"진피는 차와 음식에 어떻게 먹고 공식 권장량이 있는가?","heading":"3. 진피는 어떻게 먹을까?｜진피차·죽·조림에 쓰는 방법","firstAnswer":"진피에는 일반 성인을 위한 공식 하루 권장 섭취량이 따로 정해져 있지 않습니다."},
+      {"axis":4,"expectedAxis":"궁합·상호작용","readerQuestion":"진피는 무엇과 먹으면 좋고 실제 시너지인가 풍미 조합인가?","heading":"4. 진피는 무엇과 먹으면 좋을까?｜생강·차·오트밀과 음식 궁합","firstAnswer":"진피 + 생강은 따뜻하고 알싸한 향에 감귤 향을 더하는 조합입니다."},
+      {"axis":5,"expectedAxis":"부작용·주의 대상","readerQuestion":"진피를 먹을 때 무엇을 주의해야 하는가?","heading":"5. 진피 부작용은?｜주의할 사람과 안전하게 먹는 기준","firstAnswer":"일반적인 식품 사용에서 가장 먼저 살필 것은 위장 불편과 제품의 위생 상태입니다."},
+      {"axis":6,"expectedAxis":"신선도·보관·조리 팁","readerQuestion":"좋은 진피를 어떻게 고르고 말리고 보관하는가?","heading":"6. 좋은 진피 고르는 법과 보관법｜식용 제품·건조 상태·곰팡이 확인","firstAnswer":"먹을 진피는 식용으로 판매된 제품을 고르고, 향이 선명하면서 눅눅함이나 곰팡이 냄새가 없는지 확인하는 것이 기본입니다."}
+    ],
+    "balanceReview": {
+      "status":"AUTHOR_REVIEW_COMPLETED",
+      "automatedSemanticVerdict":false,
+      "questions":[
+        "도입·핵심 요약이 정체·장점·활용을 먼저 보여주는가? PASS",
+        "② 효능 첫 문단이 실제 식품 가치를 먼저 설명하는가? PASS",
+        "연구 한계와 공식 권장량 없음을 반복하지 않았는가? PASS",
+        "안전·위생·농축물 주의를 ⑤ 중심으로 정리했는가? PASS",
+        "강한 강조가 장점·활용·행동 기준 중심인가? PASS"
+      ]
+    }
+  },
+  "gate0Commit": "e1c766037541e568e98f2205a122d6c767961f5a",
+  "sourceCommit": null,
+  "githubSourceStatus": "NOT_WRITTEN",
+  "runStatus": "NOT_STARTED",
+  "runUrl": null,
+  "publicStatus": "NOT_STARTED",
+  "publicUrl": null,
+  "ledger": "pending"
+}
