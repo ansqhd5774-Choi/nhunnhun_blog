@@ -4,6 +4,7 @@ import {renderEditorialPost,editorialExpectations,editorialVersionFor} from './e
 import {localBrowserConfig,openPublicBrowser} from './local-browser.mjs';
 import {verificationContext} from './verification-context.mjs';
 import {verifyPublishedPublic} from './verify-published-public.mjs';
+import {verifyPublicWithRetry} from './public-verification-retry.mjs';
 
 let browser;
 try {
@@ -17,12 +18,14 @@ try {
   browser=await openPublicBrowser(await localBrowserConfig());
   const context=await verificationContext(browser,{viewport:{width:1440,height:900}});
   const publicPage=await context.newPage();
-  await publicPage.goto(url,{waitUntil:'domcontentloaded'});
   const bodyHtml=renderEditorialPost(post);
   const sources=[...new Set([...bodyHtml.matchAll(/<img\b[^>]*\bsrc=["'](.*?)["']/gi)].map(m=>m[1]))];
-  await verifyPublishedPublic({publicPage,publicBrowser:browser,post,bodyHtml,sources,
-    representativeSource:post.representativeImageUrl||sources[0],
-    editorialExpected:editorialExpectations(post.bodyHtml,{version:editorialVersionFor(post)}),url});
+  await verifyPublicWithRetry({
+    navigate:()=>publicPage.goto(url,{waitUntil:'domcontentloaded'}),
+    verify:()=>verifyPublishedPublic({publicPage,publicBrowser:browser,post,bodyHtml,sources,
+      representativeSource:post.representativeImageUrl||sources[0],
+      editorialExpected:editorialExpectations(post.bodyHtml,{version:editorialVersionFor(post)}),url})
+  });
   const latest=await ledger.read(id);
   if(latest.sha!==state.sha) throw Error('E_LEDGER_CONFLICT');
   const {sha,...record}=state;
