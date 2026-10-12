@@ -29,16 +29,25 @@ test('new submission rejects mixed valid and standalone marks before publication
 });
 
 test('new submission rejects evidence-limit disclaimers as highlighted takeaways',()=>{
-  const phrases=['근거가 부족합니다','사람 대상 연구가 충분하지 않습니다','효과를 단정하기 어렵습니다','아직 입증되지 않았습니다'];
+  const phrases=[
+    '근거가 부족합니다','사람 대상 연구가 충분하지 않습니다','효과를 단정하기 어렵습니다','아직 입증되지 않았습니다',
+    '기간 효과를 보장할 수 없습니다','뚜렷한 임상 이득을 확인하지 못했습니다','비교 가능한 공식 데이터베이스는 없습니다',
+    '모든 사람이 보충제를 먹어야 하는 것은 아닙니다'
+  ];
   for(const phrase of phrases){
     const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark><strong>${phrase}</strong></mark>`};
     assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/);
   }
 });
 
-test('new submission requires at least one core highlight outside safety-only sections',()=>{
+test('new submission requires at least one core highlight outside pure safety-only sections',()=>{
   const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({heading:'5. 부작용과 주의사항'})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_PRIMARY_EMPHASIS_MISSING/);
+});
+
+test('mixed nutrient risk section still counts as a primary information section',()=>{
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({heading:'6. 결핍·과다 복용의 위험, 예방 가능한 질병과 추천 제품'})};
+  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
 test('four categories share the same minimum emphasis quota',()=>{
