@@ -2,14 +2,14 @@
 
 대상은 `https://nhunnhun.tistory.com/`, 저장소는 `ansqhd5774-Choi/nhunnhun_blog`다. 이 저장소에서 일반 Chat이 새로 조사·작성·수정하는 콘텐츠는 **음식 카테고리만** 허용한다.
 
-음식의 내용·검색 의도·6개 소주제·문체는 `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`가 결정한다. 이 문서는 실행 역할만 정한다. 다른 카테고리의 질문·목차·편집 기준을 음식 작업에 사용하지 않는다.
+음식의 내용·검색 의도·6개 소주제·문체는 `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`가 결정한다. `docs/content/CATEGORY_CONTENT_PARITY.md`, direct/SP1 계약과 이 문서는 실행·디자인·저장·발행의 기술 계약에만 사용하며 다른 카테고리의 질문·목차·편집 기준을 음식 작업에 사용하지 않는다.
 
 ## 역할
 
 ### 일반 Chat
 - 최신 main SHA와 음식 전용 지침을 확인한다.
 - 기존 음식 글과 검색 의도 중복을 확인한다.
-- **원고를 `posts/` 또는 `updates/`에 넣기 전에 신규/기존 대상을 먼저 판정한다.**
+- **원고를 `posts/` 또는 `updates/`에 넣기 전에 신규/기존 대상을 먼저 확정한다.**
 - 공식 자료와 원문 연구를 조사한다.
 - 쉬운 한국어 본문, 3단계 강조, 관련 음식 내부링크, 이미지 근거를 함께 준비한다.
 - 저장 전 음식 6개 H2와 첫 문장 답변을 직접 검토한다.
@@ -18,9 +18,10 @@
 - 자동 워크플로우를 관찰하고 원장과 PUBLIC_VERIFIED까지 확인한다.
 
 ### 공통 러너
+- 작성 전 인증된 관리자 전체 글 목록을 읽기 전용으로 조회해 `NEW / EXISTING_CANDIDATE` 증거를 남긴다.
 - direct preflight
 - 기존 인증 세션 사용
-- **신규 발행 전 인증된 관리자 글 목록 전체를 읽기 전용으로 조회해 신규/기존 대상을 다시 확인**
+- **신규 발행 직전 같은 관리자 글 목록을 다시 조회해 작성 전 판정이 아직 유효한지 확인한다.**
 - 티스토리 최종 제출
 - 익명 공개 확인
 - 제목·본문·이미지·대표 이미지·강조·PC1440·모바일390 렌더 검증
@@ -36,17 +37,19 @@
 - 일반 Chat에서 사용자에게 Node·CMD·gh·Chrome·GUI·로컬 HTML 실행 요구
 - 비밀번호·OTP·CAPTCHA·쿠키·토큰·인증 헤더 노출
 
-## 작성 전
+## 작성 전 — Target Resolution Gate 0
 
 1. 최신 main SHA를 확인한다.
 2. 음식 프로젝트 지침과 현재 direct/SP1 기술 계약을 읽는다.
-3. GitHub 음식 원고·기존 글 목록·허용된 공개 검색으로 중복을 확인한다.
-4. **같은 검색 의도의 기존 글이 있으면 숫자 URL을 유지하는 `updates/direct-*.json` 작업으로 확정한다. 기존 후보가 없을 때만 신규 작업으로 진행한다.**
-5. 신규 direct/SP1 음식은 `authoring/target-resolution/<sourceId>.json`을 먼저 저장한다. 이 파일은 `sourceId`, `operation:"create"`, 대표 음식명 `topic`, 제목에서 기존 글을 찾는 데 필요한 `aliases`, `reviewed:true`를 가진다.
-6. 독자의 실제 검색 질문을 정한다.
-7. 음식 6개 축에 맞춰 최대 6개 핵심 H2를 확정한다.
+3. GitHub 음식 원고·기존 글 목록·허용된 공개 검색으로 1차 중복을 확인한다.
+4. 신규 가능성이 있는 음식은 **본문 작성 전에** `authoring/target-resolution/<sourceId>.json`만 먼저 저장한다. 이 파일은 `sourceId`, `operation:"create"`, 대표 음식명 `topic`, 검색 의도를 찾는 `aliases`, 선택적 `proposedTitle`, `reviewed:true`를 가진다.
+5. 이 파일 저장은 `.github/workflows/resolve-target.yml`을 실행한다. 러너는 인증된 `/manage/posts.json`의 공개·비공개를 포함한 관리자 글 목록 전체를 읽기 전용으로 조회하고 `authoring/target-resolution-results/<sourceId>.json`에 결과를 저장한다.
+6. 결과가 `existing_candidate`이면 **신규 원고를 만들지 않는다.** 후보의 숫자 `articleId`, 현재 제목, 공개 URL을 기준으로 기존 수정 `updates/direct-*.json` 작업으로 전환한다.
+7. 결과가 `new`이고 request digest가 현재 target-resolution 요청과 일치할 때만 신규 원고 작성과 `posts/*.json` 저장을 허용한다.
+8. 결과 파일이 없거나, 요청 digest가 다르거나, 관리자 조회가 실패하거나, 후보가 둘 이상이라 판정이 불명확하면 **fail closed**로 신규 발행을 금지한다.
+9. 판정 뒤 독자의 실제 검색 질문과 음식 6개 축, 최대 6개 핵심 H2를 확정한다.
 
-`target-resolution` 기록은 일반 Chat의 의미 판정을 저장하는 영수증이며 자동 의미 판정기가 아니다. 실제 신규 mutation 직전 러너는 인증된 `/manage/posts.json` 전체 목록을 다시 조회한다. 정확히 같은 제목 또는 `topic/aliases`와 일치하는 기존 제목 후보가 하나라도 나오면 `E_TARGET_EXISTING_CANDIDATE`로 **새 글 편집기 진입 전에 중단**한다. 이 경우 신규 재시도를 하지 않고 후보의 숫자 articleId·현재 제목을 확인해 기존 수정 source로 다시 준비한다.
+`target-resolution` 요청은 일반 Chat이 대표 음식명과 별칭을 명시하는 영수증이며 자동 AI 의미 판정기가 아니다. `posts/`와 `updates/` 폴더는 더 이상 신규/기존을 결정하는 근거가 아니라 **이미 확정된 target 판정 결과를 담는 실행 경로**다.
 
 비음식 source·비음식 큐·다른 카테고리 편집 문서는 음식 원고의 기준이나 예시로 읽지 않는다. 음식 기준에서 필요한 내용이 없으면 다른 분야 자료로 보충하지 않고 미확인으로 처리한다.
 
@@ -64,7 +67,7 @@
 ## Gate 0·GitHub 저장
 
 - 완성 원고 전체 JSON과 sourceId·articleId·title·digest·검사 상태를 자동 발행 경로 밖에 먼저 보존한다.
-- 신규 음식이면 target-resolution 판정 기록도 source와 함께 보존한다.
+- 신규 음식이면 target-resolution 요청과 판정 결과도 source와 함께 보존한다.
 - GitHub 쓰기 성공 문구만으로 저장 완료라고 하지 않는다.
 - 실제 커밋 SHA에 고정한 파일을 다시 읽고 전체 JSON digest가 일치해야 `GITHUB_SOURCE_CONFIRMED`다.
 - 실제 보안 거절은 `WRITE_BLOCKED`로 구분하고 우회하지 않는다.
@@ -72,9 +75,10 @@
 
 ## 표준 실행
 
-- 신규: `target-resolution → posts/*.json → publish-posts.yml → 관리자 대상 식별 Gate → 단일 제출`
-- 기존 수정: `updates/direct-*.json → direct-author-update.yml → update-posts.yml`
+- 신규: `target-resolution request → resolve-target.yml → result=new → 원고 작성/Gate0 → posts/*.json → publish-posts.yml → 관리자 대상 재확인 Gate → 단일 제출`
+- 기존 수정: `result=existing_candidate 또는 기존 numeric URL 확인 → updates/direct-*.json → direct-author-update.yml → update-posts.yml`
 - direct source는 `contentStandard=SP1`을 유지한다.
+- 신규 mutation 직전 `target-resolution-gate.mjs`는 작성 전 판정 결과의 request digest를 다시 대조한 다음 관리자 전체 글을 **다시 조회**한다. 기존 후보가 생겼으면 `E_TARGET_EXISTING_CANDIDATE`로 새 글 편집기 진입 전에 중단한다.
 - 자동 실행이 있으면 그 실행을 관찰하고 수동 실행을 겹치지 않는다.
 - 실제 제출 시작 뒤 최종 상태가 확인될 때까지 해당 source와 실행 코드를 변경하지 않는다.
 - queued·busy·offline·cancelled·failed를 구분한다.
@@ -91,4 +95,4 @@
 
 ## 보고
 
-최종적으로 source SHA, Run 링크, 공개 URL, 원장 상태, 실제 중요한 문제만 짧게 보고한다. 확인하지 않은 결과를 PASS로 쓰지 않는다.
+최종적으로 target 판정, source SHA, Run 링크, 공개 URL, 원장 상태, 실제 중요한 문제만 짧게 보고한다. 확인하지 않은 결과를 PASS로 쓰지 않는다.
