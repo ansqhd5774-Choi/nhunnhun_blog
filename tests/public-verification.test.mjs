@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {articleUrl,ogAsset,checkMeasurements,assertImagePayload,verifyInternalLink,headingStyleProfile} from '../publishing/verify-updated-public.mjs';
+import {renderDirectArticle} from '../publishing/direct-design.mjs';
 const e={images:3,h2:10,h3:3,tables:2,highlights:7,faq:5};
 const m={overflowPx:0,wideImages:0,images:3,missingAlt:0,brokenImages:0,nonNativeImages:0,h2:10,h3:3,badHeadingStyles:0,tables:2,badTableWraps:0,highlights:7,highlightColors:4,hiddenHighlights:0,faqQ:5,faqA:5,heroPriority:true,badLazyImages:0};
 test('approved reading skin uses exact responsive headings while legacy keeps its own profile',()=>{
@@ -46,6 +47,18 @@ test('internal-link verifier still fails permanent 404',async()=>{
 });
 import { publishedUrls } from '../publishing/published-url.mjs';
 import {directPublicExpectations,assertDirectPublicSnapshot} from '../publishing/direct-public-contract.mjs';
+
+test('approved direct quick summary renders six cards with responsive two-column to one-column layout',()=>{
+  const html='<blockquote><strong>핵심만 먼저:</strong> <strong>효능</strong> 항산화·염증 신호 조절<br><strong>누가</strong> 관련 관리가 필요한 사람<br><strong>복용</strong> 하루 1캡슐 예시<br><strong>기간</strong> 4주 첫 점검<br><strong>조합</strong> PEA 등 근거 있는 조합<br><strong>주의</strong> 하루 총량 확인</blockquote><h2>소개</h2><p>본문</p>';
+  const rendered=renderDirectArticle(html);
+  assert.match(rendered,/class="quick-summary"/);
+  assert.equal((rendered.match(/class="quick-summary-item"/g)||[]).length,6);
+  for(const label of ['효능','누가','복용','기간','조합','주의']) assert.match(rendered,new RegExp('quick-summary-label">'+label));
+  assert.match(rendered,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(rendered,/@media\(max-width:600px\)[\s\S]*?quick-summary-grid\{grid-template-columns:1fr\}/);
+  assert.match(rendered,/QUICK GUIDE/);
+  assert.match(rendered,/30초 안에 보는 핵심 기준/);
+});
 
 test('direct public verification follows the varied renderer and rejects lost emphasis or styling',()=>{
   const html='<h2>소개</h2><p><mark><u><strong>핵심</strong></u></mark></p><table><tr><td>자료</td></tr></table>';
