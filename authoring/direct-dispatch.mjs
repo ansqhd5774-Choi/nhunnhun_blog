@@ -62,6 +62,9 @@ export async function dispatchDirectSource({sourceId,commitSha,token,root=proces
   catch(e) { if(e?.code!=='ENOENT')throw e; }
   if(ledger?.phase==='updated' && ledger.fingerprint===updateFingerprint(source) && ledger.url===source.targetUrl)
     return {alreadyUpdated:true,sourceId};
+  // A PUBLIC_VERIFIED/updated source is immutable. A later editorial correction must use a new revision ID
+  // for the same article rather than mutating the finalized source and obscuring its ledger fingerprint.
+  if(ledger?.phase==='updated')throw Error('E_DIRECT_FINALIZED_SOURCE_MUTATION');
   // A submitting record may already have a successful final click. Inspect its run,
   // rather than spending another runner job on a duplicate/uncertain submission.
   if(ledger)throw Error('E_DIRECT_ALREADY_ATTEMPTED');
