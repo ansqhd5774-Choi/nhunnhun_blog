@@ -1,10 +1,11 @@
-import {DIRECT_AUTHORING_CONTRACT,isDirectSource} from './direct-authoring-contract.mjs';
+import {DIRECT_AUTHORING_CONTRACT,isDirectSource,hasAuthoritativePreflight} from './direct-authoring-contract.mjs';
 import {assertDirectSubmissionEmphasis} from './direct-emphasis.mjs';
 import {assertDirectSubmissionFocus} from './direct-focus.mjs';
 import {assertImageReview} from './image-review.mjs';
 
 export function directPreflight(source){
   if(!isDirectSource(source))return {status:'NOT_APPLICABLE',contractVersion:DIRECT_AUTHORING_CONTRACT.version};
+  if(hasAuthoritativePreflight())return {status:'PREFLIGHT_REUSED',contractVersion:DIRECT_AUTHORING_CONTRACT.version,validatedSha:process.env.GITHUB_SHA,checks:{emphasis:'REUSED',focus:'REUSED',images:'REUSED'},errors:[],automatedSemanticVerdict:false};
   const checks={},errors=[];
   for(const [name,check] of [['emphasis',assertDirectSubmissionEmphasis],['focus',assertDirectSubmissionFocus],['images',assertImageReview]]){
     try{check(source);checks[name]='PASS';}
