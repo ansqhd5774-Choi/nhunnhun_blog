@@ -35,10 +35,11 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:조리용|일상|평소)[^.!?]{0,70}(?:보충|농축|추출|오일)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다(?:르|릅)/u,
   /(?:연구|시험|자료|수치|용량)[^.!?]{0,70}(?:권장량|안전\s*상한)[^.!?]{0,30}(?:바꾸지\s*않|간주하지\s*않)/u,
   /(?:일상|평소|조리용)[^.!?]{0,45}(?:그대로|같은)[^.!?]{0,25}(?:적용|계산|판단)(?:하지\s*않|할\s*수\s*없)/u,
+  /(?:효과|개선|수치|결과)[^.!?]{0,55}(?:예방|치료|효능)[^.!?]{0,35}(?:바꾸어\s*해석하면\s*안|확대(?:해|하여)\s*표현하지\s*않|동일하게\s*볼\s*수\s*없)/u,
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
+const ACTIONABLE_SAFETY_PATTERN=/(?:즉시\s*(?:중단|진료|병원|응급)|복용을?\s*중단|섭취를?\s*중단|피해야|복용하지\s*말|섭취하지\s*말|의료진(?:과|에게)\s*(?:상담|확인)|진료를?\s*받)/u;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
-const NEGATIVE_TONES=new Set(['caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 
@@ -68,9 +69,10 @@ export function assertDirectSubmissionEmphasis(source) {
       if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
-      const isNeutralIntakeInfo=tone==='info'&&OFFICIAL_INTAKE_ABSENCE_PATTERN.test(text);
-      // Negative/evidence-limit facts require caution/negative tones. A missing official intake standard is neutral dosing information and may use info.
-      if(isLimitation&&!NEGATIVE_TONES.has(tone)&&!isNeutralIntakeInfo)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
+      const isActionableSafety=PURE_SAFETY_HEADING.test(currentHeading)&&ACTIONABLE_SAFETY_PATTERN.test(text);
+      // Evidence limits, no-effect statements and neutral absence-of-standard facts stay plain/bold.
+      // Only an actionable safety instruction in a dedicated safety section may remain strongly highlighted.
+      if(isLimitation&&!isActionableSafety)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
     }
     for(const child of node.children??[])visit(child);
