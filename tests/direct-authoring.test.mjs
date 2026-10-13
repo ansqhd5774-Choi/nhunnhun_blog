@@ -14,6 +14,9 @@ import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
 import {startDirectPublish} from '../authoring/start-direct-publish.mjs';
 const source=directFixture();
+test('existing direct update reports new-post-only tags as the unsupported key',()=>{
+ assert.throws(()=>checkUpdateSource({...source,tags:['히카마']},`${source.id}.json`),/E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags/);
+});
 test('local publication entry reads remote main and starts one update without another writer job',()=>{
  let starts=0;
  const run=args=>{
