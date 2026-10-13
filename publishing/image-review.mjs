@@ -11,6 +11,7 @@ function sourceBlock(html=''){return (String(html).match(/<h2>자료 출처<\/h2
 // Match the closing delimiter to its opening quote; file names may contain apostrophes.
 function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/.*?)\1/gi)].map(m=>m[2].replace(/&amp;/g,'&')));}
 function assertHttps(value,code){let u;try{u=new URL(value);}catch{throw new Error(code);}if(u.protocol!=='https:'||u.username||u.password)throw new Error(code);return u;}
+function canonicalUrl(value){try{return new URL(String(value)).href;}catch{return String(value??'');}}
 function isAbstractNutrientHero(item,review){
   if(String(item?.category??'').trim()!=='영양소')return false;
   let pathname='';
@@ -32,7 +33,8 @@ function mismatchIssues(tags=[],review=[]){
   const issues=[];
   for(let i=0;i<Math.min(tags.length,review.length);i++){
     const r=review[i]??{},src=attr(tags[i],'src'),alt=attr(tags[i],'alt');
-    if(r.src!==src)issues.push({index:i,field:'src',review:r.src??null,body:src});
+    // Equivalent URL spellings such as a literal space and %20 identify the same source.
+    if(canonicalUrl(r.src)!==canonicalUrl(src))issues.push({index:i,field:'src',review:r.src??null,body:src});
     if(r.alt!==alt)issues.push({index:i,field:'alt',review:r.alt??null,body:alt});
     if(!alt.trim()||alt.length<6)issues.push({index:i,field:'alt',reason:'missing-or-short',body:alt});
   }
@@ -54,7 +56,7 @@ export function assertImageReview(item){
   if(hasAuthoritativePreflight())return item;
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
-  if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||review[0]?.src!==item.representativeImageUrl)throw new Error('E_IMAGE_HERO_REVIEW');
+  if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
   // Sources explicitly rejected after visual inspection must not silently return as a hero.
   // Nutrient hero images also reject deterministic abstract-science filename patterns so molecular structures,
   // microscopy and crystal images cannot become the representative image merely because licensing metadata passes.
@@ -77,8 +79,9 @@ export function assertImageReview(item){
     if(page.hostname!=='commons.wikimedia.org'||!/^\/wiki\/File:/i.test(page.pathname))throw new Error('E_IMAGE_REVIEW_SOURCE');
     if(!String(r.author||'').trim()||!LICENSE.test(String(r.license||'').trim()))throw new Error('E_IMAGE_REVIEW_LICENSE');
     if(!sourceLinks.has(r.sourcePage))throw new Error('E_IMAGE_REVIEW_ATTRIBUTION');
-    if(seenSrc.has(r.src)||seenPages.has(r.sourcePage))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
-    seenSrc.add(r.src);seenPages.add(r.sourcePage);
+    const srcKey=canonicalUrl(r.src),pageKey=canonicalUrl(r.sourcePage);
+    if(seenSrc.has(srcKey)||seenPages.has(pageKey))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
+    seenSrc.add(srcKey);seenPages.add(pageKey);
   }
   return item;
 }
