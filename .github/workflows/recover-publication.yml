@@ -8,6 +8,10 @@ on:
       public_url:
         required: true
         type: string
+  push:
+    branches: [main]
+    paths:
+      - automation/recover-publication-request.json
 permissions:
   contents: write
 concurrency:
@@ -28,8 +32,15 @@ jobs:
         with:
           enable-cache: false
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Resolve verification-only recovery inputs
+        id: recovery-inputs
+        run: node publishing/recovery-inputs.mjs
+        env:
+          DISPATCH_SOURCE_ID: ${{ inputs.source_id }}
+          DISPATCH_PUBLIC_URL: ${{ inputs.public_url }}
+          RECOVERY_REQUEST_FILE: automation/recover-publication-request.json
       - run: node publishing/recover-publication.mjs
         env:
-          PUBLISH_SOURCE_ID: ${{ inputs.source_id }}
-          RECOVERY_PUBLIC_URL: ${{ inputs.public_url }}
+          PUBLISH_SOURCE_ID: ${{ steps.recovery-inputs.outputs.source_id }}
+          RECOVERY_PUBLIC_URL: ${{ steps.recovery-inputs.outputs.public_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
