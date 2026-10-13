@@ -42,10 +42,19 @@ test('manager page cleanup is bounded when Playwright close never settles',async
   assert.equal(calls,1);
 });
 
-test('runtime target gate exits after cleanup so residual CDP handles cannot stall the mutation queue',()=>{
+test('editor cleanup uses the Playwright browser close path instead of directly closing the client connection',()=>{
+  const source=readFileSync(new URL('../publishing/local-browser.mjs',import.meta.url),'utf8');
+  assert.match(source,/await Promise\.race\(\[\s*browser\.close\(\)/);
+  assert.doesNotMatch(source,/browser\._connection\.close\(\)/);
+});
+
+test('runtime target gate has one terminal timeout instead of repeated polling',()=>{
   const source=readFileSync(new URL('../publishing/target-resolution-gate.mjs',import.meta.url),'utf8');
-  assert.match(source,/\.then\(\(\)=>setTimeout\(\(\)=>process\.exit\(0\),0\)\)/);
-  assert.match(source,/setTimeout\(\(\)=>process\.exit\(1\),0\)/);
+  assert.match(source,/const CLI_TIMEOUT_MS=90000/);
+  assert.match(source,/E_TARGET_RESOLUTION_TIMEOUT/);
+  assert.equal((source.match(/process\.exit\(0\)/g)||[]).length,1);
+  assert.equal((source.match(/process\.exit\(1\)/g)||[]).length,2);
+  assert.doesNotMatch(source,/setInterval\(/);
 });
 
 test('pre-authoring resolver workflow is read-only to Tistory and persists decision evidence',()=>{
