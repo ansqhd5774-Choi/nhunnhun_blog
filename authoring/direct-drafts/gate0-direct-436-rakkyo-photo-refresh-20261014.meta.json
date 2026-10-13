@@ -1,0 +1,19 @@
+{
+  "sourceId": "direct-436-rakkyo-photo-refresh-20261014",
+  "articleId": "436",
+  "title": "락교(염교) 효능·먹는 법｜생것과 초절임 영양·주의사항·보관법",
+  "sourceSha256": "3c15b6d6f3da8ee8997bd9897619db54f0906f263643565b1c48291651fd7a17",
+  "baseMainSha": "dc928bf556e9bdfb1686703f944b920994c1d178",
+  "contentStandard": "SP1",
+  "status": "GATE0_PRESERVED",
+  "checks": {
+    "coreH2": 6,
+    "images": 3,
+    "strong": 51,
+    "mark": 13,
+    "markUnderlineStrong": 2,
+    "contentReview": "AUTHOR_REVIEW_COMPLETED",
+    "imageReview": "three exact-topic images reviewed; subject-centered replacements applied",
+    "balanceReview": "body claims unchanged in scope; photo relevance improved"
+  }
+}
