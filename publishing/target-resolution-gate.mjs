@@ -7,6 +7,7 @@ import {assertTistoryAuthenticated} from './auth-preflight.mjs';
 import {localBrowserConfig,openEditorConnection,closeEditorConnection} from './local-browser.mjs';
 
 const MAX_MANAGER_PAGES=100;
+const CLI_TIMEOUT_MS=90000;
 const IDENTITY_KEYS=new Set(['sourceId','operation','topic','aliases','reviewed','proposedTitle']);
 
 export function normalizeIdentityText(value){
@@ -138,10 +139,19 @@ export async function runTargetResolutionGate({root=process.cwd(),sourceId=proce
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
+  const timeout=setTimeout(()=>{
+    console.error('E_TARGET_RESOLUTION_TIMEOUT');
+    process.exit(1);
+  },CLI_TIMEOUT_MS);
+  timeout.unref?.();
   runTargetResolutionGate()
-    .then(()=>setTimeout(()=>process.exit(0),0))
+    .then(()=>{
+      clearTimeout(timeout);
+      process.exit(0);
+    })
     .catch(error=>{
+      clearTimeout(timeout);
       console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');
-      setTimeout(()=>process.exit(1),0);
+      process.exit(1);
     });
 }
