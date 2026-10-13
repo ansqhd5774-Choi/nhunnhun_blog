@@ -17,6 +17,9 @@ test('visualChecked는 누락·false·true 모두 관찰값으로 허용하며 �
  for(const value of [undefined,false,true]){const s=directFixture();s.imageReview[0].visualChecked=value;assert.equal(directPreflight(s).status,'PREFLIGHT_PASS');}
  for(const change of [{visualChecked:'true'},{arbitrary:true}]){const s=directFixture();Object.assign(s.imageReview[0],change);assert.ok(directPreflight(s).errors.includes('E_IMAGE_REVIEW_SCHEMA'));}
 });
+test('음식 이미지 실제 확인은 발행 차단 규칙이 아니라 동일 작성 보고서의 1회 관찰값이다',()=>{
+ const s=directFixture({category:'음식'});s.imageReview[0].visualChecked=true;s.imageReview[1].visualChecked=false;const r=prepareDirectSource(s).report.imageEditorialReview;assert.equal(r.total,s.imageReview.length);assert.equal(r.visualCheckedCount,1);assert.equal(r.automatedSemanticVerdict,false);assert.ok(Number.isInteger(r.directFoodImageCount));
+});
 test('저장 전 검사에서 서로 다른 세 오류를 모두 수집하고 임의 자동 교정하지 않는다',()=>{
  const s=directFixture();s.bodyHtml+='<h2>새 핵심 질문</h2><mark><strong>근거가 부족합니다</strong></mark>';s.imageReview[0].unexpected=true;
  const before=JSON.stringify(s),r=directPreflight(s);assert.deepEqual(r.errors,['E_DIRECT_EMPHASIS_LIMITATION','E_DIRECT_FOCUS_SECTION_OVERLOAD','E_IMAGE_REVIEW_SCHEMA']);assert.equal(JSON.stringify(s),before);assert.throws(()=>assertDirectPreflight(s),/E_DIRECT_EMPHASIS_LIMITATION/);
