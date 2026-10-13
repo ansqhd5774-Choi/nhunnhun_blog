@@ -47,8 +47,9 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.match(balanceQuestions,/첫 인상/);
   assert.match(balanceQuestions,/동일 의미/);
   assert.match(balanceQuestions,/⑤에 집중/);
-  assert.match(balanceQuestions,/건강·영양 판단에 직접 필요한 정보/);
-  assert.match(balanceQuestions,/맛·향·조리 팁·품종 비교만으로/);
+  assert.match(balanceQuestions,/확인된 긍정적 효능/);
+  assert.match(balanceQuestions,/효과 없음·미확인·공식 권장량 없음/);
+  assert.match(balanceQuestions,/응급·금기처럼 놓치면 위험한 안전 행동만 예외/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -89,6 +90,8 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.match(evidenceQuestions,/경고·부정 표현을 첫 인상/);
   assert.match(evidenceQuestions,/동일 의미를 반복하지 않았는가/);
   assert.match(evidenceQuestions,/⑤ 부작용·주의 대상에 집중/);
+  assert.match(evidenceQuestions,/확인된 긍정적 효능/);
+  assert.match(evidenceQuestions,/효과 없음·미확인·공식 권장량 없음/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});

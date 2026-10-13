@@ -2,6 +2,7 @@ import {parseDocument} from 'htmlparser2';
 import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 export const DIRECT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.emphasisMinimums;
+export const DIRECT_FOOD_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.foodEmphasisMinimums;
 
 // Structural omission guard only; the author still chooses meaningful phrases.
 export function assertDirectEmphasis(source) {
@@ -26,6 +27,12 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/u,
   /(?:(?:비교\s*가능한)\s*)?(?:공식\s*)?(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
   /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|아닙|없)/u,
+  /(?:공식\s*)?(?:하루\s*)?(?:권장량|권장\s*섭취량|상한)(?:이|가|은|는)?[^.!?]{0,35}(?:없|정해지지\s*않|마련되지\s*않)/u,
+  /(?:유의하게|뚜렷하게)[^.!?]{0,35}(?:달라지지\s*않|변하지\s*않|개선되지\s*않)/u,
+  /(?:같은|동일한)\s*(?:효과\s*크기|섭취\s*기준|용량|조건)[^.!?]{0,30}(?:아니|않|다르)/u,
+  /(?:보충|농축|추출|오일)[^.!?]{0,70}(?:조리용|일상|평소)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다르/u,
+  /(?:연구|시험|자료|수치|용량)[^.!?]{0,70}(?:권장량|안전\s*상한)[^.!?]{0,30}(?:바꾸지\s*않|간주하지\s*않)/u,
+  /(?:일상|평소|조리용)[^.!?]{0,45}(?:그대로|같은)[^.!?]{0,25}(?:적용|계산|판단)(?:하지\s*않|할\s*수\s*없)/u,
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
@@ -35,6 +42,7 @@ const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 export function assertDirectSubmissionEmphasis(source) {
   if(source.contentStandard!=='SP1'||!source.id?.startsWith('direct-'))return;
   assertDirectEmphasis(source);
+  const minimums=source.category==='음식'?DIRECT_FOOD_EMPHASIS_MINIMUMS:DIRECT_EMPHASIS_MINIMUMS;
   let currentHeading='';
   let primaryHighlights=0;
   let boldCount=0;
@@ -59,8 +67,8 @@ export function assertDirectSubmissionEmphasis(source) {
   };
   visit(parseDocument(source.bodyHtml??''));
   if(!primaryHighlights)throw Error('E_DIRECT_PRIMARY_EMPHASIS_MISSING');
-  if(boldCount<DIRECT_EMPHASIS_MINIMUMS.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
-  if(highlightCount<DIRECT_EMPHASIS_MINIMUMS.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
-  if(underlineCount<DIRECT_EMPHASIS_MINIMUMS.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
+  if(boldCount<minimums.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
+  if(highlightCount<minimums.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
+  if(underlineCount<minimums.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
   return {boldCount,highlightCount,underlineCount};
 }

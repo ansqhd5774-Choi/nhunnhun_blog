@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {DIRECT_EMPHASIS_MINIMUMS,assertDirectEmphasis,assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
+import {DIRECT_EMPHASIS_MINIMUMS,DIRECT_FOOD_EMPHASIS_MINIMUMS,assertDirectEmphasis,assertDirectSubmissionEmphasis} from '../publishing/direct-emphasis.mjs';
 
 const quotaBody=({plainBold=10,level2=6,level3=2,heading='2. 핵심 정보'}={})=>{
   const plain=Array.from({length:plainBold},(_,i)=>`<strong>굵게${i+1}</strong>`).join('');
@@ -32,7 +32,10 @@ test('new submission rejects evidence-limit disclaimers as highlighted takeaways
   const phrases=[
     '근거가 부족합니다','사람 대상 연구가 충분하지 않습니다','효과를 단정하기 어렵습니다','아직 입증되지 않았습니다',
     '기간 효과를 보장할 수 없습니다','뚜렷한 임상 이득을 확인하지 못했습니다','비교 가능한 공식 데이터베이스는 없습니다',
-    '모든 사람이 보충제를 먹어야 하는 것은 아닙니다'
+    '모든 사람이 보충제를 먹어야 하는 것은 아닙니다','큐민은 일반 성인을 위한 공식 하루 권장량이 따로 정해져 있지 않습니다',
+    '공복혈당과 인슐린 지표가 유의하게 달라지지 않았습니다','같은 효과 크기로 계산하지 않습니다',
+    '조리용 큐민과 보충제의 섭취 조건이 다릅니다','연구 용량을 일반인의 하루 권장량이나 안전 상한으로 바꾸지 않습니다',
+    '같은 섭취 기준으로 판단하지 않습니다'
   ];
   for(const phrase of phrases){
     const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark><strong>${phrase}</strong></mark>`};
@@ -50,26 +53,34 @@ test('mixed nutrient risk section still counts as a primary information section'
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
-test('four categories share the same minimum emphasis quota',()=>{
+test('food uses a lower highlight floor while other categories keep the shared quota',()=>{
   assert.deepEqual(DIRECT_EMPHASIS_MINIMUMS,{bold:18,highlight:8,underline:2});
-  for(const category of ['음식','영양소','약학','질병']){
+  assert.deepEqual(DIRECT_FOOD_EMPHASIS_MINIMUMS,{bold:18,highlight:4,underline:2});
+  const food={id:'direct-음식-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:14,level2:2,level3:2})};
+  assert.deepEqual(assertDirectSubmissionEmphasis(food),{boldCount:18,highlightCount:4,underlineCount:2});
+  for(const category of ['영양소','약학','질병']){
     const source={id:`direct-${category}-test`,category,contentStandard:'SP1',bodyHtml:quotaBody()};
     assert.deepEqual(assertDirectSubmissionEmphasis(source),{boldCount:18,highlightCount:8,underlineCount:2});
   }
 });
 
 test('new submission rejects fewer than 18 bold effects',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:9,level2:6,level3:2})};
+  const source={id:'direct-test',category:'영양소',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:9,level2:6,level3:2})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_BOLD_MIN/);
 });
 
-test('new submission rejects fewer than 8 highlight effects',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:11,level2:5,level3:2})};
+test('non-food submission still rejects fewer than 8 highlight effects',()=>{
+  const source={id:'direct-test',category:'영양소',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:11,level2:5,level3:2})};
+  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
+});
+
+test('food submission rejects fewer than 4 highlight effects',()=>{
+  const source={id:'direct-food-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:15,level2:1,level3:2})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
 });
 
 test('new submission rejects fewer than 2 underline highlight effects',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:10,level2:7,level3:1})};
+  const source={id:'direct-test',category:'영양소',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:10,level2:7,level3:1})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_UNDERLINE_MIN/);
 });
 
