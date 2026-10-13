@@ -5,7 +5,7 @@ const CSS=BASE_CSS+LINK_CSS+"/* Item number badges: distinct from the large sect
 const EFFECTS_CSS='.nh-direct-v2 .effects{background:#f7f9fc;border:1px solid #dce4ec;border-radius:12px;padding:4px 24px;margin:22px 0}.nh-direct-v2 .effects article:last-child{border-bottom:0}@media(max-width:600px){.nh-direct-v2 .effects{padding:4px 16px}}';
 const QUICK_SUMMARY_CSS='.nh-direct-v2 .quick-summary{margin:26px 0 40px;border:1px solid #dfe5e1;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(39,54,45,.06)}.nh-direct-v2 .quick-summary-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;background:#f6f8f5;border-bottom:1px solid #e5e9e6}.nh-direct-v2 .quick-summary-title{display:flex;align-items:baseline;gap:10px}.nh-direct-v2 .quick-summary-title strong{font-size:20px;color:#23352b}.nh-direct-v2 .quick-summary-kicker{font-size:11px;letter-spacing:.08em;font-weight:800;color:#a95325}.nh-direct-v2 .quick-summary-note{font-size:12px;color:#75817a}.nh-direct-v2 .quick-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#e8ece9}.nh-direct-v2 .quick-summary-item{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;padding:18px 20px;background:#fff;min-height:118px}.nh-direct-v2 .quick-summary-index{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:#fff0e1;color:#a54b1c;font-size:12px;font-weight:800;box-shadow:inset 0 0 0 1px #f2d4b8}.nh-direct-v2 .quick-summary-label{font-size:13px;font-weight:800;color:#476050;margin:1px 0 5px}.nh-direct-v2 .quick-summary-item p{margin:0;font-size:15px;line-height:1.68;color:#2d3b33}.nh-direct-v2 .quick-summary-item mark{padding:0 2px}@media(max-width:600px){.nh-direct-v2 .quick-summary{margin:20px 0 32px;border-radius:13px}.nh-direct-v2 .quick-summary-head{display:block;padding:16px}.nh-direct-v2 .quick-summary-note{display:block;margin-top:3px}.nh-direct-v2 .quick-summary-grid{grid-template-columns:1fr}.nh-direct-v2 .quick-summary-item{min-height:0;padding:16px;grid-template-columns:32px minmax(0,1fr)}.nh-direct-v2 .quick-summary-title strong{font-size:18px}}';
 const DIRECT_HIGHLIGHT_CSS='.nh-direct-v2 mark:has(span[style*="linear-gradient"]){background:rgba(255,255,255,.01);padding:0}';
-const DIRECT_MARK_COLORS=Object.freeze({default:'#fff0b9',positive:'#dff3df',info:'#dceeff',caution:'#ffe4bd',negative:'#ffd9de'});
+const DIRECT_MARK_COLORS=Object.freeze({positive:'#dff3df',info:'#dceeff',caution:'#ffe4bd',negative:'#ffd9de'});
 const FALLBACK_SECTION_KIND={3:'effects',4:'pairs',5:'cautions',6:'storage'};
 const headingText=value=>String(value??'').replace(/<[^>]+>/g,'').replace(/^\d+[.)]\s*/u,'').replace(/\s+/gu,' ').trim();
 function sectionKind(title,section){
@@ -29,9 +29,9 @@ function renderQuickSummary(html){
  });
 }
 function renderDirectHighlights(html){
- return String(html).replace(/<mark(?:\s+data-tone="(positive|info|caution|negative)")?>(<u>)?<strong>([\s\S]*?)<\/strong>(<\/u>)?<\/mark>/g,(full,tone,openU,text,closeU)=>{
+ return String(html).replace(/<mark\s+data-tone="(positive|info|caution|negative)">(<u>)?<strong>([\s\S]*?)<\/strong>(<\/u>)?<\/mark>/g,(full,tone,openU,text,closeU)=>{
   if(Boolean(openU)!==Boolean(closeU))return full;
-  const color=DIRECT_MARK_COLORS[tone||'default'];
+  const color=DIRECT_MARK_COLORS[tone];
   const span='<span style="background:linear-gradient(transparent 45%,'+color+' 45%);padding:0 .06em;">'+text+'</span>';
   return '<mark>'+(openU||'')+'<strong>'+span+'</strong>'+(closeU||'')+'</mark>';
  });
