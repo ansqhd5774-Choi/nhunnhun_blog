@@ -36,8 +36,8 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:일상|평소|조리용)[^.!?]{0,45}(?:그대로|같은)[^.!?]{0,25}(?:적용|계산|판단)(?:하지\s*않|할\s*수\s*없)/u,
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
-const MARK_TONES=new Set(['key','action','info','caution','danger']);
-const NEGATIVE_TONES=new Set(['caution','danger']);
+const MARK_TONES=new Set(['positive','info','caution','negative']);
+const NEGATIVE_TONES=new Set(['caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 
@@ -56,8 +56,9 @@ export function assertDirectSubmissionEmphasis(source) {
     if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
       highlightCount++;
-      const tone=String(node.attribs?.['data-tone']??'key').trim().toLowerCase();
-      if(!MARK_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_TONE');
+      const rawTone=node.attribs?.['data-tone'];
+      const tone=rawTone==null?'default':String(rawTone).trim().toLowerCase();
+      if(tone!=='default'&&!MARK_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_TONE');
       const children=(node.children??[]).filter(n=>n.type!=='comment' && !(n.type==='text'&&!n.data.trim()));
       const inner=children[0];
       const underlined=inner?.name==='u';
@@ -66,8 +67,8 @@ export function assertDirectSubmissionEmphasis(source) {
       if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
-      // Limitations may be highlighted only when the author explicitly marks them as caution/danger.
-      // This keeps positive/key highlights from becoming warning-heavy while allowing meaningful negative colors.
+      // Negative/limitation facts are allowed when explicitly given a caution/negative tone.
+      // Untoned/positive highlights remain protected from becoming warning-heavy by accident.
       if(isLimitation&&!NEGATIVE_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
     }
