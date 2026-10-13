@@ -1,8 +1,8 @@
 {
   "sourceId": "direct-jicama-20261013",
-  "articleId": null,
+  "articleId": "428",
   "title": "히카마 효능·칼로리｜식이섬유·비타민C·먹는 법·씨앗 주의·보관법",
-  "sourceSha256": "421d66eacbd4c190c4e8b0896e02b618f3b34b93a93cc16ccac8f573f000bcb8",
+  "sourceSha256": "25ebf2b8f0dca5841fef70f6df6eb9d124a868b9a4a23c65feaf684c8514720f",
   "baseMainSha": "b2c727dbd76da8bf22c10a707ec6bda980e99e8a",
   "checks": {
     "contentReview": "PASS",
@@ -15,7 +15,7 @@
     "imageAttribution": "PASS",
     "duplicateIntentReview": "NEW_INTENT",
     "visualChecked": 0,
-    "preflight": "NOT_RUN"
+    "preflight": "PASS"
   },
   "researchScope": {
     "readerIntent": "히카마가 무엇인지, 100g 칼로리와 식이섬유·비타민 C가 어느 정도인지, 실제 영양 장점과 먹는 법, 궁합, 씨앗 독성 주의, 고르는 법과 보관법을 알고 싶다.",
@@ -55,12 +55,12 @@
       ]
     }
   },
-  "gate0Commit": "ccc7f88991d15c6a89c9e0de234d35fcd0deed94",
-  "sourceCommit": null,
-  "githubSourceStatus": "NOT_WRITTEN",
-  "runStatus": "NOT_STARTED",
-  "runUrl": null,
-  "publicStatus": "NOT_STARTED",
-  "publicUrl": null,
-  "ledger": "pending"
+  "gate0Commit": "a3f75c53bd1e27b54f475646381c70e44788f52c",
+  "sourceCommit": "dba6f9f2c5ceb7d1a3bc835dcf09666743028a6c",
+  "githubSourceStatus": "GITHUB_SOURCE_CONFIRMED",
+  "runStatus": "SUCCESS",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38403649314",
+  "publicStatus": "PUBLIC_VERIFIED",
+  "publicUrl": "https://nhunnhun.tistory.com/428",
+  "ledger": "published"
 }
