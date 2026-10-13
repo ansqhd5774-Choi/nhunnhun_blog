@@ -2,8 +2,8 @@
   "sourceId": "direct-tsaoko-20261013",
   "articleId": null,
   "title": "초과(Tsaoko)란? 향·주요 성분·먹는 법·궁합·주의사항·보관법",
-  "sourceSha256": "ca78e1fdcc941d5e7f82f9683b290d03816eb03719726f192fdefc78d9556ed9",
-  "baseMainSha": "436d821bce4d3f46b3d8180d11939239665c1cf2",
+  "sourceSha256": "aece03cdb32c55660e8df9b7190ed28d3ab27098b71510c522a93baa1ad10440",
+  "baseMainSha": "cfba86566401a1cea9102632d4871081de280565",
   "checks": {
     "contentReview": "PASS",
     "strong": 60,
@@ -19,7 +19,7 @@
   },
   "researchScope": {
     "readerIntent": "초과(Tsaoko)가 무엇인지, 어떤 향과 성분이 있는지, 건강 연구의 범위는 어디까지인지, 요리에 어떻게 쓰고 어떤 향신료와 어울리며 무엇을 주의하고 어떻게 보관하는지",
-    "duplicateCheck": "target-resolution scanned 374 manager posts; decision=new; candidates=0",
+    "duplicateCheck": "target-resolution rerun scanned 374 manager posts; decision=new; candidates=0; run=38326013448",
     "evidenceBoundary": [
       "현재 인정명 Lanxangia tsao-ko와 과거 문헌명 Amomum tsao-ko를 같은 종의 명칭 변화로 구분",
       "정유·추출물·시험관 연구를 일반 조리용 초과의 사람 건강 효과로 일반화하지 않음",
@@ -55,7 +55,7 @@
       ]
     }
   },
-  "gate0Commit": "f7924ca813b09d02ec1c4f436d575bc31adb671e",
+  "gate0Commit": "d93fb089200c8b4fa331a9cc02723539b50e0c80",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
   "runStatus": "NOT_STARTED",
