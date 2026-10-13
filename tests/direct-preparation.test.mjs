@@ -43,9 +43,12 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.balanceReview.status,'AUTHOR_REVIEW_REQUIRED');
   assert.equal(review.balanceReview.automatedSemanticVerdict,false);
   assert.equal(review.balanceReview.questions.length,5);
-  assert.match(review.balanceReview.questions.join('\n'),/첫 인상/);
-  assert.match(review.balanceReview.questions.join('\n'),/동일 의미/);
-  assert.match(review.balanceReview.questions.join('\n'),/⑤에 집중/);
+  const balanceQuestions=review.balanceReview.questions.join('\n');
+  assert.match(balanceQuestions,/첫 인상/);
+  assert.match(balanceQuestions,/동일 의미/);
+  assert.match(balanceQuestions,/⑤에 집중/);
+  assert.match(balanceQuestions,/건강·영양 판단에 직접 필요한 정보/);
+  assert.match(balanceQuestions,/맛·향·조리 팁·품종 비교만으로/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
