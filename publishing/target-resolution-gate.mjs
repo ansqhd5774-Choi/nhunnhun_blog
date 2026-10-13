@@ -87,6 +87,17 @@ export async function fetchManagedPosts(page,{maxPages=MAX_MANAGER_PAGES}={}){
   for(const item of result?.items??[]){if(item?.id!=null)byId.set(String(item.id),item);}
   return [...byId.values()];
 }
+export async function closeManagedPage(page,{timeoutMs=3000}={}){
+  if(!page)return;
+  let timer=null;
+  try{
+    await Promise.race([
+      Promise.resolve().then(()=>page.close({runBeforeUnload:false})),
+      new Promise(resolve=>{timer=setTimeout(resolve,timeoutMs);})
+    ]);
+  }catch{}
+  finally{if(timer)clearTimeout(timer);}
+}
 async function readJson(path,missingCode,readCode){
   try{return JSON.parse(await readFile(path,'utf8'));}
   catch(error){if(error?.code==='ENOENT')throw Error(missingCode);throw Error(readCode);}
@@ -117,7 +128,7 @@ export async function runTargetResolutionGate({root=process.cwd(),sourceId=proce
     }
     console.log('TARGET_RESOLUTION_NEW_CONFIRMED '+JSON.stringify({sourceId:post.id,topic:identity?.topic??null,preAuthoringDecision:resolution?.decision??null,preAuthoringScanned:resolution?.scanned??null,runtimeScanned:items.length,exactTitleChecked:true}));
   }finally{
-    try{await page?.close({runBeforeUnload:false});}catch{}
+    await closeManagedPage(page);
     if(connection)await closeEditorConnection(connection);
   }
 }
