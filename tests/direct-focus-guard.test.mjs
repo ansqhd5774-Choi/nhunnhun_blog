@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {assertDirectSubmissionFocus,directFocusReview} from '../publishing/direct-focus.mjs';
 
-const source=bodyHtml=>({id:'direct-999-focus-test',contentStandard:'SP1',bodyHtml});
+const source=(bodyHtml,category='음식')=>({id:'direct-999-focus-test',contentStandard:'SP1',category,bodyHtml});
 const h2=title=>`<h2>${title}</h2><p>독자가 필요한 설명입니다.</p>`;
 
 test('focus review separates six core questions from utility sections',()=>{
@@ -59,4 +59,12 @@ test('mixed risk heading is not treated as a pure safety exemption',()=>{
   const review=directFocusReview(html);
   assert.equal(review.limitationHits,3);
   assert.throws(()=>assertDirectSubmissionFocus(source(html)),/E_DIRECT_FOCUS_LIMITATION_OVERLOAD/);
+});
+
+test('non-food direct posts keep observations but are not blocked by food editorial limits',()=>{
+  const html='<h2>효능</h2><p>연구에서는 무작위 대조군 시험을 설명했습니다. 120명을 대상으로 통계적으로 유의한 차이를 분석했습니다. 근거가 부족합니다. 자료가 제한적입니다. 효과를 단정하기 어렵습니다.</p>';
+  const review=directFocusReview(html);
+  assert.ok(review.researchDetailHits>2);
+  assert.equal(review.limitationHits,3);
+  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html,'영양소')));
 });
