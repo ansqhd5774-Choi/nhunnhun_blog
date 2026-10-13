@@ -1,0 +1,2 @@
+source_id=direct-292-zeaxanthin-r86-20261014
+reason=source-preserving retry after unrelated main drift before mutation
