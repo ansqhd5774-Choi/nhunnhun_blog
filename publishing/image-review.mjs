@@ -28,6 +28,16 @@ function metadataIssues(review=[]){
   }
   return issues;
 }
+function mismatchIssues(tags=[],review=[]){
+  const issues=[];
+  for(let i=0;i<Math.min(tags.length,review.length);i++){
+    const r=review[i]??{},src=attr(tags[i],'src'),alt=attr(tags[i],'alt');
+    if(r.src!==src)issues.push({index:i,field:'src',review:r.src??null,body:src});
+    if(r.alt!==alt)issues.push({index:i,field:'alt',review:r.alt??null,body:alt});
+    if(!alt.trim()||alt.length<6)issues.push({index:i,field:'alt',reason:'missing-or-short',body:alt});
+  }
+  return issues;
+}
 export function imageReviewObservation(item){
   const review=Array.isArray(item?.imageReview)?item.imageReview:[];
   const direct=new Set(['closeup','cross-section','serving','process']);
@@ -53,14 +63,15 @@ export function assertImageReview(item){
   // fail-fix-rerun cycles such as discovering `serving` and `field` on separate runs.
   const issues=metadataIssues(review);
   if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
+  // Do the same for src/alt pairing: report all mismatches at once instead of one opaque retry per image.
+  const mismatches=mismatchIssues(tags,review);
+  if(mismatches.length){console.error('IMAGE_REVIEW_MISMATCH_DIAG '+JSON.stringify(mismatches));throw new Error('E_IMAGE_REVIEW_MISMATCH');}
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
-    const r=review[i],tag=tags[i];
+    const r=review[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     // Optional observation only. Never synthesize true or restore the removed mandatory gate.
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
-    const src=attr(tag,'src'),alt=attr(tag,'alt');
-    if(r.src!==src||r.alt!==alt||!alt.trim()||alt.length<6)throw new Error('E_IMAGE_REVIEW_MISMATCH');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
     const page=assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
     if(page.hostname!=='commons.wikimedia.org'||!/^\/wiki\/File:/i.test(page.pathname))throw new Error('E_IMAGE_REVIEW_SOURCE');
