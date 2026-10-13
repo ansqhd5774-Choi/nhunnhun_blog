@@ -1,0 +1,66 @@
+{
+  "sourceId": "direct-jicama-20261013",
+  "articleId": null,
+  "title": "히카마 효능·칼로리｜식이섬유·비타민C·먹는 법·씨앗 주의·보관법",
+  "sourceSha256": "76cd2c15c87d23896e9e7ead8471d981b84e0d87b4620aafbc9f58d99d5cd5e1",
+  "baseMainSha": "b2c727dbd76da8bf22c10a707ec6bda980e99e8a",
+  "checks": {
+    "contentReview": "PASS",
+    "strong": 58,
+    "mark": 13,
+    "markUnderlineStrong": 2,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS",
+    "imageAttribution": "PASS",
+    "duplicateIntentReview": "NEW_INTENT",
+    "visualChecked": 0,
+    "preflight": "NOT_RUN"
+  },
+  "researchScope": {
+    "readerIntent": "히카마가 무엇인지, 100g 칼로리와 식이섬유·비타민 C가 어느 정도인지, 실제 영양 장점과 먹는 법, 궁합, 씨앗 독성 주의, 고르는 법과 보관법을 알고 싶다.",
+    "duplicateCheck": "target-resolution scanned 374 manager posts; decision=new; candidates=0; run=38399544809",
+    "evidenceBoundary": [
+      "Pachyrhizus erosus 식용 뿌리와 로테논이 든 씨앗을 구분",
+      "USDA SR Legacy FDC 170073의 생 히카마 100g 수치를 사용하고 1컵 계량값을 권장량으로 바꾸지 않음",
+      "식이섬유·비타민 C의 일반 영양 역할은 FDA·NIH 근거로 설명하고 히카마의 질병 치료 효과로 확대하지 않음",
+      "비타민 C와 식물성 철 흡수는 일반 영양 원리로만 설명하고 히카마 특정 임상 시너지로 표현하지 않음",
+      "통뿌리의 12.5~15℃ 보관은 UC Davis의 히카마 직접 자료 범위로 제한하고 일반 냉장고 장기 보관을 권하지 않음",
+      "본문 이미지 3개의 sourcePage·저작자·라이선스를 각각 확인해 연결"
+    ]
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {"axis": 1, "expectedAxis": "정의·주요 성분·작용", "readerQuestion": "히카마는 무엇이고 100g 영양성분은 어떻게 되는가?", "heading": "1. 히카마란?｜100g 영양성분과 주요 역할", "firstAnswer": "히카마는 멕시코에서 중앙아메리카가 원산인 덩이뿌리 식물입니다."},
+      {"axis": 2, "expectedAxis": "핵심 효능·예방 효과", "readerQuestion": "히카마의 실제 영양 장점은 무엇인가?", "heading": "2. 히카마 효능은?｜식이섬유·비타민 C로 얻는 실제 장점", "firstAnswer": "히카마의 가장 분명한 영양 장점은 낮은 열량에 식이섬유와 비타민 C를 함께 공급한다는 점입니다."},
+      {"axis": 3, "expectedAxis": "섭취법·권장량", "readerQuestion": "히카마는 얼마나 어떻게 먹고 껍질은 어떻게 손질하는가?", "heading": "3. 히카마는 얼마나·어떻게 먹을까?｜껍질 손질과 생식·조리법", "firstAnswer": "히카마 자체에 일반 성인을 위한 공식 하루 권장량은 없습니다."},
+      {"axis": 4, "expectedAxis": "궁합·상호작용", "readerQuestion": "히카마는 어떤 음식과 함께 먹으면 좋은가?", "heading": "4. 히카마와 잘 어울리는 음식은?｜콩·두부·라임과 먹는 이유", "firstAnswer": "히카마는 콩·두부처럼 식물성 철을 공급하는 음식과 함께 먹기 좋고, 라임·칠리와는 맛의 궁합이 좋습니다."},
+      {"axis": 5, "expectedAxis": "부작용·주의 대상", "readerQuestion": "히카마를 먹을 때 씨앗과 소화 문제는 무엇을 주의해야 하는가?", "heading": "5. 히카마 부작용·주의 대상은?｜씨앗 로테논과 소화 불편", "firstAnswer": "마트에서 식용으로 판매되는 히카마 뿌리와 씨앗은 구분해야 합니다."},
+      {"axis": 6, "expectedAxis": "신선도·보관·조리 팁", "readerQuestion": "좋은 히카마를 어떻게 고르고 통째로 또는 자른 뒤 어떻게 보관하는가?", "heading": "6. 좋은 히카마 고르는 법·보관법｜통뿌리와 자른 뒤 관리", "firstAnswer": "좋은 히카마는 겉이 단단하고 매끈하며 갈라짐·멍·곰팡이가 적고, 잘랐을 때 속살이 희고 아삭합니다."}
+    ],
+    "balanceReview": {
+      "status": "AUTHOR_REVIEW_COMPLETED",
+      "automatedSemanticVerdict": false,
+      "questions": [
+        "도입·핵심 요약이 히카마의 정체·영양 장점·활용을 먼저 보여주는가? PASS",
+        "② 효능 첫 문장이 확인된 식품 가치와 영양 역할을 먼저 답하는가? PASS",
+        "질병 예방·치료를 직접 효능으로 만들지 않았는가? PASS",
+        "③에서 100g·1컵 계량값을 하루 권장량으로 바꾸지 않았는가? PASS",
+        "⑤에서 식용 뿌리와 독성 씨앗을 명확히 구분하고 필요한 응급 행동만 강조했는가? PASS",
+        "강한 강조가 영양 가치·실제 활용·안전 행동·보관 기준 중심인가? PASS",
+        "이미지 3개의 원출처·저작자·라이선스가 자료 출처에 포함되어 있는가? PASS"
+      ]
+    }
+  },
+  "gate0Commit": "df19a915b8a55dd024c192597b5b2443b56f854a",
+  "sourceCommit": null,
+  "githubSourceStatus": "NOT_WRITTEN",
+  "runStatus": "NOT_STARTED",
+  "runUrl": null,
+  "publicStatus": "NOT_STARTED",
+  "publicUrl": null,
+  "ledger": "pending"
+}
