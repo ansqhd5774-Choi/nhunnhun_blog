@@ -16,6 +16,8 @@ on:
       - publishing/publish.mjs
       - publishing/update.mjs
       - publishing/auth-preflight.mjs
+      - publishing/direct-public-contract.mjs
+      - publishing/verify-published-public.mjs
       - publishing/verify-updated-public.mjs
       - tests/**
       - package.json
@@ -40,6 +42,8 @@ on:
       - publishing/publish.mjs
       - publishing/update.mjs
       - publishing/auth-preflight.mjs
+      - publishing/direct-public-contract.mjs
+      - publishing/verify-published-public.mjs
       - publishing/verify-updated-public.mjs
       - tests/**
       - package.json
