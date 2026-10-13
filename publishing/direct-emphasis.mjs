@@ -36,6 +36,8 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:일상|평소|조리용)[^.!?]{0,45}(?:그대로|같은)[^.!?]{0,25}(?:적용|계산|판단)(?:하지\s*않|할\s*수\s*없)/u,
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
+const MARK_TONES=new Set(['key','action','info','caution','danger']);
+const NEGATIVE_TONES=new Set(['caution','danger']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 
@@ -54,6 +56,8 @@ export function assertDirectSubmissionEmphasis(source) {
     if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
       highlightCount++;
+      const tone=String(node.attribs?.['data-tone']??'key').trim().toLowerCase();
+      if(!MARK_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_TONE');
       const children=(node.children??[]).filter(n=>n.type!=='comment' && !(n.type==='text'&&!n.data.trim()));
       const inner=children[0];
       const underlined=inner?.name==='u';
@@ -61,7 +65,10 @@ export function assertDirectSubmissionEmphasis(source) {
       if(children.length!==1||boldChildren.length!==1||boldChildren[0].name!=='strong')throw Error('E_DIRECT_EMPHASIS_STRUCTURE');
       if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
-      if(LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text)))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
+      const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
+      // Limitations may be highlighted only when the author explicitly marks them as caution/danger.
+      // This keeps positive/key highlights from becoming warning-heavy while allowing meaningful negative colors.
+      if(isLimitation&&!NEGATIVE_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
     }
     for(const child of node.children??[])visit(child);
