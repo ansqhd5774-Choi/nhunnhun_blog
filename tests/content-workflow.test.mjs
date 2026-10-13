@@ -26,8 +26,8 @@ test('published product address repair preserves identity and rejects content, p
   writeFileSync(ledgerFile,JSON.stringify({...ledger,fingerprint:'stale'}));assert.equal(isPublishedProductLinkRepair(request,root),false);
  } finally {rmSync(root,{recursive:true,force:true});}
 });
-test('direct workflow never starts generation on code or keyword pushes',()=>{
- const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on).sort(),['push','workflow_dispatch']);assert.deepEqual(w.on.push.branches,['main']);assert.deepEqual(w.on.push.paths,['updates/direct-*.json']);
+test('direct workflow starts only from prepared source or source-preserving retry',()=>{
+ const w=workflow('direct-author-update.yml');assert.deepEqual(Object.keys(w.on).sort(),['push','workflow_dispatch']);assert.deepEqual(w.on.push.branches,['main']);assert.deepEqual(w.on.push.paths,['updates/direct-*.json','automation/update-retry/direct-*.txt']);
  assert.equal(w.jobs.produce,undefined);assert.equal(w.jobs.summary,undefined);
  assert.equal(w.on.workflow_dispatch.inputs.source_id.required,true);
  assert.ok(w.jobs.dispatch.steps.some(x=>x.run?.includes('node authoring/direct-dispatch.mjs')));
@@ -48,4 +48,3 @@ test('writer instructions and onboarding point to food editing and shared execut
   }
   assert.match(read('docs/CONTENT_STANDARD_R1.md'),/R1/);
 });
-
