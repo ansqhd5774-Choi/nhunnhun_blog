@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "bbfa8b4d54067cd445e23a2f93481ae06ab65c20faab8856bc40f71102a399fe",
-  "sourceCommit": "762e5791f7f633a49f46d15004d46bfaa235d014",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-13T21:02:23.694Z",
   "url": "https://nhunnhun.tistory.com/439",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-13T21:02:52.768Z",
+  "sourceCommit": "762e5791f7f633a49f46d15004d46bfaa235d014",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38467173457",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-munieojingeo-20261014",
+    "url": "https://nhunnhun.tistory.com/439",
+    "checkedAt": "2026-10-13T21:02:52.768Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
