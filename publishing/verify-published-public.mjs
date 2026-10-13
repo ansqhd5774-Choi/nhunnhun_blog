@@ -2,27 +2,33 @@ import { assertPublicTitle } from './public-title.mjs';
 import { assertEmphasisContract } from './content-emphasis.mjs';
 import { assertDirectPublicSnapshot } from './direct-public-contract.mjs';
 import { verificationContext } from './verification-context.mjs';
+import { publicBodiesMatch } from './public-body.mjs';
 import {COUPANG_DISCLOSURE,assertAffiliatePublicEvidence} from './affiliate-products.mjs';
 export async function verifyPublishedPublic({publicPage,publicBrowser,post,bodyHtml,sources,representativeSource,editorialExpected,url}) {
   assertPublicTitle(await publicPage.evaluate(() => ({title:document.title,og:document.querySelector('meta[property="og:title"]')?.content,heading:document.querySelector('h1')?.innerText})),post.title);
   const content = publicPage.locator('.contents_style');
   if (await content.count() !== 1) throw new Error('E_BODY_UNVERIFIED');
   if(post.contentStandard==='R1') assertEmphasisContract(await content.innerHTML(),post.bodyHtml);
-  const actual = (await content.innerText()).replace(/\s+/g,' ').trim();
-  // Materialize the final editorial HTML in the browser and compare rendered innerText.
-  // textContent collapses table cells and block boundaries differently from the live page,
-  // which can create false E_BODY_UNVERIFIED failures even when the public article is complete.
-  const expectedText = await publicPage.evaluate(html => {
+  const actualBody=await content.evaluate(el=>({
+    text:el.innerText||el.textContent||'',
+    headings:[...el.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'')
+  }));
+  // Compare through the same public-body contract used by existing-post QA.
+  // The reading skin may remove only an H2 numbering decoration; prose and quantities stay exact.
+  const expectedBody = await publicPage.evaluate(html => {
     const host=document.createElement('div');
     host.setAttribute('aria-hidden','true');
     host.style.cssText='position:fixed;left:-100000px;top:0;width:800px;opacity:0;pointer-events:none;';
     host.innerHTML=html;
     document.body.appendChild(host);
-    const text=(host.innerText||host.textContent||'').replace(/\s+/g,' ').trim();
+    const result={
+      text:host.innerText||host.textContent||'',
+      headings:[...host.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'')
+    };
     host.remove();
-    return text;
+    return result;
   }, bodyHtml);
-  if (!expectedText || actual !== expectedText) throw new Error('E_BODY_UNVERIFIED');
+  if (!expectedBody.text || !publicBodiesMatch(actualBody,expectedBody)) throw new Error('E_BODY_UNVERIFIED');
   if(post.affiliateProducts){
     const evidence=await content.evaluate((root,arg)=>({
       disclosureCount:root.innerText.split(arg.disclosure).length-1,
@@ -140,7 +146,12 @@ export async function verifyPublishedPublic({publicPage,publicBrowser,post,bodyH
       const mobilePage = await mobileContext.newPage();
       await mobilePage.goto(url, {waitUntil:'domcontentloaded'});
       const mobileContent = mobilePage.locator('.contents_style');
-      if (await mobileContent.count() !== 1 || (await mobileContent.innerText()).replace(/\s+/g,' ').trim() !== expectedText) throw new Error('E_CONTENT_MOBILE_BODY');
+      if (await mobileContent.count() !== 1) throw new Error('E_CONTENT_MOBILE_BODY');
+      const mobileBody=await mobileContent.evaluate(el=>({
+        text:el.innerText||el.textContent||'',
+        headings:[...el.querySelectorAll('h2')].map(h=>h.innerText||h.textContent||'')
+      }));
+      if(!publicBodiesMatch(mobileBody,expectedBody)) throw new Error('E_CONTENT_MOBILE_BODY');
       if(post.contentStandard==='R1') assertEmphasisContract(await mobileContent.innerHTML(), post.bodyHtml);
       const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
       if (overflow) throw new Error('E_CONTENT_MOBILE_OVERFLOW');
