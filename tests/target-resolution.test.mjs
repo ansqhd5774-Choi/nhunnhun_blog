@@ -76,13 +76,19 @@ test('pre-authoring resolver workflow is read-only to Tistory and persists decis
   assert.ok(!steps.some(step=>/publishing\/publish\.mjs|pnpm run publish|publishing\/update\.mjs|pnpm run update/.test(String(step.run||''))));
 });
 
-test('publish workflow requires target proof and runtime recheck before the only submit attempt',()=>{
+test('publish workflow requires target proof before one submit attempt and never auto-recovers the same failure',()=>{
   const workflow=YAML.parse(readFileSync('.github/workflows/publish-posts.yml','utf8').replace(/^\uFEFF/,''));
   const steps=workflow.jobs.publish.steps;
   const target=steps.findIndex(step=>step.run==='node publishing/target-resolution-gate.mjs');
-  const publish=steps.findIndex(step=>step.id==='publish-attempt');
-  const recover=steps.findIndex(step=>step.run==='node publishing/recover-publication.mjs');
-  assert.ok(target>=0&&publish>target&&recover>publish);
-  assert.equal(steps[publish]['continue-on-error'],true);
-  assert.match(String(steps[recover].if),/publish-attempt\.outcome == 'failure'/);
+  const publishSteps=steps.filter(step=>step.run==='pnpm run publish');
+  const publish=steps.findIndex(step=>step.run==='pnpm run publish');
+  assert.ok(target>=0&&publish>target);
+  assert.equal(publishSteps.length,1);
+  assert.equal(steps[publish]['continue-on-error'],undefined);
+  assert.equal(steps.some(step=>step.run==='node publishing/recover-publication.mjs'),false);
+
+  const recovery=YAML.parse(readFileSync('.github/workflows/recover-publication.yml','utf8').replace(/^\uFEFF/,''));
+  const recoverySteps=recovery.jobs.verify.steps;
+  assert.ok(recoverySteps.some(step=>step.run==='node publishing/recover-publication.mjs'));
+  assert.equal(recoverySteps.some(step=>step.run==='pnpm run publish'),false);
 });
