@@ -11,7 +11,17 @@ function sourceBlock(html=''){return (String(html).match(/<h2>자료 출처<\/h2
 // Match the closing delimiter to its opening quote; file names may contain apostrophes.
 function hrefs(html=''){return new Set([...String(html).matchAll(/<a\b[^>]*\bhref=(["'])(https:\/\/.*?)\1/gi)].map(m=>m[2].replace(/&amp;/g,'&')));}
 function assertHttps(value,code){let u;try{u=new URL(value);}catch{throw new Error(code);}if(u.protocol!=='https:'||u.username||u.password)throw new Error(code);return u;}
-function canonicalUrl(value){try{return new URL(String(value)).href;}catch{return String(value??'');}}
+function canonicalUrl(value){
+  try{
+    const u=new URL(String(value));
+    if(u.hostname==='commons.wikimedia.org'){
+      // MediaWiki treats spaces and underscores as the same title separator.
+      const decoded=decodeURIComponent(u.pathname).replace(/_/g,' ');
+      u.pathname=decoded;
+    }
+    return u.href;
+  }catch{return String(value??'');}
+}
 function isAbstractNutrientHero(item,review){
   if(String(item?.category??'').trim()!=='영양소')return false;
   let pathname='';
@@ -33,7 +43,6 @@ function mismatchIssues(tags=[],review=[]){
   const issues=[];
   for(let i=0;i<Math.min(tags.length,review.length);i++){
     const r=review[i]??{},src=attr(tags[i],'src'),alt=attr(tags[i],'alt');
-    // Equivalent URL spellings such as a literal space and %20 identify the same source.
     if(canonicalUrl(r.src)!==canonicalUrl(src))issues.push({index:i,field:'src',review:r.src??null,body:src});
     if(r.alt!==alt)issues.push({index:i,field:'alt',review:r.alt??null,body:alt});
     if(!alt.trim()||alt.length<6)issues.push({index:i,field:'alt',reason:'missing-or-short',body:alt});
@@ -57,22 +66,15 @@ export function assertImageReview(item){
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
   if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
-  // Sources explicitly rejected after visual inspection must not silently return as a hero.
-  // Nutrient hero images also reject deterministic abstract-science filename patterns so molecular structures,
-  // microscopy and crystal images cannot become the representative image merely because licensing metadata passes.
   if(isRejectedHeroSource(review[0]?.sourcePage)||isAbstractNutrientHero(item,review[0]))throw new Error('E_IMAGE_HERO_REJECTED');
-  // Diagnose every invalid role/composition in this one pass. This prevents serial
-  // fail-fix-rerun cycles such as discovering `serving` and `field` on separate runs.
   const issues=metadataIssues(review);
   if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
-  // Do the same for src/alt pairing: report all mismatches at once instead of one opaque retry per image.
   const mismatches=mismatchIssues(tags,review);
   if(mismatches.length){console.error('IMAGE_REVIEW_MISMATCH_DIAG '+JSON.stringify(mismatches));throw new Error('E_IMAGE_REVIEW_MISMATCH');}
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
-    // Optional observation only. Never synthesize true or restore the removed mandatory gate.
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
     const page=assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
