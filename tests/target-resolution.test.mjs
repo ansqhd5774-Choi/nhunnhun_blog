@@ -4,10 +4,10 @@ import {readFileSync} from 'node:fs';
 import YAML from 'yaml';
 import {titleMatchesAlias,validateCreateIdentity,validateIdentityRequest,identityDigest,validateResolutionProof,existingTargetCandidates,closeManagedPage} from '../publishing/target-resolution-gate.mjs';
 
-test('food target identity is mandatory for new direct SP1 sources',()=>{
+test('food target identity is mandatory for new direct SP1 sources and proposed title may change before final authoring',()=>{
   const post={id:'direct-chenpi-20261013',category:'음식',contentStandard:'SP1',title:'진피 효능과 먹는 법'};
   assert.throws(()=>validateCreateIdentity(post,null),/E_TARGET_IDENTITY_REQUIRED/);
-  assert.doesNotThrow(()=>validateCreateIdentity(post,{sourceId:post.id,operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질','Chenpi'],reviewed:true,proposedTitle:post.title}));
+  assert.doesNotThrow(()=>validateCreateIdentity(post,{sourceId:post.id,operation:'create',topic:'진피',aliases:['진피차','말린 귤껍질','Chenpi'],reviewed:true,proposedTitle:'진피란? 주요 성분과 활용법'}));
 });
 
 test('pre-authoring proof must match the exact reviewed request and say new',()=>{
