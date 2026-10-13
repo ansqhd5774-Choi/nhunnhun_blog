@@ -2,8 +2,8 @@
   "sourceId": "direct-tsaoko-20261013",
   "articleId": null,
   "title": "초과(Tsaoko)란? 향·주요 성분·먹는 법·궁합·주의사항·보관법",
-  "sourceSha256": "0a996546bbace423e30dd3a91d2ecd62922943a3057cb9361bd96ee147c105da",
-  "baseMainSha": "320d17a94c290fd88a86e5fe9edd6ca09b02e8e7",
+  "sourceSha256": "ca78e1fdcc941d5e7f82f9683b290d03816eb03719726f192fdefc78d9556ed9",
+  "baseMainSha": "436d821bce4d3f46b3d8180d11939239665c1cf2",
   "checks": {
     "contentReview": "PASS",
     "strong": 60,
@@ -12,6 +12,7 @@
     "images": 3,
     "coreH2": 6,
     "evidenceScope": "PASS",
+    "imageAttribution": "PASS",
     "duplicateIntentReview": "NEW_INTENT",
     "visualChecked": 0,
     "preflight": "NOT_RUN"
@@ -25,7 +26,8 @@
       "약재 용량·연구 용량을 음식의 하루 권장량이나 안전 상한으로 바꾸지 않음",
       "정유의 성분 비율을 말린 통열매 전체 함량으로 표현하지 않음",
       "정확한 보관 개월 수를 근거 없이 제시하지 않음",
-      "black cardamom 유통명이 다른 종에도 쓰일 수 있어 학명 확인을 안내"
+      "black cardamom 유통명이 다른 종에도 쓰일 수 있어 학명 확인을 안내",
+      "본문 3개 이미지의 sourcePage·저작자·라이선스를 자료 출처에 직접 연결"
     ]
   },
   "foodAxisReview": {
@@ -48,11 +50,12 @@
         "② 효능 첫 문단이 실제 식품 가치를 먼저 설명하고 추출물 근거를 분리하는가? PASS",
         "제한·근거 부족 문구를 mark 또는 최고강조로 처리하지 않았는가? PASS",
         "안전·알레르기·농축물 주의를 ⑤ 중심으로 모았는가? PASS",
-        "강한 강조가 장점·활용·행동 기준 중심인가? PASS"
+        "강한 강조가 장점·활용·행동 기준 중심인가? PASS",
+        "이미지 3개의 원출처·저작자·라이선스 링크가 자료 출처에 포함되어 있는가? PASS"
       ]
     }
   },
-  "gate0Commit": "926e031b0c4d52da098bd964fec62cafd1e91567",
+  "gate0Commit": "f7924ca813b09d02ec1c4f436d575bc31adb671e",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
   "runStatus": "NOT_STARTED",
