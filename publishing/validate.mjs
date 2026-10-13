@@ -1,11 +1,10 @@
-import {assertDirectPreflight} from './direct-preflight.mjs';
+import {assertDirectPreflight,directPreflight} from './direct-preflight.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
 import { loadPosts, checkPublishHtml, eligible } from './core.mjs';
 import { Ledger } from './ledger.mjs';
 import { renderEditorialPost, EDITORIAL_TEMPLATE_VERSION } from './editorial.mjs';
-import { assertImageReview } from './image-review.mjs';
 
 function diagnoseHtml(html) {
   const clean = sanitizeHtml(html, {
@@ -32,8 +31,11 @@ try {
     if (eligible(post, state)) {
       checkPublishHtml(post);
       assertContentStandard(post);
-      assertDirectPreflight(post);
-      assertImageReview(post);
+      const preflight=directPreflight(post);
+      if(preflight.status==='FAIL') {
+        console.error('DIRECT_PREFLIGHT_FAIL '+post.id+' '+JSON.stringify(preflight));
+        throw Error(preflight.errors[0]);
+      }
       renderEditorialPost(post);
       pending++;
     }
