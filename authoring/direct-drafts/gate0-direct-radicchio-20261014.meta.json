@@ -1,0 +1,25 @@
+{
+  "sourceId": "direct-radicchio-20261014",
+  "articleId": null,
+  "title": "라디키오(Radicchio) 효능·먹는 법｜영양·쓴맛 줄이기·주의사항·보관법",
+  "sourceSha256": "ea4ac9d7494485d43cef03c58819b8652970f418c1fac6fab5a5cd0906b5467e",
+  "baseMainSha": "b0499e07869a65112e086225254852f7999f45ea",
+  "contentStandard": "SP1",
+  "status": "GATE0_PRESERVED",
+  "checks": {
+    "coreH2": 6,
+    "images": 3,
+    "strong": 40,
+    "mark": 13,
+    "markUnderlineStrong": 2,
+    "contentReview": "AUTHOR_REVIEW_COMPLETED",
+    "foodAxisReview": "six axes reviewed",
+    "imageReview": "three food-centered Wikimedia Commons images reviewed by source metadata",
+    "balanceReview": "benefits first; limitations scoped; no disease-treatment generalization"
+  },
+  "execution": {
+    "githubSource": "NOT_CONFIRMED",
+    "publish": "NOT_STARTED",
+    "publicVerification": "NOT_STARTED"
+  }
+}
