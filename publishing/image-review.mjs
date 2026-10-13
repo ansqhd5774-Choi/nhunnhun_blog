@@ -17,6 +17,29 @@ function isAbstractNutrientHero(item,review){
   try{pathname=decodeURIComponent(new URL(review?.sourcePage??'').pathname);}catch{return false;}
   return NUTRIENT_ABSTRACT_HERO.test(pathname);
 }
+function metadataIssues(review=[]){
+  const issues=[];
+  for(let i=0;i<review.length;i++){
+    const r=review[i];
+    if(!r||typeof r!=='object'||Array.isArray(r))continue;
+    if(!ROLES.has(r.role))issues.push({index:i,field:'role',value:r.role??null});
+    if(!COMPOSITIONS.has(r.composition))issues.push({index:i,field:'composition',value:r.composition??null});
+    if(i>0&&r.role==='hero')issues.push({index:i,field:'role',value:'hero',reason:'secondary-hero'});
+  }
+  return issues;
+}
+export function imageReviewObservation(item){
+  const review=Array.isArray(item?.imageReview)?item.imageReview:[];
+  const direct=new Set(['closeup','cross-section','serving','process']);
+  const contextual=new Set(['context','field','diagram']);
+  return {
+    visualCheckedCount:review.filter(r=>r?.visualChecked===true).length,
+    total:review.length,
+    directFoodImageCount:String(item?.category??'').trim()==='음식'?review.filter(r=>direct.has(r?.composition)).length:null,
+    contextualImageCount:String(item?.category??'').trim()==='음식'?review.filter(r=>contextual.has(r?.composition)).length:null,
+    automatedSemanticVerdict:false
+  };
+}
 export function assertImageReview(item){
   if(hasAuthoritativePreflight())return item;
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
@@ -26,13 +49,16 @@ export function assertImageReview(item){
   // Nutrient hero images also reject deterministic abstract-science filename patterns so molecular structures,
   // microscopy and crystal images cannot become the representative image merely because licensing metadata passes.
   if(isRejectedHeroSource(review[0]?.sourcePage)||isAbstractNutrientHero(item,review[0]))throw new Error('E_IMAGE_HERO_REJECTED');
+  // Diagnose every invalid role/composition in this one pass. This prevents serial
+  // fail-fix-rerun cycles such as discovering `serving` and `field` on separate runs.
+  const issues=metadataIssues(review);
+  if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
   const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i],tag=tags[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     // Optional observation only. Never synthesize true or restore the removed mandatory gate.
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
-    if(!ROLES.has(r.role)||!COMPOSITIONS.has(r.composition)||(i>0&&r.role==='hero'))throw new Error('E_IMAGE_REVIEW_REQUIRED');
     const src=attr(tag,'src'),alt=attr(tag,'alt');
     if(r.src!==src||r.alt!==alt||!alt.trim()||alt.length<6)throw new Error('E_IMAGE_REVIEW_MISMATCH');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
