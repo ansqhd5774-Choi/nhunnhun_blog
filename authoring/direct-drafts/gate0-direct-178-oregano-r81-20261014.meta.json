@@ -1,0 +1,19 @@
+{
+  "sourceId": "direct-178-oregano-r81-20261014",
+  "articleId": "178",
+  "title": "오레가노 효능·먹는 법｜카바크롤·타임롤·주의사항·보관법",
+  "sourceSha256": "c4cda10f56495f4394efbd286c09ddcea7f1952ffd1e5d530d55be3934354eef",
+  "baseMainSha": "c1bb39d78d09f5ea877dac60117d5297bf7b588a",
+  "contentStandard": "SP1",
+  "status": "GATE0_PRESERVED",
+  "checks": {
+    "coreH2": 6,
+    "images": 3,
+    "strong": 36,
+    "mark": 13,
+    "markUnderlineStrong": 2,
+    "contentReview": "AUTHOR_REVIEW_COMPLETED",
+    "foodAxisReview": "six axes reviewed",
+    "balanceReview": "food use first; extract and laboratory evidence separated from culinary intake"
+  }
+}
