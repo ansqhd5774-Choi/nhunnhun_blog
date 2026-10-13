@@ -4,6 +4,7 @@ on:
     branches: [ main ]
     paths:
       - posts/**
+      - automation/publish-retry-request.txt
       - .github/workflows/publish-posts.yml
   workflow_dispatch:
     inputs:
