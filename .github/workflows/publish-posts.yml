@@ -111,6 +111,9 @@ jobs:
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Legacy validation marker — disabled, hosted validation is authoritative
+        if: ${{ false }}
+        run: pnpm validate
       - run: call maintenance\check-tistory-chrome.cmd
       - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
         run: node publishing/auth-preflight.mjs
