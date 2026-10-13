@@ -14,8 +14,26 @@ export function summarizeEmphasis(html) {
     level3:count(/<mark\b[^>]*>\s*<u\b[^>]*>\s*<strong\b[^>]*>/gi)
   };
 }
+
+function foodHighlightDensity(totals,sections,category){
+  if(category!=='음식')return null;
+  const coreSections=sections.slice(1).filter(section=>!/^자료\s*출처$/u.test(String(section.heading??'').trim()));
+  const coreH2=coreSections.length;
+  if(!coreH2)return {status:'NOT_APPLICABLE',advisoryOnly:true,coreH2:0};
+  const recommendedMin=Math.max(4,coreH2+1);
+  const recommendedMax=coreH2+3;
+  return {
+    status:totals.highlight<recommendedMin?'LOW_HIGHLIGHT_DENSITY':'OK',
+    advisoryOnly:true,
+    coreH2,
+    current:totals.highlight,
+    recommendedRange:[recommendedMin,recommendedMax],
+    note:'작성 품질 참고값이며 발행 차단·색상 할당량·자동 재작성 기준이 아니다.'
+  };
+}
+
 // Section observations identify omissions without deciding meaning or blocking publication.
-export function observeEmphasis(html) {
+export function observeEmphasis(html,{category}={}) {
   const sections=[];
   let section={heading:'도입',bold:0,highlight:0,underline:0,level2:0,level3:0,standaloneHighlights:[]};
   sections.push(section);
@@ -38,9 +56,10 @@ export function observeEmphasis(html) {
     for(const child of node.children??[])visit(child);
   };
   visit(parseDocument(html));
-  return {totals:summarizeEmphasis(html),sections};
+  const totals=summarizeEmphasis(html);
+  return {totals,sections,highlightDensity:foodHighlightDensity(totals,sections,category)};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
   const source=JSON.parse(readFileSync(process.argv[2],'utf8'));
-  console.log(JSON.stringify({sourceId:source.id,...observeEmphasis(source.bodyHtml??'')},null,2));
+  console.log(JSON.stringify({sourceId:source.id,...observeEmphasis(source.bodyHtml??'',{category:source.category})},null,2));
 }
