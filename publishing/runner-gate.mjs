@@ -55,4 +55,4 @@ async function main() {
   const checkout = assertCurrentSource();
   console.log(JSON.stringify({runner:process.env.RUNNER_NAME,os:process.env.RUNNER_OS,arch:process.env.RUNNER_ARCH,runId:process.env.GITHUB_RUN_ID,workflowSha:process.env.GITHUB_SHA,checkoutSha:checkout,time:new Date().toISOString(),shell:'cmd',labels:'workflow runs-on: '+RUNNER_LABELS.join('/')}));
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(e => {console.error(['BLOCKED_SOURCE_DRIFT','E_RUNNER_CONTRACT'].includes(e.message)?e.message:'E_RUNNER_GATE');process.exitCode=1;});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch(e => {console.error(['BLOCKED_SOURCE_DRIFT','E_RUNNER_CONTRACT'].includes(e.message)?e.message:'E_RUNNER_GATE');process.exitCode=1;});
