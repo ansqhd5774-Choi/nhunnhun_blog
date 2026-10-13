@@ -2,8 +2,8 @@
   "sourceId": "direct-tsaoko-20261013",
   "articleId": null,
   "title": "초과(Tsaoko)란? 향·주요 성분·먹는 법·궁합·주의사항·보관법",
-  "sourceSha256": "7e5d15b0e3a95e8fa86553841102ba2eca023d75f079b22873419c502ebadbc5",
-  "baseMainSha": "c864546ed9f7862d7e4d35b45a975977eb06a789",
+  "sourceSha256": "ca78e1fdcc941d5e7f82f9683b290d03816eb03719726f192fdefc78d9556ed9",
+  "baseMainSha": "dba6f9f2c5ceb7d1a3bc835dcf09666743028a6c",
   "checks": {
     "contentReview": "PASS",
     "strong": 60,
@@ -55,10 +55,10 @@
       ]
     }
   },
-  "gate0Commit": "8f6898b1b49710e08e0a98faeac308173768d178",
+  "gate0Commit": "02ccf168348986db671e274d950654c4d3659a25",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
-  "runStatus": "NOT_STARTED",
+  "runStatus": "RETRY_PENDING",
   "runUrl": null,
   "publicStatus": "NOT_STARTED",
   "publicUrl": null,
