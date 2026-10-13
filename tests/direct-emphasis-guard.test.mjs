@@ -59,6 +59,16 @@ test('semantic positive and info tones are accepted for ordinary takeaways',()=>
   }
 });
 
+test('nutrient benefit section rejects evidence-quality highlight without an actual health outcome highlight',()=>{
+  const bodyHtml=quotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>장기간 섭취했을 때 사람 자료가 더 탄탄합니다.</strong></mark>`;
+  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-test',category:'영양소',contentStandard:'SP1',bodyHtml}),/E_DIRECT_BENEFIT_EMPHASIS_MISSING/);
+});
+
+test('nutrient benefit section accepts a positive highlight that states the confirmed health outcome',()=>{
+  const bodyHtml=quotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>황반색소밀도가 증가하고 대비감도와 강한 빛 노출 뒤 시각 회복이 개선됐습니다.</strong></mark>`;
+  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
+});
+
 test('unknown semantic highlight tone fails closed',()=>{
   const bodyHtml=quotaBody()+'<mark data-tone="purple"><strong>임의 색상</strong></mark>';
   assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}),/E_DIRECT_EMPHASIS_TONE/);
