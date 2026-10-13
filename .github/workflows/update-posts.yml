@@ -61,10 +61,11 @@ jobs:
           Error('E_UPDATE_TARGET_ID');const {runContentCli}=await
           import('./publishing/validate-content.mjs');runContentCli(['--check','updates/'+id+'.json']);"
       - run: pnpm run validate:update
-      - name: 선택 원고 준비와 강조 현황 — 러너 담당
+      - name: 선택 원고 준비와 강조 현황 — 검증 결과 재사용
         run: node authoring/prepare-selected-source.mjs updates
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTHORITATIVE_PREFLIGHT_SHA: ${{ github.sha }}
       - run: call maintenance\check-tistory-chrome.cmd
       - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
         run: node publishing/auth-preflight.mjs
@@ -74,6 +75,7 @@ jobs:
           UPDATE_SOURCE_ID: ${{ inputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
+          AUTHORITATIVE_PREFLIGHT_SHA: ${{ github.sha }}
   verify-existing:
     concurrency:
       group: nhunnhun-tistory-mutation
