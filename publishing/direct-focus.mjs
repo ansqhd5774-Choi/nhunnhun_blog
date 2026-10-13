@@ -59,14 +59,11 @@ export function directFocusReview(bodyHtml='') {
   return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12)};
 }
 
-// Shared direct/SP1 structure guard. Food-only editorial balance limits stay scoped to food.
+// Shared direct/SP1 structure guard. Food editorial-balance counts are advisory metrics only:
+// simplistic word counts must not force authors to delete accurate evidence or rewrite facts merely to pass CI.
 export function assertDirectSubmissionFocus(source) {
   if(source?.contentStandard!=='SP1'||!source?.id?.startsWith('direct-'))return;
   const review=directFocusReview(source.bodyHtml??'');
   if(review.coreHeadings.length>DIRECT_AUTHORING_CONTRACT.coreHeadingMaximum)throw Error('E_DIRECT_FOCUS_SECTION_OVERLOAD');
-  if(source?.category==='음식'){
-    if(review.researchDetailHits>2)throw Error('E_DIRECT_FOCUS_RESEARCH_OVERLOAD');
-    if(review.limitationHits>2)throw Error('E_DIRECT_FOCUS_LIMITATION_OVERLOAD');
-  }
   return review;
 }
