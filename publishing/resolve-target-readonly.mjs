@@ -4,7 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {BLOG} from './core.mjs';
 import {assertTistoryAuthenticated} from './auth-preflight.mjs';
 import {localBrowserConfig,openEditorConnection,closeEditorConnection} from './local-browser.mjs';
-import {validateIdentityRequest,identityDigest,existingTargetCandidates,fetchManagedPosts} from './target-resolution-gate.mjs';
+import {validateIdentityRequest,identityDigest,existingTargetCandidates,fetchManagedPosts,closeManagedPage} from './target-resolution-gate.mjs';
 
 const REPO='ansqhd5774-Choi/nhunnhun_blog';
 function encode(value){return Buffer.from(JSON.stringify(value,null,2)+'\n').toString('base64');}
@@ -57,11 +57,11 @@ export async function resolveTargetReadonly({root=process.cwd(),sourceId=process
     console.log('TARGET_RESOLUTION_RESULT '+JSON.stringify({sourceId,decision:result.decision,scanned:result.scanned,candidates:result.candidates}));
     return result;
   }finally{
-    try{await page?.close({runBeforeUnload:false});}catch{}
+    await closeManagedPage(page);
     if(connection)await closeEditorConnection(connection);
   }
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  resolveTargetReadonly().then(()=>exitCli(0)).catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');exitCli(1);});
+  resolveTargetReadonly().then(()=>exitCli(0)).catch(error=>{console.error(/^E_/.test(error?.message||'')?error.message:'E_TARGET_RESOLUTION_RUNTIME');exitCli(1);});
 }
