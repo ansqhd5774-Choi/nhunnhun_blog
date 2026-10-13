@@ -2,30 +2,30 @@
   "sourceId": "direct-tsaoko-20261013",
   "articleId": null,
   "title": "초과(Tsaoko)란? 향·주요 성분·먹는 법·궁합·주의사항·보관법",
-  "sourceSha256": "8682874a181e08a18424eecb99b538c0fb2ece9c544bb90eda64fecf9555c8fb",
-  "baseMainSha": "3162296035cccaf1c32937694f4952c5c6a2d30d",
+  "sourceSha256": "0a996546bbace423e30dd3a91d2ecd62922943a3057cb9361bd96ee147c105da",
+  "baseMainSha": "320d17a94c290fd88a86e5fe9edd6ca09b02e8e7",
   "checks": {
     "contentReview": "PASS",
-    "strong": 61,
-    "mark": 15,
+    "strong": 60,
+    "mark": 12,
     "markUnderlineStrong": 2,
     "images": 3,
     "coreH2": 6,
     "evidenceScope": "PASS",
     "duplicateIntentReview": "NEW_INTENT",
-    "visualChecked": 3,
+    "visualChecked": 0,
     "preflight": "NOT_RUN"
   },
   "researchScope": {
-    "readerIntent": "초과(Tsaoko)가 무엇인지, 어떤 향과 성분이 있는지, 건강 효과의 근거는 어디까지인지, 요리에 얼마나 어떻게 쓰고 어떤 향신료와 어울리며 무엇을 주의하고 어떻게 보관하는지",
+    "readerIntent": "초과(Tsaoko)가 무엇인지, 어떤 향과 성분이 있는지, 건강 연구의 범위는 어디까지인지, 요리에 어떻게 쓰고 어떤 향신료와 어울리며 무엇을 주의하고 어떻게 보관하는지",
     "duplicateCheck": "target-resolution scanned 374 manager posts; decision=new; candidates=0",
     "evidenceBoundary": [
       "현재 인정명 Lanxangia tsao-ko와 과거 문헌명 Amomum tsao-ko를 같은 종의 명칭 변화로 구분",
-      "정유·추출물·세포·동물 연구를 일반 조리용 초과의 사람 건강 효과로 일반화하지 않음",
+      "정유·추출물·시험관 연구를 일반 조리용 초과의 사람 건강 효과로 일반화하지 않음",
       "약재 용량·연구 용량을 음식의 하루 권장량이나 안전 상한으로 바꾸지 않음",
-      "정유의 성분 비율을 말린 통열매 전체의 함량으로 표현하지 않음",
+      "정유의 성분 비율을 말린 통열매 전체 함량으로 표현하지 않음",
       "정확한 보관 개월 수를 근거 없이 제시하지 않음",
-      "black cardamom이라는 유통명이 다른 종에도 쓰이므로 학명 확인을 안내"
+      "black cardamom 유통명이 다른 종에도 쓰일 수 있어 학명 확인을 안내"
     ]
   },
   "foodAxisReview": {
@@ -33,12 +33,12 @@
     "automatedSemanticVerdict": false,
     "observedCoreH2Count": 6,
     "axes": [
-      {"axis":1,"expectedAxis":"정의·주요 성분·작용","readerQuestion":"초과는 무엇이고 어떤 향 성분이 특징인가?","heading":"1. 초과(Tsaoko)란?｜말린 열매와 주요 향 성분","firstAnswer":"초과는 Lanxangia tsao-ko의 잘 익은 열매를 말려 쓰는 향신료입니다."},
-      {"axis":2,"expectedAxis":"핵심 효능·예방 효과","readerQuestion":"초과의 실제 식품 가치는 무엇이고 건강 효과는 어디까지 확인됐는가?","heading":"2. 초과의 효능·장점은?｜식품 가치와 건강 연구의 범위","firstAnswer":"초과의 가장 분명한 식품 가치는 강한 향으로 잡내를 줄이고 음식의 풍미를 넓히는 것입니다."},
-      {"axis":3,"expectedAxis":"섭취법·권장량","readerQuestion":"초과는 얼마나 어떻게 먹으며 공식 권장량이 있는가?","heading":"3. 초과는 얼마나·어떻게 먹을까?｜공식 하루 권장량은 없음","firstAnswer":"식품으로 먹는 초과에는 일반 성인을 위한 공식 하루 권장 섭취량이 따로 정해져 있지 않습니다."},
-      {"axis":4,"expectedAxis":"궁합·상호작용","readerQuestion":"초과는 무엇과 잘 어울리고 이 조합은 건강 시너지인가 풍미 궁합인가?","heading":"4. 초과와 잘 어울리는 음식은?｜팔각·생강·화조와 풍미 조합","firstAnswer":"초과는 팔각·생강·화조처럼 향이 뚜렷한 재료와 함께 육류·국물 요리에 잘 어울립니다."},
-      {"axis":5,"expectedAxis":"부작용·주의 대상","readerQuestion":"초과를 먹을 때 무엇을 주의하고 농축 제품과 어떻게 구분해야 하는가?","heading":"5. 초과 부작용·주의 대상은?｜일반 향신료와 농축 추출물 구분","firstAnswer":"초과를 음식에 향신료로 소량 쓰는 것과 정유·고농도 추출물을 섭취하는 것은 같은 조건이 아닙니다."},
-      {"axis":6,"expectedAxis":"신선도·보관·조리 팁","readerQuestion":"좋은 초과를 어떻게 고르고 보관하며 조리하는가?","heading":"6. 좋은 초과 고르는 법·보관·조리 팁｜통열매 상태와 향 확인","firstAnswer":"초과는 눅눅하지 않고 통열매의 형태가 비교적 온전하며 향이 선명한 제품을 고르는 것이 기본입니다."}
+      {"axis": 1, "expectedAxis": "정의·주요 성분·작용", "readerQuestion": "초과는 무엇이고 어떤 향 성분이 특징인가?", "heading": "1. 초과(Tsaoko)란?｜말린 열매와 주요 향 성분", "firstAnswer": "초과는 Lanxangia tsao-ko의 말린 익은 열매를 이용하는 향신료입니다."},
+      {"axis": 2, "expectedAxis": "핵심 효능·예방 효과", "readerQuestion": "초과의 실제 식품 가치는 무엇이고 건강 연구는 어디까지인가?", "heading": "2. 초과의 효능·장점은?｜향신료 가치와 건강 연구 범위", "firstAnswer": "초과의 가장 확실한 식품 가치는 강한 향으로 육류와 국물의 무거운 냄새를 정돈하고 풍미를 넓히는 것입니다."},
+      {"axis": 3, "expectedAxis": "섭취법·권장량", "readerQuestion": "초과는 얼마나 어떻게 먹으며 공식 섭취량이 있는가?", "heading": "3. 초과는 얼마나·어떻게 먹을까?｜조리 사용량과 먹는 법", "firstAnswer": "식품으로 사용하는 초과에는 일반 성인을 위한 공식 하루 섭취량이 따로 제시되어 있지 않습니다."},
+      {"axis": 4, "expectedAxis": "궁합·상호작용", "readerQuestion": "초과는 무엇과 잘 어울리며 조합의 의미는 무엇인가?", "heading": "4. 초과와 잘 어울리는 음식은?｜팔각·생강·화조와 풍미 궁합", "firstAnswer": "초과는 팔각·생강·화조처럼 향이 뚜렷한 재료와 육류·국물 요리에 잘 어울립니다."},
+      {"axis": 5, "expectedAxis": "부작용·주의 대상", "readerQuestion": "초과를 먹을 때 무엇을 주의하고 농축 제품과 어떻게 구분하는가?", "heading": "5. 초과 부작용·주의 대상은?｜일반 향신료와 농축 제품 구분", "firstAnswer": "초과를 음식에 향신료로 쓰는 것과 정유·고농도 추출물을 섭취하는 것은 같은 조건이 아닙니다."},
+      {"axis": 6, "expectedAxis": "신선도·보관·조리 팁", "readerQuestion": "좋은 초과를 어떻게 고르고 보관하며 조리하는가?", "heading": "6. 좋은 초과 고르는 법·보관·조리 팁｜통열매 상태와 향 확인", "firstAnswer": "초과는 눅눅하지 않고 통열매 형태가 비교적 온전하며 향이 선명한 제품을 고르는 것이 기본입니다."}
     ],
     "balanceReview": {
       "status": "AUTHOR_REVIEW_COMPLETED",
@@ -46,13 +46,13 @@
       "questions": [
         "도입·핵심 요약이 초과의 정체·향신료 가치·활용을 먼저 보여주는가? PASS",
         "② 효능 첫 문단이 실제 식품 가치를 먼저 설명하고 추출물 근거를 분리하는가? PASS",
-        "공식 권장량 없음과 연구 한계를 불필요하게 반복하지 않았는가? PASS",
+        "제한·근거 부족 문구를 mark 또는 최고강조로 처리하지 않았는가? PASS",
         "안전·알레르기·농축물 주의를 ⑤ 중심으로 모았는가? PASS",
         "강한 강조가 장점·활용·행동 기준 중심인가? PASS"
       ]
     }
   },
-  "gate0Commit": "9f7e554543dc1f3466de2de5de5fde3d2d440488",
+  "gate0Commit": "926e031b0c4d52da098bd964fec62cafd1e91567",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
   "runStatus": "NOT_STARTED",
