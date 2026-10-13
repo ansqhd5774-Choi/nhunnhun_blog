@@ -39,6 +39,8 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
 const ACTIONABLE_SAFETY_PATTERN=/(?:즉시\s*(?:중단|진료|병원|응급)|복용을?\s*중단|섭취를?\s*중단|피해야|복용하지\s*말|섭취하지\s*말|의료진(?:과|에게)\s*(?:상담|확인)|진료를?\s*받)/u;
+const BENEFIT_HEADING_PATTERN=/(?:효능|효과|기대\s*변화|건강상\s*이점|장점)/u;
+const BENEFIT_OUTCOME_PATTERN=/(?:개선|증가|감소|낮추|줄이|유지|보호|회복|완화|향상|도움|위험\s*감소|진행\s*(?:지연|감소))/u;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
@@ -49,12 +51,19 @@ export function assertDirectSubmissionEmphasis(source) {
   assertDirectEmphasis(source);
   const minimums=source.category==='음식'?DIRECT_FOOD_EMPHASIS_MINIMUMS:DIRECT_EMPHASIS_MINIMUMS;
   let currentHeading='';
+  let inBenefitSection=false;
+  let hasBenefitSection=false;
+  let benefitOutcomeHighlights=0;
   let primaryHighlights=0;
   let boldCount=0;
   let highlightCount=0;
   let underlineCount=0;
   const visit=node=>{
-    if(node.name==='h2')currentHeading=cleanText(nodeText(node)).replace(/^\d+[.)]\s*/u,'');
+    if(node.name==='h2'){
+      currentHeading=cleanText(nodeText(node)).replace(/^\d+[.)]\s*/u,'');
+      inBenefitSection=BENEFIT_HEADING_PATTERN.test(currentHeading);
+      if(inBenefitSection)hasBenefitSection=true;
+    }
     if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
       highlightCount++;
@@ -74,11 +83,15 @@ export function assertDirectSubmissionEmphasis(source) {
       // Only an actionable safety instruction in a dedicated safety section may remain strongly highlighted.
       if(isLimitation&&!isActionableSafety)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
+      if(source.category==='영양소'&&inBenefitSection&&tone==='positive'&&BENEFIT_OUTCOME_PATTERN.test(text))benefitOutcomeHighlights++;
     }
     for(const child of node.children??[])visit(child);
   };
   visit(parseDocument(source.bodyHtml??''));
   if(!primaryHighlights)throw Error('E_DIRECT_PRIMARY_EMPHASIS_MISSING');
+  // Nutrient benefit sections must visibly emphasize at least one confirmed health outcome,
+  // not merely evidence quality, limitations, dosage, or product-selection facts.
+  if(source.category==='영양소'&&hasBenefitSection&&!benefitOutcomeHighlights)throw Error('E_DIRECT_BENEFIT_EMPHASIS_MISSING');
   if(boldCount<minimums.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
   if(highlightCount<minimums.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
   if(underlineCount<minimums.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
