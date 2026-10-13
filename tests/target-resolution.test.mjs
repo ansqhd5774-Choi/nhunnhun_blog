@@ -36,6 +36,16 @@ test('existing candidates include exact title and reviewed topic aliases',()=>{
   assert.deepEqual(existingTargetCandidates(items,post,identity).map(x=>x.id),['12','13']);
 });
 
+test('comparison keywords after the main title divider are not treated as the article target',()=>{
+  const post={title:'큐민(Cumin)이란? 주요 성분·효능·먹는 법·궁합·주의사항·보관법'};
+  const identity={topic:'큐민',aliases:['커민','Cumin','Cuminum cyminum']};
+  const items=[
+    {id:417,title:'캐러웨이 효능·먹는 법｜커민·회향 차이·부작용',visibility:'PUBLIC'},
+    {id:418,title:'커민 효능·먹는 법｜주요 성분·주의사항',visibility:'PUBLIC'}
+  ];
+  assert.deepEqual(existingTargetCandidates(items,post,identity).map(x=>x.id),['418']);
+});
+
 test('manager page cleanup is bounded when Playwright close never settles',async()=>{
   let calls=0;
   await closeManagedPage({close:()=>{calls+=1;return new Promise(()=>{});}},{timeoutMs:5});

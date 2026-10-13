@@ -21,6 +21,9 @@ export function titleMatchesAlias(title,alias){
   const pattern=escapeRegExp(needle).replace(/\s+/g,'\\s+');
   return new RegExp(`(^|[^\\p{L}\\p{N}])${pattern}(?=$|[^\\p{L}\\p{N}])`,'iu').test(text);
 }
+export function primaryTitleSegment(title){
+  return String(title??'').trim().split(/\s*[｜|]\s*/u,1)[0].trim();
+}
 export function validateIdentityRequest(identity,{sourceId=null}={}){
   if(!identity||typeof identity!=='object'||Array.isArray(identity))throw Error('E_TARGET_IDENTITY_REQUIRED');
   if(Object.keys(identity).some(key=>!IDENTITY_KEYS.has(key)))throw Error('E_TARGET_IDENTITY_SCHEMA');
@@ -60,7 +63,8 @@ export function existingTargetCandidates(items,post,identity){
     const title=String(item?.title??'').trim();
     if(!title)continue;
     const exact=expected&&normalizeIdentityText(title)===expected;
-    const aliasHit=aliases.some(alias=>titleMatchesAlias(title,alias));
+    // Comparison terms after the main title divider describe related foods, not the article's primary target.
+    const aliasHit=aliases.some(alias=>titleMatchesAlias(primaryTitleSegment(title),alias));
     if(exact||aliasHit)matches.push({id:String(item?.id??''),title,visibility:item?.visibility??null,exact,aliasHit});
   }
   return matches;
