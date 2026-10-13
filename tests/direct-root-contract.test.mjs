@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import YAML from 'yaml';
 import {directFixture} from './direct-source-fixture.mjs';
 import {directPreflight,assertDirectPreflight} from '../publishing/direct-preflight.mjs';
+import {hasAuthoritativePreflight} from '../publishing/direct-authoring-contract.mjs';
 import {prepareDirectSource} from '../authoring/prepare-direct-source.mjs';
 import {preservedSourceBundle} from '../authoring/preserve-direct-source.mjs';
 import {confirmGithubSource,sourceDigest} from '../authoring/source-confirmation.mjs';
@@ -39,9 +40,20 @@ test('모든 실제 제출·복구·관찰 공통 잠금은 pending 교체를 �
  for(const file of ['publish-posts.yml','update-posts.yml','direct-author-update.yml','recover-publication.yml','observe-alt-maintenance.yml']){
  const w=YAML.parse(await readFile('.github/workflows/'+file,'utf8'));const groups=[w.concurrency,...Object.values(w.jobs).map(j=>j.concurrency)].filter(c=>c&&/nhunnhun-(tistory-(mutation|update)|direct-source-dispatch)/.test(c.group));assert.ok(groups.length);for(const c of groups){assert.equal(c.queue,'max');assert.equal(c['cancel-in-progress'],false);}}
 });
-
-test('신규·수정 러너의 동일 준비 단계에 Gate 0 인증을 제공하고 SP1 우회가 없다',async()=>{
- for(const file of ['publish-posts.yml','update-posts.yml']){const w=YAML.parse(await readFile('.github/workflows/'+file,'utf8'));const job=w.jobs[file==='publish-posts.yml'?'validate':'update'];const step=job.steps.find(s=>s.run?.startsWith('node authoring/prepare-selected-source.mjs'));assert.equal(step.env.GITHUB_TOKEN,'${{ secrets.GITHUB_TOKEN }}');}
- const update=await readFile('publishing/update.mjs','utf8');assert.match(update,/if\(eligibleUpdate\(update,state\)\)\s*\{\s*assertDirectPreflight\(update\);/);
- for(const file of ['authoring/direct-dispatch.mjs','authoring/start-direct-publish.mjs','authoring/prepare-selected-source.mjs','publishing/publish.mjs','publishing/validate.mjs','publishing/validate-update.mjs'])assert.match(await readFile(file,'utf8'),/assertDirectPreflight\(/);
+test('권위 preflight 재사용은 GitHub Actions의 정확히 같은 SHA에서만 허용한다',()=>{
+ const sha='b'.repeat(40);assert.equal(hasAuthoritativePreflight({GITHUB_ACTIONS:'true',GITHUB_SHA:sha,AUTHORITATIVE_PREFLIGHT_SHA:sha}),true);assert.equal(hasAuthoritativePreflight({GITHUB_ACTIONS:'true',GITHUB_SHA:sha,AUTHORITATIVE_PREFLIGHT_SHA:'c'.repeat(40)}),false);assert.equal(hasAuthoritativePreflight({GITHUB_ACTIONS:'false',GITHUB_SHA:sha,AUTHORITATIVE_PREFLIGHT_SHA:sha}),false);
+ const old={GITHUB_ACTIONS:process.env.GITHUB_ACTIONS,GITHUB_SHA:process.env.GITHUB_SHA,AUTHORITATIVE_PREFLIGHT_SHA:process.env.AUTHORITATIVE_PREFLIGHT_SHA};
+ try{process.env.GITHUB_ACTIONS='true';process.env.GITHUB_SHA=sha;process.env.AUTHORITATIVE_PREFLIGHT_SHA=sha;const s=directFixture();s.imageReview[0].unexpected=true;assert.equal(directPreflight(s).status,'PREFLIGHT_REUSED');process.env.AUTHORITATIVE_PREFLIGHT_SHA='c'.repeat(40);assert.equal(directPreflight(s).status,'FAIL');}finally{for(const [k,v] of Object.entries(old)){if(v===undefined)delete process.env[k];else process.env[k]=v;}}
+});
+test('신규·수정 워크플로는 검증 후 동일 SHA 결과를 재사용하고 최초 검증은 단일 preflight다',async()=>{
+ const publishWorkflow=YAML.parse(await readFile('.github/workflows/publish-posts.yml','utf8'));
+ const prep=publishWorkflow.jobs.validate.steps.find(s=>s.run?.startsWith('node authoring/prepare-selected-source.mjs'));
+ const submit=publishWorkflow.jobs.publish.steps.find(s=>s.run==='pnpm run publish');
+ assert.equal(prep.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');assert.equal(submit.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');
+ const updateWorkflow=YAML.parse(await readFile('.github/workflows/update-posts.yml','utf8'));
+ const updatePrep=updateWorkflow.jobs.update.steps.find(s=>s.run?.startsWith('node authoring/prepare-selected-source.mjs'));
+ const updateSubmit=updateWorkflow.jobs.update.steps.find(s=>s.run==='pnpm run update');
+ assert.equal(updatePrep.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');assert.equal(updateSubmit.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');
+ const validate=await readFile('publishing/validate.mjs','utf8');assert.match(validate,/directPreflight\(post\)/);assert.doesNotMatch(validate,/assertImageReview\(post\)/);assert.doesNotMatch(validate,/assertDirectPreflight\(post\)/);
+ const prepare=await readFile('authoring/prepare-selected-source.mjs','utf8');assert.match(prepare,/hasAuthoritativePreflight\(\)/);assert.match(prepare,/if\(!reused\)assertDirectPreflight\(source\)/);
 });
