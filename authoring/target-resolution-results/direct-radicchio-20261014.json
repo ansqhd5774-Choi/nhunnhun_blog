@@ -1,0 +1,10 @@
+{
+  "sourceId": "direct-radicchio-20261014",
+  "requestDigest": "90032dee19659dd9decb855b891474a0df7bde439f64a0d0e4ba521acd2cc369",
+  "decision": "new",
+  "scanned": 383,
+  "candidates": [],
+  "resolvedAt": "2026-10-13T20:21:10.931Z",
+  "requestCommit": "ec498ea56f8f5f6b77124d1ee459fb3e31594ad4",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38461751328"
+}
