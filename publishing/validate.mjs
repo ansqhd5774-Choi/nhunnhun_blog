@@ -1,4 +1,4 @@
-import {assertDirectPreflight,directPreflight} from './direct-preflight.mjs';
+import {directPreflight} from './direct-preflight.mjs';
 import { assertContentStandard } from './content-standards.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import sanitizeHtml from 'sanitize-html';
