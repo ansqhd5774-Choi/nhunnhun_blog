@@ -4,6 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {checkUpdateSource} from '../publishing/update-core.mjs';
 import {renderDirectArticle} from '../publishing/direct-design.mjs';
 import {directFocusReview} from '../publishing/direct-focus.mjs';
+import {imageReviewObservation} from '../publishing/image-review.mjs';
 import {observeEmphasis} from './emphasis-summary.mjs';
 import {pairingReview} from './pairing-review.mjs';
 import {buildFoodAxisReview} from './food-axis-review.mjs';
@@ -17,8 +18,9 @@ export function prepareDirectSource(source) {
   const observation=observeEmphasis(source.bodyHtml,{category:source.category});
   const focusReview=directFocusReview(source.bodyHtml);
   const foodAxisReview=source.category==='음식'?buildFoodAxisReview(source):null;
+  const imageEditorialReview=imageReviewObservation(source);
   return {
-    report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),...(foodAxisReview?{foodAxisReview}:{}),
+    report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),imageEditorialReview,...(foodAxisReview?{foodAxisReview}:{}),
       editorialReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[
         '이 키워드를 검색한 독자가 가장 먼저 알고 싶은 핵심 질문을 6개 이내로 정리했는가?',
         '각 핵심 소제목이 독자의 질문 하나에 직접 답하며 세부 설명 때문에 별도 대주제를 불필요하게 만들지 않았는가?',
@@ -34,6 +36,7 @@ export function prepareDirectSource(source) {
         '독성·고용량·금기·응급 행동은 원칙적으로 ⑤ 부작용·주의 대상에 집중하고, 다른 축에는 그 자리의 행동 결정에 꼭 필요한 최소 주의만 남겼는가?',
         '강한 강조(mark+strong, mark+u+strong)는 확인된 긍정적 효능·핵심 성분의 건강상 역할·건강 개선을 위한 실천 행동을 우선했는가? 효과 없음·미확인·공식 권장량 없음·연구와 일상 섭취 조건 차이 같은 한계 설명은 일반 문장 또는 strong으로 두고, 응급·금기처럼 놓치면 위험한 안전 행동만 예외적으로 강하게 강조했는가?',
         '음식 글의 형광펜이 최소 하한만 겨우 채운 상태는 아닌가? 핵심 H2가 6개인 일반적인 전체 최신화 글은 보통 mark 7~9개 정도가 자연스럽지만, 숫자를 맞추기 위해 문장·효능·색을 억지로 추가하지 않았는가?',
+        '음식 이미지는 저장 전에 한 번만 실제로 열어 보고, 최소 2장은 음식 자체가 화면의 주 피사체인지 확인했는가? 밭·꽃·식당 전체·다른 음식이 중심인 사진은 보조 맥락 사진 1장 이내로 두고, 실제 확인하지 않았으면 visualChecked:true를 기록하지 않았는가?',
         '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?',
         '분야별 섭취·복용·생활 관리에 필요한 행동·양·시간·조건과 실제 안전 경고를 명확하게 표시했는가?'
       ]}},
