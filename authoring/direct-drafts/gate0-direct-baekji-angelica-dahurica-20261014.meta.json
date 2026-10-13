@@ -1,0 +1,66 @@
+{
+  "sourceId": "direct-baekji-angelica-dahurica-20261014",
+  "articleId": null,
+  "title": "백지(Angelica Dahurica Root) 효능·먹는 법｜주요 성분·궁합·주의사항·보관법",
+  "sourceSha256": "0f8fd9b140dc142cd9825fe8b5be34ad4cafe660a80fb08da1e413fe38401a77",
+  "baseMainSha": "77eb62ffeee7ecd4e5199a8eaec5677deffb101c",
+  "checks": {
+    "contentReview": "PASS",
+    "strong": 55,
+    "mark": 13,
+    "markUnderlineStrong": 2,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS",
+    "imageAttribution": "PASS",
+    "duplicateIntentReview": "NEW_CONFIRMED",
+    "visualChecked": 0,
+    "preflight": "PENDING_STANDARD_CI"
+  },
+  "researchScope": {
+    "readerIntent": "백지가 무엇인지, 어떤 성분과 실제 식품적 장점이 있는지, 어떻게 먹고 무엇과 어울리며 농축 제품은 무엇을 주의하고 어떻게 고르고 보관하는지",
+    "duplicateCheck": "target-resolution scanned 377 manager posts; decision=new; candidates=0; run=38427526434",
+    "evidenceBoundary": [
+      "백지를 Angelica dahurica의 말린 뿌리로 한정하고 다른 당귀류와 구분",
+      "쿠마린·휘발성 성분 연구와 조리용 뿌리의 실제 섭취 효과를 구분",
+      "추출물·시험관·동물 연구를 일반 음식량의 질병 예방 효과로 일반화하지 않음",
+      "약물 상호작용 자료는 고용량 백지 추출물을 사용한 동물 연구라는 조건을 본문에 명시",
+      "일반 성인의 공식 식품 섭취량을 만들지 않고 약재·연구 용량과 혼합하지 않음",
+      "정확한 보관 개월 수를 근거 없이 제시하지 않음",
+      "이미지 3개의 원출처·저작자·라이선스를 자료 출처에 직접 연결"
+    ]
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {"axis": 1, "expectedAxis": "정의·주요 성분·작용", "readerQuestion": "백지는 무엇이고 어떤 성분이 특징인가?", "heading": "1. 백지(Angelica Dahurica Root)란?｜구릿대 뿌리와 주요 성분", "firstAnswer": "백지는 구릿대의 굵은 뿌리를 건조해 사용하는 재료입니다."},
+      {"axis": 2, "expectedAxis": "핵심 효능·예방 효과", "readerQuestion": "백지의 실제 식품적 장점과 건강 연구 범위는 무엇인가?", "heading": "2. 백지의 효능·장점은?｜향신료 가치와 건강 연구 범위", "firstAnswer": "백지의 가장 확실한 식품적 장점은 독특한 향으로 육수와 고기 요리의 풍미를 보완하는 것입니다."},
+      {"axis": 3, "expectedAxis": "섭취법·권장량", "readerQuestion": "백지는 얼마나 어떻게 먹고 공식 권장량이 있는가?", "heading": "3. 백지는 얼마나·어떻게 먹을까?｜소량부터 쓰는 조리법", "firstAnswer": "백지를 식품으로 사용할 때 일반 성인을 위한 공식 하루 권장량은 따로 정해져 있지 않습니다."},
+      {"axis": 4, "expectedAxis": "궁합·상호작용", "readerQuestion": "백지는 어떤 재료와 잘 어울리고 그 이유는 무엇인가?", "heading": "4. 백지와 잘 어울리는 음식은?｜생강·팔각·육류와 풍미 궁합", "firstAnswer": "백지는 생강·팔각·대파처럼 향이 선명한 재료와 육류나 오래 끓이는 국물에 잘 어울립니다."},
+      {"axis": 5, "expectedAxis": "부작용·주의 대상", "readerQuestion": "백지를 먹을 때 무엇을 주의하고 농축 제품은 어떻게 구분하는가?", "heading": "5. 백지 부작용·주의 대상은?｜농축 추출물과 약 복용 구분", "firstAnswer": "음식에 향을 내기 위해 소량 쓰는 백지와 고농도 추출물·보충제는 같은 조건이 아닙니다."},
+      {"axis": 6, "expectedAxis": "신선도·보관·조리 팁", "readerQuestion": "좋은 백지를 어떻게 고르고 보관하는가?", "heading": "6. 좋은 백지 고르는 법·보관·조리 팁｜건조 상태와 향 확인", "firstAnswer": "말린 백지는 눅눅하지 않고 곰팡이 흔적이 없으며 특유의 향이 남아 있는 제품을 고르는 것이 기본입니다."}
+    ],
+    "balanceReview": {
+      "status": "AUTHOR_REVIEW_COMPLETED",
+      "automatedSemanticVerdict": false,
+      "questions": [
+        "도입·핵심 요약이 백지의 정체·향신료 가치·활용을 먼저 보여주는가? PASS",
+        "② 효능 첫 문단이 확인된 식품 가치를 먼저 설명하고 추출물 근거를 분리하는가? PASS",
+        "제한·근거 부족 문구를 mark 또는 최고강조로 처리하지 않았는가? PASS",
+        "약물 상호작용·농축물·응급 주의를 ⑤ 중심으로 모았는가? PASS",
+        "궁합을 건강 시너지가 아닌 실제 풍미 조합으로 설명했는가? PASS",
+        "이미지 3개의 원출처·저작자·라이선스 링크가 자료 출처에 포함되어 있는가? PASS"
+      ]
+    }
+  },
+  "gate0Commit": "8da71584d87c8da75eaac897e31bda6a3e12a451",
+  "sourceCommit": null,
+  "githubSourceStatus": "NOT_WRITTEN",
+  "runStatus": "NOT_STARTED",
+  "runUrl": null,
+  "publicStatus": "NOT_STARTED",
+  "publicUrl": null,
+  "ledger": "pending"
+}
