@@ -16,6 +16,7 @@ on:
       - publishing/publish.mjs
       - publishing/update.mjs
       - publishing/auth-preflight.mjs
+      - publishing/direct-design.mjs
       - publishing/direct-public-contract.mjs
       - publishing/verify-published-public.mjs
       - publishing/verify-updated-public.mjs
@@ -42,6 +43,7 @@ on:
       - publishing/publish.mjs
       - publishing/update.mjs
       - publishing/auth-preflight.mjs
+      - publishing/direct-design.mjs
       - publishing/direct-public-contract.mjs
       - publishing/verify-published-public.mjs
       - publishing/verify-updated-public.mjs
