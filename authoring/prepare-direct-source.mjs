@@ -14,7 +14,7 @@ import {directPreflight} from '../publishing/direct-preflight.mjs';
 export function prepareDirectSource(source) {
   if(source.articleId)checkUpdateSource(source,source.id+'.json');
   else {checkPost(source,source.id+'.json');checkPublishHtml(source);}
-  const observation=observeEmphasis(source.bodyHtml);
+  const observation=observeEmphasis(source.bodyHtml,{category:source.category});
   const focusReview=directFocusReview(source.bodyHtml);
   const foodAxisReview=source.category==='음식'?buildFoodAxisReview(source):null;
   return {
@@ -33,6 +33,7 @@ export function prepareDirectSource(source) {
         '도입·②효능·③섭취·⑤주의·FAQ·핵심 정리에서 사람 연구 부족·미확인·공식 권장량 없음·고용량 위험 같은 동일 의미를 반복하지 않았는가?',
         '독성·고용량·금기·응급 행동은 원칙적으로 ⑤ 부작용·주의 대상에 집중하고, 다른 축에는 그 자리의 행동 결정에 꼭 필요한 최소 주의만 남겼는가?',
         '강한 강조(mark+strong, mark+u+strong)는 확인된 긍정적 효능·핵심 성분의 건강상 역할·건강 개선을 위한 실천 행동을 우선했는가? 효과 없음·미확인·공식 권장량 없음·연구와 일상 섭취 조건 차이 같은 한계 설명은 일반 문장 또는 strong으로 두고, 응급·금기처럼 놓치면 위험한 안전 행동만 예외적으로 강하게 강조했는가?',
+        '음식 글의 형광펜이 최소 하한만 겨우 채운 상태는 아닌가? 핵심 H2가 6개인 일반적인 전체 최신화 글은 보통 mark 7~9개 정도가 자연스럽지만, 숫자를 맞추기 위해 문장·효능·색을 억지로 추가하지 않았는가?',
         '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?',
         '분야별 섭취·복용·생활 관리에 필요한 행동·양·시간·조건과 실제 안전 경고를 명확하게 표시했는가?'
       ]}},
