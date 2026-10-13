@@ -50,9 +50,9 @@ test('varied renderer assigns layouts by section and preserves emphasis and imag
  assert.ok(out.includes('<mark><strong>중요 수치</strong></mark>'));assert.equal((out.match(/<img\b/g)||[]).length,3);
  assert.ok(out.includes('font-size:23px'));assert.ok(out.includes('@media(max-width:600px)'));
 });
-test('workflow starts only from explicit prepared-source dispatch with no AI generation',async()=>{
+test('workflow starts only from prepared-source or source-preserving retry dispatch with no AI generation',async()=>{
  const text=await readFile('.github/workflows/direct-author-update.yml','utf8');const workflow=YAML.parse(text.replace(/^\uFEFF/,''));
- assert.deepEqual(Object.keys(workflow.on).sort(),['push','workflow_dispatch']);assert.deepEqual(workflow.on.push.branches,['main']);assert.deepEqual(workflow.on.push.paths,['updates/direct-*.json']);assert.ok(!/OLLAMA_HOST|update-producer|api\/chat|schedule:/.test(text));
+ assert.deepEqual(Object.keys(workflow.on).sort(),['push','workflow_dispatch']);assert.deepEqual(workflow.on.push.branches,['main']);assert.deepEqual(workflow.on.push.paths,['updates/direct-*.json','automation/update-retry/direct-*.txt']);assert.ok(!/OLLAMA_HOST|update-producer|api\/chat|schedule:/.test(text));
  assert.equal(workflow.jobs.dispatch['runs-on'],'windows-latest');
  const checkout=workflow.jobs.dispatch.steps.find(step=>step.uses==='actions/checkout@v5');
  assert.equal(checkout.with.ref,'${{ github.sha }}');assert.equal(checkout.with['persist-credentials'],false);
