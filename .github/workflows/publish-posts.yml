@@ -44,29 +44,33 @@ jobs:
         env:
           MUTATION_REQUESTED: ${{ inputs.publish }}
       - uses: ./.github/actions/setup-node-pnpm
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
         with:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
       - name: Target resolution proof — fail fast before content validation
         if: steps.mutation-gate.outputs.should_mutate == 'true'
         run: node publishing/target-resolution-proof.mjs
         env:
           PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
       - name: Diagnose self-hosted allocation
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
         run: node publishing/runner-gate.mjs --queue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Content standard for changed source
+        if: steps.mutation-gate.outputs.should_mutate == 'true' && github.event_name == 'push'
         run: pnpm run validate:content:changed
-        if: github.event_name == 'push'
         env:
           CONTENT_BASE_SHA: ${{ github.event.before }}
           CONTENT_HEAD_SHA: ${{ github.sha }}
       - run: pnpm run validate:content
-        if: github.event_name == 'workflow_dispatch'
+        if: steps.mutation-gate.outputs.should_mutate == 'true' && github.event_name == 'workflow_dispatch'
       - name: Revalidate publish source at mutation boundary
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
         run: pnpm validate
         env:
           PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
