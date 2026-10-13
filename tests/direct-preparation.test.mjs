@@ -31,6 +31,8 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.observedCoreH2Count,6);
   assert.equal(review.axes.length,6);
   assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
+  assert.match(review.axes[0].readerQuestion,/일반 영양표 외에/);
+  assert.match(review.axes[0].reviewQuestion,/일반 열량·비타민·무기질 표에 묻히게/);
   assert.equal(review.axes[1].heading,'2. 효능은 어디까지 확인됐을까?');
   assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
   assert.equal(review.axes[2].heading,'3. 얼마나 먹을까?');
