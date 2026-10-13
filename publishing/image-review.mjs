@@ -2,7 +2,7 @@ import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 import {isRejectedHeroSource} from './rejected-hero-sources.mjs';
 const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
-const COMPOSITIONS=new Set(['closeup','cross-section','context','serving','process','diagram']);
+const COMPOSITIONS=new Set(['closeup','cross-section','context','serving','field','process','diagram']);
 const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
 const NUTRIENT_ABSTRACT_HERO=/(?:structure|skeletal|formula|molecule|molecular|crystal|kristall|microscop|polarized|polarised|polariseeritud|chemical[_ -]?structure)/i;
 function imageTags(html=''){return [...String(html).matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]);}
