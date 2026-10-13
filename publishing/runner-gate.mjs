@@ -2,16 +2,23 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 export const RUNNER_LABELS = ['self-hosted', 'windows', 'x64', 'tistory-publisher'];
+const SOURCE_ID_RE='([a-z0-9][a-z0-9-]{2,79})';
+function sourceOwnedArtifactId(path){
+  const standard=path.match(new RegExp('^(?:posts|updates|content-reviews/(?:posts|updates)|publishing/(?:state|update-state)|authoring/(?:target-resolution|target-resolution-results))/'+SOURCE_ID_RE+'\\.json$'));
+  if(standard)return standard[1];
+  const gate0=path.match(new RegExp('^authoring/direct-drafts/gate0-'+SOURCE_ID_RE+'(?:\\.meta)?\\.json$'));
+  return gate0?.[1]??null;
+}
 export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths, sourceId) {
   if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha) throw new Error('BLOCKED_SOURCE_DRIFT');
   if(checkoutSha===remoteSha)return;
-  // Documentation and other articles' update records may advance. The selected
-  // source/review, runtime, dependencies, and unknown paths still fail closed.
+  // Another article may advance through standard source-owned artifacts while this
+  // mutation waits. The selected source plus shared runtime/workflow/dependencies remain frozen.
   const unrelated=p=>{
     if(p.startsWith('docs/')||p==='AGENTS.md'||p==='README.md')return true;
     if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(sourceId??''))return false;
-    const match=p.match(/^(?:updates|content-reviews\/updates|publishing\/update-state|authoring\/target-resolution-results)\/([a-z0-9][a-z0-9-]{2,79})\.json$/);
-    return !!match&&match[1]!==sourceId;
+    const artifactId=sourceOwnedArtifactId(p);
+    return artifactId!==null&&artifactId!==sourceId;
   };
   if(!Array.isArray(changedPaths)||!changedPaths.length||changedPaths.some(p=>!unrelated(p)))throw new Error('BLOCKED_SOURCE_DRIFT');
 }
