@@ -8,6 +8,7 @@ import {hasAuthoritativePreflight} from '../publishing/direct-authoring-contract
 import {prepareDirectSource} from '../authoring/prepare-direct-source.mjs';
 import {preservedSourceBundle} from '../authoring/preserve-direct-source.mjs';
 import {confirmGithubSource,sourceDigest} from '../authoring/source-confirmation.mjs';
+import {directDispatchErrorMessage} from '../authoring/direct-dispatch.mjs';
 const commit='a'.repeat(40);
 const args=source=>({source,commitSha:commit,token:'fixture',fetcher:async url=>{assert.ok(url.endsWith('?ref='+commit));return {ok:true,json:async()=>({type:'file',encoding:'base64',content:Buffer.from(JSON.stringify(source)).toString('base64')})}}});
 test('네 카테고리 저장 전·러너 공통 preflight 결과는 같고 원고를 변경하지 않는다',()=>{
@@ -59,4 +60,10 @@ test('신규·수정 워크플로는 검증 후 동일 SHA 결과를 재사용�
  assert.equal(updatePrep.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');assert.equal(updateSubmit.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');
  const validate=await readFile('publishing/validate.mjs','utf8');assert.match(validate,/directPreflight\(post\)/);assert.doesNotMatch(validate,/assertImageReview\(post\)/);assert.doesNotMatch(validate,/assertDirectPreflight\(post\)/);
  const prepare=await readFile('authoring/prepare-selected-source.mjs','utf8');assert.match(prepare,/hasAuthoritativePreflight\(\)/);assert.match(prepare,/if\(!reused\)assertDirectPreflight\(source\)/);
+});
+test('direct update dispatch는 안전한 상세 오류를 첫 실패에서 보존하고 임의 예외는 숨긴다',()=>{
+ assert.equal(directDispatchErrorMessage(Error('E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags')),'E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags');
+ assert.equal(directDispatchErrorMessage(Error('E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags,publish')),'E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags,publish');
+ assert.equal(directDispatchErrorMessage(Error('E_DIRECT_SOURCE_ID')),'E_DIRECT_SOURCE_ID');
+ assert.equal(directDispatchErrorMessage(Error('sensitive token=abc')),'E_DIRECT_DISPATCH_FAILED');
 });

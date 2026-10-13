@@ -71,6 +71,15 @@ export async function dispatchDirectSource({sourceId,commitSha,token,root=proces
   return dispatch({token,commitSha,sourceId});
 }
 
+// Preserve the exact actionable contract error without leaking arbitrary exception text.
+// This lets one failed run identify unsupported fields such as `tags` immediately.
+export function directDispatchErrorMessage(error){
+  const message=typeof error?.message==='string'?error.message:'';
+  return /^E_[A-Z0-9_]+(?::[A-Za-z0-9_.-]+(?:,[A-Za-z0-9_.-]+)*)?$/.test(message)
+    ? message
+    : 'E_DIRECT_DISPATCH_FAILED';
+}
+
 async function main(){
   const eventName=process.env.GITHUB_EVENT_NAME??'workflow_dispatch';
   let eventPayload=null;
@@ -83,4 +92,4 @@ async function main(){
   console.log(result.alreadyUpdated?'DIRECT_SOURCE_ALREADY_UPDATED':'DIRECT_SOURCE_DISPATCHED',sourceId);
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)
-  main().catch(e=>{console.error(/^E_[A-Z0-9_]+$/.test(e.message)?e.message:'E_DIRECT_DISPATCH_FAILED');process.exitCode=1;});
+  main().catch(e=>{console.error(directDispatchErrorMessage(e));process.exitCode=1;});
