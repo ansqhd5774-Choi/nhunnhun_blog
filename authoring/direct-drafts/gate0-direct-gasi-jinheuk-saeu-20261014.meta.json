@@ -1,0 +1,59 @@
+{
+  "sourceId": "direct-gasi-jinheuk-saeu-20261014",
+  "articleId": null,
+  "title": "가시진흙새우란?｜동해보리새우 차이·먹는 법·제철·보관법",
+  "sourceSha256": "cdefc57798febfb48c9810452b507074b13b9c0639b5e3752be670dba04710aa",
+  "baseMainSha": "fbf36584a424b7953d3c9828be74fa9753001e79",
+  "checks": {
+    "contentReview": "PASS",
+    "strong": 46,
+    "mark": 7,
+    "markUnderlineStrong": 2,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS",
+    "imageAttribution": "PASS",
+    "duplicateIntentReview": "NEW_INTENT",
+    "visualChecked": 0,
+    "preflight": "PENDING_AUTHORITATIVE_WORKFLOW"
+  },
+  "researchScope": {
+    "readerIntent": "가시진흙새우가 어떤 새우인지, 동해보리새우·보리새우와 무엇이 다른지, 언제 먹기 좋은지, 어떻게 먹고 보관하는지 알고 싶다.",
+    "duplicateCheck": "target-resolution scanned 386 manager posts; decision=new; candidates=0; run=38481388948",
+    "evidenceBoundary": [
+      "종의 학명·분류·국내 분포·서식 수심은 국립해양생물자원관과 국립생물자원관 자료 범위로 제한",
+      "2026년 식품 원료 등재는 식품의약품안전처와 국립수산과학원 공식 자료로 확인",
+      "동해보리새우·보리새우라는 지역 유통명은 국내 보도의 시장 용례로만 설명하고 표준 종명과 구분",
+      "전국 공통 제철을 확정할 공식 자료가 없어 임의의 월 범위를 제철로 만들지 않음",
+      "가시진흙새우 종 자체의 공개 표준 100g 영양성분표를 확인하지 못해 다른 새우의 수치를 대입하지 않음",
+      "냉장·해동·가열 기준은 일반 해산물 안전 지침으로 명시해 적용",
+      "Wikimedia Commons에서 정확한 가시진흙새우 사진을 확인하지 못해 본문 이미지는 새우류 참고 사진으로 명시하고 정확한 종 모습은 공식 종 페이지로 연결"
+    ]
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {"axis": 1, "expectedAxis": "정의·주요 성분·작용", "readerQuestion": "가시진흙새우는 어떤 종이고 동해보리새우·보리새우와 무엇이 다르며 제철은 언제인가?", "heading": "1. 가시진흙새우란?｜동해보리새우·보리새우 차이와 제철", "firstAnswer": "가시진흙새우는 자주새우과 진흙새우속에 속하는 별도 종입니다."},
+      {"axis": 2, "expectedAxis": "핵심 효능·예방 효과", "readerQuestion": "가시진흙새우의 확인된 영양·식품 가치는 무엇인가?", "heading": "2. 가시진흙새우의 영양·장점은?｜확인된 범위만 보기", "firstAnswer": "이 종은 2026년 식품 원료로 공식 등재됐다는 점이 가장 확실한 식품학적 변화입니다."},
+      {"axis": 3, "expectedAxis": "섭취법·권장량", "readerQuestion": "가시진흙새우는 어떻게 먹고 얼마나 먹는가?", "heading": "3. 가시진흙새우 먹는 법｜회·숙회·구이와 먹는 양", "firstAnswer": "가시진흙새우에는 일반 성인을 위한 공식 하루 권장 섭취량이 없습니다."},
+      {"axis": 4, "expectedAxis": "궁합·상호작용", "readerQuestion": "가시진흙새우는 어떤 음식과 함께 먹으면 좋은가?", "heading": "4. 가시진흙새우와 잘 어울리는 음식은?｜레몬·마늘·채소", "firstAnswer": "가시진흙새우의 궁합은 검증되지 않은 ‘영양 시너지’보다 맛과 한 끼 균형으로 보는 것이 정확합니다."},
+      {"axis": 5, "expectedAxis": "부작용·주의 대상", "readerQuestion": "알레르기·날것·선도에서 무엇을 주의해야 하는가?", "heading": "5. 먹을 때 주의할 점｜갑각류 알레르기·날것·선도", "firstAnswer": "가시진흙새우도 새우이므로 갑각류 알레르기가 있는 사람은 피해야 합니다."},
+      {"axis": 6, "expectedAxis": "신선도·보관·조리 팁", "readerQuestion": "어떻게 고르고 냉장·냉동·해동·가열해야 하는가?", "heading": "6. 고르는 법·보관법｜산지 구매부터 냉장·냉동까지", "firstAnswer": "가시진흙새우는 산지에서 선도가 좋을 때 구매해 빨리 먹는 것이 핵심입니다."}
+    ],
+    "balanceReview": {
+      "status": "AUTHOR_REVIEW_COMPLETED",
+      "automatedSemanticVerdict": false,
+      "questions": [
+        "도입·제목이 종의 정체·이름 혼동·제철 질문에 직접 답하는가? PASS",
+        "②에서 다른 새우의 영양 수치를 가시진흙새우 수치로 만들지 않았는가? PASS",
+        "③에서 공식 근거 없는 권장 섭취 g 수치를 만들지 않았는가? PASS",
+        "④에서 맛·식사 조합과 임상 시너지를 구분했는가? PASS",
+        "⑤에서 갑각류 알레르기·날것 안전 행동을 유지했는가? PASS",
+        "⑥에서 냉장 온도·2일·해동·가열 행동을 구체적으로 제시했는가? PASS",
+        "이미지 3개의 원출처·저작자·라이선스를 연결하고 정확한 종 사진이 아닌 참고 사진임을 명시했는가? PASS"
+      ]
+    }
+  }
+}
