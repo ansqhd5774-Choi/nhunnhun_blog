@@ -1,4 +1,4 @@
-import { readFileSync, appendFileSync } from 'node:fs';
+import { readFileSync, appendFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 const kind = process.argv[2];
@@ -42,6 +42,19 @@ if (eventName === 'workflow_dispatch') {
       sourceId = retrySourceId;
       shouldMutate = true;
       console.log(`MUTATION_GATE_RETRY_SOURCE=${sourceId}`);
+    }
+
+    // A source already recorded as published is terminal for the new-post lane.
+    // Further article changes must use updates/, so do not allocate the publisher runner again.
+    if(shouldMutate && sourceId) {
+      const statePath=`publishing/state/${sourceId}.json`;
+      if(existsSync(statePath)) {
+        const state=JSON.parse(readFileSync(statePath,'utf8'));
+        if(state.phase==='published') {
+          shouldMutate=false;
+          console.log(`MUTATION_GATE_ALREADY_PUBLISHED=${sourceId}`);
+        }
+      }
     }
   }
 }
