@@ -1,0 +1,18 @@
+{
+  "sourceId": "direct-cumin-20261014",
+  "requestDigest": "105f5ddc2f205cc1fa93dc03291e759a5a5a22e4f9f656d23ab2d892efb33c18",
+  "decision": "existing_candidate",
+  "scanned": 378,
+  "candidates": [
+    {
+      "id": "417",
+      "title": "캐러웨이 효능·먹는 법｜커민·회향 차이·부작용",
+      "visibility": "PUBLIC",
+      "exact": false,
+      "aliasHit": true
+    }
+  ],
+  "resolvedAt": "2026-10-13T16:46:56.877Z",
+  "requestCommit": "b6a8abf5e331400df7f80d56f30f7c8691693826",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38433164319"
+}
