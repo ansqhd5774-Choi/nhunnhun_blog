@@ -2,7 +2,7 @@
   "sourceId": "direct-gasi-jinheuk-saeu-20261014",
   "articleId": null,
   "title": "가시진흙새우란?｜동해보리새우 차이·먹는 법·제철·보관법",
-  "sourceSha256": "cdefc57798febfb48c9810452b507074b13b9c0639b5e3752be670dba04710aa",
+  "sourceSha256": "ec5debaf7218f0dc40dbcbe2cb5d469e591fce71b1f7e37a71d673e42d3c1ddb",
   "baseMainSha": "fbf36584a424b7953d3c9828be74fa9753001e79",
   "checks": {
     "contentReview": "PASS",
@@ -15,7 +15,8 @@
     "imageAttribution": "PASS",
     "duplicateIntentReview": "NEW_INTENT",
     "visualChecked": 0,
-    "preflight": "PENDING_AUTHORITATIVE_WORKFLOW"
+    "preflight": "RETRY_AFTER_E_POST_SCHEMA",
+    "schemaCorrection": "replaced unsupported publish/publishApproved/dryRun with status=ready, approved=true"
   },
   "researchScope": {
     "readerIntent": "가시진흙새우가 어떤 새우인지, 동해보리새우·보리새우와 무엇이 다른지, 언제 먹기 좋은지, 어떻게 먹고 보관하는지 알고 싶다.",
