@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "9cbc3c5c245fcd8cbaa4288ef21ad6ba786ad2ded36de4e59067adbd0d46ebc5",
-  "sourceCommit": "e7fa51839a9b62bebbb5140ea90a867208e4b76d",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-13T23:13:30.096Z",
   "url": "https://nhunnhun.tistory.com/440",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-13T23:13:58.396Z",
+  "sourceCommit": "e7fa51839a9b62bebbb5140ea90a867208e4b76d",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38482622967",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-gasi-jinheuk-saeu-20261014",
+    "url": "https://nhunnhun.tistory.com/440",
+    "checkedAt": "2026-10-13T23:13:58.396Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
