@@ -69,6 +69,15 @@
 9. 파일 부재·조회 제약·내용 불일치를 각각 구분한다.
 10. 재개할 때는 같은 source의 저장·원장·실행 상태부터 확인하고 근거 변화가 없으면 조사를 반복하지 않는다.
 
+## 신규/기존 source 스키마 분리
+
+- 신규 글 `posts/*.json`과 기존 글 수정 `updates/direct-*.json`은 같은 JSON 스키마가 아니다. 신규 원고 필드를 기존 수정 원고에 그대로 복사하지 않는다.
+- 기존 수정 source의 일반 허용 키는 `id`, `articleId`, `targetUrl`, `expectedCurrentTitle`, `title`, `representativeImageUrl`, `imageReview`, `bodyHtml`, `status`, `approved`, `category`, `contentStandard`, `affiliateProducts`다. 실제 기준은 `publishing/update-core.mjs` 한 곳을 원본으로 삼는다.
+- `tags`는 기존 수정 source의 허용 키가 아니다. 현재 수정 러너는 기존 티스토리 태그를 변경하지 않고 그대로 보존하므로 `updates/direct-*.json`에 `tags`를 넣지 않는다.
+- 태그 자체를 바꾸는 기능이 필요하면 별도 명시 요청과 지원되는 mutation 경로를 먼저 정의한다. 기존 글 전체 최신화 과정에서 임의로 태그 변경 기능을 섞지 않는다.
+- 스키마 오류는 기존 `checkUpdateSource()` 한 번으로 판정한다. 같은 내용을 확인하는 별도 게이트나 재검사 루프를 추가하지 않는다.
+- 허용되지 않은 키가 있으면 `E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:<키>`로 해당 키를 즉시 표시하고, source를 한 번 수정한 뒤 표준 실행을 이어간다.
+
 ## 실행·대기열
 
 - 신규: `posts/*.json → publish-posts.yml`.
