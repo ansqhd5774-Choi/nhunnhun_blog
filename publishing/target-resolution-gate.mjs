@@ -64,12 +64,12 @@ export function existingTargetCandidates(items,post,identity){
   }
   return matches;
 }
-export async function fetchManagedPosts(page,{maxPages=MAX_MANAGER_PAGES}={}){
-  const result=await page.evaluate(async ({maxPages})=>{
+export async function fetchManagedPosts(page,{maxPages=MAX_MANAGER_PAGES,searchKeyword=''}={}){
+  const result=await page.evaluate(async ({maxPages,searchKeyword})=>{
     try{
       const out=[];
       for(let pageNo=1;pageNo<=maxPages;pageNo++){
-        const params=new URLSearchParams({category:'-3',page:String(pageNo),searchKeyword:'',searchType:'title',visibility:'all'});
+        const params=new URLSearchParams({category:'-3',page:String(pageNo),searchKeyword,searchType:'title',visibility:'all'});
         const response=await fetch('/manage/posts.json?'+params.toString(),{credentials:'include',headers:{Accept:'application/json'}});
         if(response.status!==200)return {errorCode:'E_TARGET_MANAGER_HTTP',status:response.status};
         let data;try{data=await response.json();}catch{return {errorCode:'E_TARGET_MANAGER_JSON'};}
@@ -81,7 +81,7 @@ export async function fetchManagedPosts(page,{maxPages=MAX_MANAGER_PAGES}={}){
       }
       return {items:out};
     }catch{return {errorCode:'E_TARGET_MANAGER_FETCH'};}
-  },{maxPages});
+  },{maxPages,searchKeyword});
   if(result?.errorCode)throw Error(result.errorCode);
   const byId=new Map();
   for(const item of result?.items??[]){if(item?.id!=null)byId.set(String(item.id),item);}
@@ -120,7 +120,11 @@ export async function runTargetResolutionGate({root=process.cwd(),sourceId=proce
     page=await connection.context.newPage();
     await page.goto(`${BLOG}/manage/posts`,{waitUntil:'domcontentloaded',timeout:30000});
     await assertTistoryAuthenticated(page);
-    const items=await fetchManagedPosts(page);
+    // Non-food direct sources have no alias identity file, so their runtime gate only checks exact-title duplicates.
+    // Use Tistory's title search for the same exact-title decision instead of scanning up to 100 manager pages.
+    const items=identity
+      ? await fetchManagedPosts(page)
+      : await fetchManagedPosts(page,{maxPages:10,searchKeyword:String(post.title||'').trim()});
     const candidates=existingTargetCandidates(items,post,identity);
     if(candidates.length){
       console.log('TARGET_RESOLUTION_CANDIDATES '+JSON.stringify({sourceId:post.id,topic:identity?.topic??null,count:candidates.length,candidates:candidates.slice(0,12)}));
