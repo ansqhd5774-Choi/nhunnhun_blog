@@ -10,7 +10,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import YAML from 'yaml';
 import {renderEditorialPost} from '../publishing/editorial.mjs';
-import {checkUpdateSource} from '../publishing/update-core.mjs';
+import {checkUpdateSource,updateFingerprint} from '../publishing/update-core.mjs';
 import {dispatchDirectSource} from '../authoring/direct-dispatch.mjs';
 import {startDirectPublish} from '../authoring/start-direct-publish.mjs';
 const source=directFixture();
@@ -68,6 +68,10 @@ test('direct dispatch requires existing approved source and calls existing publi
  await mkdir(join(root,'publishing','update-state'),{recursive:true});
  await writeFile(join(root,'publishing','update-state',source.id+'.json'),JSON.stringify({phase:'submitting'}));
  await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_ALREADY_ATTEMPTED/);assert.equal(calls,1);
+ await writeFile(join(root,'publishing','update-state',source.id+'.json'),JSON.stringify({phase:'updated',fingerprint:updateFingerprint(source),url:source.targetUrl}));
+ const already=await dispatchDirectSource({root,sourceId:source.id,dispatch});assert.equal(already.alreadyUpdated,true);assert.equal(calls,1);
+ await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify({...source,title:source.title+' 수정'}));
+ await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_DIRECT_FINALIZED_SOURCE_MUTATION/);assert.equal(calls,1);
  await writeFile(join(root,'updates',source.id+'.json'),JSON.stringify({...source,approved:false}));await assert.rejects(dispatchDirectSource({root,sourceId:source.id,dispatch}),/E_UPDATE_APPROVAL/);assert.equal(calls,1);
  await assert.rejects(dispatchDirectSource({root,sourceId:'auto-179-test',dispatch}),/E_DIRECT_SOURCE_ID/);
  }finally{await rm(root,{recursive:true,force:true});}
