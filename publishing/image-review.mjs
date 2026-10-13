@@ -1,4 +1,4 @@
-import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
+import {DIRECT_AUTHORING_CONTRACT,hasAuthoritativePreflight} from './direct-authoring-contract.mjs';
 import {isRejectedHeroSource} from './rejected-hero-sources.mjs';
 const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
@@ -18,6 +18,7 @@ function isAbstractNutrientHero(item,review){
   return NUTRIENT_ABSTRACT_HERO.test(pathname);
 }
 export function assertImageReview(item){
+  if(hasAuthoritativePreflight())return item;
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
   if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||review[0]?.src!==item.representativeImageUrl)throw new Error('E_IMAGE_HERO_REVIEW');
