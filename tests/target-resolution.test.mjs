@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import YAML from 'yaml';
-import {titleMatchesAlias,validateCreateIdentity,validateIdentityRequest,identityDigest,validateResolutionProof,existingTargetCandidates} from '../publishing/target-resolution-gate.mjs';
+import {titleMatchesAlias,validateCreateIdentity,validateIdentityRequest,identityDigest,validateResolutionProof,existingTargetCandidates,closeManagedPage} from '../publishing/target-resolution-gate.mjs';
 
 test('food target identity is mandatory for new direct SP1 sources',()=>{
   const post={id:'direct-chenpi-20261013',category:'음식',contentStandard:'SP1',title:'진피 효능과 먹는 법'};
@@ -34,6 +34,12 @@ test('existing candidates include exact title and reviewed topic aliases',()=>{
     {id:13,title:'진피 효능과 먹는 법',visibility:'PRIVATE'}
   ];
   assert.deepEqual(existingTargetCandidates(items,post,identity).map(x=>x.id),['12','13']);
+});
+
+test('manager page cleanup is bounded when Playwright close never settles',async()=>{
+  let calls=0;
+  await closeManagedPage({close:()=>{calls+=1;return new Promise(()=>{});}},{timeoutMs:5});
+  assert.equal(calls,1);
 });
 
 test('pre-authoring resolver workflow is read-only to Tistory and persists decision evidence',()=>{
