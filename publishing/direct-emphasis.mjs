@@ -17,6 +17,7 @@ export function assertDirectEmphasis(source) {
   if(!emphasized)throw Error('E_DIRECT_EMPHASIS_MISSING');
 }
 
+const OFFICIAL_INTAKE_ABSENCE_PATTERN=/(?:공식\s*)?(?:하루\s*)?(?:권장량|권장\s*섭취량|상한)(?:이|가|은|는)?[^.!?]{0,35}(?:없|정해(?:지지|져\s*있지)\s*않|마련되지\s*않)/u;
 const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
   /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
@@ -27,7 +28,7 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/u,
   /(?:(?:비교\s*가능한)\s*)?(?:공식\s*)?(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
   /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|아닙|없)/u,
-  /(?:공식\s*)?(?:하루\s*)?(?:권장량|권장\s*섭취량|상한)(?:이|가|은|는)?[^.!?]{0,35}(?:없|정해(?:지지|져\s*있지)\s*않|마련되지\s*않)/u,
+  OFFICIAL_INTAKE_ABSENCE_PATTERN,
   /(?:유의하게|뚜렷하게)[^.!?]{0,35}(?:달라지지\s*않|변하지\s*않|개선되지\s*않)/u,
   /(?:같은|동일한)\s*(?:효과\s*크기|섭취\s*기준|용량|조건)[^.!?]{0,30}(?:(?:계산|판단|적용)하지\s*않|아니|않|다(?:르|릅))/u,
   /(?:보충|농축|추출|오일)[^.!?]{0,70}(?:조리용|일상|평소)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다(?:르|릅)/u,
@@ -67,9 +68,9 @@ export function assertDirectSubmissionEmphasis(source) {
       if(underlined)underlineCount++;
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
-      // Negative/limitation facts are allowed when explicitly given a caution/negative tone.
-      // Untoned/positive highlights remain protected from becoming warning-heavy by accident.
-      if(isLimitation&&!NEGATIVE_TONES.has(tone))throw Error('E_DIRECT_EMPHASIS_LIMITATION');
+      const isNeutralIntakeInfo=tone==='info'&&OFFICIAL_INTAKE_ABSENCE_PATTERN.test(text);
+      // Negative/evidence-limit facts require caution/negative tones. A missing official intake standard is neutral dosing information and may use info.
+      if(isLimitation&&!NEGATIVE_TONES.has(tone)&&!isNeutralIntakeInfo)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
     }
     for(const child of node.children??[])visit(child);
