@@ -7,7 +7,9 @@ function sourceOwnedArtifactId(path){
   const standard=path.match(new RegExp('^(?:posts|updates|content-reviews/(?:posts|updates)|publishing/(?:state|update-state)|authoring/(?:target-resolution|target-resolution-results))/'+SOURCE_ID_RE+'\\.json$'));
   if(standard)return standard[1];
   const gate0=path.match(new RegExp('^authoring/direct-drafts/gate0-'+SOURCE_ID_RE+'(?:\\.meta)?\\.json$'));
-  return gate0?.[1]??null;
+  if(gate0)return gate0[1];
+  const retry=path.match(new RegExp('^automation/update-retry/'+SOURCE_ID_RE+'\\.txt$'));
+  return retry?.[1]??null;
 }
 export function assertSourceIdentity(workflowSha, checkoutSha, remoteSha, changedPaths, sourceId) {
   if (![workflowSha, checkoutSha, remoteSha].every(s => /^[a-f0-9]{40}$/.test(s || '')) || workflowSha !== checkoutSha) throw new Error('BLOCKED_SOURCE_DRIFT');
