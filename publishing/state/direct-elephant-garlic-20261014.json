@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "c376c675e2a3d894e0ece9f60efa8032e7a3c6e4fbe6b3ac9b055cbdc4cbe07f",
-  "sourceCommit": "e920868fcb085a797c302fab09e658a179503ab3",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-13T21:00:29.720Z",
   "url": "https://nhunnhun.tistory.com/438",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-13T21:01:00.051Z",
+  "sourceCommit": "e920868fcb085a797c302fab09e658a179503ab3",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38467021561",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-elephant-garlic-20261014",
+    "url": "https://nhunnhun.tistory.com/438",
+    "checkedAt": "2026-10-13T21:01:00.051Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
