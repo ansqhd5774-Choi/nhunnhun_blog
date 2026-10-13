@@ -2,8 +2,8 @@
   "sourceId": "direct-tsaoko-20261013",
   "articleId": null,
   "title": "초과(Tsaoko)란? 향·주요 성분·먹는 법·궁합·주의사항·보관법",
-  "sourceSha256": "aece03cdb32c55660e8df9b7190ed28d3ab27098b71510c522a93baa1ad10440",
-  "baseMainSha": "cfba86566401a1cea9102632d4871081de280565",
+  "sourceSha256": "7e5d15b0e3a95e8fa86553841102ba2eca023d75f079b22873419c502ebadbc5",
+  "baseMainSha": "c864546ed9f7862d7e4d35b45a975977eb06a789",
   "checks": {
     "contentReview": "PASS",
     "strong": 60,
@@ -15,7 +15,7 @@
     "imageAttribution": "PASS",
     "duplicateIntentReview": "NEW_INTENT",
     "visualChecked": 0,
-    "preflight": "NOT_RUN"
+    "preflight": "CI_PASS"
   },
   "researchScope": {
     "readerIntent": "초과(Tsaoko)가 무엇인지, 어떤 향과 성분이 있는지, 건강 연구의 범위는 어디까지인지, 요리에 어떻게 쓰고 어떤 향신료와 어울리며 무엇을 주의하고 어떻게 보관하는지",
@@ -55,7 +55,7 @@
       ]
     }
   },
-  "gate0Commit": "d93fb089200c8b4fa331a9cc02723539b50e0c80",
+  "gate0Commit": "8f6898b1b49710e08e0a98faeac308173768d178",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
   "runStatus": "NOT_STARTED",
