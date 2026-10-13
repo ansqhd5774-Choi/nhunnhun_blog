@@ -28,33 +28,28 @@ test('new submission rejects mixed valid and standalone marks before publication
   }
 });
 
-test('untagged positive-style highlights still reject evidence-limit disclaimers',()=>{
+test('limitation and no-effect statements stay plain or bold instead of highlighted',()=>{
   const phrases=[
     '근거가 부족합니다','사람 대상 연구가 충분하지 않습니다','효과를 단정하기 어렵습니다','아직 입증되지 않았습니다',
     '기간 효과를 보장할 수 없습니다','뚜렷한 임상 이득을 확인하지 못했습니다','비교 가능한 공식 데이터베이스는 없습니다',
     '모든 사람이 보충제를 먹어야 하는 것은 아닙니다','큐민은 일반 성인을 위한 공식 하루 권장량이 따로 정해져 있지 않습니다',
     '공복혈당과 인슐린 지표가 유의하게 달라지지 않았습니다','같은 효과 크기로 계산하지 않습니다',
     '조리용 큐민과 보충제의 섭취 조건이 다릅니다','조리용 큐민과 보충제의 섭취 조건은 다릅니다',
-    '연구 용량을 일반인의 하루 권장량이나 안전 상한으로 바꾸지 않습니다','같은 섭취 기준으로 판단하지 않습니다'
+    '연구 용량을 일반인의 하루 권장량이나 안전 상한으로 바꾸지 않습니다','같은 섭취 기준으로 판단하지 않습니다',
+    '호모시스테인 수치 감소를 심혈관질환 예방 효과로 바꾸어 해석하면 안 됩니다',
+    '호모시스테인 개선을 심혈관질환 예방 효과로 확대해 표현하지 않습니다'
   ];
   for(const phrase of phrases){
-    const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark><strong>${phrase}</strong></mark>`};
-    assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/,phrase);
+    for(const attrs of ['', ' data-tone="info"', ' data-tone="caution"', ' data-tone="negative"']){
+      const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark${attrs}><strong>${phrase}</strong></mark>`};
+      assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/,`${attrs}:${phrase}`);
+    }
   }
 });
 
-test('semantic info tone allows neutral absence of an official intake standard only',()=>{
+test('absence of an official intake standard is neutral information and must not be highlighted',()=>{
   const bodyHtml=quotaBody()+`<h2>3. 섭취량</h2><mark data-tone="info"><strong>SAC의 공식 하루 권장량은 없습니다.</strong></mark>`;
-  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-info-standard-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
-  const evidenceLimit=quotaBody()+`<h2>3. 섭취량</h2><mark data-tone="info"><strong>사람 대상 연구가 충분하지 않습니다.</strong></mark>`;
-  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-info-limit-test',category:'영양소',contentStandard:'SP1',bodyHtml:evidenceLimit}),/E_DIRECT_EMPHASIS_LIMITATION/);
-});
-
-test('semantic caution and negative tones allow important negative facts without weakening structure rules',()=>{
-  for(const tone of ['caution','negative']){
-    const bodyHtml=quotaBody()+`<h2>5. 부작용과 주의사항</h2><mark data-tone="${tone}"><strong>근거가 부족한 제품은 과장 광고를 확인합니다.</strong></mark>`;
-    assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}));
-  }
+  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-info-standard-test',category:'영양소',contentStandard:'SP1',bodyHtml}),/E_DIRECT_EMPHASIS_LIMITATION/);
 });
 
 test('semantic positive and info tones are accepted for ordinary takeaways',()=>{
