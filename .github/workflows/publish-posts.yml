@@ -49,6 +49,11 @@ jobs:
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Target resolution proof — fail fast before content validation
+        if: steps.mutation-gate.outputs.should_mutate == 'true'
+        run: node publishing/target-resolution-proof.mjs
+        env:
+          PUBLISH_SOURCE_ID: ${{ steps.mutation-gate.outputs.source_id }}
       - name: Diagnose self-hosted allocation
         run: node publishing/runner-gate.mjs --queue
         env:
@@ -102,10 +107,6 @@ jobs:
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: pnpm validate
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
       - run: call maintenance\check-tistory-chrome.cmd
       - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
         run: node publishing/auth-preflight.mjs
