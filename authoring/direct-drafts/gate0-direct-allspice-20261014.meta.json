@@ -1,0 +1,17 @@
+{
+  "sourceId": "direct-allspice-20261014",
+  "articleId": null,
+  "title": "올스파이스(Allspice) 효능·먹는 법｜주요 성분·궁합·주의사항·보관법",
+  "sourceSha256": "b7848d44c9254fccbc3b138b90e51fca823d6f910a5fa0f299fabf8c572245ea",
+  "baseMainSha": "d588b8fdb4739f42fe8ebace396b34774a953662",
+  "checks": {
+    "targetResolution": "new",
+    "strong": 40,
+    "mark": 11,
+    "underline": 2,
+    "coreH2": 6,
+    "images": 3
+  },
+  "gate0": "PRESERVED",
+  "githubSourceConfirmed": true
+}
