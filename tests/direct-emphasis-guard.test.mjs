@@ -43,6 +43,13 @@ test('untagged positive-style highlights still reject evidence-limit disclaimers
   }
 });
 
+test('semantic info tone allows neutral absence of an official intake standard only',()=>{
+  const bodyHtml=quotaBody()+`<h2>3. 섭취량</h2><mark data-tone="info"><strong>SAC의 공식 하루 권장량은 없습니다.</strong></mark>`;
+  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-info-standard-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
+  const evidenceLimit=quotaBody()+`<h2>3. 섭취량</h2><mark data-tone="info"><strong>사람 대상 연구가 충분하지 않습니다.</strong></mark>`;
+  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-info-limit-test',category:'영양소',contentStandard:'SP1',bodyHtml:evidenceLimit}),/E_DIRECT_EMPHASIS_LIMITATION/);
+});
+
 test('semantic caution and negative tones allow important negative facts without weakening structure rules',()=>{
   for(const tone of ['caution','negative']){
     const bodyHtml=quotaBody()+`<h2>5. 부작용과 주의사항</h2><mark data-tone="${tone}"><strong>근거가 부족한 제품은 과장 광고를 확인합니다.</strong></mark>`;
