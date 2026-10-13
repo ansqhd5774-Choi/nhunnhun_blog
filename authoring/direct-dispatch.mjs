@@ -7,7 +7,15 @@ import {dispatchQueuedUpdate} from './update-queue-dispatch.mjs';
 import {assertDirectPreflight} from '../publishing/direct-preflight.mjs';
 import {confirmGithubSource} from './source-confirmation.mjs';
 
-// A push may include several commits. Never guess which update should be mutated.
+const sourceIdFromMutationPath=path=>{
+  let match=path.match(/^updates\/(direct-[a-z0-9-]{2,70})\.json$/);
+  if(match)return match[1];
+  match=path.match(/^automation\/update-retry\/(direct-[a-z0-9-]{2,70})\.txt$/);
+  return match?.[1]??null;
+};
+
+// A push may include several commits. Resolve one source ID whether the push
+// changed the prepared source itself or its source-preserving retry marker.
 export function sourceIdForEvent({eventName,sourceId,eventPayload}={}) {
   if(eventName!=='push') {
     if(!/^direct-[a-z0-9-]{2,70}$/.test(sourceId??''))throw Error('E_DIRECT_SOURCE_ID');
@@ -15,11 +23,11 @@ export function sourceIdForEvent({eventName,sourceId,eventPayload}={}) {
   }
   if(eventPayload?.ref!=='refs/heads/main'||eventPayload?.deleted===true)
     throw Error('E_DIRECT_PUSH_REF');
-  const changed=new Set((eventPayload.commits??[]).flatMap(commit=>[
+  const ids=new Set((eventPayload.commits??[]).flatMap(commit=>[
     ...(commit.added??[]),...(commit.modified??[])
-  ]).filter(path=>/^updates\/direct-[a-z0-9-]{2,70}\.json$/.test(path)));
-  if(changed.size!==1)throw Error('E_DIRECT_PUSH_SOURCE_COUNT');
-  return [...changed][0].slice('updates/'.length,-'.json'.length);
+  ]).map(sourceIdFromMutationPath).filter(Boolean));
+  if(ids.size!==1)throw Error('E_DIRECT_PUSH_SOURCE_COUNT');
+  return [...ids][0];
 }
 
 // GitHub Actions can omit commit file arrays in its normalized push event.
