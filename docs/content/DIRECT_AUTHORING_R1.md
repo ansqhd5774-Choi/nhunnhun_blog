@@ -1,4 +1,4 @@
-# 음식 direct/SP1 직접 작성 기술 기준 — 2026-10-12
+# 음식 direct/SP1 직접 작성 기술 기준 — 2026-10-14
 
 공유 렌더링·강조·이미지·제출·검증의 기술 계약은 [CATEGORY_CONTENT_PARITY.md](CATEGORY_CONTENT_PARITY.md)를 참조한다. 음식 내용·소주제는 음식 전용 지침에서 정하며 다른 분야의 편집 예시는 가져오지 않는다.
 
@@ -14,14 +14,17 @@
 ## 작성 순서
 
 1. 음식 전용 프로젝트 지침과 최신 사용자 지시를 확인한다.
-2. 검색 의도와 기존 음식 글 중복을 확인한다.
-3. 독자의 실제 질문을 정한다.
-4. 음식 6개 축에 맞춰 최대 6개의 핵심 H2를 확정한다.
-5. 조사·본문·근거·강조·사진·내부링크를 한 작성 과정에서 완성한다.
-6. 저장 전 각 H2를 `음식 축 → 독자 질문 → H2 → 첫 문장 답변`으로 대조한다.
-7. 쉬운말·안전·수치·중복·이미지·강조를 검토한다.
-8. Gate 0 보존 후 GitHub에 완성 source만 저장한다.
-9. 자동 실행을 관찰하고 PUBLIC_VERIFIED와 원장 상태까지 확인한다.
+2. 신규 가능성이 있으면 본문 작성 전에 target-resolution 요청을 저장하고 `new` 결과를 확인한다. 기존 후보면 신규 작성하지 않고 숫자 URL 수정으로 전환한다.
+3. 검색 의도와 기존 음식 글 중복을 확인한다.
+4. 독자의 실제 질문을 정한다.
+5. 음식 6개 축에 맞춰 최대 6개의 핵심 H2를 확정한다.
+6. 조사·본문·근거·강조·사진·내부링크를 한 작성 과정에서 완성한다.
+7. 저장 전 각 H2를 `음식 축 → 독자 질문 → H2 → 첫 문장 답변`으로 대조한다.
+8. 쉬운말·안전·수치·중복·이미지·강조를 한 번에 검토하고 direct preflight를 한 번 실행한다.
+9. Gate 0 보존 후 GitHub에 완성 source만 저장한다.
+10. 자동 실행을 관찰하고 PUBLIC_VERIFIED와 원장 상태까지 확인한다.
+
+이미 같은 source·같은 SHA에서 PASS한 검사를 발행 러너에서 다시 반복하지 않는다. 단, 제출 직전에는 source drift, 로그인, target 재확인처럼 시간이 지나면 달라질 수 있는 상태만 다시 확인한다.
 
 ## 음식 본문
 
@@ -31,6 +34,7 @@
 - 연구 설계·표본·통계는 결과 해석과 행동 결정에 필요한 범위만 남긴다.
 - 확인된 특징·장점·성분 역할·식사 활용을 먼저 설명한다. 불필요한 치료 반박이나 근거 부족 문장을 반복하지 않는다.
 - 실제 알레르기·독성·금기·상호작용·응급 행동은 주의 항목에서 분명하게 유지한다.
+- 연구 방법 단어 수나 한계 문장 수 같은 단순 카운트는 편집 참고값으로만 사용하고 자동 발행 차단 기준으로 쓰지 않는다.
 
 ## 음식 궁합
 
@@ -42,11 +46,17 @@
 ## 강조
 
 - 1단계 `<strong>`
-- 2단계 `<mark><strong>`
-- 3단계 `<mark><u><strong>`
-- direct/SP1 하한: strong18, mark8, mark>u>strong2.
+- 2단계 `<mark data-tone="..."><strong>`
+- 3단계 `<mark data-tone="..."><u><strong>`
+- 음식 direct/SP1 하한: strong18, mark4, mark>u>strong2.
+- 색은 문장 순서대로 돌리지 않고 **의미에 따라** 선택한다. 색 종류 개수 자체는 PASS 조건으로 강제하지 않는다.
+- 기본 `<mark>`: 노랑 — 가장 일반적인 핵심 사실·수치.
+- `data-tone="positive"`: 초록 — 확인된 긍정적 효능·개선 결과·도움이 되는 실천 행동.
+- `data-tone="info"`: 파랑 — 이해에 필요한 기준·비교·섭취/보관 정보.
+- `data-tone="caution"`: 주황 — 주의가 필요한 조건·상호작용·오해 방지.
+- `data-tone="negative"`: 빨강 — 금기·위험·중요한 부정 결과·즉시 피해야 할 행동.
 - 핵심 성분·수치·작용·조건·궁합 이유·안전 행동·선택·보관 기준을 강조한다.
-- 근거 한계 문구나 안전 경고만 강조의 대부분을 차지하게 하지 않는다.
+- 부정·한계 사실도 독자 판단에 중요하면 `caution` 또는 `negative`로 강조할 수 있다. 다만 경고만 강조의 대부분을 차지하게 하지 않는다.
 - 하한을 채우려고 문장·효능·수치를 만들지 않는다.
 
 ## 이미지
@@ -55,6 +65,7 @@
 - 대표 이미지와 본문 이미지의 src/alt 및 원출처·저작자·라이선스를 확인한다.
 - `imageReview` 허용 키는 `src, alt, role, composition, sourcePage, author, license`와 선택적 boolean `visualChecked`다.
 - `visualChecked`는 현재 source에서 실제 확인한 경우에만 true로 기록한다. 필수 게이트가 아니다.
+- `imageReview.sourcePage`는 본문 `자료 출처`에도 같은 HTTPS 링크로 한 번씩 연결한다. 이 누락은 저장 전 preflight에서 한 번에 잡고 발행 러너에서 재수정하지 않는다.
 
 ## 저장 전 내용 검토
 
@@ -73,8 +84,10 @@
 
 - `publishing/direct-authoring-contract.mjs`와 `publishing/direct-preflight.mjs`를 사용한다.
 - PREFLIGHT_PASS는 구조 검사이며 의학적·문체적·소제목 의미·시각 적합성 인증이 아니다.
-- 신규는 `posts/*.json → publish-posts.yml`.
+- 신규는 `target-resolution request → result=new → posts/*.json → publish-posts.yml`.
 - 기존 수정은 `updates/direct-*.json → direct-author-update.yml → update-posts.yml`.
 - direct source는 `contentStandard=SP1`을 유지한다.
+- 신규 food direct source의 target-resolution 요청/결과가 없거나 digest가 다르면 hosted validate 초반에 즉시 실패시켜 self-hosted 러너까지 보내지 않는다.
+- hosted validate가 같은 source SHA에서 통과한 전체 `pnpm validate`를 self-hosted publish job에서 다시 반복하지 않는다. self-hosted에서는 source drift·인증·관리자 대상 재확인과 실제 제출 검증만 수행한다.
 - 원고 저장이나 CI PASS만으로 완료라고 하지 않는다.
 - PUBLIC_VERIFIED와 신규 `published` 또는 기존 `updated` 원장을 확인해야 완료다.
