@@ -1,1 +1,1 @@
-retry after canonical image URL comparison fix
+retry after Wikimedia filename normalization fix
