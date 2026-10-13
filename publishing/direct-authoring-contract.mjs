@@ -8,3 +8,4 @@ export const DIRECT_AUTHORING_CONTRACT=Object.freeze({
   coreHeadingMaximum:6,
 });
 export const isDirectSource=source=>source?.contentStandard==='SP1'&&source?.id?.startsWith('direct-');
+export const hasAuthoritativePreflight=(env=process.env)=>env.GITHUB_ACTIONS==='true'&&/^[a-f0-9]{40}$/i.test(env.GITHUB_SHA||'')&&env.AUTHORITATIVE_PREFLIGHT_SHA===env.GITHUB_SHA;
