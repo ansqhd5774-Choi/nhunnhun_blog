@@ -138,5 +138,10 @@ export async function runTargetResolutionGate({root=process.cwd(),sourceId=proce
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  runTargetResolutionGate().catch(error=>{console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');process.exitCode=1;});
+  runTargetResolutionGate()
+    .then(()=>setTimeout(()=>process.exit(0),0))
+    .catch(error=>{
+      console.error(/^E_[A-Z0-9_]+$/.test(error?.message)?error.message:'E_TARGET_RESOLUTION_RUNTIME');
+      setTimeout(()=>process.exit(1),0);
+    });
 }
