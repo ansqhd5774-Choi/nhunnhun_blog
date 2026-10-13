@@ -115,11 +115,14 @@ export async function openEditorConnection(config, { engine = chromium, fetchImp
     }
     const contexts = browser.contexts();
     if (contexts.length !== 1) {
-      browser._shouldCloseConnectionOnClose = true;
+      // Real Playwright connectOverCDP must keep its default close path so the
+      // server-side CDP WebSocket is closed. Injected test engines have no
+      // Playwright connection and retain the legacy disconnect-only flag.
+      if (!browser._connection?.close) browser._shouldCloseConnectionOnClose = true;
       await browser.close();
       throw new Error('E_LOCAL_BROWSER_CONTEXT');
     }
-    browser._shouldCloseConnectionOnClose = true;
+    if (!browser._connection?.close) browser._shouldCloseConnectionOnClose = true;
     return { browser, context:contexts[0] };
   } catch (error) {
     if (error?.message === 'E_LOCAL_BROWSER_CONTEXT') throw error;
@@ -129,17 +132,18 @@ export async function openEditorConnection(config, { engine = chromium, fetchImp
 export async function closeEditorConnection(connection) {
   const browser = connection?.browser;
   if (!browser) return;
+  let timer=null;
   try {
-    if (browser._connection?.close) {
-      browser._connection.close();
-      return;
-    }
-    browser._shouldCloseConnectionOnClose = true;
+    // Do not close browser._connection directly. With in-process Playwright it
+    // only tears down the client side and can leave the server CDP transport alive.
+    // browser.close() follows connectOverCDP's server browserProcess.close(),
+    // which closes the CDP WebSocket while leaving the persistent Chrome process running.
     await Promise.race([
       browser.close(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('disconnect-timeout')), 3000))
+      new Promise((_, reject) => {timer=setTimeout(() => reject(new Error('disconnect-timeout')), 3000);})
     ]);
   } catch { throw new Error('E_LOCAL_BROWSER_DISCONNECT'); }
+  finally {if(timer)clearTimeout(timer);}
 }
 export async function freshEditorPage(context) {
   const pages = context.pages();
