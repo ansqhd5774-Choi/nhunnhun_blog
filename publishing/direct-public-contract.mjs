@@ -5,7 +5,7 @@ export function directPublicExpectations(sourceHtml) {
   const count=re=>(html.match(re)||[]).length;
   return {roots:1,h2:count(/<h2\b/g),numbers:count(/<small>/g),h3:count(/<h3>/g),
     tables:count(/<table>/g),tableWraps:count(/class="table-scroll"/g),images:count(/<img\b/g),
-    marks:count(/<mark>/g),boldMarks:count(/<mark>(?:<u>)?<strong>/g),underlinedMarks:count(/<mark><u><strong>/g),
+    marks:count(/<mark\b[^>]*>/g),boldMarks:count(/<mark\b[^>]*>(?:<u>)?<strong>/g),underlinedMarks:count(/<mark\b[^>]*><u><strong>/g),
     badges:count(/class="badge"/g)};
 }
 export function assertDirectPublicSnapshot(actual,sourceHtml) {
