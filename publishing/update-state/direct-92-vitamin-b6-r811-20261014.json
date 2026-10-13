@@ -6,5 +6,16 @@
   "sourceCommit": "4eab7f9d25b744dbe9d9dbf4f30dca4bbe2832a3",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-13T18:51:18.512Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38449940992"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38449940992",
+  "publicResult": {
+    "sourceId": "direct-92-vitamin-b6-r811-20261014",
+    "url": "https://nhunnhun.tistory.com/92",
+    "sourceCommit": "4eab7f9d25b744dbe9d9dbf4f30dca4bbe2832a3",
+    "fingerprint": "db76faf480b94d1b58e494b9c89f05cec2779200639ceffbbe85e923233ee095",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38449940992",
+    "checkedAt": "2026-10-13T18:51:20.197Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38449940992",
+    "status": "PUBLIC_VERIFICATION_MISMATCH",
+    "code": "E_DIRECT_PUBLIC_MARKS"
+  }
 }
