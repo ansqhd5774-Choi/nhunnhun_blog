@@ -69,6 +69,11 @@ test('nutrient benefit section accepts a positive highlight that states the conf
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
 });
 
+test('nutrient benefit guard recognizes natural Korean decrease wording',()=>{
+  const bodyHtml=quotaBody()+`<h2>2. 어떤 효능이 확인됐고 누가 우선 확인해야 할까?</h2><mark data-tone="positive"><strong>철결핍이 교정되면 피로와 숨참, 운동 시 부담이 줄어드는 방향을 기대할 수 있습니다.</strong></mark>`;
+  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-korean-inflection-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
+});
+
 test('unknown semantic highlight tone fails closed',()=>{
   const bodyHtml=quotaBody()+'<mark data-tone="purple"><strong>임의 색상</strong></mark>';
   assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}),/E_DIRECT_EMPHASIS_TONE/);
