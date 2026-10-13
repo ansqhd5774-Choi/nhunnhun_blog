@@ -28,7 +28,7 @@ test('new submission rejects mixed valid and standalone marks before publication
   }
 });
 
-test('new submission rejects evidence-limit disclaimers as highlighted takeaways',()=>{
+test('untagged positive-style highlights still reject evidence-limit disclaimers',()=>{
   const phrases=[
     '근거가 부족합니다','사람 대상 연구가 충분하지 않습니다','효과를 단정하기 어렵습니다','아직 입증되지 않았습니다',
     '기간 효과를 보장할 수 없습니다','뚜렷한 임상 이득을 확인하지 못했습니다','비교 가능한 공식 데이터베이스는 없습니다',
@@ -41,6 +41,25 @@ test('new submission rejects evidence-limit disclaimers as highlighted takeaways
     const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark><strong>${phrase}</strong></mark>`};
     assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/,phrase);
   }
+});
+
+test('semantic caution and negative tones allow important negative facts without weakening structure rules',()=>{
+  for(const tone of ['caution','negative']){
+    const bodyHtml=quotaBody()+`<h2>5. 부작용과 주의사항</h2><mark data-tone="${tone}"><strong>근거가 부족한 제품은 과장 광고를 확인합니다.</strong></mark>`;
+    assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}));
+  }
+});
+
+test('semantic positive and info tones are accepted for ordinary takeaways',()=>{
+  for(const tone of ['positive','info']){
+    const bodyHtml=quotaBody()+`<h2>4. 활용</h2><mark data-tone="${tone}"><strong>식사에 적용할 핵심 기준입니다.</strong></mark>`;
+    assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}));
+  }
+});
+
+test('unknown semantic highlight tone fails closed',()=>{
+  const bodyHtml=quotaBody()+'<mark data-tone="purple"><strong>임의 색상</strong></mark>';
+  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-tone-test',contentStandard:'SP1',bodyHtml}),/E_DIRECT_EMPHASIS_TONE/);
 });
 
 test('new submission requires at least one core highlight outside pure safety-only sections',()=>{
@@ -85,7 +104,7 @@ test('new submission rejects fewer than 2 underline highlight effects',()=>{
 });
 
 test('actionable safety warning can stay strong when core benefits and common quotas are satisfied',()=>{
-  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody()+'<h2>5. 부작용과 주의사항</h2><mark><u><strong>호흡곤란이 생기면 즉시 진료를 받습니다.</strong></u></mark>'};
+  const source={id:'direct-test',contentStandard:'SP1',bodyHtml:quotaBody()+'<h2>5. 부작용과 주의사항</h2><mark data-tone="negative"><u><strong>호흡곤란이 생기면 즉시 진료를 받습니다.</strong></u></mark>'};
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
