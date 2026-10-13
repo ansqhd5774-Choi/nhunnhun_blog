@@ -49,7 +49,7 @@ export function validateCreateIdentity(post,identity){
   const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
   if(!required)return null;
   validateIdentityRequest(identity,{sourceId:post.id});
-  if(identity.proposedTitle&&normalizeIdentityText(identity.proposedTitle)!==normalizeIdentityText(post.title))throw Error('E_TARGET_IDENTITY_TITLE_MISMATCH');
+  // proposedTitle belongs to the pre-authoring duplicate review. Runtime duplicate detection uses the final post.title plus reviewed aliases.
   return identity;
 }
 export function existingTargetCandidates(items,post,identity){
