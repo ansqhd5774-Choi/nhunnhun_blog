@@ -42,6 +42,12 @@ test('manager page cleanup is bounded when Playwright close never settles',async
   assert.equal(calls,1);
 });
 
+test('runtime target gate exits after cleanup so residual CDP handles cannot stall the mutation queue',()=>{
+  const source=readFileSync(new URL('../publishing/target-resolution-gate.mjs',import.meta.url),'utf8');
+  assert.match(source,/\.then\(\(\)=>setTimeout\(\(\)=>process\.exit\(0\),0\)\)/);
+  assert.match(source,/setTimeout\(\(\)=>process\.exit\(1\),0\)/);
+});
+
 test('pre-authoring resolver workflow is read-only to Tistory and persists decision evidence',()=>{
   const workflow=YAML.parse(readFileSync('.github/workflows/resolve-target.yml','utf8').replace(/^\uFEFF/,''));
   assert.deepEqual(workflow.on.push.paths,['authoring/target-resolution/**']);
