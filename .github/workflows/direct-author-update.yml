@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'updates/direct-*.json'
+      - 'automation/update-retry/direct-*.txt'
   workflow_dispatch:
     inputs:
       source_id:
