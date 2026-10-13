@@ -5,7 +5,9 @@ import {assertDirectPreflight} from '../publishing/direct-preflight.mjs';
 import {isAltMaintenance,checkAltSource} from '../publishing/alt-maintenance-source.mjs';
 import {confirmGithubSource} from './source-confirmation.mjs';
 
-// Runner-side preparation before mutation. Never invent emphasis or review claims.
+// Source preparation reports emphasis/image metadata. In GitHub Actions the selected
+// SHA has already passed the workflow's authoritative validation, so do not repeat the
+// same direct preflight here. Standalone/local use still validates before preparation.
 const kind=process.argv[2];
 const id=process.env.UPDATE_SOURCE_ID||process.env.PUBLISH_SOURCE_ID;
 if(!['posts','updates'].includes(kind)||!/^[a-z0-9][a-z0-9-]{2,79}$/.test(id||''))throw Error('E_PREPARATION_TARGET');
@@ -16,7 +18,7 @@ if(kind==='updates'&&isNativeTextMaintenance(source)){checkNativeTextSource(sour
   console.log('SOURCE_PREPARATION_MAINTENANCE '+JSON.stringify({id,scope:'image-alt-only',semanticVerification:'existing-content-not-recertified'}));
 }else if(source.contentStandard==='SP1'&&source.id.startsWith('direct-')) {
   if(process.env.GITHUB_ACTIONS==='true')console.log('SOURCE_CONFIRMED '+JSON.stringify(await confirmGithubSource({kind,source,commitSha:process.env.GITHUB_SHA,token:process.env.GITHUB_TOKEN})));
-  assertDirectPreflight(source);
+  else assertDirectPreflight(source);
   const {report}=prepareDirectSource(source);
-  console.log('SOURCE_PREPARATION '+JSON.stringify({...report,semanticVerification:'author-review-not-automated'}));
+  console.log('SOURCE_PREPARATION '+JSON.stringify({...report,preflight:process.env.GITHUB_ACTIONS==='true'?'reused-authoritative-ci':'validated-locally',semanticVerification:'author-review-not-automated'}));
 } else console.log('SOURCE_PREPARATION_EXISTING_STANDARD '+id);
