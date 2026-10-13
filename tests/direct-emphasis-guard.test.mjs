@@ -39,7 +39,7 @@ test('new submission rejects evidence-limit disclaimers as highlighted takeaways
   ];
   for(const phrase of phrases){
     const source={id:'direct-test',contentStandard:'SP1',bodyHtml:`<h2>3. 몸에서 하는 일</h2><mark><strong>${phrase}</strong></mark>`};
-    assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/);
+    assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_LIMITATION/,phrase);
   }
 });
 
