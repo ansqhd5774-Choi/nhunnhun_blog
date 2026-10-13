@@ -1,0 +1,57 @@
+{
+  "sourceId": "direct-428-jicama-inulin-r81-20261014",
+  "articleId": "428",
+  "title": "히카마 효능·칼로리｜이눌린·식이섬유·먹는 법·씨앗 주의·보관법",
+  "sourceSha256": "928c7a53bc4fc7cbfa15a871ce02c06f75bdfda19e3572a8df4a25e16aaab2cf",
+  "baseMainSha": "95f50234a32d766d4ca933870a1ea2382beb18d2",
+  "checks": {
+    "contentReview": "AUTHOR_REVIEW_COMPLETED",
+    "strong": 75,
+    "mark": 19,
+    "markUnderlineStrong": 2,
+    "images": 3,
+    "coreH2": 6,
+    "evidenceScope": "PASS",
+    "imageAttribution": "SOURCE_LINKS_INCLUDED",
+    "duplicateIntentReview": "UPDATE_EXISTING_428",
+    "visualChecked": 0,
+    "preflight": "NOT_RUN"
+  },
+  "researchScope": {
+    "readerIntent": "히카마의 핵심 성분인 이눌린·FOS가 무엇인지, 일반 영양성분과 함께 어떤 의미가 있는지, 먹는 법·궁합·씨앗 주의·보관법까지 알고 싶다.",
+    "duplicateCheck": "기존 공개 글 /428을 유지해 전체 최신화; 신규 URL 생성 안 함",
+    "evidenceBoundary": [
+      "Pachyrhizus erosus 뿌리에서 이눌린과 FOS(nystose 포함)가 직접 분석으로 확인됨",
+      "이눌린 비율은 품종·성숙 단계에 따라 크게 달라지므로 시판 히카마 고정 함량으로 일반화하지 않음",
+      "이눌린·FOS의 프리바이오틱 성질은 일반 성분 근거와 구분하고 히카마 자체의 질병 예방·치료 효과로 확대하지 않음",
+      "USDA SR Legacy의 생 히카마 100g 일반 영양 수치는 이눌린 함량을 대신하지 않음",
+      "식용 뿌리와 로테논이 든 씨앗을 구분",
+      "통뿌리 12.5~15℃ 상업 저장 조건은 UC Davis의 히카마 직접 자료 범위로 제한"
+    ]
+  },
+  "foodAxisReview": {
+    "assessment": "AUTHOR_REVIEW_COMPLETED",
+    "automatedSemanticVerdict": false,
+    "observedCoreH2Count": 6,
+    "axes": [
+      {"axis":1,"expectedAxis":"정의·주요 성분·작용","readerQuestion":"히카마는 무엇이며 일반 영양표 외에 대표 성분은 무엇인가?","heading":"1. 히카마란?｜이눌린·FOS와 100g 영양성분","firstAnswer":"히카마의 영양적 특징은 수분 많은 아삭한 뿌리에 식이섬유뿐 아니라 이눌린과 FOS가 함께 들어 있다는 점입니다."},
+      {"axis":2,"expectedAxis":"핵심 효능·예방 효과","readerQuestion":"히카마의 핵심 영양 장점과 이눌린·FOS의 의미는 무엇인가?","heading":"2. 히카마 효능은?｜이눌린·FOS와 식이섬유의 실제 장점","firstAnswer":"히카마의 핵심 영양 장점은 낮은 열량과 식이섬유에 더해 이눌린·FOS 같은 프리바이오틱 탄수화물을 함께 제공한다는 점입니다."},
+      {"axis":3,"expectedAxis":"섭취법·권장량","readerQuestion":"히카마는 얼마나 어떻게 먹는가?","heading":"3. 히카마는 얼마나·어떻게 먹을까?｜껍질 손질과 생식·조리법","firstAnswer":"히카마에는 일반 성인을 위한 공식 하루 권장량이 따로 정해져 있지 않습니다."},
+      {"axis":4,"expectedAxis":"궁합·상호작용","readerQuestion":"히카마는 어떤 음식과 왜 함께 먹기 좋은가?","heading":"4. 히카마와 잘 어울리는 음식은?｜요거트·콩·라임과 먹는 이유","firstAnswer":"히카마는 플레인 요거트·콩류·라임과 함께 먹기 좋지만 이유는 각각 다릅니다."},
+      {"axis":5,"expectedAxis":"부작용·주의 대상","readerQuestion":"히카마 씨앗과 이눌린·FOS 섭취에서 무엇을 주의해야 하는가?","heading":"5. 히카마 부작용·주의 대상은?｜씨앗 로테논과 가스·복부팽만","firstAnswer":"히카마는 식용 뿌리와 씨앗을 반드시 구분해야 합니다."},
+      {"axis":6,"expectedAxis":"신선도·보관·조리 팁","readerQuestion":"좋은 히카마를 어떻게 고르고 보관·조리하는가?","heading":"6. 좋은 히카마 고르는 법·보관법｜통뿌리와 자른 뒤 관리","firstAnswer":"좋은 히카마는 단단하고 묵직하며 껍질에 큰 갈라짐·곰팡이·물러진 부분이 적은 것을 고릅니다."}
+    ],
+    "balanceReview": {
+      "status": "AUTHOR_REVIEW_COMPLETED",
+      "automatedSemanticVerdict": false,
+      "questions": [
+        "일반 영양표보다 히카마 고유의 이눌린·FOS를 먼저 확인했는가? PASS",
+        "이눌린·FOS 함량을 모든 시판 히카마의 고정값으로 만들지 않았는가? PASS",
+        "② 효능이 확인된 영양 가치와 성분 역할을 먼저 답하는가? PASS",
+        "씨앗 독성은 ⑤에 집중하고 도입에서는 최소 경고만 남겼는가? PASS",
+        "강한 강조가 이눌린·FOS·식이섬유·실제 행동 기준 중심인가? PASS"
+      ]
+    }
+  },
+  "gate0Status": "PRESERVED_BEFORE_AUTOPUBLISH"
+}
