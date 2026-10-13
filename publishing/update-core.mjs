@@ -11,7 +11,9 @@ const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','repr
 export function checkUpdateSource(update, filename){
   if(isNativeTextMaintenance(update))return checkNativeTextSource(update,filename);
   if(isAltMaintenance(update))return checkAltSource(update,filename);
-  if(!update || typeof update!=='object' || Array.isArray(update) || Object.keys(update).some(k=>!ALLOWED.includes(k))) throw new Error('E_UPDATE_SCHEMA');
+  if(!update || typeof update!=='object' || Array.isArray(update)) throw new Error('E_UPDATE_SCHEMA');
+  const unsupported=Object.keys(update).filter(k=>!ALLOWED.includes(k)).sort();
+  if(unsupported.length) throw new Error(`E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:${unsupported.join(',')}`);
   if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
   if(update.contentStandard!==undefined&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(update.id) || filename!==`${update.id}.json`) throw new Error('E_UPDATE_ID');
