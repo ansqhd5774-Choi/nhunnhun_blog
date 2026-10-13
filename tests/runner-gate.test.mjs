@@ -32,14 +32,15 @@ test('another source may advance through standard source-owned artifacts',()=>{
    'authoring/target-resolution/'+other+'.json',
    'authoring/target-resolution-results/'+other+'.json',
    'authoring/direct-drafts/gate0-'+other+'.json',
-   'authoring/direct-drafts/gate0-'+other+'.meta.json'
+   'authoring/direct-drafts/gate0-'+other+'.meta.json',
+   'automation/update-retry/'+other+'.txt'
  ];
  assert.doesNotThrow(()=>assertSourceIdentity(a,a,b,paths,id));
  for(const path of [
    'posts/'+id+'.json','updates/'+id+'.json','content-reviews/posts/'+id+'.json','content-reviews/updates/'+id+'.json',
    'publishing/state/'+id+'.json','publishing/update-state/'+id+'.json','authoring/target-resolution/'+id+'.json',
    'authoring/target-resolution-results/'+id+'.json','authoring/direct-drafts/gate0-'+id+'.json','authoring/direct-drafts/gate0-'+id+'.meta.json',
-   'publishing/update.mjs','publishing/publish.mjs','package.json'
+   'automation/update-retry/'+id+'.txt','publishing/update.mjs','publishing/publish.mjs','package.json'
  ]) assert.throws(()=>assertSourceIdentity(a,a,b,[path],id),/BLOCKED_SOURCE_DRIFT/);
 });
 test('new publication source ID scopes unrelated article artifacts without weakening its own protection',()=>{
