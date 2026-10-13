@@ -1,0 +1,18 @@
+{
+  "sourceId": "direct-oregano-20261014",
+  "requestDigest": "9a3bbd7bb0d5d2bfa94b7b64640ad80bd0291fb42ec5a27158d2f26aeebe5f8b",
+  "decision": "existing_candidate",
+  "scanned": 384,
+  "candidates": [
+    {
+      "id": "178",
+      "title": "오레가노(Oregano) 건강 효과와 영양 가치!! 항산화 작용, 면역 강화",
+      "visibility": "PUBLIC",
+      "exact": false,
+      "aliasHit": true
+    }
+  ],
+  "resolvedAt": "2026-10-13T20:31:28.540Z",
+  "requestCommit": "5c63e4818bf92cd2888a244e61b6d9c38945b1a0",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38463316624"
+}
