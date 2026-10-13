@@ -2,7 +2,7 @@
   "sourceId": "direct-jicama-20261013",
   "articleId": null,
   "title": "히카마 효능·칼로리｜식이섬유·비타민C·먹는 법·씨앗 주의·보관법",
-  "sourceSha256": "76cd2c15c87d23896e9e7ead8471d981b84e0d87b4620aafbc9f58d99d5cd5e1",
+  "sourceSha256": "421d66eacbd4c190c4e8b0896e02b618f3b34b93a93cc16ccac8f573f000bcb8",
   "baseMainSha": "b2c727dbd76da8bf22c10a707ec6bda980e99e8a",
   "checks": {
     "contentReview": "PASS",
@@ -26,7 +26,7 @@
       "식이섬유·비타민 C의 일반 영양 역할은 FDA·NIH 근거로 설명하고 히카마의 질병 치료 효과로 확대하지 않음",
       "비타민 C와 식물성 철 흡수는 일반 영양 원리로만 설명하고 히카마 특정 임상 시너지로 표현하지 않음",
       "통뿌리의 12.5~15℃ 보관은 UC Davis의 히카마 직접 자료 범위로 제한하고 일반 냉장고 장기 보관을 권하지 않음",
-      "본문 이미지 3개의 sourcePage·저작자·라이선스를 각각 확인해 연결"
+      "본문 이미지 3개의 sourcePage·저작자·라이선스를 자료 출처 H2 블록에 직접 연결"
     ]
   },
   "foodAxisReview": {
@@ -51,11 +51,11 @@
         "③에서 100g·1컵 계량값을 하루 권장량으로 바꾸지 않았는가? PASS",
         "⑤에서 식용 뿌리와 독성 씨앗을 명확히 구분하고 필요한 응급 행동만 강조했는가? PASS",
         "강한 강조가 영양 가치·실제 활용·안전 행동·보관 기준 중심인가? PASS",
-        "이미지 3개의 원출처·저작자·라이선스가 자료 출처에 포함되어 있는가? PASS"
+        "이미지 3개의 원출처·저작자·라이선스가 자료 출처 H2 블록에 포함되어 있는가? PASS"
       ]
     }
   },
-  "gate0Commit": "df19a915b8a55dd024c192597b5b2443b56f854a",
+  "gate0Commit": "ccc7f88991d15c6a89c9e0de234d35fcd0deed94",
   "sourceCommit": null,
   "githubSourceStatus": "NOT_WRITTEN",
   "runStatus": "NOT_STARTED",
