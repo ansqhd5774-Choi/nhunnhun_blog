@@ -53,10 +53,15 @@ test('mutation workflows require authenticated Tistory preflight after Chrome re
  assert.match(preflight,/120000/);
  assert.match(preflight,/setTimeout\(\(\) => process\.exit\(process\.exitCode \?\? 0\), 0\)/);
 });
-test('scheduled GPT contract isolates each article and distinguishes uncommitted writes',()=>{
+test('general Chat contract is execution-only and keeps source confirmation, target resolution and public verification',()=>{
  const contract=readFileSync('docs/GENERAL_CHAT_EXECUTION.md','utf8');
- assert.match(contract,/글 1건 = 독립 1회성 ChatGPT 예약 작업/);
- assert.match(contract,/WRITE_NOT_COMMITTED/);
- assert.match(contract,/TISTORY_CHROME_READY/);
- assert.match(contract,/TISTORY_AUTH_READY/);
+ assert.match(contract,/대상 판정·저장·실행·발행·공개 검증의 기술 계약/);
+ assert.match(contract,/PROJECT_INSTRUCTIONS_FOOD_R8\.1\.txt/);
+ assert.match(contract,/FOOD_CONTENT_QUALITY_R1\.md/);
+ assert.match(contract,/GITHUB_SOURCE_CONFIRMED/);
+ assert.match(contract,/target-resolution/);
+ assert.match(contract,/PUBLIC_VERIFIED/);
+ assert.match(contract,/direct\/SP1/);
+ assert.match(contract,/Queue\/Ollama/);
+ assert.doesNotMatch(contract,/글 1건 = 독립 1회성 ChatGPT 예약 작업|WRITE_NOT_COMMITTED/);
 });
