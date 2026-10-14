@@ -29,7 +29,7 @@ function foodEditorialReview(foodAxisReview){
     questions:[
       '음식 원고는 이 저장소의 음식 전용 지침만 편집 기준으로 사용하고, 사용자 확정 6개 소제목(소개, 영양소·핵심 성분, 꾸준 섭취 변화, 궁합·시너지, 주의사항, 고르는 법·보관법)을 이름·순서·의미 그대로 사용했는가?',
       '일반 독자가 실제로 궁금해하는 질문과 생활정보 범위를 먼저 확인하고, 글이 음식의 특징·영양·장점·활용·선택·섭취·보관을 중심으로 구성됐는가?',
-      '자료가 부족한 주장을 `근거 부족`, `연구 부족`, `미확인`, `일반화 불가` 같은 부정 문장으로 자동 대체하지 않았는가?',
+      '확인해서 사용할 수 없는 내용은 생략하고 독자에게 필요한 다른 생활정보를 충분히 조사했는가?',
       ...foodAxisReview.axes.map(axis=>`${axis.expectedAxis}: ${axis.readerQuestion} ${axis.reviewQuestion}`),
       ...foodAxisReview.balanceReview.questions,
       '음식 이미지·내부링크·강조가 일반 독자의 이해와 실제 선택·섭취·보관에 직접 도움이 되는가?'
