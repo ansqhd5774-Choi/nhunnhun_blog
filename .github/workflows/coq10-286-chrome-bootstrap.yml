@@ -1,0 +1,30 @@
+name: One-shot Tistory Chrome bootstrap for CoQ10 286
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/coq10-286-chrome-bootstrap.txt'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nhunnhun-tistory-maintenance
+  cancel-in-progress: false
+
+jobs:
+  start-chrome:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - name: Start saved-session Chrome if absent
+        run: call maintenance\ensure-tistory-chrome.cmd
+      - name: Confirm local CDP readiness
+        run: call maintenance\check-tistory-chrome.cmd
