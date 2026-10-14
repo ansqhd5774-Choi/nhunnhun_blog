@@ -4,6 +4,7 @@ export const DIRECT_AUTHORING_CONTRACT=Object.freeze({
   imageMinimum:3,
   imageReviewKeys:Object.freeze(['src','alt','role','composition','sourcePage','author','license','visualChecked']),
   emphasisMinimums:Object.freeze({bold:18,highlight:8,underline:2}),
+  nutrientEmphasisMinimums:Object.freeze({bold:25,highlight:14,underline:8}),
   foodEmphasisMinimums:Object.freeze({bold:25,highlight:12,underline:8}),
   coreHeadingMaximum:6,
 });
