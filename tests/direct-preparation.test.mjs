@@ -14,7 +14,7 @@ test('preparation exposes actual pairing paragraphs for author review without au
  assert.equal(pairingReview('<h2>소개</h2>').combinations.length,0);
 });
 
-test('food-axis review exposes six reader-question, H2 and first-answer pairs plus value-first balance questions without semantic auto-pass',()=>{
+test('food-axis review exposes six reader-question, H2 and first-answer pairs plus depth-first balance questions without semantic auto-pass',()=>{
   const source={bodyHtml:[
     '<h2>1. 음식은 무엇일까?</h2><p><img src="https://example.com/food.jpg" alt="음식"></p><p>첫째 답변입니다.</p>',
     '<h2>2. 효능은 무엇일까?</h2><p>둘째 효능 답변입니다.</p>',
@@ -30,6 +30,7 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.automatedSemanticVerdict,false);
   assert.equal(review.scope,'FOOD_ONLY');
   assert.equal(review.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
+  assert.equal(review.qualityRuleSource,'docs/content/FOOD_CONTENT_QUALITY_R1.md');
   assert.equal(review.observedCoreH2Count,6);
   assert.equal(review.axes.length,6);
   assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
@@ -48,14 +49,20 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.balanceReview.automatedSemanticVerdict,false);
   assert.equal(review.balanceReview.scope,'FOOD_ONLY');
   assert.equal(review.balanceReview.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
-  assert.equal(review.balanceReview.questions.length,5);
+  assert.equal(review.balanceReview.qualityRuleSource,'docs/content/FOOD_CONTENT_QUALITY_R1.md');
+  assert.equal(review.balanceReview.questions.length,11);
   const balanceQuestions=review.balanceReview.questions.join('\n');
   assert.match(balanceQuestions,/첫 인상/);
   assert.match(balanceQuestions,/건강상 장점·몸에서 하는 역할·실제 식사 활용/);
   assert.match(balanceQuestions,/연구 설계·표본·근거 수준·미확인/);
   assert.match(balanceQuestions,/⑤에 집중/);
   assert.match(balanceQuestions,/각 H2의 직접 답/);
-  assert.match(balanceQuestions,/연구 한계나 반박 문구를 강조 개수 충족용/);
+  assert.match(balanceQuestions,/같은 사실을 도입·표·본문·요약/);
+  assert.match(balanceQuestions,/100mL→200mL/);
+  assert.match(balanceQuestions,/표의 각 행·열/);
+  assert.match(balanceQuestions,/일반 영양표가 음식 고유 특징/);
+  assert.match(balanceQuestions,/벤치마크와 추가 조사/);
+  assert.match(balanceQuestions,/실제 행동으로 옮길 수 있는 정보/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -87,13 +94,16 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.equal(result.report.foodAxisReview.automatedSemanticVerdict,false);
   assert.equal(result.report.foodAxisReview.scope,'FOOD_ONLY');
   assert.equal(result.report.foodAxisReview.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
+  assert.equal(result.report.foodAxisReview.qualityRuleSource,'docs/content/FOOD_CONTENT_QUALITY_R1.md');
   assert.equal(result.report.foodAxisReview.axes[0].heading,'소개');
   assert.equal(result.report.foodAxisReview.axes[0].firstAnswer,'소개');
-  assert.equal(result.report.foodAxisReview.balanceReview.questions.length,5);
+  assert.equal(result.report.foodAxisReview.balanceReview.questions.length,11);
   assert.equal(result.report.editorialReview.scope,'FOOD_ONLY');
   assert.equal(result.report.editorialReview.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
+  assert.equal(result.report.editorialReview.qualityRuleSource,'docs/content/FOOD_CONTENT_QUALITY_R1.md');
   const evidenceQuestions=result.report.editorialReview.questions.join('\n');
   assert.match(evidenceQuestions,/이 저장소의 음식 전용 지침만 사용/);
+  assert.match(evidenceQuestions,/벤치마크해 독자 질문과 정보 범위/);
   assert.match(evidenceQuestions,/정의·주요 성분·작용/);
   assert.match(evidenceQuestions,/핵심 효능·예방 효과/);
   assert.match(evidenceQuestions,/섭취법·권장량/);
@@ -102,11 +112,14 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.match(evidenceQuestions,/신선도·보관·조리 팁/);
   assert.match(evidenceQuestions,/건강상 장점·몸에서 하는 역할·실제 식사 활용/);
   assert.match(evidenceQuestions,/연구 설계·표본·근거 수준.*소제목이나 본문의 중심/);
-  assert.match(evidenceQuestions,/각 H2의 직접 답과 확인된 건강·영양·안전·섭취 가치/);
+  assert.match(evidenceQuestions,/100mL→200mL/);
+  assert.match(evidenceQuestions,/표의 각 행·열/);
+  assert.match(evidenceQuestions,/벤치마크와 추가 조사/);
   assert.doesNotMatch(evidenceQuestions,/제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});
   assert.equal('foodAxisReview' in nonFoodResult.report,false);
   assert.equal('scope' in nonFoodResult.report.editorialReview,false);
+  assert.equal('qualityRuleSource' in nonFoodResult.report.editorialReview,false);
 });

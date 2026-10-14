@@ -1,4 +1,5 @@
 const FOOD_RULE_SOURCE='docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt';
+const FOOD_QUALITY_RULE_SOURCE='docs/content/FOOD_CONTENT_QUALITY_R1.md';
 const FOOD_AXES = [
   {
     expectedAxis:'정의·주요 성분·작용',
@@ -37,7 +38,13 @@ const BALANCE_REVIEW_QUESTIONS=[
   '② 효능의 첫 문단이 건강상 장점·몸에서 하는 역할·실제 식사 활용을 먼저 설명하는가? 없는 효능을 만들지는 않았는가?',
   '연구 설계·표본·근거 수준·미확인 같은 작성자 검토 정보가 소제목이나 본문의 중심으로 반복되지 않았는가? 독자 판단에 꼭 필요할 때만 짧게 남겼는가?',
   '독성·고용량·금기·응급 행동은 원칙적으로 ⑤에 집중하고, 다른 축에는 그 자리의 행동 결정에 꼭 필요한 최소 주의만 남겼는가?',
-  'mark·최고강조는 각 H2의 직접 답과 확인된 건강·영양·안전·섭취 가치를 먼저 드러내는가? 연구 한계나 반박 문구를 강조 개수 충족용으로 올리지 않았는가?'
+  'mark·최고강조는 각 H2의 직접 답과 확인된 건강·영양·안전·섭취 가치를 먼저 드러내는가? 연구 한계나 반박 문구를 강조 개수 충족용으로 올리지 않았는가?',
+  '같은 사실을 도입·표·본문·요약에서 표현이나 숫자만 바꿔 반복해 정보량처럼 보이게 하지 않았는가?',
+  '100mL→200mL처럼 단순 배수·단위 환산·산술 확장으로 표의 행이나 열을 채우지 않았는가? 기준량이 둘 이상이면 각각 실제로 다른 독자 질문에 답하는가?',
+  '표의 각 행·열이 독자에게 새로운 선택·섭취·보관 판단 정보를 주는가? 비교 가치가 없다면 표 대신 더 짧은 문장으로 처리했는가?',
+  '일반 영양표가 음식 고유 특징·제품/형태 차이·실제 선택 정보를 밀어내지 않았는가?',
+  '내용이 얕은 부분을 문장·표·강조로 늘리지 않고 벤치마크와 추가 조사로 보강했는가?',
+  '구매·섭취·궁합·주의·보관 중 독자가 실제 행동으로 옮길 수 있는 정보가 충분한가?'
 ];
 
 // Keep this utility set aligned with publishing/direct-focus.mjs.
@@ -105,6 +112,7 @@ export function buildFoodAxisReview(source={}){
     automatedSemanticVerdict:false,
     scope:'FOOD_ONLY',
     ruleSource:FOOD_RULE_SOURCE,
+    qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,
     observedCoreH2Count:coreHeadings.length,
     axes,
     balanceReview:{
@@ -112,6 +120,7 @@ export function buildFoodAxisReview(source={}){
       automatedSemanticVerdict:false,
       scope:'FOOD_ONLY',
       ruleSource:FOOD_RULE_SOURCE,
+      qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,
       questions:[...BALANCE_REVIEW_QUESTIONS]
     }
   };
