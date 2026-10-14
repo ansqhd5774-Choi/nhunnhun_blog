@@ -1,0 +1,1 @@
+2026-10-15 benchmark-driven rewrite superseded by r96 source. Do not reuse r95 body; dispatch r96 only.
