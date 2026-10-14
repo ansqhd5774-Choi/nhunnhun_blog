@@ -27,8 +27,9 @@ jobs:
           ref: ${{ github.sha }}
       - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Open dedicated Tistory Chrome and wait for manual login
+      - name: Open visible dedicated Tistory Chrome in logged-on Windows session
         run: |
-          call maintenance\ensure-tistory-chrome.cmd
+          call maintenance\open-visible-tistory-login.cmd
           if errorlevel 1 exit /b %ERRORLEVEL%
-          node publishing\login.mjs
+      - name: Wait for manual login and save session
+        run: node publishing\login.mjs
