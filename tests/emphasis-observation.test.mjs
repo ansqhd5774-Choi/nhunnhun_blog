@@ -17,12 +17,12 @@ test('handles whitespace and inline links in highlighted phrases',()=>{
   assert.equal(result.sections[1].level2,1);
   assert.deepEqual(result.sections[1].standaloneHighlights,[]);
 });
-test('food highlight density is advisory only and scales with core h2 count',()=>{
+test('food highlight density is advisory only and aligned with the 12 mark minimum',()=>{
   const html=[1,2,3,4,5,6].map(n=>`<h2>${n}. 항목</h2><p>${n<=6?'<mark><strong>핵심</strong></mark>':''}</p>`).join('')+'<h2>자료 출처</h2><ul><li>출처</li></ul>';
   const result=observeEmphasis(html,{category:'음식'});
   assert.equal(result.highlightDensity.status,'LOW_HIGHLIGHT_DENSITY');
   assert.equal(result.highlightDensity.advisoryOnly,true);
   assert.equal(result.highlightDensity.coreH2,6);
   assert.equal(result.highlightDensity.current,6);
-  assert.deepEqual(result.highlightDensity.recommendedRange,[7,9]);
+  assert.deepEqual(result.highlightDensity.recommendedRange,[12,12]);
 });
