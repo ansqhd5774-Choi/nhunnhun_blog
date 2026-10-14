@@ -56,6 +56,7 @@ test('approved direct quick summary renders six cards with responsive two-column
   for(const label of ['효능','누가','복용','기간','조합','주의']) assert.match(rendered,new RegExp('quick-summary-label">'+label));
   assert.match(rendered,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(rendered,/@media\(max-width:600px\)[\s\S]*?quick-summary-grid\{grid-template-columns:1fr\}/);
+  assert.match(rendered,/quick-summary-item p\{margin:0;font-size:15px;line-height:1\.68;font-weight:600;color:#2d3b33\}/);
   assert.match(rendered,/QUICK GUIDE/);
   assert.match(rendered,/30초 안에 보는 핵심 기준/);
 });
