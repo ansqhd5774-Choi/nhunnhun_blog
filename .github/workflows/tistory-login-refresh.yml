@@ -1,0 +1,34 @@
+name: Refresh Tistory saved login session
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/tistory-login-refresh.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nhunnhun-tistory-login-refresh
+  cancel-in-progress: false
+
+jobs:
+  login-refresh:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 7
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node-pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Open dedicated Tistory Chrome and wait for manual login
+        run: |
+          call maintenance\ensure-tistory-chrome.cmd
+          if errorlevel 1 exit /b %ERRORLEVEL%
+          node publishing\login.mjs
