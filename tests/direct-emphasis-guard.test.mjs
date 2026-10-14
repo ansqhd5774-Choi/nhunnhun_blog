@@ -89,11 +89,11 @@ test('mixed nutrient risk section still counts as a primary information section'
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
-test('food uses a lower highlight floor while other categories keep the shared quota',()=>{
+test('food uses the dedicated 25/12/8 emphasis minimums while other categories keep the shared quota',()=>{
   assert.deepEqual(DIRECT_EMPHASIS_MINIMUMS,{bold:18,highlight:8,underline:2});
-  assert.deepEqual(DIRECT_FOOD_EMPHASIS_MINIMUMS,{bold:18,highlight:4,underline:2});
-  const food={id:'direct-음식-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:14,level2:2,level3:2})};
-  assert.deepEqual(assertDirectSubmissionEmphasis(food),{boldCount:18,highlightCount:4,underlineCount:2});
+  assert.deepEqual(DIRECT_FOOD_EMPHASIS_MINIMUMS,{bold:25,highlight:12,underline:8});
+  const food={id:'direct-음식-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:13,level2:4,level3:8})};
+  assert.deepEqual(assertDirectSubmissionEmphasis(food),{boldCount:25,highlightCount:12,underlineCount:8});
   for(const category of ['영양소','약학','질병']){
     const source={id:`direct-${category}-test`,category,contentStandard:'SP1',bodyHtml:quotaBody()};
     assert.deepEqual(assertDirectSubmissionEmphasis(source),{boldCount:18,highlightCount:8,underlineCount:2});
@@ -110,9 +110,14 @@ test('non-food submission still rejects fewer than 8 highlight effects',()=>{
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
 });
 
-test('food submission rejects fewer than 4 highlight effects',()=>{
-  const source={id:'direct-food-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:15,level2:1,level3:2})};
+test('food submission rejects fewer than 12 highlight effects',()=>{
+  const source={id:'direct-food-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:14,level2:3,level3:8})};
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
+});
+
+test('food submission rejects fewer than 8 underline highlight effects',()=>{
+  const source={id:'direct-food-underline-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:13,level2:5,level3:7})};
+  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_UNDERLINE_MIN/);
 });
 
 test('new submission rejects fewer than 2 underline highlight effects',()=>{
