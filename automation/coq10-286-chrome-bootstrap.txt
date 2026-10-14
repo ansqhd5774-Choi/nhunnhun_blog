@@ -1,2 +1,2 @@
 direct-286-coq10-r10-20261015
-pre-submit recovery: start saved-session Chrome only; no Tistory mutation
+pre-submit recovery attempt 2: detached saved-session Chrome only; no Tistory mutation
