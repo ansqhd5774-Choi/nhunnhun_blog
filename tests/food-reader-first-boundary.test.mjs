@@ -5,14 +5,16 @@ import {assertOllamaAuthoringAllowed} from '../authoring/ollama.mjs';
 
 const ACTIVE_FOOD_FILES=[
   'AGENTS.md',
+  'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
+  'docs/content/FOOD_CONTENT_QUALITY_R1.md',
   'docs/content/DIRECT_AUTHORING_R1.md',
   'authoring/prepare-direct-source.mjs',
   'authoring/food-axis-review.mjs'
 ];
 const LOCKED_TOPICS=['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'];
-const RESEARCH_NEGATIVE_ENUM=/연구 부족|근거 부족|미확인|일반화 불가/u;
+const RESEARCH_NEGATIVE_ENUM=/연구\S{0,3}부족|근거\S{0,3}부족|미확인|일반화\S{0,3}(?:불가|어렵)/u;
 
-test('active food authoring inputs do not enumerate research-negative fallback wording',async()=>{
+test('active food authoring inputs do not enumerate expert-review fallback wording',async()=>{
   for(const file of ACTIVE_FOOD_FILES){
     const text=await readFile(file,'utf8');
     assert.doesNotMatch(text,RESEARCH_NEGATIVE_ENUM,`${file} must stay reader-first`);
