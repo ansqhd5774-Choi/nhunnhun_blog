@@ -17,7 +17,7 @@ export function directFixture(overrides={}){
   const tone=isNutrientChange?' data-tone="positive"':'';
   let detail='';
   if(category==='영양소'&&index===1)detail='<p>성인이 500mg을 하루 1회 4주 섭취했을 때 불편감이 줄고 일상 기능이 개선됐습니다.</p>';
-  if(category==='영양소'&&index===3)detail='<table><tbody><tr><td>1</td><td>식품 A</td><td>120mg/100g</td></tr><tr><td>2</td><td>식품 B</td><td>80mg/100g</td></tr><tr><td>3</td><td>식품 C</td><td>40mg/100g</td></tr></tbody></table>';
+  if(category==='영양소'&&index===3)detail='<table><tbody><tr><td>1</td><td><mark data-tone="info"><u><strong>식품 A</strong></u></mark></td><td>120mg/100g</td></tr><tr><td>2</td><td><mark data-tone="info"><strong>식품 B</strong></mark></td><td>80mg/100g</td></tr><tr><td>3</td><td><mark data-tone="info"><strong>식품 C</strong></mark></td><td>40mg/100g</td></tr></tbody></table>';
   return `<h2>${h}</h2><ul><li><strong>핵심</strong><strong>기준</strong><mark${tone}><strong>${highlighted}</strong></mark></li></ul>${detail}`;
  }).join('');
  const extras=Array.from({length:8},(_,i)=>`<mark data-tone="info"><u><strong>중요한 실천 행동 ${i+1}</strong></u></mark>`).join('');
