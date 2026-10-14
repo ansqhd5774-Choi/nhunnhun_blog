@@ -19,6 +19,11 @@ const LIMITATION_PATTERNS=[
   /(?:(?:비교\s*가능한)\s*)?(?:공식\s*)?(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
   /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|아닙|없)/u,
 ];
+const NUTRIENT_EXPECTED_CHANGE_HEADING=/(?:효능|효과|기대\s*변화|어떤\s*변화|누가\s*(?:먹|섭취|복용)|먹으면\s*좋)/u;
+const HUMAN_EVIDENCE_PATTERN=/(?:사람|성인|환자|참가자|대상자|인체|임상|무작위)/u;
+const OBSERVED_CHANGE_PATTERN=/(?:개선|증가|감소|낮아|높아|줄(?:었|어|어들|어드는|이는)|완화|향상|회복|유지|변화|호전)/u;
+const STUDY_DURATION_PATTERN=/(?:^|[^0-9])\d{1,3}(?:\.\d+)?\s*(?:일|주|개월|달|년)(?:간|동안|후)?(?:[^0-9]|$)/u;
+const INTAKE_AMOUNT_PATTERN=/(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(?:μg|mcg|mg|g|IU|국제단위|mL|ml|정|캡슐)(?:\/일|\s*\/\s*일|\s*하루)?/iu;
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
@@ -56,7 +61,19 @@ export function directFocusReview(bodyHtml='') {
       limitationFindings.push(...hits.map(match=>({heading:section.heading,match})));
     }
   }
-  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12)};
+  const nutrientExpectedChangeSections=sections
+    .filter(section=>section.heading!=='__INTRO__'&&!UTILITY_HEADING.test(section.heading)&&NUTRIENT_EXPECTED_CHANGE_HEADING.test(section.heading))
+    .map(section=>{
+      const text=clean(section.text);
+      return {
+        heading:section.heading,
+        hasHumanEvidence:HUMAN_EVIDENCE_PATTERN.test(text),
+        hasObservedChange:OBSERVED_CHANGE_PATTERN.test(text),
+        hasStudyDuration:STUDY_DURATION_PATTERN.test(text),
+        hasIntakeAmount:INTAKE_AMOUNT_PATTERN.test(text),
+      };
+    });
+  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12),nutrientExpectedChangeSections};
 }
 
 // Shared direct/SP1 structure guard. Food editorial-balance counts are advisory metrics only:
@@ -65,5 +82,11 @@ export function assertDirectSubmissionFocus(source) {
   if(source?.contentStandard!=='SP1'||!source?.id?.startsWith('direct-'))return;
   const review=directFocusReview(source.bodyHtml??'');
   if(review.coreHeadings.length>DIRECT_AUTHORING_CONTRACT.coreHeadingMaximum)throw Error('E_DIRECT_FOCUS_SECTION_OVERLOAD');
+  if(source.category==='영양소'){
+    if(!review.nutrientExpectedChangeSections.length)throw Error('E_DIRECT_NUTRIENT_EXPECTED_CHANGE_SECTION_MISSING');
+    const humanSections=review.nutrientExpectedChangeSections.filter(section=>section.hasHumanEvidence);
+    if(humanSections.length&&humanSections.every(section=>!(section.hasObservedChange&&section.hasStudyDuration&&section.hasIntakeAmount)))
+      throw Error('E_DIRECT_NUTRIENT_EXPECTED_CHANGE_INCOMPLETE');
+  }
   return review;
 }
