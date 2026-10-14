@@ -9,6 +9,7 @@ import { collectSectionImages } from './queue-images.mjs';
 import { applyCuratedEvidence, collectInternalLinks, renderR53Body } from './queue-r53.mjs';
 import { writeSinglePassArticle, singlePassReceipt } from './queue-single-pass.mjs';
 import { createStageCache, producerPolicyDigest, digest, recordAttempt } from './queue-checkpoint.mjs';
+import { assertLegacyNutrientAuthoringDisabled } from './nutrient-editorial-boundary.mjs';
 
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { checkUpdateSource, updateFingerprint } from '../publishing/update-core.mjs';
@@ -61,6 +62,8 @@ export async function runQueueProducer({root=process.cwd(),model=process.env.OLL
     onOutput?.({complete:'true',commit_sha:''});
     return {complete:true};
   }
+
+  assertLegacyNutrientAuthoringDisabled(selected.item.domain);
 
   const item=selected.item,sourceId=queueSourceId(item,todayInSeoul(),baseSha.slice(0,12));
   const running={
