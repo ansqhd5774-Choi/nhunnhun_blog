@@ -7,6 +7,16 @@ const ACTIVE_FOOD_FILES=[
   'AGENTS.md',
   'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
   'docs/content/FOOD_CONTENT_QUALITY_R1.md',
+  'docs/GENERAL_CHAT_EXECUTION.md',
+  'docs/content/DIRECT_AUTHORING_R1.md',
+  'docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md',
+  'authoring/prepare-direct-source.mjs',
+  'authoring/food-axis-review.mjs'
+];
+const EDITORIAL_FOOD_FILES=[
+  'AGENTS.md',
+  'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
+  'docs/content/FOOD_CONTENT_QUALITY_R1.md',
   'docs/content/DIRECT_AUTHORING_R1.md',
   'authoring/prepare-direct-source.mjs',
   'authoring/food-axis-review.mjs'
@@ -15,7 +25,7 @@ const LOCKED_TOPICS=['소개','영양소·핵심 성분','꾸준 섭취 변화',
 const RESEARCH_NEGATIVE_ENUM=/연구\S{0,3}부족|근거\S{0,3}부족|미확인|일반화\S{0,3}(?:불가|어렵)/u;
 const EXPERT_FRAMING=/연구자|대학원생|논문\s*해설|근거평가|연구평가/u;
 
-test('active food authoring inputs do not enumerate expert-review fallback wording',async()=>{
+test('all active food authoring inputs avoid expert-review fallback wording',async()=>{
   for(const file of ACTIVE_FOOD_FILES){
     const text=await readFile(file,'utf8');
     assert.doesNotMatch(text,RESEARCH_NEGATIVE_ENUM,`${file} must stay reader-first`);
@@ -23,21 +33,30 @@ test('active food authoring inputs do not enumerate expert-review fallback wordi
 });
 
 test('food editorial standards stay general-reader-first rather than expert-review-first',async()=>{
-  for(const file of ['AGENTS.md','docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt','docs/content/FOOD_CONTENT_QUALITY_R1.md','docs/content/DIRECT_AUTHORING_R1.md']){
+  for(const file of EDITORIAL_FOOD_FILES){
     const text=await readFile(file,'utf8');
     assert.doesNotMatch(text,EXPERT_FRAMING,`${file} must not restore expert-review framing`);
   }
 });
 
-test('active food authoring inputs retain the user-locked six topics',async()=>{
-  for(const file of ACTIVE_FOOD_FILES){
+test('editorial food inputs retain the user-locked six topics',async()=>{
+  for(const file of EDITORIAL_FOOD_FILES){
     const text=await readFile(file,'utf8');
     for(const topic of LOCKED_TOPICS) assert.match(text,new RegExp(topic.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'u'));
   }
 });
 
+test('active execution contracts defer food content to dedicated food standards',async()=>{
+  for(const file of ['docs/GENERAL_CHAT_EXECUTION.md','docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md']){
+    const text=await readFile(file,'utf8');
+    assert.match(text,/PROJECT_INSTRUCTIONS_FOOD_R8\.1\.txt/u);
+    assert.match(text,/FOOD_CONTENT_QUALITY_R1\.md/u);
+    assert.match(text,/기술 계약/u);
+  }
+});
+
 test('food direct standards explicitly exclude Queue and Ollama authoring',async()=>{
-  for(const file of ['AGENTS.md','docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt','docs/content/DIRECT_AUTHORING_R1.md']){
+  for(const file of ['AGENTS.md','docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt','docs/content/DIRECT_AUTHORING_R1.md','docs/GENERAL_CHAT_EXECUTION.md','docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md']){
     const text=await readFile(file,'utf8');
     assert.match(text,/direct\/SP1/u);
     assert.match(text,/Queue\/Ollama/u);
