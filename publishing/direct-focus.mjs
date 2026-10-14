@@ -3,6 +3,8 @@ import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 const UTILITY_HEADING=/^(?:자주 묻는 질문|FAQ|핵심 정리|함께 보면 좋은 글|자료 출처)$/iu;
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
+
+// Diagnostics only. These counters must never become authoring targets or force research-report wording.
 const RESEARCH_DETAIL_PATTERNS=[
   /(?:연구에서는|논문에서는|시험에서는)/gu,
   /(?:무작위|이중맹검|대조군|표본\s*(?:수|크기)|통계적(?:으로)?\s*유의)/gu,
@@ -20,7 +22,10 @@ const LIMITATION_PATTERNS=[
   /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|아닙|없)/u,
 ];
 const NUTRIENT_EXPECTED_CHANGE_HEADING=/(?:효능|효과|기대\s*변화|어떤\s*변화|누가\s*(?:먹|섭취|복용)|먹으면\s*좋)/u;
-const HUMAN_EVIDENCE_PATTERN=/(?:사람|성인|환자|참가자|대상자|인체|임상|무작위)/u;
+
+// Human applicability must come from an actual reader-relevant population, not from study-design words
+// such as "임상" or "무작위". This lets reader-first prose pass without requiring research framing.
+const HUMAN_SUBJECT_PATTERN=/(?:사람|성인|환자|참가자|대상자|남성|여성|어린이|청소년|노인|고령자|임신부|임산부|수유부)/u;
 const OBSERVED_CHANGE_PATTERN=/(?:개선|증가|감소|낮아|높아|줄(?:었|어|어들|어드는|이는)|완화|향상|회복|유지|변화|호전)/u;
 const STUDY_DURATION_PATTERN=/(?:^|[^0-9])\d{1,3}(?:\.\d+)?\s*(?:일|주|개월|달|년)(?:간|동안|후)?(?:[^0-9]|$)/u;
 const INTAKE_AMOUNT_PATTERN=/(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(?:μg|mcg|mg|g|IU|국제단위|mL|ml|정|캡슐)(?:\/일|\s*\/\s*일|\s*하루)?/iu;
@@ -69,7 +74,7 @@ export function directFocusReview(bodyHtml='') {
       const text=clean(section.text);
       return {
         heading:section.heading,
-        hasHumanEvidence:HUMAN_EVIDENCE_PATTERN.test(text),
+        hasHumanEvidence:HUMAN_SUBJECT_PATTERN.test(text),
         hasObservedChange:OBSERVED_CHANGE_PATTERN.test(text),
         hasStudyDuration:STUDY_DURATION_PATTERN.test(text),
         hasIntakeAmount:INTAKE_AMOUNT_PATTERN.test(text),
@@ -87,8 +92,9 @@ export function directFocusReview(bodyHtml='') {
   return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12),nutrientExpectedChangeSections,nutrientFoodRankingSections};
 }
 
-// Shared direct/SP1 structure guard. Food editorial-balance counts are advisory metrics only:
-// simplistic word counts must not force authors to delete accurate evidence or rewrite facts merely to pass CI.
+// Shared direct/SP1 structure guard.
+// Research-detail and limitation counters are diagnostics only. They must not reward, require, or inject
+// research-report prose. Editorial meaning remains an author-review responsibility.
 export function assertDirectSubmissionFocus(source) {
   if(source?.contentStandard!=='SP1'||!source?.id?.startsWith('direct-'))return;
   const review=directFocusReview(source.bodyHtml??'');
