@@ -2,13 +2,10 @@ import { ollamaJson } from './queue-ollama.mjs';
 import { R53_SECTION_SPECS } from './queue-r53.mjs';
 import { contentDigest, todayInSeoul } from '../publishing/content-standards.mjs';
 import { foodSectionInstructions, writeFoodSections } from './queue-food-sections.mjs';
+import { assertLegacyNutrientAuthoringDisabled, NUTRIENT_EDITORIAL_EXTERNAL_ERROR } from './nutrient-editorial-boundary.mjs';
 
 export const SINGLE_PASS_STANDARD='SP1';
-export const NUTRIENT_EDITORIAL_EXTERNAL_ERROR='E_NUTRIENT_DIRECT_EDITORIAL_EXTERNAL';
-
-function assertLegacyWriterAllowed(domain){
-  if(domain==='nutrient')throw Error(NUTRIENT_EDITORIAL_EXTERNAL_ERROR);
-}
+export { NUTRIENT_EDITORIAL_EXTERNAL_ERROR };
 
 const DETAILS={
   food:[
@@ -38,7 +35,7 @@ const DETAILS={
 };
 
 export function writingInstructions(domain) {
-  assertLegacyWriterAllowed(domain);
+  assertLegacyNutrientAuthoringDisabled(domain);
   if(domain==='food')return foodSectionInstructions();
   const specs=R53_SECTION_SPECS[domain];
   if(!specs)throw Error('E_QUEUE_PLAN_DOMAIN');
@@ -47,7 +44,7 @@ export function writingInstructions(domain) {
 }
 
 export async function writeSinglePassArticle(item,evidence,{cached=(_stage,_input,action)=>action(),onCacheHit,...options}={}) {
-  assertLegacyWriterAllowed(item.domain);
+  assertLegacyNutrientAuthoringDisabled(item.domain);
   if(item.domain==='food')return writeFoodSections(item,evidence,{cached,onCacheHit,...options});
   const instructions=writingInstructions(item.domain);
   const format={type:'object',additionalProperties:false,required:['title','lead','summary','sections'],properties:{
@@ -63,7 +60,7 @@ export async function writeSinglePassArticle(item,evidence,{cached=(_stage,_inpu
 }
 
 export function singlePassReceipt(source,item,evidence) {
-  assertLegacyWriterAllowed(item.domain);
+  assertLegacyNutrientAuthoringDisabled(item.domain);
   return {version:SINGLE_PASS_STANDARD,domain:item.domain,sourceDigest:contentDigest(source),generatedAt:todayInSeoul(),
     policy:'single-write-auto-publish-user-content-review',semanticReview:'not-performed',
     instructions:writingInstructions(item.domain),sources:evidence.sources.map(s=>({title:s.title,url:s.url})),notes:[]};
