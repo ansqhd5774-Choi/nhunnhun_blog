@@ -1,0 +1,3 @@
+sourceId=direct-77-curcumin-r93-20261015
+reason=previous update stopped before submit with BLOCKED_SOURCE_DRIFT after main advanced during the run
+policy=source-preserving retry; do not modify article source
