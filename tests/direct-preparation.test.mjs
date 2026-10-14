@@ -41,8 +41,12 @@ test('food-axis review uses the user-defined six food topics and reader-first qu
   assert.match(review.axes[3].reviewQuestion,/무엇과 먹는지·왜 좋은지·어떻게 먹는지/);
   assert.match(review.axes[4].reviewQuestion,/행동을 바꿔야 하는 주의/);
   assert.match(review.axes[5].reviewQuestion,/신선도·구매 기준·제품 형태·보관/);
-  assert.equal(review.balanceReview.questions.length,10);
+  assert.equal(review.balanceReview.questions.length,11);
   const balance=review.balanceReview.questions.join('\n');
+  assert.match(balance,/기존 음식 글 전체 재작성/);
+  assert.match(balance,/기존 본문을 초안·문장 재료로 쓰지 않고/);
+  assert.match(balance,/빈 문서/);
+  assert.match(balance,/부분 수정은 사용자가 범위를 명시한 경우/);
   assert.match(balance,/사용자 확정 6개 소제목/);
   assert.match(balance,/부정·제한·반박 문장/);
   assert.match(balance,/확인해서 사용할 수 없는 내용은 생략/);
