@@ -31,6 +31,10 @@ export function validateJob(job) {
   }
   return job;
 }
+export function assertOllamaAuthoringAllowed(job) {
+  if(job?.domain==='food' || job?.category==='음식') throw new Error('E_OLLAMA_FOOD_DISABLED');
+  return job;
+}
 export function renderArticle(article, job) {
   if (!article || typeof article.title!=='string' || typeof article.summary!=='string' || typeof article.reviewNotes!=='string' || !Array.isArray(article.sections) || article.sections.length<4 || article.sections.length>10) throw new Error('E_OLLAMA_ARTICLE');
   const sources = new Map(job.sources.map(s=>[s.id,s]));
@@ -85,7 +89,7 @@ export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) 
 }
 export async function runOllama(jobId,{root=process.cwd(),fetcher=fetch,model='qwen3:4b'}={}) {
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(jobId??'') || model.includes('cloud') || !/^[a-z0-9][a-z0-9.:_-]+$/.test(model)) throw new Error('E_OLLAMA_INPUT');
-  const job=validateJob(JSON.parse(await readFile(resolve(root,'authoring/jobs',`${jobId}.json`),'utf8')));
+  const job=assertOllamaAuthoringAllowed(validateJob(JSON.parse(await readFile(resolve(root,'authoring/jobs',`${jobId}.json`),'utf8'))));
   let tags; try { tags=await fetcher('http://127.0.0.1:11434/api/tags').then(r=>r.json()); } catch { throw new Error('E_OLLAMA_NOT_RUNNING'); }
   if(!tags.models?.some(m=>m.name===model)) throw new Error('E_OLLAMA_MODEL_MISSING');
   const domainGuide=await readFile(resolve(root,'docs/content/DOMAIN_GUIDES_R1.md'),'utf8');
