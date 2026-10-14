@@ -41,9 +41,18 @@ const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:
 const ACTIONABLE_SAFETY_PATTERN=/(?:즉시\s*(?:중단|진료|병원|응급)|복용을?\s*중단|섭취를?\s*중단|피해야|복용하지\s*말|섭취하지\s*말|의료진(?:과|에게)\s*(?:상담|확인)|진료를?\s*받)/u;
 const BENEFIT_HEADING_PATTERN=/(?:효능|효과|기대\s*변화|건강상\s*이점|장점)/u;
 const BENEFIT_OUTCOME_PATTERN=/(?:개선|증가|감소|낮추|줄(?:이|어)|유지|보호|회복|완화|향상|도움|위험\s*감소|진행\s*(?:지연|감소))/u;
+const TOP_FOOD_HEADING_PATTERN=/(?:TOP\s*\d+|풍부한\s*식품)/iu;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
+const containsTag=(node,name)=>node?.name===name||(node?.children??[]).some(child=>containsTag(child,name));
+const containsMarkedStrong=node=>(node?.name==='mark'&&containsTag(node,'strong'))||(node?.children??[]).some(containsMarkedStrong);
+const collectRows=(node,rows=[])=>{
+  if(node?.name==='tr')rows.push(node);
+  for(const child of node?.children??[])collectRows(child,rows);
+  return rows;
+};
+const firstDataCell=row=>(row?.children??[]).find(child=>child?.name==='td');
 
 // New submission preparation only. Historical read-only loading keeps its existing guard.
 export function assertDirectSubmissionEmphasis(source) {
@@ -58,11 +67,21 @@ export function assertDirectSubmissionEmphasis(source) {
   let boldCount=0;
   let highlightCount=0;
   let underlineCount=0;
+  let topRankEmphasisMissing=false;
   const visit=node=>{
     if(node.name==='h2'){
       currentHeading=cleanText(nodeText(node)).replace(/^\d+[.)]\s*/u,'');
       inBenefitSection=BENEFIT_HEADING_PATTERN.test(currentHeading);
       if(inBenefitSection)hasBenefitSection=true;
+    }
+    if(source.category==='영양소'&&node.name==='table'&&TOP_FOOD_HEADING_PATTERN.test(currentHeading)){
+      const rankedRows=collectRows(node).map(row=>{
+        const first=firstDataCell(row);
+        const match=cleanText(nodeText(first)).match(/^([123])(?:위)?$/u);
+        return match?{rank:Number(match[1]),row}:null;
+      }).filter(Boolean);
+      const topThree=[1,2,3].map(rank=>rankedRows.find(item=>item.rank===rank)).filter(Boolean);
+      if(topThree.length===3&&topThree.some(item=>!containsMarkedStrong(item.row)))topRankEmphasisMissing=true;
     }
     if(node.name==='strong')boldCount++;
     if(node.name==='mark') {
@@ -92,6 +111,8 @@ export function assertDirectSubmissionEmphasis(source) {
   // Nutrient benefit sections must visibly emphasize at least one confirmed health outcome,
   // not merely evidence quality, limitations, dosage, or product-selection facts.
   if(source.category==='영양소'&&hasBenefitSection&&!benefitOutcomeHighlights)throw Error('E_DIRECT_BENEFIT_EMPHASIS_MISSING');
+  // In a nutrient TOP food table, ranks 1-3 are the direct answer to the H2 and must be visibly emphasized.
+  if(topRankEmphasisMissing)throw Error('E_DIRECT_TOP3_EMPHASIS_MISSING');
   if(boldCount<minimums.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
   if(highlightCount<minimums.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
   if(underlineCount<minimums.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
