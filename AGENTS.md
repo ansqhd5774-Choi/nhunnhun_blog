@@ -7,9 +7,10 @@
 2. `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt` — 음식 내용·소제목·문체·독자 중심 작성의 유일한 기본 기준
 3. `docs/content/FOOD_CONTENT_QUALITY_R1.md` — 정보 깊이·벤치마크·정보 밀도·표·중복 제거 기준
 4. `docs/GENERAL_CHAT_EXECUTION.md` — 실행 역할과 공개 검증
-5. direct/SP1 공통 문서와 실제 워크플로 — 디자인·강조·이미지·저장·제출·검증의 기술 계약
+5. `docs/content/DIRECT_AUTHORING_R1.md`, `docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md`, `docs/content/CATEGORY_CONTENT_PARITY.md` — 디자인·강조·이미지·저장·제출·검증의 **기술 계약에만** 사용
+6. 실제 `.github/workflows/`와 `publishing/` 코드
 
-다른 저장소·다른 블로그·다른 카테고리·legacy 공통 문서의 소제목·연구평가·복용·치료·제품선택 구조를 음식 글 편집 기준으로 사용하지 않는다.
+다른 저장소·다른 블로그·다른 카테고리·legacy 공통 문서의 소제목·연구평가·복용·치료·제품선택 구조를 음식 글 편집 기준으로 사용하지 않는다. 위 공통 기술 문서에 다른 분야의 편집 예시가 남아 있어도 음식 내용 기준으로 승격하지 않는다.
 
 ## 사용자 확정 음식 6개 소제목
 1. 소개
