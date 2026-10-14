@@ -19,52 +19,22 @@ test('focus guard blocks more than six core reader questions',()=>{
   assert.throws(()=>assertDirectSubmissionFocus(source(html)),/E_DIRECT_FOCUS_SECTION_OVERLOAD/);
 });
 
-test('research-report detail count stays visible but does not hard-block food publication',()=>{
-  const html='<h2>효능</h2><p>연구에서는 무작위 대조군 시험을 설명했습니다. 120명을 대상으로 통계적으로 유의한 차이를 분석했습니다.</p>';
+test('focus review exposes no research or limitation editorial counters',()=>{
+  const html='<h2>효능</h2><p>일반 독자가 필요한 실제 설명입니다.</p>';
   const review=directFocusReview(html);
-  assert.ok(review.researchDetailHits>2);
+  assert.equal('researchDetailHits' in review,false);
+  assert.equal('limitationHits' in review,false);
+  assert.equal('limitationFindings' in review,false);
+});
+
+test('food publication is not evaluated by research or caveat wording',()=>{
+  const html='<h2>효능</h2><p>연구에서는 무작위 대조군 시험을 설명했습니다. 근거가 부족합니다. 자료가 제한적입니다.</p>';
+  const review=directFocusReview(html);
+  assert.deepEqual(Object.keys(review).sort(),['coreHeadings','nutrientChangeSections','nutrientFoodRankingSections','utilityHeadings'].sort());
   assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html)));
 });
 
-test('repeated evidence-limit caveat count stays visible but does not hard-block food publication',()=>{
-  const html='<h2>효능</h2><p>근거가 부족합니다. 자료가 제한적입니다. 효과를 단정하기 어렵습니다.</p>'+
-    '<h2>주의사항</h2><p>안전 근거가 부족한 제품은 피합니다.</p>';
-  const review=directFocusReview(html);
-  assert.equal(review.limitationHits,3);
-  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html)));
-});
-
-test('focus review catches guarantee no-effect no-database and universal-negation variants without blocking',()=>{
-  const html='<h2>한 달 복용 후 기대 변화</h2><p>기간 효과를 보장할 수 없습니다. 뚜렷한 임상 이득을 확인하지 못했습니다.</p>'+
-    '<h2>식품 TOP7</h2><p>비교 가능한 공식 데이터베이스는 없습니다.</p>'+
-    '<h2>권장 대상</h2><p>모든 사람이 보충제를 먹어야 하는 것은 아닙니다.</p>';
-  const review=directFocusReview(html);
-  assert.equal(review.limitationHits,4);
-  assert.equal(review.limitationFindings.length,4);
-  assert.ok(review.limitationFindings.some(f=>/보장할 수 없습니다/.test(f.match)));
-  assert.ok(review.limitationFindings.some(f=>/비교 가능한 공식 데이터베이스는 없습니다/.test(f.match)));
-  assert.ok(review.limitationFindings.some(f=>/모든 사람이 보충제를 먹어야 하는 것은 아닙니다/.test(f.match)));
-  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html)));
-});
-
-test('focus review recognizes Korean negative-copula wording as one caveat sentence',()=>{
-  const review=directFocusReview('<h2>권장 대상</h2><p>모든 사람이 보충제를 먹어야 하는 것은 아닙니다.</p>');
-  assert.equal(review.limitationHits,1);
-  assert.match(review.limitationFindings[0].match,/아닙니다/);
-});
-
-test('mixed risk heading remains observable without becoming an automatic editorial blocker',()=>{
-  const html='<h2>효능</h2><p>근거가 부족합니다. 자료가 제한적입니다.</p>'+
-    '<h2>결핍·과다 복용의 위험, 예방 가능한 질병과 추천 제품</h2><p>효과를 보장할 수 없습니다.</p>';
-  const review=directFocusReview(html);
-  assert.equal(review.limitationHits,3);
-  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html)));
-});
-
-test('non-food direct posts keep observations and are not blocked by editorial counts',()=>{
-  const html='<h2>효능</h2><p>연구에서는 무작위 대조군 시험을 설명했습니다. 120명을 대상으로 통계적으로 유의한 차이를 분석했습니다. 근거가 부족합니다. 자료가 제한적입니다. 효과를 단정하기 어렵습니다.</p>';
-  const review=directFocusReview(html);
-  assert.ok(review.researchDetailHits>2);
-  assert.equal(review.limitationHits,3);
+test('non-nutrient direct posts are checked only for shared structure',()=>{
+  const html='<h2>효능</h2><p>독자에게 필요한 설명입니다.</p>';
   assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html,'약학')));
 });
