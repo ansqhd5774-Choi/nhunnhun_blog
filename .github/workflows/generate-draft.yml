@@ -5,13 +5,13 @@ on:
       - 'authoring/**'
       - 'tests/authoring.test.mjs'
       - 'tests/ollama-authoring.test.mjs'
+      - 'tests/nutrient-hard-isolation.test.mjs'
       - '.github/workflows/generate-draft.yml'
       - '.github/actions/setup-node-pnpm/**'
 permissions:
   contents: read
 concurrency:
-  group: authoring-regression-tests-${{ github.event.pull_request.number ||
-    github.ref }}
+  group: authoring-regression-tests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   test:
@@ -28,4 +28,4 @@ jobs:
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs
+      - run: node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs tests/nutrient-hard-isolation.test.mjs
