@@ -40,7 +40,7 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
 ];
 const PURE_SAFETY_HEADING=/^(?:주의(?:사항)?|부작용(?:과|·)\s*주의(?:사항)?|금기(?:와|·)\s*주의(?:사항)?|응급(?:\s*신호)?|이상반응(?:과|·)\s*주의(?:사항)?)$/u;
 const ACTIONABLE_SAFETY_PATTERN=/(?:즉시\s*(?:중단|진료|병원|응급)|복용을?\s*중단|섭취를?\s*중단|피해야|복용하지\s*말|섭취하지\s*말|의료진(?:과|에게)\s*(?:상담|확인)|진료를?\s*받)/u;
-const BENEFIT_HEADING_PATTERN=/(?:효능|효과|기대\s*변화|건강상\s*이점|장점)/u;
+const BENEFIT_HEADING_PATTERN=/(?:효능|기대(?:되는)?(?:\s*신체)?\s*변화|어떤\s*변화|건강상\s*이점|장점)/u;
 const BENEFIT_OUTCOME_PATTERN=/(?:개선|증가|감소|낮추|줄(?:이|어)|유지|보호|회복|완화|향상|도움|위험\s*감소|진행\s*(?:지연|감소))/u;
 const TOP_FOOD_HEADING_PATTERN=/(?:TOP\s*\d+|풍부한\s*식품)/iu;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
