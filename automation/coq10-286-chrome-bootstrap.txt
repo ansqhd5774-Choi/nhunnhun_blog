@@ -1,2 +1,2 @@
-direct-286-coq10-r10-20261015
-pre-submit recovery attempt 2: detached saved-session Chrome only; no Tistory mutation
+direct-367-ginger-cheong-r94-food-only-20261015
+pre-submit recovery: detached saved-session Chrome only; no Tistory mutation
