@@ -2,6 +2,7 @@ import {parseDocument} from 'htmlparser2';
 import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 export const DIRECT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.emphasisMinimums;
+export const DIRECT_NUTRIENT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.nutrientEmphasisMinimums;
 export const DIRECT_FOOD_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.foodEmphasisMinimums;
 
 // Structural omission guard only; the author still chooses meaningful phrases.
@@ -58,7 +59,11 @@ const firstDataCell=row=>(row?.children??[]).find(child=>child?.name==='td');
 export function assertDirectSubmissionEmphasis(source) {
   if(source.contentStandard!=='SP1'||!source.id?.startsWith('direct-'))return;
   assertDirectEmphasis(source);
-  const minimums=source.category==='음식'?DIRECT_FOOD_EMPHASIS_MINIMUMS:DIRECT_EMPHASIS_MINIMUMS;
+  const minimums=source.category==='음식'
+    ?DIRECT_FOOD_EMPHASIS_MINIMUMS
+    :source.category==='영양소'
+      ?DIRECT_NUTRIENT_EMPHASIS_MINIMUMS
+      :DIRECT_EMPHASIS_MINIMUMS;
   let currentHeading='';
   let inBenefitSection=false;
   let hasBenefitSection=false;
