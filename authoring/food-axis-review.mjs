@@ -1,3 +1,4 @@
+const FOOD_RULE_SOURCE='docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt';
 const FOOD_AXES = [
   {
     expectedAxis:'정의·주요 성분·작용',
@@ -102,11 +103,15 @@ export function buildFoodAxisReview(source={}){
   return {
     assessment:'AUTHOR_REVIEW_REQUIRED',
     automatedSemanticVerdict:false,
+    scope:'FOOD_ONLY',
+    ruleSource:FOOD_RULE_SOURCE,
     observedCoreH2Count:coreHeadings.length,
     axes,
     balanceReview:{
       status:'AUTHOR_REVIEW_REQUIRED',
       automatedSemanticVerdict:false,
+      scope:'FOOD_ONLY',
+      ruleSource:FOOD_RULE_SOURCE,
       questions:[...BALANCE_REVIEW_QUESTIONS]
     }
   };
