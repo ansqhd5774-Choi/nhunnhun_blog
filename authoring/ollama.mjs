@@ -6,6 +6,7 @@ import { buildDraft } from './generate.mjs';
 import { reviewScaffold } from '../publishing/validate-content.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { SITE_CATEGORIES } from '../publishing/standards/common.mjs';
+import { assertLegacyNutrientAuthoringDisabled } from './nutrient-editorial-boundary.mjs';
 
 const esc = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export const articleSchema = {type:'object',additionalProperties:false,required:['title','summary','sections','reviewNotes'],properties:{
@@ -49,7 +50,6 @@ export function renderArticle(article, job) {
     html+=`<p>${section.sourceIds.map(id=>`<a href="${esc(sources.get(id).url)}">${esc(sources.get(id).title)}</a>`).join(' · ')}</p>`;
   }
   html+=`<h2>자료 출처</h2><ul>${job.sources.map(s=>`<li><a href="${esc(s.url)}">${esc(s.title)}</a> — 자료 확인일 ${s.checkedAt}</li>`).join('')}</ul>`;
-  // Common source/HTML checks, without making the existing update publisher eligible.
   const post = buildDraft({title:article.title,tags:[],bodyHtml:html},{id:job.id,domain:job.domain},job.sources.map(s=>s.url));
   const {tags,...source} = post;
   return {...source, articleId:job.articleId,targetUrl:job.targetUrl,expectedCurrentTitle:job.expectedCurrentTitle};
@@ -86,6 +86,7 @@ export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) 
 export async function runOllama(jobId,{root=process.cwd(),fetcher=fetch,model='qwen3:4b'}={}) {
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(jobId??'') || model.includes('cloud') || !/^[a-z0-9][a-z0-9.:_-]+$/.test(model)) throw new Error('E_OLLAMA_INPUT');
   const job=validateJob(JSON.parse(await readFile(resolve(root,'authoring/jobs',`${jobId}.json`),'utf8')));
+  assertLegacyNutrientAuthoringDisabled(job.domain);
   let tags; try { tags=await fetcher('http://127.0.0.1:11434/api/tags').then(r=>r.json()); } catch { throw new Error('E_OLLAMA_NOT_RUNNING'); }
   if(!tags.models?.some(m=>m.name===model)) throw new Error('E_OLLAMA_MODEL_MISSING');
   const domainGuide=await readFile(resolve(root,'docs/content/DOMAIN_GUIDES_R1.md'),'utf8');
