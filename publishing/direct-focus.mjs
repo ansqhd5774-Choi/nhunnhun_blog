@@ -2,7 +2,7 @@ import {parseDocument} from 'htmlparser2';
 import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 const UTILITY_HEADING=/^(?:자주 묻는 질문|FAQ|핵심 정리|함께 보면 좋은 글|자료 출처)$/iu;
-const NUTRIENT_CHANGE_HEADING=/(?:효능|효과|기대(?:되는)?(?:\s*신체)?\s*변화|어떤\s*변화|누가\s*(?:먹|섭취|복용)|먹으면\s*좋)/u;
+const NUTRIENT_CHANGE_HEADING=/(?:효능|기대(?:되는)?(?:\s*신체)?\s*변화|어떤\s*변화|누가\s*(?:먹|섭취|복용)|먹으면\s*좋)/u;
 const TARGET_GROUP_PATTERN=/(?:사람|성인|환자|참가자|대상자|남성|여성|어린이|청소년|노인|고령자|임신부|임산부|수유부)/u;
 const CHANGE_PATTERN=/(?:개선|증가|감소|낮아|높아|줄(?:었|어|어들|어드는|이는)|완화|향상|회복|유지|변화|호전)/u;
 const TIME_PERIOD_PATTERN=/(?:^|[^0-9])\d{1,3}(?:\.\d+)?\s*(?:일|주|개월|달|년)(?:간|동안|후)?(?:[^0-9]|$)/u;
