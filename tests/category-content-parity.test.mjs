@@ -21,6 +21,15 @@ for(const [category,titles] of Object.entries(headings))test(`${category}: 같�
  assert.equal(prepared.report.pairingReview.targetSection,pairingIndex+1);
  assert.equal(prepared.report.pairingReview.reviewQuestions.length,6);
  assert.equal(prepared.report.editorialReview.automatedSemanticVerdict,false);
+ if(category==='음식'){
+   assert.equal(prepared.report.editorialReview.scope,'FOOD_ONLY');
+   assert.equal(prepared.report.editorialReview.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
+   const q=prepared.report.editorialReview.questions.join(' ');
+   assert.match(q,/음식 전용 지침/);
+   assert.match(q,/정의·주요 성분·작용/);
+   assert.match(q,/신선도·보관·조리 팁/);
+   assert.doesNotMatch(q,/제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
+ }
  if(category==='약학')assert.match(prepared.report.pairingReview.reviewQuestions.join(' '),/허가사항/);
  if(category==='질병')assert.match(prepared.report.pairingReview.reviewQuestions.join(' '),/표준 치료/);
  if(category==='영양소'){
@@ -35,6 +44,13 @@ for(const [category,titles] of Object.entries(headings))test(`${category}: 같�
  }
  const css=prepared.preview.match(/<style>([\s\S]*?)<\/style>/)[1];if(baseline)assert.equal(css,baseline);else baseline=css;
  assert.equal((prepared.preview.match(/<mark><u><strong>실천 행동/g)||[]).length,6);
+});
+test('주요 음식 작성 진입 문서는 음식 편집 기준을 외부 저장소에 위임하지 않는다',async()=>{
+ for(const f of ['AGENTS.md','docs/GENERAL_CHAT_EXECUTION.md','docs/content/DIRECT_AUTHORING_R1.md','docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md']){
+   const text=await readFile(f,'utf8');
+   assert.match(text,/PROJECT_INSTRUCTIONS_FOOD_R8\.1\.txt/);
+   assert.doesNotMatch(text,/ansqhd5774-Choi\/nhunnhun_nutrients/);
+ }
 });
 test('주요 작성 진입 문서는 동일 공통 계약을 참조한다',async()=>{
  for(const f of ['AGENTS.md','docs/GENERAL_CHAT_EXECUTION.md','docs/CONTENT_STANDARD_R1.md','docs/CONTENT_WRITER_PROMPT_R1.md','docs/content/DIRECT_AUTHORING_R1.md','docs/content/DOMAIN_GUIDES_R1.md'])assert.match(await readFile(f,'utf8'),/CATEGORY_CONTENT_PARITY\.md/);
