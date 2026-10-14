@@ -17,7 +17,7 @@ test('preparation exposes actual pairing paragraphs for author review without au
 test('food-axis review exposes six reader-question, H2 and first-answer pairs plus value-first balance questions without semantic auto-pass',()=>{
   const source={bodyHtml:[
     '<h2>1. 음식은 무엇일까?</h2><p><img src="https://example.com/food.jpg" alt="음식"></p><p>첫째 답변입니다.</p>',
-    '<h2>2. 효능은 어디까지 확인됐을까?</h2><p>둘째 효능 답변입니다.</p>',
+    '<h2>2. 효능은 무엇일까?</h2><p>둘째 효능 답변입니다.</p>',
     '<h2>함께 보면 좋은 글</h2><p>보조 링크 설명입니다.</p>',
     '<h2>3. 얼마나 먹을까?</h2><p>셋째 섭취 답변입니다.</p>',
     '<h2>4. 무엇과 먹을까?</h2><p>넷째 궁합 답변입니다.</p>',
@@ -33,11 +33,13 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
   assert.match(review.axes[0].readerQuestion,/일반 영양표 외에/);
   assert.match(review.axes[0].reviewQuestion,/일반 열량·비타민·무기질 표에 묻히게/);
-  assert.equal(review.axes[1].heading,'2. 효능은 어디까지 확인됐을까?');
+  assert.equal(review.axes[1].heading,'2. 효능은 무엇일까?');
   assert.equal(review.axes[1].firstAnswer,'둘째 효능 답변입니다.');
   assert.equal(review.axes[2].heading,'3. 얼마나 먹을까?');
-  assert.match(review.axes[1].readerQuestion,/핵심 효능/);
-  assert.match(review.axes[1].reviewQuestion,/부정 설명을 첫 답변으로/);
+  assert.match(review.axes[1].readerQuestion,/핵심 건강상 장점/);
+  assert.match(review.axes[1].readerQuestion,/일상 식사/);
+  assert.match(review.axes[1].reviewQuestion,/건강상 장점·몸에서 하는 역할·실제 식사 활용/);
+  assert.match(review.axes[1].reviewQuestion,/연구 설계·근거 수준·한계 설명이 소제목이나 문단의 중심/);
   assert.match(review.axes[2].reviewQuestion,/⑤에서 다룰 독성·고용량 경고/);
   assert.match(review.axes[4].reviewQuestion,/독성·고용량·금기·응급 행동을 이 축에 집중/);
   assert.equal(review.balanceReview.status,'AUTHOR_REVIEW_REQUIRED');
@@ -45,11 +47,11 @@ test('food-axis review exposes six reader-question, H2 and first-answer pairs pl
   assert.equal(review.balanceReview.questions.length,5);
   const balanceQuestions=review.balanceReview.questions.join('\n');
   assert.match(balanceQuestions,/첫 인상/);
-  assert.match(balanceQuestions,/동일 의미/);
+  assert.match(balanceQuestions,/건강상 장점·몸에서 하는 역할·실제 식사 활용/);
+  assert.match(balanceQuestions,/연구 설계·표본·근거 수준·미확인/);
   assert.match(balanceQuestions,/⑤에 집중/);
-  assert.match(balanceQuestions,/확인된 긍정적 효능/);
-  assert.match(balanceQuestions,/효과 없음·미확인·공식 권장량 없음/);
-  assert.match(balanceQuestions,/응급·금기처럼 놓치면 위험한 안전 행동만 예외/);
+  assert.match(balanceQuestions,/각 H2의 직접 답/);
+  assert.match(balanceQuestions,/연구 한계나 반박 문구를 강조 개수 충족용/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -83,15 +85,14 @@ test('one local preparation uses publishing layout and retains author-selected e
   assert.equal(result.report.foodAxisReview.axes[0].firstAnswer,'소개');
   assert.equal(result.report.foodAxisReview.balanceReview.questions.length,5);
   const evidenceQuestions=result.report.editorialReview.questions.join('\n');
-  assert.match(evidenceQuestions,/정제 성분·추출물·오일·보충제·유사 종/);
-  assert.match(evidenceQuestions,/항산화·항균·항염/);
-  assert.match(evidenceQuestions,/전통 약재·민간 기록/);
   assert.match(evidenceQuestions,/종·부위·제형·용량/);
-  assert.match(evidenceQuestions,/경고·부정 표현을 첫 인상/);
-  assert.match(evidenceQuestions,/동일 의미를 반복하지 않았는가/);
+  assert.match(evidenceQuestions,/연구·공식 자료는 주장 사실 확인에 사용/);
+  assert.match(evidenceQuestions,/전통 사용 기록을 현대 치료·예방 효과/);
+  assert.match(evidenceQuestions,/건강상 장점과 몸에서 하는 역할, 실제 섭취 활용/);
+  assert.match(evidenceQuestions,/연구 방법·표본·통계·근거 수준.*소제목이나 본문의 중심/);
   assert.match(evidenceQuestions,/⑤ 부작용·주의 대상에 집중/);
-  assert.match(evidenceQuestions,/확인된 긍정적 효능/);
-  assert.match(evidenceQuestions,/효과 없음·미확인·공식 권장량 없음/);
+  assert.match(evidenceQuestions,/각 H2의 직접 답과 확인된 건강·영양·안전·섭취 가치/);
+  assert.match(evidenceQuestions,/연구 한계·반박 문구를 강조 개수 충족용/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});
