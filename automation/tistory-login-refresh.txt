@@ -1,1 +1,1 @@
-2026-10-15 refresh saved Tistory login session for dedicated publisher PC before retrying /367. Login refresh only; no post mutation.
+2026-10-15 visible interactive Tistory login window request for dedicated publisher PC before retrying /367. Login refresh only; no post mutation.
