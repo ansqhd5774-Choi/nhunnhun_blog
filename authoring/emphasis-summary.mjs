@@ -20,8 +20,8 @@ function foodHighlightDensity(totals,sections,category){
   const coreSections=sections.slice(1).filter(section=>!/^자료\s*출처$/u.test(String(section.heading??'').trim()));
   const coreH2=coreSections.length;
   if(!coreH2)return {status:'NOT_APPLICABLE',advisoryOnly:true,coreH2:0};
-  const recommendedMin=Math.max(4,coreH2+1);
-  const recommendedMax=coreH2+3;
+  const recommendedMin=12;
+  const recommendedMax=Math.max(12,coreH2*2);
   return {
     status:totals.highlight<recommendedMin?'LOW_HIGHLIGHT_DENSITY':'OK',
     advisoryOnly:true,
