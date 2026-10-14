@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {prepareDirectSource} from '../authoring/prepare-direct-source.mjs';
 const headings={
- 음식:['정의·주요 성분·작용','핵심 효능·예방 효과','섭취법·권장량','궁합·상호작용','부작용·주의 대상','신선도·보관·조리 팁'],
+ 음식:['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'],
  영양소:['정의·주요 성분·작용','효능·기대 변화·권장 대상·제품 형태 선택','실제 섭취량·복용법·기간·대표 제품','풍부한 식품 TOP7·평균 함량','함께 섭취할 영양소·보충제 조합','결핍·과다 섭취'],
  약학:['개발 목적·주요 성분·작용','주요 적응증·기본 복용법','효과를 높이는 보조제·주의점','위험한 약물·음식 병용','안전 복용·부작용·모니터링','대체 약품 비교·선택'],
  질병:['정의·발병 기전','주요 원인·고위험군','진단 방법·핵심 검사','예방·도움되는 음식 5가지','표준 치료·주요 의약품 3가지','재발 예방·생활습관 5가지·추적 관찰']
@@ -26,9 +26,13 @@ for(const [category,titles] of Object.entries(headings))test(`${category}: 같�
    assert.equal(prepared.report.editorialReview.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
    const q=prepared.report.editorialReview.questions.join(' ');
    assert.match(q,/음식 전용 지침/);
-   assert.match(q,/정의·주요 성분·작용/);
-   assert.match(q,/신선도·보관·조리 팁/);
-   assert.doesNotMatch(q,/제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
+   assert.match(q,/소개/);
+   assert.match(q,/영양소·핵심 성분/);
+   assert.match(q,/꾸준 섭취 변화/);
+   assert.match(q,/궁합·시너지/);
+   assert.match(q,/주의사항/);
+   assert.match(q,/고르는 법·보관법/);
+   assert.doesNotMatch(q,/정의·주요 성분·작용|핵심 효능·예방 효과|섭취법·권장량|궁합·상호작용|부작용·주의 대상|신선도·보관·조리 팁|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
  }
  if(category==='약학')assert.match(prepared.report.pairingReview.reviewQuestions.join(' '),/허가사항/);
  if(category==='질병')assert.match(prepared.report.pairingReview.reviewQuestions.join(' '),/표준 치료/);
