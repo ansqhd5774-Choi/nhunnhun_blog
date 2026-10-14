@@ -2,7 +2,7 @@
 
 대상은 `https://nhunnhun.tistory.com/`, 저장소는 `ansqhd5774-Choi/nhunnhun_blog`다. 이 저장소에서 일반 Chat이 새로 조사·작성·수정하는 콘텐츠는 **음식 카테고리만** 허용한다.
 
-음식의 내용·검색 의도·소제목·문체는 `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`와 `docs/content/FOOD_CONTENT_QUALITY_R1.md`가 결정한다. 이 문서는 **대상 판정·저장·실행·발행·공개 검증의 기술 계약에만** 사용한다. 음식의 편집 질문이나 본문 내용을 이 문서에서 추가하지 않는다.
+음식의 내용·검색 의도·소제목·문체는 `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`와 `docs/content/FOOD_CONTENT_QUALITY_R1.md`가 결정한다. 이 문서는 **대상 판정·저장·실행·발행·공개 검증의 기술 계약에만** 사용한다. 음식의 편집 질문이나 본문 내용을 이 문서에서 추가하지 않는다. 공통 렌더링·강조·이미지·제출 기술 계약은 `docs/content/CATEGORY_CONTENT_PARITY.md`를 따른다.
 
 ## 역할
 
