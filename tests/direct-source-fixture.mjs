@@ -7,6 +7,7 @@ export function directFixture(overrides={}){
   const tone=category==='영양소'&&h==='역할과 효과'?' data-tone="positive"':'';
   return `<h2>${h}</h2><ul><li><strong>핵심</strong><strong>기준</strong><mark${tone}><strong>${highlighted}</strong></mark></li></ul>`;
  }).join('');
- const extras='<p><mark><u><strong>중요한 실천 행동</strong></u></mark><mark><u><strong>보관 조건</strong></u></mark></p>';
- return {id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:review[0].src,imageReview:review,bodyHtml:images+sections+extras+'<h2>자료 출처</h2><ul>'+review.map(r=>`<li><a href="${r.sourcePage}">사진 출처</a></li>`).join('')+'</ul>',...overrides};
+ const extras=Array.from({length:8},(_,i)=>`<mark data-tone="info"><u><strong>중요한 실천 행동 ${i+1}</strong></u></mark>`).join('');
+ const extraBold=Array.from({length:2},(_,i)=>`<strong>보조 핵심 ${i+1}</strong>`).join('');
+ return {id:'direct-179-test',articleId:'179',targetUrl:'https://nhunnhun.tistory.com/179',expectedCurrentTitle:'감자',title:'감자',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:review[0].src,imageReview:review,bodyHtml:images+sections+`<p>${extras}${extraBold}</p>`+'<h2>자료 출처</h2><ul>'+review.map(r=>`<li><a href="${r.sourcePage}">사진 출처</a></li>`).join('')+'</ul>',...overrides};
 }
