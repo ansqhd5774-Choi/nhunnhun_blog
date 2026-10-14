@@ -1,1 +1,1 @@
-2026-10-15 visible interactive Tistory login window request for dedicated publisher PC before retrying /367. Login refresh only; no post mutation.
+2026-10-15 retry visible Tistory login after CDP readiness fix before /367 update. Login refresh only; no post mutation.
