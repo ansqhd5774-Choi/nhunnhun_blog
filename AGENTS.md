@@ -13,6 +13,10 @@
 
 음식의 제목·소제목·효능 구조·궁합·문체를 정할 때 다른 저장소, 다른 블로그, 다른 카테고리의 지침·예시·원고를 기준으로 사용하지 않는다. 공통 기술 문서 안에 과거 다른 분야 문구가 남아 있더라도 음식 편집 기준으로 승격하지 않는다.
 
+**음식 작업 중에는 다른 GitHub 저장소의 프로젝트 지침·목차·작성 예시를 조회해 빈칸을 보충하지 않는다.** 현재 저장소 안의 음식 전용 지침에서 확인되지 않은 편집 기준은 다른 저장소에서 가져오지 말고 음식 기준에서 미확인으로 처리한다. 비교가 필요한 경우에도 사용자가 명시적으로 요청한 때만 읽고, 음식 원고의 편집 기준으로 재사용하지 않는다.
+
+공통 direct/SP1 파일·테스트에 영양소·약학·질병용 legacy 예시가 존재할 수 있으나 이는 해당 legacy 경로의 보존 자료일 뿐이다. **음식 원고의 H2·질문·복용·제품선택·치료 구조를 정하는 근거로 사용하지 않는다.** 음식 작성 준비 결과의 `editorialReview`는 음식 source에서 반드시 `scope=FOOD_ONLY`, `ruleSource=docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt`를 사용한다.
+
 ## 음식 작성 범위
 
 - 음식·식재료·음료·향신료처럼 실제 식품으로 다룰 수 있는 주제만 신규 작성·전체 수정한다.
@@ -46,7 +50,7 @@
 
 - 공통 direct-design 렌더러와 기존 CSS를 사용한다. 글별 CSS·별도 러너를 만들지 않는다.
 - 강조는 `strong` → `mark>strong` → `mark>u>strong` 3단계다.
-- direct/SP1 하한은 strong18·mark8·mark>u>strong2다. 개수를 채우려고 문장을 만들거나 전체 문단을 자동 강조하지 않는다.
+- 음식 direct/SP1 하한은 **strong25·mark12·mark>u>strong8**이다. 개수를 채우려고 문장을 만들거나 전체 문단을 자동 강조하지 않는다.
 - 신규 및 direct/SP1 전체 수정은 서로 다른 본문 이미지 최소 3개를 준비한다.
 - `imageReview` 허용 키는 `src, alt, role, composition, sourcePage, author, license`와 선택적 boolean `visualChecked`다.
 - `visualChecked`는 실제 확인한 경우에만 true로 기록하며 필수 게이트가 아니다.
