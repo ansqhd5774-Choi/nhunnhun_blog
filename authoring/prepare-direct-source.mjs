@@ -18,26 +18,16 @@ const GENERIC_EDITORIAL_QUESTIONS=[
   '연구·공식 자료는 주장 사실 확인에 사용하고, 대상·제형·용량이 다른 결과를 그대로 일반화하지 않았는가?',
   '수치 설명은 모으고 FAQ·요약을 제외한 불필요한 반복을 줄였는가?'
 ];
-
 function foodEditorialReview(foodAxisReview){
-  return {
-    status:'AUTHOR_REVIEW_REQUIRED',
-    automatedSemanticVerdict:false,
-    ruleSource:'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
-    qualityRuleSource:'docs/content/FOOD_CONTENT_QUALITY_R1.md',
-    scope:'FOOD_ONLY',
-    questions:[
-      '음식 원고는 이 저장소의 음식 전용 지침만 편집 기준으로 사용하고, 사용자 확정 6개 소제목(소개, 영양소·핵심 성분, 꾸준 섭취 변화, 궁합·시너지, 주의사항, 고르는 법·보관법)을 이름·순서·의미 그대로 사용했는가?',
-      '일반 독자가 실제로 궁금해하는 질문과 생활정보 범위를 먼저 확인하고, 글이 음식의 특징·영양·장점·활용·선택·섭취·보관을 중심으로 구성됐는가?',
-      '자료가 부족한 주장을 `근거 부족`, `연구 부족`, `미확인`, `일반화 불가` 같은 부정 문장으로 자동 대체하지 않았는가?',
-      ...foodAxisReview.axes.map(axis=>`${axis.expectedAxis}: ${axis.readerQuestion} ${axis.reviewQuestion}`),
-      ...foodAxisReview.balanceReview.questions,
-      '음식 이미지·내부링크·강조가 일반 독자의 이해와 실제 선택·섭취·보관에 직접 도움이 되는가?'
-    ]
-  };
+  return {status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,ruleSource:'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',qualityRuleSource:'docs/content/FOOD_CONTENT_QUALITY_R1.md',scope:'FOOD_ONLY',questions:[
+    '음식 원고는 이 저장소의 음식 전용 지침만 편집 기준으로 사용하고, 사용자 확정 6개 소제목(소개, 영양소·핵심 성분, 꾸준 섭취 변화, 궁합·시너지, 주의사항, 고르는 법·보관법)을 이름·순서·의미 그대로 사용했는가?',
+    '일반 독자가 실제로 궁금해하는 질문과 생활정보 범위를 먼저 확인하고, 글이 음식의 특징·영양·장점·활용·선택·섭취·보관을 중심으로 구성됐는가?',
+    '확인해서 사용할 수 없는 내용은 생략하고 독자에게 필요한 다른 생활정보를 충분히 조사했는가?',
+    ...foodAxisReview.axes.map(axis=>`${axis.expectedAxis}: ${axis.readerQuestion} ${axis.reviewQuestion}`),
+    ...foodAxisReview.balanceReview.questions,
+    '음식 이미지·내부링크·강조가 일반 독자의 이해와 실제 선택·섭취·보관에 직접 도움이 되는가?'
+  ]};
 }
-
-// A single local preparation view; no AI, network or publication.
 export function prepareDirectSource(source) {
   if(source.articleId)checkUpdateSource(source,source.id+'.json');
   else {checkPost(source,source.id+'.json');checkPublishHtml(source);}
@@ -45,13 +35,8 @@ export function prepareDirectSource(source) {
   const focusReview=directFocusReview(source.bodyHtml);
   const foodAxisReview=source.category==='음식'?buildFoodAxisReview(source):null;
   const imageEditorialReview=imageReviewObservation(source);
-  const editorialReview=foodAxisReview
-    ?foodEditorialReview(foodAxisReview)
-    :{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[...GENERIC_EDITORIAL_QUESTIONS]};
-  return {
-    report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),imageEditorialReview,...(foodAxisReview?{foodAxisReview}:{}),editorialReview},
-    preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'
-  };
+  const editorialReview=foodAxisReview?foodEditorialReview(foodAxisReview):{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[...GENERIC_EDITORIAL_QUESTIONS]};
+  return {report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),imageEditorialReview,...(foodAxisReview?{foodAxisReview}:{}),editorialReview},preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
   const source=JSON.parse(readFileSync(process.argv[2],'utf8'));
