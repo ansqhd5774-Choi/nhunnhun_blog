@@ -85,14 +85,14 @@ test('food editorial review is reader-first and does not reintroduce research-ce
   assert.match(questions,/사용자 확정 6개 소제목/);
   assert.match(questions,/일반 독자/);
   assert.match(questions,/특징·영양·장점·활용·선택·섭취·보관/);
-  assert.match(questions,/부정 문장으로 자동 대체하지 않았는가/);
+  assert.match(questions,/확인해서 사용할 수 없는 내용은 생략/);
   assert.match(questions,/소개/);
   assert.match(questions,/영양소·핵심 성분/);
   assert.match(questions,/꾸준 섭취 변화/);
   assert.match(questions,/궁합·시너지/);
   assert.match(questions,/주의사항/);
   assert.match(questions,/고르는 법·보관법/);
-  assert.doesNotMatch(questions,/연구 설계|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
+  assert.doesNotMatch(questions,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});
