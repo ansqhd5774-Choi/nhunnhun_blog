@@ -1,0 +1,2 @@
+source_id=direct-273-casein-r86-20261014
+reason=source-preserving retry after queue source drift before mutation
