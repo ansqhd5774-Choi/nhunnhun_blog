@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateJob, renderArticle, localRequest, assembleEvidenceArticle } from '../authoring/ollama.mjs';
+import { validateJob, renderArticle, localRequest, assembleEvidenceArticle, assertOllamaAuthoringAllowed } from '../authoring/ollama.mjs';
 
 const sources=[
   {id:'identity',title:'Identity source',url:'https://example.org/identity',checkedAt:'2026-10-14',notes:'검증용 식별 자료'},
@@ -14,6 +14,10 @@ test('수정 URL·분류·출처 입력 계약',()=>{
   assert.equal(validateJob(job).articleId,'232');
   assert.throws(()=>validateJob({...job,targetUrl:'https://nhunnhun.tistory.com/233'}),/E_OLLAMA_JOB/);
   assert.throws(()=>validateJob({...job,sources:[]}),/E_OLLAMA_SOURCES/);
+});
+test('음식은 Ollama 작성 실행 경로에서 하드 차단',()=>{
+  assert.throws(()=>assertOllamaAuthoringAllowed(job),/E_OLLAMA_FOOD_DISABLED/);
+  assert.doesNotThrow(()=>assertOllamaAuthoringAllowed({...job,id:'medicine-fixture',domain:'medicine',category:'약학'}));
 });
 test('구조화 텍스트는 HTML escape하고 대상 URL과 미승인을 유지',()=>{
   const source=renderArticle({...article,summary:'<script>bad()</script>'},job);

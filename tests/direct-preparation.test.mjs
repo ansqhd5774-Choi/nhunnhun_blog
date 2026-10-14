@@ -32,9 +32,7 @@ test('food-axis review uses the user-defined six food topics and reader-first qu
   assert.equal(review.ruleSource,'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt');
   assert.equal(review.qualityRuleSource,'docs/content/FOOD_CONTENT_QUALITY_R1.md');
   assert.equal(review.observedCoreH2Count,6);
-  assert.deepEqual(review.axes.map(axis=>axis.expectedAxis),[
-    '소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'
-  ]);
+  assert.deepEqual(review.axes.map(axis=>axis.expectedAxis),['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법']);
   assert.equal(review.axes[0].firstAnswer,'첫째 답변입니다.');
   assert.equal(review.axes[2].heading,'3. 꾸준 섭취 변화');
   assert.match(review.axes[0].readerQuestion,/맛·식감·종류·제철·산지/);
@@ -47,11 +45,11 @@ test('food-axis review uses the user-defined six food topics and reader-first qu
   const balance=review.balanceReview.questions.join('\n');
   assert.match(balance,/사용자 확정 6개 소제목/);
   assert.match(balance,/부정·제한·반박 문장/);
-  assert.match(balance,/자료가 부족한 내용을/);
+  assert.match(balance,/확인해서 사용할 수 없는 내용은 생략/);
   assert.match(balance,/100mL→200mL/);
   assert.match(balance,/표의 각 행·열/);
   assert.match(balance,/실제 행동으로 옮길 수 있는 정보/);
-  assert.doesNotMatch(balance,/연구 설계|표본|근거 수준|직접 근거|간접 근거/);
+  assert.doesNotMatch(balance,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -85,14 +83,14 @@ test('food editorial review is reader-first and does not reintroduce research-ce
   assert.match(questions,/사용자 확정 6개 소제목/);
   assert.match(questions,/일반 독자/);
   assert.match(questions,/특징·영양·장점·활용·선택·섭취·보관/);
-  assert.match(questions,/부정 문장으로 자동 대체하지 않았는가/);
+  assert.match(questions,/확인해서 사용할 수 없는 내용은 생략/);
   assert.match(questions,/소개/);
   assert.match(questions,/영양소·핵심 성분/);
   assert.match(questions,/꾸준 섭취 변화/);
   assert.match(questions,/궁합·시너지/);
   assert.match(questions,/주의사항/);
   assert.match(questions,/고르는 법·보관법/);
-  assert.doesNotMatch(questions,/연구 설계|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
+  assert.doesNotMatch(questions,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});

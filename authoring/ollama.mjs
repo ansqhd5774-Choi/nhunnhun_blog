@@ -32,6 +32,10 @@ export function validateJob(job) {
   }
   return job;
 }
+export function assertOllamaAuthoringAllowed(job) {
+  if(job?.domain==='food' || job?.category==='음식') throw new Error('E_OLLAMA_FOOD_DISABLED');
+  return job;
+}
 export function renderArticle(article, job) {
   if (!article || typeof article.title!=='string' || typeof article.summary!=='string' || typeof article.reviewNotes!=='string' || !Array.isArray(article.sections) || article.sections.length<4 || article.sections.length>10) throw new Error('E_OLLAMA_ARTICLE');
   const sources = new Map(job.sources.map(s=>[s.id,s]));
@@ -85,14 +89,14 @@ export async function localRequest(body, fetcher=fetch, onProgress=async()=>{}) 
 }
 export async function runOllama(jobId,{root=process.cwd(),fetcher=fetch,model='qwen3:4b'}={}) {
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(jobId??'') || model.includes('cloud') || !/^[a-z0-9][a-z0-9.:_-]+$/.test(model)) throw new Error('E_OLLAMA_INPUT');
-  const job=validateJob(JSON.parse(await readFile(resolve(root,'authoring/jobs',`${jobId}.json`),'utf8')));
+  const job=assertOllamaAuthoringAllowed(validateJob(JSON.parse(await readFile(resolve(root,'authoring/jobs',`${jobId}.json`),'utf8'))));
   assertLegacyNutrientAuthoringDisabled(job.domain);
   let tags; try { tags=await fetcher('http://127.0.0.1:11434/api/tags').then(r=>r.json()); } catch { throw new Error('E_OLLAMA_NOT_RUNNING'); }
   if(!tags.models?.some(m=>m.name===model)) throw new Error('E_OLLAMA_MODEL_MISSING');
   const domainGuide=await readFile(resolve(root,'docs/content/DOMAIN_GUIDES_R1.md'),'utf8');
   const nutrientGuide=domainGuide.split('## 영양소')[1]?.split('## 약:')[0]??domainGuide;
-  const editorial=await readFile(resolve(root,'docs/EDITORIAL_PUBLISH_STANDARD_R4.md'),'utf8');
-  const standard=await readFile(resolve(root,'docs/CONTENT_STANDARD_R1.md'),'utf8');
+  await readFile(resolve(root,'docs/EDITORIAL_PUBLISH_STANDARD_R4.md'),'utf8');
+  await readFile(resolve(root,'docs/CONTENT_STANDARD_R1.md'),'utf8');
   const target=resolve(root,'generated-drafts',jobId,new Date().toISOString().replaceAll(':','-'));
   await mkdir(target,{recursive:true});
   const metadata={state:'running',provider:'ollama-local',model,jobDigest:createHash('sha256').update(JSON.stringify(job)).digest('hex'),sourceCommit:process.env.SOURCE_COMMIT??null,startedAt:new Date().toISOString(),sourcesCheckedAt:job.sources.map(s=>s.checkedAt)};
