@@ -66,5 +66,5 @@ test('non-food direct posts keep observations and are not blocked by editorial c
   const review=directFocusReview(html);
   assert.ok(review.researchDetailHits>2);
   assert.equal(review.limitationHits,3);
-  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html,'영양소')));
+  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(html,'약학')));
 });
