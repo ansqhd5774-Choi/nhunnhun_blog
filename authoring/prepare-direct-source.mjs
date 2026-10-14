@@ -24,9 +24,11 @@ function foodEditorialReview(foodAxisReview){
     status:'AUTHOR_REVIEW_REQUIRED',
     automatedSemanticVerdict:false,
     ruleSource:'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
+    qualityRuleSource:'docs/content/FOOD_CONTENT_QUALITY_R1.md',
     scope:'FOOD_ONLY',
     questions:[
       '음식 원고의 편집 기준은 이 저장소의 음식 전용 지침만 사용했는가? 다른 저장소·다른 카테고리의 소제목·복용·제품 선택·치료 구조를 가져오지 않았는가?',
+      '신규 글·전체 재작성이라면 우수 건강·영양 콘텐츠를 벤치마크해 독자 질문과 정보 범위를 먼저 확인하고, 사실·수치는 별도 신뢰 자료로 검증했는가?',
       ...foodAxisReview.axes.map(axis=>`${axis.expectedAxis}: ${axis.readerQuestion} ${axis.reviewQuestion}`),
       ...foodAxisReview.balanceReview.questions,
       '음식 이미지·내부링크·강조가 실제 음식 독자의 선택·섭취·보관 판단에 직접 도움이 되는가?'
