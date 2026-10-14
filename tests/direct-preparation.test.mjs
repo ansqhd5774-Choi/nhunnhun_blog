@@ -47,11 +47,11 @@ test('food-axis review uses the user-defined six food topics and reader-first qu
   const balance=review.balanceReview.questions.join('\n');
   assert.match(balance,/사용자 확정 6개 소제목/);
   assert.match(balance,/부정·제한·반박 문장/);
-  assert.match(balance,/자료가 부족한 내용을/);
+  assert.match(balance,/확인해서 사용할 수 없는 내용은 생략/);
   assert.match(balance,/100mL→200mL/);
   assert.match(balance,/표의 각 행·열/);
   assert.match(balance,/실제 행동으로 옮길 수 있는 정보/);
-  assert.doesNotMatch(balance,/연구 설계|표본|근거 수준|직접 근거|간접 근거/);
+  assert.doesNotMatch(balance,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
