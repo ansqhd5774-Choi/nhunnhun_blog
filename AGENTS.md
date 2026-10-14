@@ -5,11 +5,12 @@
 ## 기준 우선순위
 
 1. 최신 사용자 지시와 도구 금지
-2. `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt` — 음식 내용·검색 의도·6개 소주제·문체의 유일한 편집 기준
-3. `docs/GENERAL_CHAT_EXECUTION.md` — 실행 역할과 공개 검증
-4. `docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md` — direct/SP1 검사·저장·제출 계약
-5. `docs/content/DIRECT_AUTHORING_R1.md`, `docs/content/CATEGORY_CONTENT_PARITY.md` — 디자인·강조·이미지·러너 등 기술 기준
-6. 실제 `.github/workflows/`와 `publishing/` 코드
+2. `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt` — 음식 내용·검색 의도·6개 소주제·문체의 유일한 기본 편집 기준
+3. `docs/content/FOOD_CONTENT_QUALITY_R1.md` — 음식 벤치마크·정보 깊이·정보 밀도·표·중복 제거·독자 만족도 기준
+4. `docs/GENERAL_CHAT_EXECUTION.md` — 실행 역할과 공개 검증
+5. `docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md` — direct/SP1 검사·저장·제출 계약
+6. `docs/content/DIRECT_AUTHORING_R1.md`, `docs/content/CATEGORY_CONTENT_PARITY.md` — 디자인·강조·이미지·러너 등 기술 기준
+7. 실제 `.github/workflows/`와 `publishing/` 코드
 
 음식의 제목·소제목·효능 구조·궁합·문체를 정할 때 다른 저장소, 다른 블로그, 다른 카테고리의 지침·예시·원고를 기준으로 사용하지 않는다. 공통 기술 문서 안에 과거 다른 분야 문구가 남아 있더라도 음식 편집 기준으로 승격하지 않는다.
 
@@ -24,6 +25,8 @@
 - 사용자가 음식명만 입력하면 조사→중복 확인→작성→표준 발행→공개 검증까지 수행한다.
 - 동일 검색 의도의 기존 글이 있으면 숫자 URL을 유지해 최신화하며 새 URL을 중복 발행하지 않는다.
 - 음식 편집 구조와 문체는 반드시 음식 전용 프로젝트 지침을 따른다.
+- 신규 글과 기존 글 전체 재작성은 `FOOD_CONTENT_QUALITY_R1.md`에 따라 **벤치마크 → 독자 질문 지도 → 조사 확장 → 정보 선별**을 먼저 수행한 뒤 6축으로 정리한다.
+- 정보가 부족하면 글자 수·표·강조를 늘려 채우지 않고 조사를 확장한다.
 
 ## 6개 핵심 소주제
 
@@ -38,6 +41,8 @@
 
 저장 전 각 핵심 H2마다 `음식 축 → 독자의 실제 질문 → H2 → 첫 문장의 직접 답변`을 대조한다. 단어만 맞고 실제 질문에 답하지 않으면 PASS로 보지 않는다.
 
+6축은 내용을 억지로 채우는 템플릿이 아니다. 먼저 벤치마크와 조사로 독자의 실제 질문을 충분히 확보하고, 각 축이 서로 다른 새 정보를 제공하도록 재구성한다.
+
 ## 쉬운말
 
 건강·영양 배경지식이 없는 독자가 전문용어를 검색하지 않아도 이해할 수 있게 쓴다. 기관명·DB명·연구방법명·전문 성분명은 독자 판단에 꼭 필요하지 않으면 본문에서 빼고 출처에 둔다. 전문명이 필요하면 쉬운 설명을 먼저 쓰고 괄호로 한 번만 보조한다.
@@ -46,11 +51,23 @@
 
 공식 영양 자료, 정부·전문기관, 원문 연구를 우선한다. 영양 수치는 품종·가식부·생/조리 상태·기준량·단위를 구분한다. 권장량·상한·연구에서 사용한 양·제품 표시량을 섞지 않는다. 흡수·상호작용·효과 크기는 원문과 연결하며 일반 영양 원리를 특정 음식 조합의 직접 임상 효과로 쓰지 않는다.
 
+벤치마크는 **질문의 폭과 정보 범위를 발견하기 위한 절차**다. 벤치마크 콘텐츠의 문장·수치·주장을 그대로 복사하지 않고, 실제 사실은 별도 신뢰 자료로 검증한다. 정확한 동일 주제의 우수 콘텐츠가 부족하면 같은 식품군의 우수 콘텐츠까지 확장해 독자 질문의 수준을 확인한다.
+
+## 정보 밀도·표
+
+- 같은 사실을 도입·표·본문·요약에서 표현만 바꿔 반복하지 않는다.
+- `100mL → 200mL`처럼 단순 배수 계산으로 표 열·행을 늘리지 않는다.
+- 기준량을 둘 이상 보여줄 때는 각 기준량이 실제로 다른 독자 질문에 답해야 한다.
+- 표는 비교가 문장보다 빠르고, 각 행·열이 새로운 판단 정보를 줄 때만 사용한다.
+- 일반 영양표가 음식 고유 특징과 실제 선택 정보를 밀어내지 않게 한다.
+- 각 핵심 문단은 최소 하나의 새로운 판단 정보를 제공해야 한다.
+
 ## 강조·이미지·내부링크
 
 - 공통 direct-design 렌더러와 기존 CSS를 사용한다. 글별 CSS·별도 러너를 만들지 않는다.
 - 강조는 `strong` → `mark>strong` → `mark>u>strong` 3단계다.
 - 음식 direct/SP1 하한은 **strong25·mark12·mark>u>strong8**이다. 개수를 채우려고 문장을 만들거나 전체 문단을 자동 강조하지 않는다.
+- 단순 계산값·반복 수치·분량 채우기용 문장은 강조하지 않는다.
 - 신규 및 direct/SP1 전체 수정은 서로 다른 본문 이미지 최소 3개를 준비한다.
 - `imageReview` 허용 키는 `src, alt, role, composition, sourcePage, author, license`와 선택적 boolean `visualChecked`다.
 - `visualChecked`는 실제 확인한 경우에만 true로 기록하며 필수 게이트가 아니다.
@@ -68,20 +85,20 @@
 
 ## 작성·저장·발행
 
-기본 흐름은 `음식 기준 확인 → 검색 의도·중복 → 독자 질문 → 6개 H2 확정 → 조사 → 본문·강조·사진·내부링크 작성 → 내용 검토 → Gate 0 → GitHub 저장 확인 → 실행 관찰 → PUBLIC_VERIFIED`이다.
+기본 흐름은 `음식 기준 확인 → 검색 의도·중복 → 벤치마크 → 독자 질문 지도 → 조사 확장·사실 검증 → 정보 선별 → 6개 H2 재구성 → 본문 작성 → 정보 밀도·표·반복 검토 → 강조·사진·내부링크 → 통합 품질 검토 → Gate 0 → GitHub 저장 확인 → 실행 관찰 → PUBLIC_VERIFIED`이다.
 
 - 신규: `posts/*.json` → `publish-posts.yml`
 - 기존 수정: `updates/direct-*.json` → `direct-author-update.yml` → `update-posts.yml`
 - direct source는 `contentStandard=SP1`을 유지한다.
 - GitHub 쓰기 전 완성 JSON 전체를 자동 발행 경로 밖에 보존한다.
 - 저장 성공은 실제 커밋 SHA에 고정한 파일을 다시 읽고 digest가 일치할 때만 `GITHUB_SOURCE_CONFIRMED`로 본다.
-- preflight PASS는 구조 검사이며 의학적·문체적·시각적 인증이 아니다.
+- preflight PASS는 구조 검사이며 의학적·문체적·시각적·정보 깊이 인증이 아니다.
 - 자동 실행이 있으면 해당 실행을 관찰하며 수동 실행을 겹치지 않는다.
 - 실제 제출 시작 뒤 최종 상태가 확인될 때까지 해당 source와 실행 코드를 바꾸지 않는다.
 
 ## 공개 검증
 
-HTTP200, 제출 클릭, Actions SUCCESS만으로 완료라고 하지 않는다. source별 `PUBLIC_VERIFIED`와 신규 `published` 또는 기존 `updated` 원장을 확인한다. 러너가 제목·본문·이미지·대표 이미지·강조·PC1440·모바일390 렌더를 확인한다. PUBLIC_VERIFIED는 공개 반영 검증이며 의학적 인증이 아니다.
+HTTP200, 제출 클릭, Actions SUCCESS만으로 완료라고 하지 않는다. source별 `PUBLIC_VERIFIED`와 신규 `published` 또는 기존 `updated` 원장을 확인한다. 러너가 제목·본문·이미지·대표 이미지·강조·PC1440·모바일390 렌더를 확인한다. PUBLIC_VERIFIED는 공개 반영 검증이며 의학적 인증이나 콘텐츠 깊이 인증이 아니다.
 
 불명확 제출 상태에서는 재제출하지 않는다. 기존 수정은 `update=false + source_id`, 신규는 `recover-publication + source_id + 확인된 public_url`로 읽기 전용 복구를 수행한다.
 
