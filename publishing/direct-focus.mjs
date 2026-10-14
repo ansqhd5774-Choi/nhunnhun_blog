@@ -24,6 +24,8 @@ const HUMAN_EVIDENCE_PATTERN=/(?:사람|성인|환자|참가자|대상자|인체
 const OBSERVED_CHANGE_PATTERN=/(?:개선|증가|감소|낮아|높아|줄(?:었|어|어들|어드는|이는)|완화|향상|회복|유지|변화|호전)/u;
 const STUDY_DURATION_PATTERN=/(?:^|[^0-9])\d{1,3}(?:\.\d+)?\s*(?:일|주|개월|달|년)(?:간|동안|후)?(?:[^0-9]|$)/u;
 const INTAKE_AMOUNT_PATTERN=/(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(?:μg|mcg|mg|g|IU|국제단위|mL|ml|정|캡슐)(?:\/일|\s*\/\s*일|\s*하루)?/iu;
+const NUTRIENT_FOOD_RANKING_HEADING=/(?=.*(?:식품|음식))(?=.*(?:TOP\s*(?:7|5|3)|상위\s*(?:7|5|3)))/iu;
+const ESTIMATED_RANKING_VALUE_PATTERN=/(?:\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g)(?:\s*\/\s*(?:100\s*g|회|1회|일))?[^.!?\n]{0,24}(?:추정|환산|계산(?:값|치)?))|(?:(?:추정|환산|계산(?:값|치)?)[^.!?\n]{0,24}\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g))|(?:\d+(?:\.\d+)?\s*%[^.!?\n]{0,30}(?:배합|함유)[^.!?\n]{0,30}(?:적용|환산|계산))/iu;
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
@@ -73,7 +75,16 @@ export function directFocusReview(bodyHtml='') {
         hasIntakeAmount:INTAKE_AMOUNT_PATTERN.test(text),
       };
     });
-  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12),nutrientExpectedChangeSections};
+  const nutrientFoodRankingSections=sections
+    .filter(section=>section.heading!=='__INTRO__'&&!UTILITY_HEADING.test(section.heading)&&NUTRIENT_FOOD_RANKING_HEADING.test(section.heading))
+    .map(section=>{
+      const text=clean(section.text);
+      return {
+        heading:section.heading,
+        hasEstimatedRankingValue:ESTIMATED_RANKING_VALUE_PATTERN.test(text),
+      };
+    });
+  return {coreHeadings,utilityHeadings,researchDetailHits,limitationHits,limitationFindings:limitationFindings.slice(0,12),nutrientExpectedChangeSections,nutrientFoodRankingSections};
 }
 
 // Shared direct/SP1 structure guard. Food editorial-balance counts are advisory metrics only:
@@ -87,6 +98,8 @@ export function assertDirectSubmissionFocus(source) {
     const humanSections=review.nutrientExpectedChangeSections.filter(section=>section.hasHumanEvidence);
     if(humanSections.length&&humanSections.every(section=>!(section.hasObservedChange&&section.hasStudyDuration&&section.hasIntakeAmount)))
       throw Error('E_DIRECT_NUTRIENT_EXPECTED_CHANGE_INCOMPLETE');
+    if(review.nutrientFoodRankingSections.some(section=>section.hasEstimatedRankingValue))
+      throw Error('E_DIRECT_NUTRIENT_FOOD_RANKING_ESTIMATED_VALUE');
   }
   return review;
 }
