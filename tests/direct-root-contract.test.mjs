@@ -12,7 +12,7 @@ import {directDispatchErrorMessage} from '../authoring/direct-dispatch.mjs';
 const commit='a'.repeat(40);
 const args=source=>({source,commitSha:commit,token:'fixture',fetcher:async url=>{assert.ok(url.endsWith('?ref='+commit));return {ok:true,json:async()=>({type:'file',encoding:'base64',content:Buffer.from(JSON.stringify(source)).toString('base64')})}}});
 test('네 카테고리 저장 전·러너 공통 preflight 결과는 같고 원고를 변경하지 않는다',()=>{
- for(const category of ['음식','영양소','약학','질병']){const s=directFixture({category});const before=JSON.stringify(s);assert.equal(directPreflight(s).status,'PREFLIGHT_PASS');assert.deepEqual(prepareDirectSource(s).report.preflight,assertDirectPreflight(s));assert.equal(JSON.stringify(s),before);}
+ for(const category of ['음식','영양소','약학','질병']){const s=directFixture({category});const before=JSON.stringify(s);const preflight=directPreflight(s);assert.equal(preflight.status,'PREFLIGHT_PASS',`${category}: ${preflight.errors.join(',')}`);assert.deepEqual(prepareDirectSource(s).report.preflight,assertDirectPreflight(s));assert.equal(JSON.stringify(s),before);}
 });
 test('visualChecked는 누락·false·true 모두 관찰값으로 허용하며 문자열과 임의 키는 차단한다',()=>{
  for(const value of [undefined,false,true]){const s=directFixture();s.imageReview[0].visualChecked=value;assert.equal(directPreflight(s).status,'PREFLIGHT_PASS');}
