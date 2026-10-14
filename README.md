@@ -1,6 +1,23 @@
-> 최신 실행 기준: [일반 Chat 작성·러너 실행 계약](docs/GENERAL_CHAT_EXECUTION.md)이 작성자 로컬 명령·GUI 의무와 공개 검증 담당에 우선합니다. 아래의 명령·미리보기·관리자 화면 절차는 러너/운영자용이며 일반 Chat의 필수 기능이 아닙니다. 직접 원고는 최신 DIRECT_AUTHORING_R1을 적용합니다.
+> 최신 실행 기준: [일반 Chat 작성·러너 실행 계약](docs/GENERAL_CHAT_EXECUTION.md)이 작성자 로컬 명령·GUI 의무와 공개 검증 담당에 우선합니다. 아래의 명령·미리보기·관리자 화면 절차는 러너/운영자용이며 일반 Chat의 필수 기능이 아닙니다.
 
 # nhunnhun_blog
+
+## ACTIVE — 영양소 direct/SP1 편집 경계
+
+영양소 direct/SP1 원고의 **내용·소제목·문체·정보 배치**는 이 저장소에서 정하지 않는다. 유일한 편집 기준은 `ansqhd5774-Choi/nhunnhun_nutrients` 최신 main의 `PROJECT_INSTRUCTIONS.txt`다.
+
+이 저장소는 영양소에 대해 제출·구조 검사·이미지·강조 태그·source 무결성·공개 검증·원장 기록 같은 기술 역할만 담당한다. 상세 경계는 [NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R10](docs/NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R10.md)을 따른다.
+
+다음 legacy 자료는 영양소 direct/SP1 작성 기준으로 사용하지 않는다.
+
+- `docs/CONTENT_STANDARD_R1.md`
+- `docs/CONTENT_WRITER_PROMPT_R1.md`
+- `docs/CONTENT_REVIEW_FORMAT_R1.md`
+- `docs/content/DOMAIN_GUIDES_R1.md`
+- `workstreams/posts/templates/article.md`
+- legacy queue writer/research/review 코드와 과거 영양소 원고 예시
+
+영양소 legacy single-pass writer는 `E_NUTRIENT_DIRECT_EDITORIAL_EXTERNAL`로 차단된다. 과거 파일은 복구·감사·호환 기록으로 보존할 수 있지만 새 영양소 원고의 편집 입력으로 재사용하지 않는다.
 
 ## ACTIVE — 음식 전용 작성 기준
 
@@ -8,21 +25,21 @@
 
 ## Legacy — 건강 콘텐츠 품질 기준 R1
 
-기존 비-direct R1 경로는 [CONTENT_STANDARD_R1](docs/CONTENT_STANDARD_R1.md)과 [Editorial R4](docs/EDITORIAL_PUBLISH_STANDARD_R4.md)의 계약을 보존한다. [작성 GPT 지침](docs/CONTENT_WRITER_PROMPT_R1.md)·[분야별 상세](docs/content/DOMAIN_GUIDES_R1.md)·[검토서 형식](docs/CONTENT_REVIEW_FORMAT_R1.md)의 과거 네 분야 편집 예시를 새 음식 원고의 기준으로 사용하지 않는다.
+기존 비-direct R1 경로는 [CONTENT_STANDARD_R1](docs/CONTENT_STANDARD_R1.md)과 [Editorial R4](docs/EDITORIAL_PUBLISH_STANDARD_R4.md)의 계약을 보존한다. [작성 GPT 지침](docs/CONTENT_WRITER_PROMPT_R1.md)·[분야별 상세](docs/content/DOMAIN_GUIDES_R1.md)·[검토서 형식](docs/CONTENT_REVIEW_FORMAT_R1.md)의 과거 네 분야 편집 예시는 새 direct 음식·영양소 원고의 기준으로 사용하지 않는다.
 
-`contentStandard: "R1"` source와 같은 id의 `content-reviews/posts|updates/*.json`을 함께 검증한다. `npm run test:content`, `npm run validate:content`, `node publishing/validate-content.mjs --check posts/<id>.json`을 제공한다. GitHub Actions는 AI가 아니라 작성·검토 증거를 확인하는 자동화다. 의학적 의미·정확성은 실제 근거를 읽는 편집 검토가 필요하다.
+`contentStandard: "R1"` source와 같은 id의 `content-reviews/posts|updates/*.json`을 함께 검증한다. `npm run test:content`, `npm run validate:content`, `node publishing/validate-content.mjs --check posts/<id>.json`을 제공한다. GitHub Actions는 AI가 아니라 작성·검토 기록과 기술 계약을 확인하는 자동화다.
 
 기존 미변경 글의 R3 출력·발행 기록은 보존한다. 아래 R3 안내는 legacy에 해당한다. 직접 작성의 내용·강조 우선순위는 위 ACTIVE 기준을 따른다. 인증·source drift·ledger·공개 검증의 현재 동작은 실제 실행 계약과 YAML에서 확인한다.
 
 사용자 티스토리 블로그 https://nhunnhun.tistory.com/ 의 반복 관리용 프로젝트.
-GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (비공개, main).
+GitHub: https://github.com/ansqhd5774-Choi/nhunnhun_blog (main).
 기준일: 2026-10-04 (Asia/Seoul). 실제 사이트명: 건강 식품.
 
 이 프로젝트는 작업 파일과 증거를 관리한다. GitHub 연결을 사용할 수 있는 ChatGPT에서는 저장소의 문서를 읽어 작업을 이어간다. 저장/수정/PR 기능은 해당 대화의 실제 도구와 권한을 별도로 확인한다. 로컬 프로젝트 생성과 GitHub 연결은 ChatGPT 클라우드 실행 환경 생성이나 티스토리 로그인 공유를 의미하지 않는다.
 
 사용자 금지 지시와 `docs/GENERAL_CHAT_EXECUTION.md`가 도구 선택·작성자 역할·러너 실행·완료 판정에 우선한다. `docs/BLOG_PLUGIN_EXECUTION_RULES_R2.md`는 이 기준과 충돌하지 않는 범위의 도구 안내다. TinyFish 사용·호출·연결·승인 요청은 금지한다. 신규 글 작성·발행 디자인 기준은 `docs/EDITORIAL_PUBLISH_STANDARD_R3.md`를 ACTIVE 기준으로 사용한다. 신규 글은 서로 다른 본문 이미지 최소 3개와 제한적 다색 형광펜 강조 계약을 통과해야 한다.
 
-콘텐츠 운영 범위는 **음식 / 영양소 / 약학 / 질병 4개 카테고리 전체**다. 신규 주제는 카테고리 비율을 기계적으로 맞추지 않고 검색 수요·기존 검색의도 중복·GSC 성과·최신성 필요도를 기준으로 선택한다. 약학·질병 콘텐츠는 음식·영양소보다 높은 근거 수준과 안전성 검증을 적용한다.
+콘텐츠 운영 범위는 **음식 / 영양소 / 약학 / 질병 4개 카테고리 전체**다. 신규 주제는 카테고리 비율을 기계적으로 맞추지 않고 검색 수요·기존 검색의도 중복·GSC 성과·최신성 필요도를 기준으로 선택한다. 약학·질병은 해당 분야의 별도 안전 기준을 따른다.
 
 실제 Tistory mutation은 Windows self-hosted runner가 표준 실행 환경이다. PC·runner가 켜져 있어야 한다. 신규 공개 발행은 `publish-posts.yml`, 기존 숫자 URL 수정은 `update-posts.yml`만 사용한다. 두 경로 모두 최신 main·테스트·source drift·checkpoint·익명 공개 검증을 요구한다. 초기 runner 등록·전용 프로필 로그인은 `docs/WINDOWS_TISTORY_PUBLISHER.md`를 따른다. Browserbase 등 과거 cloud-browser 발행 경로는 RETIRED이며 기록은 `evidence/legacy-browser-publisher-20261003/`에 보존했다.
 
