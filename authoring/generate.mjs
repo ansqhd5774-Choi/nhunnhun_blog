@@ -5,11 +5,13 @@ import { checkPost, checkPublishHtml } from '../publishing/core.mjs';
 import { reviewScaffold } from '../publishing/validate-content.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { SITE_CATEGORIES } from '../publishing/standards/common.mjs';
+import { assertLegacyNutrientAuthoringDisabled } from './nutrient-editorial-boundary.mjs';
 
 export function options(env) {
   const topic = env.ARTICLE_TOPIC?.trim(), id = env.ARTICLE_ID;
   const domain = env.ARTICLE_DOMAIN;
   if (!topic || topic.length > 300 || !/^[a-z0-9][a-z0-9-]{2,79}$/.test(id ?? '') || !SITE_CATEGORIES[domain]) throw new Error('E_WRITER_INPUT');
+  assertLegacyNutrientAuthoringDisabled(domain);
   if (!env.OPENAI_API_KEY) throw new Error('E_OPENAI_KEY_MISSING');
   return { topic, id, domain, model: env.OPENAI_MODEL || 'gpt-6-sol' };
 }
@@ -36,7 +38,6 @@ export async function responseRequest(body, key, fetcher = fetch) {
     });
   } catch { throw new Error('E_OPENAI_TRANSPORT_STATE_UNKNOWN'); }
   if (!response.ok) {
-    // Never echo provider messages, request headers, or the key. No automatic paid retries.
     let failure; try { failure = (await response.json()).error; } catch {}
     const description = `${failure?.code ?? ''} ${failure?.type ?? ''} ${failure?.message ?? ''}`;
     if (response.status === 429 && /insufficient_quota|current quota|billing|credits|balance|spend limit/i.test(description)) throw new Error('E_OPENAI_QUOTA');
@@ -60,7 +61,6 @@ export function buildDraft(article, config, allowedUrls) {
 export async function generate(env = process.env, { root = process.cwd(), fetcher = fetch } = {}) {
   const config = options(env);
   const target = resolve(root, 'generated-drafts', config.id);
-  // Reserve before paying for API calls; existing drafts are never overwritten.
   await mkdir(resolve(root, 'generated-drafts'), { recursive: true });
   await mkdir(target);
   const files = ['CONTENT_STANDARD_R1.md','CONTENT_WRITER_PROMPT_R1.md','content/DOMAIN_GUIDES_R1.md','EDITORIAL_PUBLISH_STANDARD_R4.md','CONTENT_REVIEW_FORMAT_R1.md'];

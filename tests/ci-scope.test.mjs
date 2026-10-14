@@ -13,7 +13,9 @@ test('content CI owns code checks, mutation workflows retain boundary validation
  assert.ok(p.jobs.publish.steps.some(s=>s.run==='pnpm validate'));
  assert.ok(!p.jobs.publish.steps.some(s=>s.run==='pnpm test'));
  const author=read('generate-draft.yml');assert.ok(author.concurrency.group.includes('github.event.pull_request.number'));
- assert.ok(author.jobs.test.steps.some(s=>s.run==='node --test tests/authoring.test.mjs tests/ollama-authoring.test.mjs'));
+ const authorTest=author.jobs.test.steps.find(s=>typeof s.run==='string'&&s.run.startsWith('node --test '));
+ assert.ok(authorTest);
+ for(const file of ['tests/authoring.test.mjs','tests/ollama-authoring.test.mjs','tests/nutrient-hard-isolation.test.mjs']) assert.ok(authorTest.run.includes(file));
 });
 test('standard hosted validation is isolated from dedicated PC mutation jobs',()=>{
  for(const file of fs.readdirSync('.github/workflows').filter(n=>/\.ya?ml$/.test(n))){
