@@ -138,3 +138,16 @@ test('submission preserves valid emphasis and leaves historical loading unchange
   for(const old of [{...source,id:'legacy-test',bodyHtml:'<mark>과거</mark>'},{...source,contentStandard:'R1',bodyHtml:'<p>기존</p>'}])
     assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(old));
 });
+
+test('nutrient TOP food table requires visible emphasis on ranks 1-3',()=>{
+  const source=third=>({
+    id:'direct-top3-test',category:'영양소',contentStandard:'SP1',
+    bodyHtml:quotaBody()+`<h2>4. 풍부한 식품 TOP7과 평균 함량은?</h2><table><tbody>
+      <tr><td>1</td><td><mark data-tone="info"><u><strong>파르메산 치즈</strong></u></mark></td><td>35.8g</td></tr>
+      <tr><td>2</td><td><mark data-tone="info"><strong>체더 치즈</strong></mark></td><td>24.0g</td></tr>
+      <tr><td>3</td><td>${third}</td><td>19.8g</td></tr>
+    </tbody></table>`
+  });
+  assert.throws(()=>assertDirectSubmissionEmphasis(source('카망베르 치즈')),/E_DIRECT_TOP3_EMPHASIS_MISSING/);
+  assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source('<mark data-tone="info"><strong>카망베르 치즈</strong></mark>')));
+});
