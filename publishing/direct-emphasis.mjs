@@ -20,6 +20,7 @@ export function assertDirectEmphasis(source) {
 }
 
 const OFFICIAL_INTAKE_ABSENCE_PATTERN=/(?:공식\s*)?(?:하루\s*)?(?:권장량|권장\s*섭취량|상한)(?:이|가|은|는)?[^.!?]{0,35}(?:없|정해(?:지지|져\s*있지)\s*않|마련되지\s*않)/u;
+const DEFENSIVE_NEGATION_HIGHLIGHT_PATTERN=/(?:아닙니다|아니다|아니며|아니고|같지\s*않|동일하지\s*않|보면\s*안\s*(?:됩니다|된다))/u;
 const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
   /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
@@ -31,6 +32,7 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:(?:비교\s*가능한)\s*)?(?:공식\s*)?(?:자료|데이터(?:베이스)?|기준)(?:가|는)?\s*(?:없|마련되지\s*않)/u,
   /(?:모든|누구나)[^.!?]{0,40}(?:필요|먹어야|복용해야|섭취해야)[^.!?]{0,25}(?:아니|아닙|없)/u,
   OFFICIAL_INTAKE_ABSENCE_PATTERN,
+  DEFENSIVE_NEGATION_HIGHLIGHT_PATTERN,
   /(?:유의하게|뚜렷하게)[^.!?]{0,35}(?:달라지지\s*않|변하지\s*않|개선되지\s*않)/u,
   /(?:같은|동일한)\s*(?:효과\s*크기|섭취\s*기준|용량|조건)[^.!?]{0,30}(?:(?:계산|판단|적용)하지\s*않|아니|않|다(?:르|릅))/u,
   /(?:보충|농축|추출|오일)[^.!?]{0,70}(?:조리용|일상|평소)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다(?:르|릅)/u,
@@ -106,7 +108,7 @@ export function assertDirectSubmissionEmphasis(source) {
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
       const isActionableSafety=PURE_SAFETY_HEADING.test(currentHeading)&&ACTIONABLE_SAFETY_PATTERN.test(text);
-      // Evidence limits, no-effect statements and neutral absence-of-standard facts stay plain/bold.
+      // Evidence limits, no-effect statements, defensive negations and neutral absence-of-standard facts stay plain/bold.
       // Only an actionable safety instruction in a dedicated safety section may remain strongly highlighted.
       if(isLimitation&&!isActionableSafety)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
