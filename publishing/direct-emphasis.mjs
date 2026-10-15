@@ -47,6 +47,8 @@ const BENEFIT_HEADING_PATTERN=/(?:효능|기대(?:되는)?(?:\s*신체)?\s*변�
 const BENEFIT_OUTCOME_PATTERN=/(?:개선|증가|감소|낮추|줄(?:이|어)|유지|보호|회복|완화|향상|도움|위험\s*감소|진행\s*(?:지연|감소))/u;
 const TOP_FOOD_HEADING_PATTERN=/(?:TOP\s*\d+|풍부한\s*식품)/iu;
 const DEFINITION_HEADING_PATTERN=/(?:정의와\s*주요\s*성분|정의.*주요.*성분.*작용)/u;
+const NUTRIENT_NARRATIVE_CONNECTOR_PATTERN=/(?:하지만|그러나|반면|다만|그래서|때문에|(?:으|이)므로|(?:이|하)지만)/u;
+const NUTRIENT_HIGHLIGHT_MAX_CHARS=32;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
@@ -132,6 +134,14 @@ export function assertDirectSubmissionEmphasis(source) {
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
       const isActionableSafety=PURE_SAFETY_HEADING.test(currentHeading)&&ACTIONABLE_SAFETY_PATTERN.test(text);
+      // Nutrient highlights are scan anchors, not narrative sentences. Keep only short phrases / values / actions.
+      // A full-sentence safety instruction remains allowed only inside a dedicated safety section.
+      const isNutrientNarrativeHighlight=source.category==='영양소'&&!isActionableSafety&&(
+        Array.from(text).length>NUTRIENT_HIGHLIGHT_MAX_CHARS||
+        NUTRIENT_NARRATIVE_CONNECTOR_PATTERN.test(text)||
+        /[.!?。]$/u.test(text)
+      );
+      if(isNutrientNarrativeHighlight)throw Error('E_DIRECT_NUTRIENT_HIGHLIGHT_NARRATIVE');
       // Limitation, no-effect, defensive-negation and neutral absence-of-standard facts stay plain/bold.
       // Only an actionable safety instruction in a dedicated safety section may remain strongly highlighted.
       if(isLimitation&&!isActionableSafety)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
