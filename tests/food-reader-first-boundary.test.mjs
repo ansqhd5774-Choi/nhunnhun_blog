@@ -3,16 +3,6 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {assertOllamaAuthoringAllowed} from '../authoring/ollama.mjs';
 
-const ACTIVE_FOOD_FILES=[
-  'AGENTS.md',
-  'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
-  'docs/content/FOOD_CONTENT_QUALITY_R1.md',
-  'docs/GENERAL_CHAT_EXECUTION.md',
-  'docs/content/DIRECT_AUTHORING_R1.md',
-  'docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md',
-  'authoring/prepare-direct-source.mjs',
-  'authoring/food-axis-review.mjs'
-];
 const EDITORIAL_FOOD_FILES=[
   'AGENTS.md',
   'docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt',
@@ -24,8 +14,8 @@ const EDITORIAL_FOOD_FILES=[
 const LOCKED_TOPICS=['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'];
 const READER_FIRST_SIGNALS=[/일반 독자/u,/독자/u,/실제 (?:선택|섭취|행동|의미)/u];
 
-test('active food authoring inputs retain reader-first signals',async()=>{
-  for(const file of ACTIVE_FOOD_FILES){
+test('active food editorial inputs retain reader-first signals',async()=>{
+  for(const file of EDITORIAL_FOOD_FILES){
     const text=await readFile(file,'utf8');
     assert.ok(READER_FIRST_SIGNALS.some((pattern)=>pattern.test(text)),`${file} must retain reader-first guidance`);
   }
