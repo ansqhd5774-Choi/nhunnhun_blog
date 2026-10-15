@@ -21,8 +21,12 @@ const BALANCE_REVIEW_QUESTIONS=[
   '④의 각 조합은 음식명 → 왜 좋은지 → 맛·향·식감 장점 → 실제 먹는 법 순서로 생활에서 바로 쓸 수 있게 설명됐는가?',
   '④에서 영양 궁합만 다루지 않고 실제 맛·향·식감 궁합도 함께 다뤘는가?',
   '본문 전반에서 원리 설명보다 구체적인 답을 먼저 제시하고, 그 뒤 이유와 실제 활용을 설명하는 순서를 지켰는가?',
+  '신규 음식 글은 처음부터 승인된 카드·목록·표 디자인 구조를 사용했는가? ③~⑥의 여러 항목을 단순 평문 문단으로 풀어 카드 디자인을 잃지 않았는가?',
+  '기존 음식 글 수정은 승인된 HTML 디자인을 보존했는가? 내용 수정이나 형광펜 추가를 이유로 카드·박스·목록·표 구조를 삭제하지 않았는가?',
+  '③~⑥이 렌더러에서 effects / pairs / cautions / storage 구조로 표현될 수 있는 반복 항목 구조를 갖췄는가?',
   '형광펜은 경고 표시가 아니라 핵심 요약 레이어인가? 형광펜만 위에서 아래로 읽어도 음식의 정체·핵심 영양·꾸준 섭취 변화·궁합·필수 주의·선택/보관의 핵심이 이어지는가?',
   '6개 핵심 소제목의 핵심 정보가 형광펜 요약 레이어에 빠짐없이 반영됐는가? 단, 제철·산지·정의·배경처럼 핵심성이 낮은 세부를 단지 소제목을 채우기 위해 억지로 강조하지 않았는가?',
+  '③·④처럼 핵심 정보가 여러 갈래인 소제목을 형광펜 한 문장으로 뭉개지 않고 중요한 변화·조합을 필요한 만큼 나눠 강조했는가?',
   '형광펜이 경고·주의 문장에 편중되지 않고 장점·효능·신체 변화·실제 섭취/선택 행동을 우선적으로 보여주는가?',
   '각 형광펜 문장은 앞뒤 일반 문장을 읽지 않아도 의미가 완결되어 독립적인 요약 문장으로 이해되는가?',
   '제철·산지·정의·명칭·분류·배경 설명을 단지 필수 포함 정보라는 이유만으로 형광펜이나 밑줄 처리하지 않았는가?',
@@ -42,13 +46,20 @@ function textOnly(html){return decodeHtml(String(html??'').replace(/<script[\s\S
 function normalizedHeading(value){return String(value??'').replace(/^\d+[.)]\s*/u,'').trim();}
 function firstAnswer(segment){const blocks=String(segment??'').matchAll(/<(p|blockquote|li)\b[^>]*>([\s\S]*?)<\/\1>/gi);for(const match of blocks){const answer=textOnly(match[2]);if(answer)return answer;}return '';}
 function markedTexts(segment){return [...String(segment??'').matchAll(/<mark\b[^>]*>([\s\S]*?)<\/mark>/gi)].map(match=>textOnly(match[1])).filter(Boolean);}
+function designItemCount(segment){
+  const h3=[...String(segment??'').matchAll(/<h3\b[^>]*>[\s\S]*?<\/h3>/gi)].length;
+  const li=[...String(segment??'').matchAll(/<li\b[^>]*>[\s\S]*?<\/li>/gi)].length;
+  return Math.max(h3,li);
+}
 export function buildFoodAxisReview(source={}){
   const html=String(source.bodyHtml??'');
   const allHeadings=[...html.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/gi)].map((match,order)=>({order,index:match.index??0,end:(match.index??0)+match[0].length,heading:textOnly(match[1])})).filter(item=>item.heading);
   const coreHeadings=allHeadings.filter(item=>!UTILITY_HEADING_RE.test(normalizedHeading(item.heading)));
   const reviewHeadings=coreHeadings.slice(0,6);
-  const axes=FOOD_AXES.map((definition,index)=>{const item=reviewHeadings[index];const next=item?allHeadings.find(heading=>heading.order>item.order):null;const segment=item?html.slice(item.end,next?.index??html.length):'';return {axis:index+1,...definition,heading:item?.heading??'',firstAnswer:firstAnswer(segment),highlightSummary:markedTexts(segment)};});
+  const axes=FOOD_AXES.map((definition,index)=>{const item=reviewHeadings[index];const next=item?allHeadings.find(heading=>heading.order>item.order):null;const segment=item?html.slice(item.end,next?.index??html.length):'';return {axis:index+1,...definition,heading:item?.heading??'',firstAnswer:firstAnswer(segment),highlightSummary:markedTexts(segment),designItemCount:designItemCount(segment)};});
   const highlightSummarySections=axes.map(axis=>({axis:axis.axis,heading:axis.heading,highlights:axis.highlightSummary}));
   const missingHighlightAxes=highlightSummarySections.filter(item=>item.highlights.length===0).map(item=>item.axis);
-  return {assessment:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,observedCoreH2Count:coreHeadings.length,axes,highlightSummaryReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'형광펜만 순서대로 읽어도 6개 핵심 축의 핵심 정보를 빠르게 습득할 수 있는 요약 레이어인지 검토',sections:highlightSummarySections,missingHighlightAxes,warning:'형광펜 수를 채우기 위해 가치 낮은 문장을 억지로 강조하지 말고, 장점·신체 변화·실제 행동을 우선한다.'},balanceReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,questions:[...BALANCE_REVIEW_QUESTIONS]}};
+  const designStructureSections=axes.filter(axis=>axis.axis>=3&&axis.axis<=6).map(axis=>({axis:axis.axis,heading:axis.heading,itemCount:axis.designItemCount,expectedRendererClass:({3:'effects',4:'pairs',5:'cautions',6:'storage'})[axis.axis]}));
+  const weakDesignAxes=designStructureSections.filter(item=>item.itemCount<2).map(item=>item.axis);
+  return {assessment:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,observedCoreH2Count:coreHeadings.length,axes,designStructureReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'신규 글은 승인된 카드 디자인으로 작성하고 기존 글 수정은 승인 HTML 구조를 보존했는지 검토',sections:designStructureSections,weakDesignAxes,warning:'③~⑥에 실제 여러 항목이 있다면 h3+p 또는 ul/li 같은 반복 구조를 사용해 effects/pairs/cautions/storage 디자인을 유지한다. 형광펜으로 디자인을 대체하지 않는다.'},highlightSummaryReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'형광펜만 순서대로 읽어도 6개 핵심 축의 핵심 정보를 빠르게 습득할 수 있는 요약 레이어인지 검토',sections:highlightSummarySections,missingHighlightAxes,warning:'형광펜 수를 채우기 위해 가치 낮은 문장을 억지로 강조하지 말고, 장점·신체 변화·실제 행동을 우선한다.'},balanceReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,questions:[...BALANCE_REVIEW_QUESTIONS]}};
 }
