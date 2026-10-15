@@ -46,11 +46,17 @@ const ACTIONABLE_SAFETY_PATTERN=/(?:즉시\s*(?:중단|진료|병원|응급)|복
 const BENEFIT_HEADING_PATTERN=/(?:효능|기대(?:되는)?(?:\s*신체)?\s*변화|어떤\s*변화|건강상\s*이점|장점)/u;
 const BENEFIT_OUTCOME_PATTERN=/(?:개선|증가|감소|낮추|줄(?:이|어)|유지|보호|회복|완화|향상|도움|위험\s*감소|진행\s*(?:지연|감소))/u;
 const TOP_FOOD_HEADING_PATTERN=/(?:TOP\s*\d+|풍부한\s*식품)/iu;
+const DEFINITION_HEADING_PATTERN=/(?:정의와\s*주요\s*성분|정의.*주요.*성분.*작용)/u;
 const MARK_TONES=new Set(['positive','info','caution','negative']);
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const cleanText=value=>String(value??'').replace(/\s+/gu,' ').trim();
 const containsTag=(node,name)=>node?.name===name||(node?.children??[]).some(child=>containsTag(child,name));
 const containsMarkedStrong=node=>(node?.name==='mark'&&containsTag(node,'strong'))||(node?.children??[]).some(containsMarkedStrong);
+const highlightLevel=node=>{
+  let level=node?.name==='mark'&&containsTag(node,'strong')?(containsTag(node,'u')?3:2):0;
+  for(const child of node?.children??[])level=Math.max(level,highlightLevel(child));
+  return level;
+};
 const collectRows=(node,rows=[])=>{
   if(node?.name==='tr')rows.push(node);
   for(const child of node?.children??[])collectRows(child,rows);
@@ -72,17 +78,34 @@ export function assertDirectSubmissionEmphasis(source) {
   let currentHeading='';
   let inBenefitSection=false;
   let hasBenefitSection=false;
+  let inDefinitionSection=false;
+  let definitionAnswerCaptured=false;
+  let definitionAnswerLevel=0;
+  let definitionSectionMaxLevel=0;
+  let definitionPriorityViolation=false;
   let benefitOutcomeHighlights=0;
   let primaryHighlights=0;
   let boldCount=0;
   let highlightCount=0;
   let underlineCount=0;
   let topRankEmphasisMissing=false;
+  const finishDefinitionSection=()=>{
+    if(inDefinitionSection&&definitionAnswerCaptured&&definitionSectionMaxLevel>definitionAnswerLevel)definitionPriorityViolation=true;
+  };
   const visit=node=>{
     if(node.name==='h2'){
-      currentHeading=cleanText(nodeText(node)).replace(/^\d+[.)]\s*/u,'');
+      finishDefinitionSection();
+      const rawHeading=cleanText(nodeText(node));
+      currentHeading=rawHeading.replace(/^\d+[.)]\s*/u,'');
       inBenefitSection=BENEFIT_HEADING_PATTERN.test(currentHeading);
       if(inBenefitSection)hasBenefitSection=true;
+      inDefinitionSection=source.category==='영양소'&&(/^1[.)]\s*/u.test(rawHeading)||DEFINITION_HEADING_PATTERN.test(currentHeading));
+      definitionAnswerCaptured=false;
+      definitionAnswerLevel=0;
+      definitionSectionMaxLevel=0;
+    } else if(inDefinitionSection&&!definitionAnswerCaptured&&['p','ul','ol','table','blockquote'].includes(node.name)) {
+      definitionAnswerCaptured=true;
+      definitionAnswerLevel=highlightLevel(node);
     }
     if(source.category==='영양소'&&node.name==='table'&&TOP_FOOD_HEADING_PATTERN.test(currentHeading)){
       const rankedRows=collectRows(node).map(row=>{
@@ -105,6 +128,7 @@ export function assertDirectSubmissionEmphasis(source) {
       const boldChildren=underlined?(inner.children??[]).filter(n=>n.type!=='comment' && !(n.type==='text'&&!n.data.trim())):children;
       if(children.length!==1||boldChildren.length!==1||boldChildren[0].name!=='strong')throw Error('E_DIRECT_EMPHASIS_STRUCTURE');
       if(underlined)underlineCount++;
+      if(inDefinitionSection)definitionSectionMaxLevel=Math.max(definitionSectionMaxLevel,underlined?3:2);
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
       const isActionableSafety=PURE_SAFETY_HEADING.test(currentHeading)&&ACTIONABLE_SAFETY_PATTERN.test(text);
@@ -117,7 +141,11 @@ export function assertDirectSubmissionEmphasis(source) {
     for(const child of node.children??[])visit(child);
   };
   visit(parseDocument(source.bodyHtml??''));
+  finishDefinitionSection();
   if(!primaryHighlights)throw Error('E_DIRECT_PRIMARY_EMPHASIS_MISSING');
+  // The first answer block under nutrient H2 #1 is the definition itself. Product comparison or label-reading guidance
+  // later in the section must never receive a stronger emphasis tier than that direct answer.
+  if(definitionPriorityViolation)throw Error('E_DIRECT_DEFINITION_ANSWER_EMPHASIS_PRIORITY');
   // Nutrient benefit sections must visibly emphasize at least one confirmed health outcome,
   // not merely evidence quality, limitations, dosage, or product-selection facts.
   if(source.category==='영양소'&&hasBenefitSection&&!benefitOutcomeHighlights)throw Error('E_DIRECT_BENEFIT_EMPHASIS_MISSING');
