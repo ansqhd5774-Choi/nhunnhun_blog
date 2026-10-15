@@ -33,6 +33,18 @@
 - TOP 순위에서 계산·추정값을 실제 측정값처럼 사용하는 명백한 구조 오류
 - 제출·checkpoint·PUBLIC_VERIFIED·ledger
 
+## R12 원고 구조의 기술 호환
+
+영양소 최신 편집 기준이 만든 HTML 구조는 공통 direct 렌더러가 그대로 표현해야 한다.
+
+- 상단 `핵심만 먼저` blockquote는 PC 2열·모바일 1열 요약 카드로 렌더링한다.
+- 질문 안에 여러 항목이 있는 `<ul><li><strong>항목명:</strong> ...</li></ul>` 구조는 해당 H2 성격에 맞는 카드 그룹과 H3로 렌더링한다.
+- TOP7·섭취량·제품 비교처럼 표로 작성한 정보는 table과 가로 스크롤 wrapper를 유지한다.
+- `<mark>` 강조는 카드·표·문단의 구조를 대체하지 않고 그 안에서 유지된다.
+- 공개 검증은 direct root·H2·H3·table·tableWrap·image·mark·badge와 스타일 가시성을 확인한다.
+
+이 항목들은 **편집 내용을 새로 결정하는 규칙이 아니라**, `nhunnhun_nutrients`에서 완성한 구조가 제출 과정에서 사라지지 않게 하는 기술 호환 계약이다.
+
 ## legacy 자동작성 하드 차단
 
 영양소는 legacy 자동작성 경로에서 공통 오류 `E_NUTRIENT_DIRECT_EDITORIAL_EXTERNAL`로 차단한다.
@@ -50,3 +62,6 @@
 5. legacy OpenAI writer는 API key 또는 유료 API 호출 전에 차단된다.
 6. 일반 독자형 영양소 문장이 별도 편집 프레이밍 없이 기술 검사를 통과한다.
 7. legacy R1 파일은 보존하되 영양소 direct 편집 기준으로 승격하지 않는다.
+8. 상단 요약 blockquote가 quick-summary 카드로 렌더링된다.
+9. 영양소 ②·③·⑤·⑥의 항목형 list가 카드/H3 구조로 렌더링된다.
+10. 영양소 표가 table-scroll wrapper를 유지한다.
