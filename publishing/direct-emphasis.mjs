@@ -3,7 +3,8 @@ import {DIRECT_AUTHORING_CONTRACT} from './direct-authoring-contract.mjs';
 
 export const DIRECT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.emphasisMinimums;
 export const DIRECT_NUTRIENT_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.nutrientEmphasisMinimums;
-export const DIRECT_FOOD_EMPHASIS_MINIMUMS=DIRECT_AUTHORING_CONTRACT.foodEmphasisMinimums;
+// Food emphasis is semantic, not quota-driven. Keep this export for compatibility.
+export const DIRECT_FOOD_EMPHASIS_MINIMUMS=null;
 
 // Structural omission guard only; the author still chooses meaningful phrases.
 export function assertDirectEmphasis(source) {
@@ -59,8 +60,10 @@ const firstDataCell=row=>(row?.children??[]).find(child=>child?.name==='td');
 export function assertDirectSubmissionEmphasis(source) {
   if(source.contentStandard!=='SP1'||!source.id?.startsWith('direct-'))return;
   assertDirectEmphasis(source);
+  // Food content must not be rewritten to satisfy arbitrary emphasis counts.
+  // Other categories keep their existing numerical contracts.
   const minimums=source.category==='음식'
-    ?DIRECT_FOOD_EMPHASIS_MINIMUMS
+    ?null
     :source.category==='영양소'
       ?DIRECT_NUTRIENT_EMPHASIS_MINIMUMS
       :DIRECT_EMPHASIS_MINIMUMS;
@@ -118,8 +121,10 @@ export function assertDirectSubmissionEmphasis(source) {
   if(source.category==='영양소'&&hasBenefitSection&&!benefitOutcomeHighlights)throw Error('E_DIRECT_BENEFIT_EMPHASIS_MISSING');
   // In a nutrient TOP food table, ranks 1-3 are the direct answer to the H2 and must be visibly emphasized.
   if(topRankEmphasisMissing)throw Error('E_DIRECT_TOP3_EMPHASIS_MISSING');
-  if(boldCount<minimums.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
-  if(highlightCount<minimums.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
-  if(underlineCount<minimums.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
+  if(minimums){
+    if(boldCount<minimums.bold)throw Error('E_DIRECT_EMPHASIS_BOLD_MIN');
+    if(highlightCount<minimums.highlight)throw Error('E_DIRECT_EMPHASIS_HIGHLIGHT_MIN');
+    if(underlineCount<minimums.underline)throw Error('E_DIRECT_EMPHASIS_UNDERLINE_MIN');
+  }
   return {boldCount,highlightCount,underlineCount};
 }
