@@ -6,9 +6,10 @@
 1. 최신 사용자 지시와 도구 금지
 2. `docs/project-instructions/PROJECT_INSTRUCTIONS_FOOD_R8.1.txt` — 음식 내용·소제목·문체·독자 중심 작성의 유일한 기본 기준
 3. `docs/content/FOOD_CONTENT_QUALITY_R1.md` — 정보 깊이·벤치마크·정보 밀도·표·중복 제거 기준
-4. `docs/GENERAL_CHAT_EXECUTION.md` — 실행 역할과 공개 검증
-5. `docs/content/DIRECT_AUTHORING_R1.md`, `docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md`, `docs/content/CATEGORY_CONTENT_PARITY.md` — 디자인·강조·이미지·저장·제출·검증의 **기술 계약에만** 사용
-6. 실제 `.github/workflows/`와 `publishing/` 코드
+4. `docs/content/FOOD_APPROVED_REFERENCE_R1.md` — 최근 사용자 승인 수준을 재현하기 위한 포도 `/153`·멸치 `/173` 실전 기준 사례
+5. `docs/GENERAL_CHAT_EXECUTION.md` — 실행 역할과 공개 검증
+6. `docs/content/DIRECT_AUTHORING_R1.md`, `docs/content/DIRECT_AUTHORING_CONTRACT_20261012.md`, `docs/content/CATEGORY_CONTENT_PARITY.md` — 디자인·강조·이미지·저장·제출·검증의 **기술 계약에만** 사용
+7. 실제 `.github/workflows/`와 `publishing/` 코드
 
 다른 저장소·다른 블로그·다른 카테고리·legacy 공통 문서의 소제목·전문가용 평가 구조·복용·치료·제품선택 구조를 음식 글 편집 기준으로 사용하지 않는다. 위 공통 기술 문서에 다른 분야의 편집 예시가 남아 있어도 음식 내용 기준으로 승격하지 않는다.
 
@@ -38,6 +39,12 @@
 - 내용이 부족하면 글자 수·표·강조로 채우지 않고 조사를 확장한다.
 - 글의 대부분은 음식의 특징·영양·장점·활용·섭취·선택·보관을 중심으로 한다.
 - 주의사항은 원칙적으로 5번 소제목에 집중하고 다른 소제목에서 반복하지 않는다.
+- ② `영양소·핵심 성분`은 **열량·탄수화물·단백질·지방 기본값만 채우고 끝내지 않는다.** 해당 음식의 대표 검색 영양소와 고유 성분을 먼저 확인해 실제 수치와 역할을 충분히 넣는다.
+- 크기·품종·가공형태에 따라 영양값이 유의미하게 다르고 독자가 실제 구매에서 구분한다면 동일 기준량 비교표를 우선 검토한다. 멸치처럼 잔·중·대 크기별 차이가 큰 음식은 하나의 대표값으로 뭉개지 않는다.
+- 제목이나 검색의도에 들어간 대표 영양소가 ② 표·본문에서 실제 수치로 확인되지 않으면 작성 미완성으로 본다.
+- 형광펜은 개수만 맞추지 않고 도입부터 ⑥까지 고르게 배치하며, **형광펜만 훑어도 핵심 의미가 이어지는지** 최종 확인한다.
+- 완제품 비교가 유용하면 제품 TOP3, 원물이라 브랜드 비교가 무의미하면 산지·지역·품종 TOP3를 검토한다. 판매량 하나만으로 순위를 정하지 않는다.
+- 실전 적용 전에는 `FOOD_APPROVED_REFERENCE_R1.md`의 포도 `/153`·멸치 `/173` 기준 사례를 함께 확인한다.
 
 ## 작성·저장·발행
 기본 흐름은 `최신 main/음식 기준 확인 → 검색 의도·중복 → 벤치마크 → 독자 질문 지도 → 생활정보 조사 → 사실 확인 → 6개 소제목 작성 → 정보 밀도·중복·부정 과잉 검토 → 강조·이미지·내부링크 → Gate 0 → GitHub 저장 확인 → 실행 관찰 → PUBLIC_VERIFIED`이다.
