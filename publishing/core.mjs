@@ -45,9 +45,14 @@ export function checkPublishHtml(post) {
   }
   // Strict publishing HTML is checked only for a post that can create a NEW public article.
   // Already-published source may retain richer archival markup without becoming eligible for republishing.
+  const centeredTableStyles={
+    'text-align':[/^center$/],
+    'vertical-align':[/^middle$/]
+  };
   const clean = sanitizeHtml(post.bodyHtml, {
     allowedTags: ['p','br','h2','h3','h4','strong','em','u','s','ul','ol','li','blockquote','table','thead','tbody','tr','th','td','a','img','hr','span','mark'],
-    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan'], td:['colspan','rowspan'], mark:['data-tone'], span:['data-tone'], blockquote:['data-kind'] },
+    allowedAttributes: { a:['href','title'], img:['src','alt','width','height'], th:['colspan','rowspan','style'], td:['colspan','rowspan','style'], mark:['data-tone'], span:['data-tone'], blockquote:['data-kind'] },
+    allowedStyles:{th:centeredTableStyles,td:centeredTableStyles},
     allowedSchemes: ['https'], allowProtocolRelative: false,
   });
   // Compare decoded DOM structure, not harmless entity/quote/void serialization.
@@ -79,7 +84,7 @@ export async function loadPosts(directory = 'posts', sourceId = process.env.PUBL
     posts.push(checkPost(JSON.parse(await readFile(`${directory}/${name}`, 'utf8')), name));
   }
   if(sourceId&&posts.length!==1)throw Error('E_POST_TARGET_SOURCE_NOT_FOUND');
-  if (new Set(posts.map(p => p.id)).size !== posts.length || new Set(posts.map(p => p.title)).size !== posts.length) throw new Error('E_DUPLICATE_POST');
+  if (new Set(posts.map(p=>p.id)).size!==posts.length || new Set(posts.map(p=>p.title)).size!==posts.length) throw new Error('E_DUPLICATE_POST');
   return posts;
 }
 export function eligible(post, state) {
