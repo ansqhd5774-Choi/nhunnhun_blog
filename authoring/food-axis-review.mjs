@@ -24,10 +24,11 @@ const BALANCE_REVIEW_QUESTIONS=[
   '신규 음식 글은 처음부터 승인된 카드·목록·표 디자인 구조를 사용했는가? ③~⑥의 여러 항목을 단순 평문 문단으로 풀어 카드 디자인을 잃지 않았는가?',
   '기존 음식 글 수정은 승인된 HTML 디자인을 보존했는가? 내용 수정이나 형광펜 추가를 이유로 카드·박스·목록·표 구조를 삭제하지 않았는가?',
   '③~⑥이 렌더러에서 effects / pairs / cautions / storage 구조로 표현될 수 있는 반복 항목 구조를 갖췄는가?',
-  '형광펜은 경고 표시가 아니라 핵심 요약 레이어인가? 형광펜만 위에서 아래로 읽어도 음식의 정체·핵심 영양·꾸준 섭취 변화·궁합·필수 주의·선택/보관의 핵심이 이어지는가?',
+  '형광펜은 경고 표시가 아니라 빠른 읽기를 위한 스캔 앵커인가? 형광펜을 위에서 아래로 훑었을 때 음식의 정체·핵심 영양·꾸준 섭취 변화·궁합·필수 주의·선택/보관의 핵심 흐름이 잡히는가?',
   '6개 핵심 소제목의 핵심 정보가 형광펜 요약 레이어에 빠짐없이 반영됐는가? 단, 제철·산지·정의·배경처럼 핵심성이 낮은 세부를 단지 소제목을 채우기 위해 억지로 강조하지 않았는가?',
   '③·④처럼 핵심 정보가 여러 갈래인 소제목을 형광펜 한 문장으로 뭉개지 않고 중요한 변화·조합을 필요한 만큼 나눠 강조했는가?',
-  '각 형광펜이 단일 명사 하나로 끝나지 않고 대상+효과, 음식+궁합, 조건+행동처럼 최소 두 요소가 연결된 짧은 의미 묶음인가? 예: `홍삼 · 면역 기능 관리 도움`, `홍삼 + 대추 · 쓴맛 완화`처럼 형광펜만 읽어도 관계와 의미를 바로 유추할 수 있는가?',
+  '형광펜이 문장 전체도, 의미가 끊기는 단일 명사도 아닌 자연스러운 최소 의미 구절인가? 카드에서는 카드 제목과 형광펜을 함께 읽었을 때 `면역력 증진 → 면역 기능 관리에 도움`, `대추 → 쓴맛 완화`처럼 즉시 의미가 연결되는가?',
+  '같은 음식명을 모든 형광펜 앞에 반복하거나 `홍삼 · 효과`, `참치 · 효과`처럼 원래 문장에 없던 전보식 표현을 양산하지 않았는가?',
   '형광펜이 경고·주의 문장에 편중되지 않고 장점·효능·신체 변화·실제 섭취/선택 행동을 우선적으로 보여주는가?',
   '제철·산지·정의·명칭·분류·배경 설명을 단지 필수 포함 정보라는 이유만으로 형광펜이나 밑줄 처리하지 않았는가?',
   '각 형광펜·밑줄을 놓쳤을 때 독자의 건강 이해·선택·섭취·보관 행동이 실제로 달라지는가? 아니라면 일반 문장 또는 굵게로 낮췄는가?',
@@ -61,5 +62,5 @@ export function buildFoodAxisReview(source={}){
   const missingHighlightAxes=highlightSummarySections.filter(item=>item.highlights.length===0).map(item=>item.axis);
   const designStructureSections=axes.filter(axis=>axis.axis>=3&&axis.axis<=6).map(axis=>({axis:axis.axis,heading:axis.heading,itemCount:axis.designItemCount,expectedRendererClass:({3:'effects',4:'pairs',5:'cautions',6:'storage'})[axis.axis]}));
   const weakDesignAxes=designStructureSections.filter(item=>item.itemCount<2).map(item=>item.axis);
-  return {assessment:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,observedCoreH2Count:coreHeadings.length,axes,designStructureReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'신규 글은 승인된 카드 디자인으로 작성하고 기존 글 수정은 승인 HTML 구조를 보존했는지 검토',sections:designStructureSections,weakDesignAxes,warning:'③~⑥에 실제 여러 항목이 있다면 h3+p 또는 ul/li 같은 반복 구조를 사용해 effects/pairs/cautions/storage 디자인을 유지한다. 형광펜으로 디자인을 대체하지 않는다.'},highlightSummaryReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'형광펜만 순서대로 읽어도 6개 핵심 축의 핵심 정보를 빠르게 습득할 수 있는 요약 레이어인지 검토',sections:highlightSummarySections,missingHighlightAxes,warning:'형광펜은 단일 명사만 표시하지 말고 대상+효과/조건+행동처럼 짧은 의미 묶음으로 연결한다. 형광펜 수를 채우기 위해 가치 낮은 문장을 억지로 강조하지 않는다.'},balanceReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,questions:[...BALANCE_REVIEW_QUESTIONS]}};
+  return {assessment:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,observedCoreH2Count:coreHeadings.length,axes,designStructureReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'신규 글은 승인된 카드 디자인으로 작성하고 기존 글 수정은 승인 HTML 구조를 보존했는지 검토',sections:designStructureSections,weakDesignAxes,warning:'③~⑥에 실제 여러 항목이 있다면 h3+p 또는 ul/li 같은 반복 구조를 사용해 effects/pairs/cautions/storage 디자인을 유지한다. 형광펜으로 디자인을 대체하지 않는다.'},highlightSummaryReview:{status:'AUTHOR_REVIEW_REQUIRED',purpose:'형광펜을 훑을 때 6개 핵심 축의 정보를 빠르게 파악할 수 있는 스캔 앵커인지 검토',sections:highlightSummarySections,missingHighlightAxes,warning:'형광펜은 원문 안의 자연스러운 최소 의미 구절로 잡는다. 카드 제목이 이미 문맥을 제공하면 음식명·항목명을 형광펜에 반복하지 않고, 문장 전체나 의미가 끊기는 단일 명사는 피한다.'},balanceReview:{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,scope:'FOOD_ONLY',ruleSource:FOOD_RULE_SOURCE,qualityRuleSource:FOOD_QUALITY_RULE_SOURCE,questions:[...BALANCE_REVIEW_QUESTIONS]}};
 }
