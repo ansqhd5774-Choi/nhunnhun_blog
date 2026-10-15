@@ -26,3 +26,26 @@ test('pair list shares approved readable responsive list system without rewritin
   assert.match(out,/>비타민 C<\/h3><p>같은 식사에 곁들입니다.<\/p>/);
   assert.match(out,/>비타민 K<\/h3><p>섭취량 변화에 주의합니다.<\/p>/);
 });
+
+test('nutrient R12 source keeps quick summary cards, section cards, tables and highlights together',()=>{
+  const html=[
+    '<blockquote><strong>핵심만 먼저:</strong> <strong>효능</strong> 핵심 효능<br><strong>누가</strong> 권장 대상<br><strong>복용</strong> 하루 섭취량<br><strong>기간</strong> 확인 기간<br><strong>조합</strong> 함께 먹기<br><strong>주의</strong> 주의사항</blockquote>',
+    '<h2>1. 정의와 주요 성분 및 작용은 무엇인가?</h2><p><mark data-tone="info"><u><strong>정의 핵심</strong></u></mark></p>',
+    '<h2>2. 한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?</h2><ul><li><strong>변화 A:</strong> <mark data-tone="positive"><strong>변화 핵심</strong></mark></li><li><strong>대상 B:</strong> 대상 설명</li></ul>',
+    '<h2>3. 일일 권장 섭취량과 효과적인 섭취법은 무엇인가?</h2><ul><li><strong>하루량:</strong> 1회량 설명</li><li><strong>먹는 시간:</strong> 시간 설명</li></ul>',
+    '<h2>4. 풍부한 식품 TOP7과 각 식품의 평균 함유량은 얼마인가?</h2><table><thead><tr><th>순위</th><th>식품</th><th>함유량</th></tr></thead><tbody><tr><td>1</td><td>식품 A</td><td>10</td></tr></tbody></table>',
+    '<h2>5. 함께 섭취하면 좋은 영양소와 주의할 상호작용은 무엇인가?</h2><ul><li><strong>조합 A:</strong> 같이 먹는 법</li><li><strong>상호작용 B:</strong> 행동 기준</li></ul>',
+    '<h2>6. 결핍 및 과다 복용의 위험, 예방 가능한 질병과 추천 제품은 무엇인가?</h2><ul><li><strong>결핍:</strong> 결핍 설명</li><li><strong>과다:</strong> 과다 설명</li><li><strong>제품:</strong> 선택 설명</li></ul><table><tbody><tr><td>제품 A</td><td>10mg</td></tr></tbody></table>'
+  ].join('');
+  const out=renderDirectArticle(html);
+  assert.match(out,/class="quick-summary"/);
+  assert.match(out,/class="effects"/);
+  assert.match(out,/class="storage"/);
+  assert.match(out,/class="pairs"/);
+  assert.match(out,/class="cautions"/);
+  assert.equal((out.match(/<h3>/g)||[]).length,9);
+  assert.equal((out.match(/class="table-scroll"/g)||[]).length,2);
+  assert.equal((out.match(/<table>/g)||[]).length,2);
+  assert.match(out,/정의 핵심/);
+  assert.match(out,/변화 핵심/);
+});
