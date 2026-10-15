@@ -78,7 +78,8 @@ test('food editorial review is reader-first and does not reintroduce research-ce
   const result=prepareDirectSource(source);
   assert.equal(JSON.stringify(source),before);
   assert.match(result.preview,/<div class="effects">/);
-  assert.match(result.preview,/\.nh-direct-v2 \.effects\{[^}]*border:1px/);
+  assert.match(result.preview,/\.nh-direct-v2 :is\(\.effects,\.pairs\) article\{[^}]*border:1px solid #e2e7eb/);
+  assert.match(result.preview,/grid-template-columns:120px minmax\(0,1fr\)/);
   assert.match(result.preview,/<mark><u><strong>중요한 행동<\/strong><\/u><\/mark>/);
   assert.equal(result.report.sections[3].level3,1);
   assert.equal(result.report.foodAxisReview.scope,'FOOD_ONLY');
