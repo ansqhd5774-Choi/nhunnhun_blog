@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "ec85faa3b23c17babce01f26a7acc0ca3156bf2826a3386de140bc77f9675a81",
-  "sourceCommit": "a686d4927012edd7d858116c99ed6017ed3e497e",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-15T18:48:49.653Z",
   "url": "https://nhunnhun.tistory.com/441",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-15T18:49:21.681Z",
+  "sourceCommit": "a686d4927012edd7d858116c99ed6017ed3e497e",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38788333735",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-chitooligosaccharide-20261016",
+    "url": "https://nhunnhun.tistory.com/441",
+    "checkedAt": "2026-10-15T18:49:21.681Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
