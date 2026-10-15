@@ -6,5 +6,16 @@
   "sourceCommit": "dcc05cf69cfc0c1177a5f14e27ccc20923f10639",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-15T20:42:45.231Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38803832639"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38803832639",
+  "publicResult": {
+    "sourceId": "direct-173-anchovy-r2-nutrition-expanded-20261016",
+    "url": "https://nhunnhun.tistory.com/173",
+    "sourceCommit": "dcc05cf69cfc0c1177a5f14e27ccc20923f10639",
+    "fingerprint": "c62f1daeb7635c99325a6e5957d88f69865bf7b092ec14cce365af2d85290529",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38803832639",
+    "checkedAt": "2026-10-15T20:42:48.365Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38803832639",
+    "status": "PUBLIC_VERIFICATION_UNAVAILABLE",
+    "code": "E_QA_ACCESS"
+  }
 }
