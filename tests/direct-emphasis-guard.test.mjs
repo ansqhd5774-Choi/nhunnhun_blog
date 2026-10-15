@@ -90,12 +90,12 @@ test('mixed nutrient risk section still counts as a primary information section'
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source));
 });
 
-test('food and nutrient use dedicated emphasis minimums while medicine and disease keep the shared quota',()=>{
+test('food uses semantic emphasis without numerical quotas while other categories keep existing quotas',()=>{
   assert.deepEqual(DIRECT_EMPHASIS_MINIMUMS,{bold:18,highlight:8,underline:2});
   assert.deepEqual(DIRECT_NUTRIENT_EMPHASIS_MINIMUMS,{bold:25,highlight:14,underline:8});
-  assert.deepEqual(DIRECT_FOOD_EMPHASIS_MINIMUMS,{bold:25,highlight:12,underline:8});
-  const food={id:'direct-음식-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:13,level2:4,level3:8})};
-  assert.deepEqual(assertDirectSubmissionEmphasis(food),{boldCount:25,highlightCount:12,underlineCount:8});
+  assert.equal(DIRECT_FOOD_EMPHASIS_MINIMUMS,null);
+  const food={id:'direct-음식-test',category:'음식',contentStandard:'SP1',bodyHtml:'<h2>2. 영양소·핵심 성분</h2><mark data-tone="positive"><strong>요구르트는 단백질과 칼슘을 함께 섭취하기 쉬운 식품입니다.</strong></mark>'};
+  assert.deepEqual(assertDirectSubmissionEmphasis(food),{boldCount:1,highlightCount:1,underlineCount:0});
   const nutrient={id:'direct-영양소-test',category:'영양소',contentStandard:'SP1',bodyHtml:nutrientQuotaBody()};
   assert.deepEqual(assertDirectSubmissionEmphasis(nutrient),{boldCount:25,highlightCount:14,underlineCount:8});
   for(const category of ['약학','질병']){
@@ -114,14 +114,9 @@ test('nutrient submission rejects fewer than 14 highlight effects',()=>{
   assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
 });
 
-test('food submission rejects fewer than 12 highlight effects',()=>{
-  const source={id:'direct-food-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:14,level2:3,level3:8})};
-  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_HIGHLIGHT_MIN/);
-});
-
-test('food submission rejects fewer than 8 underline highlight effects',()=>{
-  const source={id:'direct-food-underline-test',category:'음식',contentStandard:'SP1',bodyHtml:quotaBody({plainBold:13,level2:5,level3:7})};
-  assert.throws(()=>assertDirectSubmissionEmphasis(source),/E_DIRECT_EMPHASIS_UNDERLINE_MIN/);
+test('food submission accepts meaningful emphasis without padding counts',()=>{
+  const source={id:'direct-food-test',category:'음식',contentStandard:'SP1',bodyHtml:'<h2>3. 꾸준 섭취 변화</h2><mark data-tone="positive"><strong>단백질이 높은 그릭요거트는 포만감을 챙기는 간식으로 활용하기 좋습니다.</strong></mark>'};
+  assert.deepEqual(assertDirectSubmissionEmphasis(source),{boldCount:1,highlightCount:1,underlineCount:0});
 });
 
 test('nutrient submission rejects fewer than 8 underline highlight effects',()=>{
