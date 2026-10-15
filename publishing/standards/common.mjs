@@ -12,7 +12,7 @@ export const MODULES = Object.freeze({
   symptoms: '주요 증상·발현 양상', causes: '원인', risk: '위험요인', self_check: '자가 점검의 범위·확진과의 차이',
   diagnosis: '검사·감별·진단 과정', treatment: '표준치료와 선택지', home_care: '집에서 할 수 있는 안전한 관리',
   red_flags: '응급 위험신호와 즉시 할 행동', medical_help: '진료 시점·진료과·약사 상담',
-  timeline: '효과 시작·관찰기간·개인차', long_term: '꾸준한 사용·연구기간·장기 안전성·재평가',
+  timeline: '효과 시작·관찰기간·개인차', long_term: '꾸준한 사용·자료기간·장기 안전성·재평가',
   stopping: '중단 후 변화·의료진과 조정할 경우', comparison: '같은 목적·기준으로 비교', alternatives: '대체 가능한 것과 불가능한 것',
   combinations: '추가하면 도움이 되는 조합과 단순 병용 가능의 구분', product_variants: '성분·제형·실함량·마케팅 차이',
   food_sources: '식품 공급원·보충제 대체 범위', deficiency: '결핍 위험·확인 방법',

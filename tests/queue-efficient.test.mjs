@@ -20,7 +20,7 @@ import { sourceMainText } from '../authoring/queue-research.mjs';
 
 const evidence={sources:[
   {id:'official-a',url:'https://nedrug.mfds.go.kr/test',title:'공식 주제 안전 안내',notes:'해당 주제의 안전 조건과 사용 범위를 확인한 자료 발췌입니다. 적용 대상에 따라 조건을 구분합니다.',kind:'official',role:'authorization',topicSpecific:true},
-  {id:'official-b',url:'https://example.gov/health',title:'공식 건강 안내',notes:'해당 주제에 관한 건강 정보와 연구의 한계를 설명한 자료입니다. 확인된 정보와 불확실한 정보를 구분합니다.',kind:'official',role:'health',topicSpecific:true}
+  {id:'official-b',url:'https://example.gov/health',title:'공식 건강 안내',notes:'해당 주제에 관한 건강 정보와 자료의 한계를 설명한 자료입니다. 확인된 정보와 불확실한 정보를 구분합니다.',kind:'official',role:'health',topicSpecific:true}
 ]};
 const item=domain=>({domain,keyword:'시험 주제',articleId:'999'});
 const section=spec=>({id:spec.id,paragraphs:[`정체를 먼저 확인합니다. 적용 조건을 구분합니다. 근거 범위를 살핍니다. 선택 기준을 확인합니다. ${spec.heading}에 관한 직접 자료의 내용과 한계를 구분해 설명합니다.`],answers:spec.modules.map(module=>({module,quote:'정체를 먼저 확인합니다. 적용 조건을 구분합니다.'})),sourceIds:['official-a'],anchors:['정체를 먼저 확인','적용 조건을 구분','근거 범위를 살핍','선택 기준을 확인']});

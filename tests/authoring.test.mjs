@@ -43,7 +43,7 @@ test('전체 생성은 source와 미승인 검토서를 저장하고 기존 산�
     let calls = 0;
     const fetcher = async (_url, init) => {
       const body = JSON.parse(init.body); assert.equal(body.store,false); calls++;
-      return {ok:true,json:async()=>({id:`response-${calls}`,status:'completed',output:[{content:[{type:'output_text',text:calls===1?'조건과 연구 한계':JSON.stringify({...article,reviewNotes:'이미지 및 의미 검토 미완료'}),annotations:calls===1?urls.map(url=>({type:'url_citation',url})):[]}]}]})};
+      return {ok:true,json:async()=>({id:`response-${calls}`,status:'completed',output:[{content:[{type:'output_text',text:calls===1?'조건과 자료 한계':JSON.stringify({...article,reviewNotes:'이미지 및 의미 검토 미완료'}),annotations:calls===1?urls.map(url=>({type:'url_citation',url})):[]}]}]})};
     };
     await generate(env,{root,fetcher}); assert.equal(calls,2);
     const review = JSON.parse(await readFile(join(root,`generated-drafts/${config.id}/content-reviews/posts/${config.id}.json`),'utf8'));

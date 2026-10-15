@@ -42,7 +42,7 @@
 ## 최소제목 후보와 대상오류 구분
 
 - /260 제목 후보: `엘라그산(Ellagic Acid)의 역할｜함유 식품·섭취 주의사항`. 불로장생 약속 제거. 기존 본문 효능의 임상근거가 해결됐다고 보고하지 않는다.
-- /24: 단순 제목교정으로 종료하지 않는다. Wheatgrass는 밀(Triticum aestivum), barley grass는 보리(Hordeum vulgare)로 다른 원료다. 실제 원하는 대상 및 활성원고·사진·성분의 종을 확인해야 한다. [밀·보리 microgreen 원문 연구](https://pubmed.ncbi.nlm.nih.gov/31168157/).
-- /259: 제목 Glebionis coronaria와 본문 Artemisia princeps의 학명이 다르다. 실제 쑥갓 대상으로 기본정의·성분·사진을 대조해야 하며 쑥 이름으로 제목만 바꿔 전체오류 해결로 처리하지 않는다. [Kew Glebionis 분류](https://powo.science.kew.org/taxon/urn%3Alsid%3Aipni.org%3Anames%3A1013480-1), [Glebionis 원문 유전체 연구](https://pmc.ncbi.nlm.nih.gov/articles/PMC9724771/).
+- /24: 단순 제목교정으로 종료하지 않는다. Wheatgrass는 밀(Triticum aestivum), barley grass는 보리(Hordeum vulgare)로 다른 원료다. 실제 원하는 대상 및 활성원고·사진·성분의 종을 확인해야 한다. [밀·보리 microgreen 원문 자료](https://pubmed.ncbi.nlm.nih.gov/31168157/).
+- /259: 제목 Glebionis coronaria와 본문 Artemisia princeps의 학명이 다르다. 실제 쑥갓 대상으로 기본정의·성분·사진을 대조해야 하며 쑥 이름으로 제목만 바꿔 전체오류 해결로 처리하지 않는다. [Kew Glebionis 분류](https://powo.science.kew.org/taxon/urn%3Alsid%3Aipni.org%3Anames%3A1013480-1), [Glebionis 원문 유전체 자료](https://pmc.ncbi.nlm.nih.gov/articles/PMC9724771/).
 
 이번 작업은 읽기전용 검토·후보 기록이다. 원고 준비·원격 변경·게시하지 않았다. 누적240 URL 검토이며 checkpoint 기준 **116개 미검토**다. 최신 공개글 증감과 최종 전체수는 메인 취합에서 별도 맞춘다.

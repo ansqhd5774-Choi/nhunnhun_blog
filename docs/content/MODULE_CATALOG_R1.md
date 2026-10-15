@@ -30,7 +30,7 @@
 | red_flags | 응급 위험신호와 즉시 할 행동 | disease |
 | medical_help | 진료 시점·진료과·약사 상담 | medicine, disease |
 | timeline | 효과 시작·관찰기간·개인차 | medicine |
-| long_term | 꾸준한 사용·연구기간·장기 안전성·재평가 | 조건부 |
+| long_term | 꾸준한 사용·자료기간·장기 안전성·재평가 | 조건부 |
 | stopping | 중단 후 변화·의료진과 조정할 경우 | 조건부 |
 | comparison | 같은 목적·기준으로 비교 | 조건부 |
 | alternatives | 대체 가능한 것과 불가능한 것 | 조건부 |

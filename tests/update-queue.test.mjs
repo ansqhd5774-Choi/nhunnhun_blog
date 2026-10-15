@@ -130,8 +130,8 @@ test('R5.2 does not automatically retry legacy or current-policy blocks',async()
 test('R5.2 derives claim type and risk in code instead of trusting model labels',()=>{
   const food={domain:'food'};
   const benefitSection={id:'benefits-amount'};
-  assert.equal(deterministicClaimType(food,benefitSection,'이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'benefit');
-  assert.equal(deterministicClaimRisk('benefit','이 식품은 건강에 도움이 될 수 있다는 연구가 있습니다.'),'low');
+  assert.equal(deterministicClaimType(food,benefitSection,'이 식품은 건강에 도움이 될 수 있다는 자료가 있습니다.'),'benefit');
+  assert.equal(deterministicClaimRisk('benefit','이 식품은 건강에 도움이 될 수 있다는 자료가 있습니다.'),'low');
   assert.equal(deterministicClaimType({domain:'nutrient'},{id:'safety-interactions'},'확인되지 않은 상호작용은 단정하지 않습니다.'),'general');
   assert.equal(deterministicClaimRisk('general','확인되지 않은 상호작용은 단정하지 않습니다.'),'low');
   assert.equal(deterministicClaimType({domain:'medicine'},{id:'audience-amount-use'},'1회 500 mg을 복용합니다.'),'dose');

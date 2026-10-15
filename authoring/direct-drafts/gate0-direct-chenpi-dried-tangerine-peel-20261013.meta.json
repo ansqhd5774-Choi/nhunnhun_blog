@@ -21,7 +21,7 @@
     "duplicateCheck": "repo search: 진피/Chenpi/귤껍질 exact topic not found; related citrus content does not cover dried tangerine peel intent",
     "evidenceBoundary": [
       "약재 규격 진피와 집에서 말린 일반 귤껍질을 같은 것으로 일반화하지 않음",
-      "추출물·실험 연구를 일반 진피차의 임상 효능으로 일반화하지 않음",
+      "추출물·실험 자료를 일반 진피차의 임상 효능으로 일반화하지 않음",
       "공식 하루 권장량을 만들지 않음",
       "보관은 건조식품 안전 원칙과 해당 제품 상태 중심으로 안내"
     ]
@@ -44,7 +44,7 @@
       "questions":[
         "도입·핵심 요약이 정체·장점·활용을 먼저 보여주는가? PASS",
         "② 효능 첫 문단이 실제 식품 가치를 먼저 설명하는가? PASS",
-        "연구 한계와 공식 권장량 없음을 반복하지 않았는가? PASS",
+        "자료 한계와 공식 권장량 없음을 반복하지 않았는가? PASS",
         "안전·위생·농축물 주의를 ⑤ 중심으로 정리했는가? PASS",
         "강한 강조가 장점·활용·행동 기준 중심인가? PASS"
       ]
