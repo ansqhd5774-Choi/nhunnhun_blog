@@ -13,7 +13,7 @@ export function directFixture(overrides={}){
  const headings=category==='영양소'?nutrientHeadings:['소개','핵심 정보','역할과 효과','연결과 활용','주의사항','실천과 관리'];
  const sections=headings.map((h,index)=>{
   const isNutrientChange=category==='영양소'&&index===1;
-  const highlighted=isNutrientChange?'건강 지표가 개선되고 필요한 기능 유지에 도움이 됩니다.':'주요 수치와 조건';
+  const highlighted=isNutrientChange?'건강 지표 개선·기능 유지 도움':'주요 수치와 조건';
   const tone=isNutrientChange?' data-tone="positive"':'';
   let detail='';
   if(category==='영양소'&&index===1)detail='<p>성인이 500mg을 하루 1회 4주 섭취했을 때 불편감이 줄고 일상 기능이 개선됐습니다.</p>';
