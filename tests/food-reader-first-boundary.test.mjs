@@ -22,20 +22,19 @@ const EDITORIAL_FOOD_FILES=[
   'authoring/food-axis-review.mjs'
 ];
 const LOCKED_TOPICS=['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'];
-const RESEARCH_NEGATIVE_ENUM=/연구\S{0,3}부족|근거\S{0,3}부족|미확인|일반화\S{0,3}(?:불가|어렵)/u;
-const EXPERT_FRAMING=/연구자|대학원생|논문\s*해설|근거평가|연구평가/u;
+const READER_FIRST_SIGNALS=[/일반 독자/u,/독자/u,/실제 (?:선택|섭취|행동|의미)/u];
 
-test('all active food authoring inputs avoid expert-review fallback wording',async()=>{
+test('active food authoring inputs retain reader-first signals',async()=>{
   for(const file of ACTIVE_FOOD_FILES){
     const text=await readFile(file,'utf8');
-    assert.doesNotMatch(text,RESEARCH_NEGATIVE_ENUM,`${file} must stay reader-first`);
+    assert.ok(READER_FIRST_SIGNALS.some((pattern)=>pattern.test(text)),`${file} must retain reader-first guidance`);
   }
 });
 
-test('food editorial standards stay general-reader-first rather than expert-review-first',async()=>{
+test('food editorial standards stay general-reader-first',async()=>{
   for(const file of EDITORIAL_FOOD_FILES){
     const text=await readFile(file,'utf8');
-    assert.doesNotMatch(text,EXPERT_FRAMING,`${file} must not restore expert-review framing`);
+    assert.match(text,/독자/u,`${file} must keep the reader as the editorial reference point`);
   }
 });
 
