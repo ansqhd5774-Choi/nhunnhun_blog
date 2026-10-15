@@ -38,7 +38,10 @@ test('limitation and no-effect statements stay plain or bold instead of highligh
     '조리용 큐민과 보충제의 섭취 조건이 다릅니다','조리용 큐민과 보충제의 섭취 조건은 다릅니다',
     '연구 용량을 일반인의 하루 권장량이나 안전 상한으로 바꾸지 않습니다','같은 섭취 기준으로 판단하지 않습니다',
     '호모시스테인 수치 감소를 심혈관질환 예방 효과로 바꾸어 해석하면 안 됩니다',
-    '호모시스테인 개선을 심혈관질환 예방 효과로 확대해 표현하지 않습니다'
+    '호모시스테인 개선을 심혈관질환 예방 효과로 확대해 표현하지 않습니다',
+    '여성호르몬 자체나 호르몬 치료제와 같은 성분은 아닙니다',
+    '에스트로겐과 같은 성분은 아닙니다',
+    '호르몬 치료제로 보면 안 됩니다'
   ];
   for(const phrase of phrases){
     for(const attrs of ['', ' data-tone="info"', ' data-tone="caution"', ' data-tone="negative"']){
