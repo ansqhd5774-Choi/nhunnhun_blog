@@ -55,7 +55,7 @@ scaffold는 stdout으로 **미승인 빈 검토서**를 출력한다. 작성자�
 
 sources 원소: `id`, `url`, `title`, `kind`, `role`, `checkedAt`(YYYY-MM-DD), `scopeNote`. 확인하지 않은 미래 날짜는 허용하지 않는다. kind는 official/guideline/systematic-review/trial/nutrition-database/manufacturer/local-authority/article, role은 health/safety/nutrition/product/origin/context/authorization다. scopeNote에는 이 자료가 실제 뒷받침하는 대상·기간·제품·조건과 적용 한계를 적는다.
 
-건강·안전·영양·허가 역할의 공식자료·지침·원문 연구·영양 데이터 URL 최소 2개가 필요하다. 판매자·지역 홍보·기사의 존재만으로 이 최소 근거를 충족시키지 않는다. 이미지·제품·산지 출처만으로 대체하지 않는다. 의약품에는 국내 식약처 공식 authorization 근거가 필요하며 실제 글의 정확한 제품 또는 성분과 일치해야 한다. 도메인 검사만으로 자료의 일치나 최신성이 증명되는 것은 아니므로 편집자가 실제 읽는다. 기사만으로 중요한 의료 주장을 확정하지 않는다.
+건강·안전·영양·허가 역할의 공식자료·지침·원문 자료·영양 데이터 URL 최소 2개가 필요하다. 판매자·지역 홍보·기사의 존재만으로 이 최소 근거를 충족시키지 않는다. 이미지·제품·산지 출처만으로 대체하지 않는다. 의약품에는 국내 식약처 공식 authorization 근거가 필요하며 실제 글의 정확한 제품 또는 성분과 일치해야 한다. 도메인 검사만으로 자료의 일치나 최신성이 증명되는 것은 아니므로 편집자가 실제 읽는다. 기사만으로 중요한 의료 주장을 확정하지 않는다.
 
 ## 5. 타 분야·비교·병용·선택
 

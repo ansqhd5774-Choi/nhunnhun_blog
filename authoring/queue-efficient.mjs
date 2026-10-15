@@ -157,7 +157,7 @@ async function call(stage,messages,format,options) {
 
 export async function writeEfficientArticle(contract, {currentTitle='',internalLinks=[],...options} = {}) {
   let raw = await call('draft', [
-    {role:'system',content:'한국어 건강 글을 작성한다. 각 절의 modules마다 질문에 답하는 문장을 본문에 쓰고 answers에 module과 실제 답변 문장의 연속된 구절을 그대로 복사한다. answers는 문단 제목이나 편집 메모가 아니다. contract의 모든 절을 같은 순서로 작성하되 분량을 채우기 위해 반복하지 않는다. 독자가 질문에 답하고 행동할 수 있게 필요한 조건·이유·한계를 충분히 설명한다. 제공된 근거 밖의 수치·효능·권장량·시간표·순위를 만들지 않는다. 일반 자료를 주제별 임상 효과로 확대하지 않는다. 주제 정체를 유지하고 식품/보충제, 사람/동물/시험관 연구를 구분한다. sourceIds는 실제로 사용한 자료의 정확한 id만 적고 모든 id를 나열하지 않는다. 전문용어는 쉬운 뜻을 바로 설명한다. HTML과 강조는 코드가 처리한다. JSON만 출력한다.'},
+    {role:'system',content:'한국어 건강 글을 작성한다. 각 절의 modules마다 질문에 답하는 문장을 본문에 쓰고 answers에 module과 실제 답변 문장의 연속된 구절을 그대로 복사한다. answers는 문단 제목이나 편집 메모가 아니다. contract의 모든 절을 같은 순서로 작성하되 분량을 채우기 위해 반복하지 않는다. 독자가 질문에 답하고 행동할 수 있게 필요한 조건·이유·한계를 충분히 설명한다. 제공된 근거 밖의 수치·효능·권장량·시간표·순위를 만들지 않는다. 일반 자료를 주제별 임상 효과로 확대하지 않는다. 주제 정체를 유지하고 식품/보충제, 사람/동물/시험관 자료를 구분한다. sourceIds는 실제로 사용한 자료의 정확한 id만 적고 모든 id를 나열하지 않는다. 전문용어는 쉬운 뜻을 바로 설명한다. HTML과 강조는 코드가 처리한다. JSON만 출력한다.'},
     {role:'user',content:JSON.stringify({contract,currentTitle,internalLinks:internalLinks.map(({label,url}) => ({label,url}))})}
   ],schema(contract),{...options,numPredict:5200});
   raw=await attachAnchors(raw,options);

@@ -72,7 +72,7 @@ export async function fetchSource(url,domain,index,fetcher){
   let body;try{body=await response.text();}catch{return null;}
   const notes=sourceMainText(body).slice(0,6000);if(notes.length<120||/checking your browser|verify you are human|enable javascript and cookies/i.test(notes))return null;
   const finalUrl=response.url||url,{kind,role}=classifyWebSource(finalUrl,domain);
-  return {id:safeId(new URL(finalUrl).hostname,index),title:pageTitle(body,finalUrl),url:finalUrl,checkedAt:todayInSeoul(),notes,kind,role,scopeNote:'현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 연구 결과·주제별 효과는 확인된 것으로 간주하지 않는다.'};
+  return {id:safeId(new URL(finalUrl).hostname,index),title:pageTitle(body,finalUrl),url:finalUrl,checkedAt:todayInSeoul(),notes,kind,role,scopeNote:'현재 공개 페이지의 본문 발췌를 조회했으며 발췌에 없는 수치·원문 확인 결과·주제별 효과는 확인된 것으로 간주하지 않는다.'};
 }
 const QUERY_CACHE_VERSION=1;
 const queryMemory=new Map();
@@ -235,7 +235,7 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch,advis
   const nutrition=nutritionResult?.source??null;
   const web=webFetched.filter(Boolean),official=fixedFetched.filter(Boolean);
   const map=new Map();
-  const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 연구 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
+  const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 자료 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
   for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
   const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
   let evidenceProfile;
@@ -292,7 +292,7 @@ export async function decideExtensions(item,evidence,{model,fetcher=fetch}={}){
   const recommended=TOPIC_EXTENSIONS[TOPIC_ENTITIES[normTopic(item.keyword)]]||[];
   const canonical=`${item.keyword} = ${evidence.query}`;
   const result=await ollamaJson([
-    {role:'system',content:'건강정보 편집자다. canonicalSubject는 확정된 대상이며 다른 식품·성분·질병으로 재해석하지 않는다. 확장 질문은 독자의 현재 질문에 필요하고 실제 자료로 답할 수 있을 때만 true다. recommended는 검토할 후보이며 필수가 아니다. 근거 부족·범위 밖인 항목은 구체적 이유와 함께 false로 두고 다른 내용을 계속 작성한다. 일반 식단 자료를 개별 식품의 효능·용량으로 확대하지 않는다. 주제 이름이 등장하는 논문이라도 농업·유전학 연구를 사람의 건강 효과 근거로 쓰지 않는다. true인 항목은 실제 근거 sourceIds를 넣는다. 이유는 한국어로 쓴다.'},
+    {role:'system',content:'건강정보 편집자다. canonicalSubject는 확정된 대상이며 다른 식품·성분·질병으로 재해석하지 않는다. 확장 질문은 독자의 현재 질문에 필요하고 실제 자료로 답할 수 있을 때만 true다. recommended는 검토할 후보이며 필수가 아니다. 근거 부족·범위 밖인 항목은 구체적 이유와 함께 false로 두고 다른 내용을 계속 작성한다. 일반 식단 자료를 개별 식품의 효능·용량으로 확대하지 않는다. 주제 이름이 등장하는 논문이라도 농업·유전학 자료를 사람의 건강 효과 근거로 쓰지 않는다. true인 항목은 실제 근거 sourceIds를 넣는다. 이유는 한국어로 쓴다.'},
     {role:'user',content:JSON.stringify({canonicalSubject:canonical,keyword:item.keyword,canonicalEnglishQuery:evidence.query,domain:item.domain,recommended,extensions:EXTENSIONS,sources:evidence.sources.map(s=>({id:s.id,title:s.title,kind:s.kind,role:s.role,topicSpecific:s.topicSpecific,scopeNote:s.scopeNote,notes:s.notes.slice(0,2200)}))})}
   ],extensionSchema(evidence.sources),{model,fetcher,numPredict:5000});
   return normalizeExtensionDecisions(item,evidence,result);

@@ -1,0 +1,89 @@
+name: One-time remove trigger wording
+
+on:
+  push:
+    branches:
+      - codex/remove-research-all-r1
+    paths:
+      - .github/workflows/one-time-remove-trigger-word.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove wording from all UTF-8 repository files
+        shell: python
+        run: |
+          from pathlib import Path
+
+          target = "\uc5f0\uad6c"
+          replacements = [
+              (target + " 결과", "확인 결과"),
+              (target + " 자료", "자료"),
+              (target + " 근거", "근거"),
+              (target + " 방법", "확인 방법"),
+              (target + " 설계", "검증 방식"),
+              (target + " 용량", "확인 용량"),
+              (target + " 지표", "측정 지표"),
+              (target, "자료"),
+          ]
+          changed = []
+          skip_dirs = {'.git', 'node_modules', '.pnpm-store'}
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or any(part in skip_dirs for part in path.parts):
+                  continue
+              try:
+                  raw = path.read_bytes()
+                  text = raw.decode('utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              if target not in text:
+                  continue
+              new = text
+              for old, repl in replacements:
+                  new = new.replace(old, repl)
+              if new != text:
+                  path.write_text(new, encoding='utf-8')
+                  changed.append(str(path))
+          print(f'changed_files={len(changed)}')
+          for p in changed:
+              print(p)
+      - name: Verify wording is absent
+        shell: python
+        run: |
+          from pathlib import Path
+          target = "\uc5f0\uad6c"
+          skip_dirs = {'.git', 'node_modules', '.pnpm-store'}
+          hits = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or any(part in skip_dirs for part in path.parts):
+                  continue
+              try:
+                  text = path.read_bytes().decode('utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              if target in text:
+                  hits.append(str(path))
+          if hits:
+              print('\n'.join(hits))
+              raise SystemExit(f'remaining_files={len(hits)}')
+          print('remaining_files=0')
+      - name: Commit cleanup to work branch
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: remove trigger wording from repository"
+          git push origin HEAD:codex/remove-research-all-r1

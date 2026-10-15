@@ -8,7 +8,7 @@ const sources=[
 ];
 const evidenceOutline=Array.from({length:4},(_,i)=>({id:`q${i+1}`,heading:`질문 ${i+1}`,paragraphs:[`검증용 문단 ${i+1}`],keyPoint:`검증 포인트 ${i+1}`,sourceIds:['identity','jecfa-2025']}));
 const job={id:'legacy-food-fixture',kind:'rewrite',articleId:'232',targetUrl:'https://nhunnhun.tistory.com/232',expectedCurrentTitle:'기존 제목',domain:'food',category:'음식',topic:'검증용 주제',proposedTitle:'카르노산 검증용 제목',evidenceSummary:'검증용 요약',generationMode:'evidence-bound-outline',sources,evidenceOutline};
-const article={title:'카르노산의 정체와 연구',summary:'허브 성분의 연구와 사용 조건을 살펴봅니다.',reviewNotes:'미승인',sections:Array.from({length:4},(_,i)=>({heading:`질문 ${i+1}`,paragraphs:['카르노산의 정체와 연구 대상은 구분해야 합니다.'],keyPoint:'근거의 적용 범위를 확인합니다.',sourceIds:['identity','jecfa-2025']}))};
+const article={title:'카르노산의 정체와 자료',summary:'허브 성분의 자료와 사용 조건을 살펴봅니다.',reviewNotes:'미승인',sections:Array.from({length:4},(_,i)=>({heading:`질문 ${i+1}`,paragraphs:['카르노산의 정체와 자료 대상은 구분해야 합니다.'],keyPoint:'근거의 적용 범위를 확인합니다.',sourceIds:['identity','jecfa-2025']}))};
 
 test('수정 URL·분류·출처 입력 계약',()=>{
   assert.equal(validateJob(job).articleId,'232');

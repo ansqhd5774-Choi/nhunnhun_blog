@@ -4,7 +4,7 @@
   "classification": {
     "rawInput": "기존 /237 성분명 혼동과 근거 없는 치료·용량·브랜드 교정",
     "topic": "카르바크롤",
-    "meaning": "오레가노 향 성분 Carvacrol의 정체·연구 범위·섭취 판단",
+    "meaning": "오레가노 향 성분 Carvacrol의 정체·자료 범위·섭취 판단",
     "entityId": "compound:carvacrol:10364",
     "status": "resolved",
     "reason": "Carvacrol과 Carbazole 식별자를 대조했다. 기존 영양소 카테고리는 유지하되 필수영양소로 표현하지 않는다."
@@ -21,7 +21,7 @@
   "extensions": {
     "longTerm": {
       "applies": false,
-      "reason": "확인한 사람 연구는 한 달 안전성 시험이며 장기 효과·관리 계획을 만들 근거가 없다."
+      "reason": "확인한 사람 자료는 한 달 안전성 시험이며 장기 효과·관리 계획을 만들 근거가 없다."
     },
     "comparison": {
       "applies": false,
@@ -53,7 +53,7 @@
     },
     "seasonality": {
       "applies": false,
-      "reason": "분리 성분의 연구·안전 안내에서 제철을 섭취 근거로 제시하지 않는다."
+      "reason": "분리 성분의 자료·안전 안내에서 제철을 섭취 근거로 제시하지 않는다."
     },
     "cost": {
       "applies": false,
@@ -61,7 +61,7 @@
     },
     "folkRemedies": {
       "applies": false,
-      "reason": "민간 치료의 처방·용량을 소개하지 않고 연구 유형을 설명한다."
+      "reason": "민간 치료의 처방·용량을 소개하지 않고 자료 유형을 설명한다."
     },
     "selfCheck": {
       "applies": false,
@@ -93,7 +93,7 @@
     },
     "latest": {
       "applies": false,
-      "reason": "과거 연구의 확인일을 새 연구 발표일로 포장하지 않는다."
+      "reason": "과거 자료의 확인일을 새 자료 발표일로 포장하지 않는다."
     }
   },
   "coverage": [
@@ -116,7 +116,7 @@
     },
     {
       "module": "benefits",
-      "heading": "3. 어떤 효능이 연구되고 있나요?",
+      "heading": "3. 어떤 효능이 자료되고 있나요?",
       "answerQuote": "사람에서의 임상적 의미가 확립되지 않았다고 설명",
       "sourceIds": [
         "oregano"
@@ -132,8 +132,8 @@
     },
     {
       "module": "expectations",
-      "heading": "4. 사람 대상 연구는 어디까지 확인됐나요?",
-      "answerQuote": "건강한 성인의 한 달 연구",
+      "heading": "4. 사람 대상 자료는 어디까지 확인됐나요?",
+      "answerQuote": "건강한 성인의 한 달 자료",
       "sourceIds": [
         "trial"
       ]
@@ -218,7 +218,7 @@
     },
     "disease": {
       "status": "not-applicable",
-      "reason": "특정 질병의 치료 효과를 입증할 연구를 선택하지 않아 질병별 효능 연결을 만들지 않는다."
+      "reason": "특정 질병의 치료 효과를 입증할 자료를 선택하지 않아 질병별 효능 연결을 만들지 않는다."
     }
   },
   "sources": [
@@ -247,16 +247,16 @@
       "kind": "official",
       "role": "nutrition",
       "checkedAt": "2026-10-10",
-      "scopeNote": "2023-04-28 NIH LiverTox 본문이 노출된 검색 결과와 PDF 검색 본문의 식물·연구 한계·임신·이상반응 설명을 읽었다. 직접 페이지는 브라우저 확인 화면으로 차단되어 전체 직접 열람으로 보고하지 않는다."
+      "scopeNote": "2023-04-28 NIH LiverTox 본문이 노출된 검색 결과와 PDF 검색 본문의 식물·자료 한계·임신·이상반응 설명을 읽었다. 직접 페이지는 브라우저 확인 화면으로 차단되어 전체 직접 열람으로 보고하지 않는다."
     },
     {
       "id": "trial",
       "url": "https://pubmed.ncbi.nlm.nih.gov/30486682/",
-      "title": "사람 대상 1상 안전성 연구 초록",
+      "title": "사람 대상 1상 안전성 자료 초록",
       "kind": "trial",
       "role": "safety",
       "checkedAt": "2026-10-10",
-      "scopeNote": "PubMed 검색에 노출된 연구 초록을 읽었다. 연구 전문은 읽지 않았으며 건강한 성인 한 달 안전성·내약성 시험 범위로 제한한다."
+      "scopeNote": "PubMed 검색에 노출된 자료 초록을 읽었다. 자료 전문은 읽지 않았으며 건강한 성인 한 달 안전성·내약성 시험 범위로 제한한다."
     },
     {
       "id": "safety",
@@ -265,7 +265,7 @@
       "kind": "official",
       "role": "safety",
       "checkedAt": "2026-10-10",
-      "scopeNote": "NCCIH 공식 웹 본문의 제품과 연구 차이·상호작용·취약대상·치료 대체 주의를 읽었다. 카르바크롤 특정 약과의 입증된 상호작용으로 확대하지 않는다."
+      "scopeNote": "NCCIH 공식 웹 본문의 제품과 자료 차이·상호작용·취약대상·치료 대체 주의를 읽었다. 카르바크롤 특정 약과의 입증된 상호작용으로 확대하지 않는다."
     }
   ],
   "glossary": [],
@@ -283,11 +283,11 @@
     "checks": {
       "readerIntent": {
         "status": "pass",
-        "note": "성분의 정체에서 연구·용량 판단·주의·선택까지 질문 순서로 답했다."
+        "note": "성분의 정체에서 자료·용량 판단·주의·선택까지 질문 순서로 답했다."
       },
       "accuracy": {
         "status": "pass",
-        "note": "식별자·공식자료와 사람 연구 초록을 대조하고 직접 접근 제한을 기록했다."
+        "note": "식별자·공식자료와 사람 자료 초록을 대조하고 직접 접근 제한을 기록했다."
       },
       "expectations": {
         "status": "pass",

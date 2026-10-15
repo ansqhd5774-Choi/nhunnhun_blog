@@ -53,7 +53,7 @@ test('food-axis review uses the user-defined six food topics and reader-first qu
   assert.match(balance,/100mL→200mL/);
   assert.match(balance,/표의 각 행·열/);
   assert.match(balance,/실제 행동으로 옮길 수 있는 정보/);
-  assert.doesNotMatch(balance,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거/);
+  assert.doesNotMatch(balance,/자료 부족|근거 부족|미확인|일반화 불가|검증 방식|표본|근거 수준|직접 근거|간접 근거/);
 });
 
 test('food-axis review reports all core H2 even though only six axis slots are displayed',()=>{
@@ -95,7 +95,7 @@ test('food editorial review is reader-first and does not reintroduce research-ce
   assert.match(questions,/궁합·시너지/);
   assert.match(questions,/주의사항/);
   assert.match(questions,/고르는 법·보관법/);
-  assert.doesNotMatch(questions,/연구 부족|근거 부족|미확인|일반화 불가|연구 설계|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
+  assert.doesNotMatch(questions,/자료 부족|근거 부족|미확인|일반화 불가|검증 방식|표본|근거 수준|직접 근거|간접 근거|제품 형태 선택|복용법|표준 치료|주요 의약품|TOP7|nhunnhun_nutrients/);
   assert.equal(result.report.editorialReview.automatedSemanticVerdict,false);
 
   const nonFoodResult=prepareDirectSource({...source,id:'direct-39-nonfood-review-test',category:'약학'});

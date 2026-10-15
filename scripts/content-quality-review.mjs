@@ -7,7 +7,7 @@ const compact = value => DomUtils.textContent(parseDocument(String(value ?? ''))
 const titlePromises = [
   ['칼로리', /칼로리|열량|kcal/i], ['단백질', /단백질/], ['보관', /보관/],
   ['주의', /주의|부작용|금기/], ['궁합', /궁합|조합|상호작용/], ['만들기', /만들|레시피|조리/],
-  ['섭취량', /섭취량|몇\s*[g알개]|하루|분량/], ['효능', /효능|효과|역할|신체|연구/],
+  ['섭취량', /섭취량|몇\s*[g알개]|하루|분량/], ['효능', /효능|효과|역할|신체|자료/],
 ];
 
 export function reviewPage(page, metadata) {

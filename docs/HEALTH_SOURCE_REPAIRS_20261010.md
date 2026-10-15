@@ -7,11 +7,11 @@
 |글|오류 및 변경|공개 증거|
 |---|---|---|
 |/264 아세트아미노펜|사라진 약학정보 PDF를 정확한 국내 타이레놀 500mg 허가사항으로 교체. 제품별 용법·금기·성분 중복·과량 시 무증상 의료평가·어린이·보관 기준을 대조하여 재작성|PR #138, Run [38000916317](https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38000916317), PUBLIC_VERIFIED/updated|
-|/237 카르바크롤|Carvacrol과 Carbazole의 성분 혼동, 근거 없는 항암·감량·해독 효과, 1,000~1,200mg 권장량과 가상 브랜드 추천 제거. Carvacrol 식별정보·연구 유형·허브와 농축 제품·시험 용량과 개인 권장량 구분으로 재작성|PR #139, Run [38001402880](https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38001402880), PUBLIC_VERIFIED/updated|
+|/237 카르바크롤|Carvacrol과 Carbazole의 성분 혼동, 근거 없는 항암·감량·해독 효과, 1,000~1,200mg 권장량과 가상 브랜드 추천 제거. Carvacrol 식별정보·자료 유형·허브와 농축 제품·시험 용량과 개인 권장량 구분으로 재작성|PR #139, Run [38001402880](https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/38001402880), PUBLIC_VERIFIED/updated|
 
 두 실행 모두 PC1440/모바일390 넘침0px, 사진3장·로딩 오류0·alt누락0·대표 이미지 확인. 메인 Codex가 공개 본문과 개정일을 직접 읽고 화면을 저장했다. /237 구조식의 실제 computed object-fit은 contain, 높이420px이며 로딩 완료. 각 번호 URL을 유지하며 중복 신규 글을 만들지 않았다.
 
-이미지3장의 Commons 실제 사진·작가·라이선스를 각각 확인했다. 독립 의학 감수는 수행하지 않았다. /237 PubChem 일부 직접 페이지 및 NIH LiverTox는 접근 제한이 있어 검색에 노출된 식별정보·본문 범위를 기록했으며 전문 직접 열람이라고 보고하지 않았다. 사람 대상 연구는 PubMed 초록 범위이다. 자료 확인일을 과거 자료의 발표·개정일로 바꾸지 않았다.
+이미지3장의 Commons 실제 사진·작가·라이선스를 각각 확인했다. 독립 의학 감수는 수행하지 않았다. /237 PubChem 일부 직접 페이지 및 NIH LiverTox는 접근 제한이 있어 검색에 노출된 식별정보·본문 범위를 기록했으며 전문 직접 열람이라고 보고하지 않았다. 사람 대상 자료는 PubMed 초록 범위이다. 자료 확인일을 과거 자료의 발표·개정일로 바꾸지 않았다.
 
 원장: `publishing/update-state/update-264-acetaminophen-source-review-20261010.json`, `publishing/update-state/update-237-carvacrol-identity-review-20261010.json`.
 로컬 화면·원장: 루트 `evidence/health-growth-final-20261010/remaining-repairs/`. 계정 화면이나 전체 원자료는 커밋하지 않는다.
