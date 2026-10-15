@@ -3,16 +3,20 @@ import assert from 'node:assert/strict';
 import {renderDirectArticle} from '../publishing/direct-design.mjs';
 
 test('effect list uses approved desktop tablet mobile responsive layout',()=>{
-  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?</h2><ul><li><strong>포만감</strong>식사 사이 허기 관리에 도움</li><li><strong>유당 소화</strong>우유보다 편하게 느껴질 수 있음</li></ul>';
+  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?</h2><ul><li><strong>포화지방 섭취가 많은 사람</strong>버터·라드 일부를 식물성 기름으로 바꿉니다.</li><li><strong>지방 섭취를 지나치게 제한하는 사람</strong>식물성 기름·견과류·씨앗류를 식사에 포함합니다.</li></ul>';
   const out=renderDirectArticle(html);
   assert.match(out,/class="effects"/);
-  assert.match(out,/grid-template-columns:120px minmax\(0,1fr\)/);
+  assert.match(out,/grid-template-columns:170px minmax\(0,1fr\)/);
   assert.match(out,/@media\(max-width:900px\)/);
-  assert.match(out,/grid-template-columns:105px minmax\(0,1fr\)/);
+  assert.match(out,/grid-template-columns:150px minmax\(0,1fr\)/);
   assert.match(out,/@media\(max-width:600px\)/);
   assert.match(out,/border-left:4px solid #6c92b7/);
-  assert.match(out,/border-radius:999px/);
-  assert.match(out,/>포만감<\/h3>/);
+  assert.match(out,/border:0!important;border-radius:0!important;background:transparent!important/);
+  assert.match(out,/font-size:17px!important/);
+  assert.match(out,/font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif!important/);
+  assert.match(out,/color:#355f86!important/);
+  assert.match(out,/article:nth-child\(4n\+2\) h3\{color:#9a5f1d!important\}/);
+  assert.match(out,/>포화지방 섭취가 많은 사람<\/h3>/);
 });
 
 test('pair list shares approved readable responsive list system without rewriting text',()=>{
