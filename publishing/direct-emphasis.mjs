@@ -22,7 +22,7 @@ export function assertDirectEmphasis(source) {
 const OFFICIAL_INTAKE_ABSENCE_PATTERN=/(?:공식\s*)?(?:하루\s*)?(?:권장량|권장\s*섭취량|상한)(?:이|가|은|는)?[^.!?]{0,35}(?:없|정해(?:지지|져\s*있지)\s*않|마련되지\s*않)/u;
 const DEFENSIVE_NEGATION_HIGHLIGHT_PATTERN=/(?:아닙니다|아니다|아니며|아니고|같지\s*않|동일하지\s*않|보면\s*안\s*(?:됩니다|된다))/u;
 const LIMITATION_HIGHLIGHT_PATTERNS=[
-  /(?:근거|자료|연구|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
+  /(?:근거|자료|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)/u,
   /(?:확인|입증|검증)(?:하지\s*못|되지\s*않|되지\s*않았|되지\s*않은|되지\s*않습니다|되지\s*않았다|되지\s*않음)/u,
   /단정(?:하기|할\s*수)?\s*어렵/u,
   /말할\s*만한[^.!?]{0,30}근거(?:가|는)?\s*부족/u,
@@ -37,7 +37,7 @@ const LIMITATION_HIGHLIGHT_PATTERNS=[
   /(?:같은|동일한)\s*(?:효과\s*크기|섭취\s*기준|용량|조건)[^.!?]{0,30}(?:(?:계산|판단|적용)하지\s*않|아니|않|다(?:르|릅))/u,
   /(?:보충|농축|추출|오일)[^.!?]{0,70}(?:조리용|일상|평소)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다(?:르|릅)/u,
   /(?:조리용|일상|평소)[^.!?]{0,70}(?:보충|농축|추출|오일)[^.!?]{0,45}(?:조건|용량|농도|제형)(?:이|가|은|는)?\s*다(?:르|릅)/u,
-  /(?:연구|시험|자료|수치|용량)[^.!?]{0,70}(?:권장량|안전\s*상한)[^.!?]{0,30}(?:바꾸지\s*않|간주하지\s*않)/u,
+  /(?:시험|자료|수치|용량)[^.!?]{0,70}(?:권장량|안전\s*상한)[^.!?]{0,30}(?:바꾸지\s*않|간주하지\s*않)/u,
   /(?:일상|평소|조리용)[^.!?]{0,45}(?:그대로|같은)[^.!?]{0,25}(?:적용|계산|판단)(?:하지\s*않|할\s*수\s*없)/u,
   /(?:효과|개선|수치|결과)[^.!?]{0,55}(?:예방|치료|효능)[^.!?]{0,35}(?:바꾸어\s*해석하면\s*안|확대(?:해|하여)\s*표현하지\s*않|동일하게\s*볼\s*수\s*없)/u,
 ];
@@ -132,7 +132,7 @@ export function assertDirectSubmissionEmphasis(source) {
       const text=cleanText(nodeText(node));
       const isLimitation=LIMITATION_HIGHLIGHT_PATTERNS.some(pattern=>pattern.test(text));
       const isActionableSafety=PURE_SAFETY_HEADING.test(currentHeading)&&ACTIONABLE_SAFETY_PATTERN.test(text);
-      // Evidence limits, no-effect statements, defensive negations and neutral absence-of-standard facts stay plain/bold.
+      // Limitation, no-effect, defensive-negation and neutral absence-of-standard facts stay plain/bold.
       // Only an actionable safety instruction in a dedicated safety section may remain strongly highlighted.
       if(isLimitation&&!isActionableSafety)throw Error('E_DIRECT_EMPHASIS_LIMITATION');
       if(!PURE_SAFETY_HEADING.test(currentHeading))primaryHighlights++;
@@ -147,7 +147,7 @@ export function assertDirectSubmissionEmphasis(source) {
   // later in the section must never receive a stronger emphasis tier than that direct answer.
   if(definitionPriorityViolation)throw Error('E_DIRECT_DEFINITION_ANSWER_EMPHASIS_PRIORITY');
   // Nutrient benefit sections must visibly emphasize at least one confirmed health outcome,
-  // not merely evidence quality, limitations, dosage, or product-selection facts.
+  // not merely source quality, limitations, dosage, or product-selection facts.
   if(source.category==='영양소'&&hasBenefitSection&&!benefitOutcomeHighlights)throw Error('E_DIRECT_BENEFIT_EMPHASIS_MISSING');
   // In a nutrient TOP food table, ranks 1-3 are the direct answer to the H2 and must be visibly emphasized.
   if(topRankEmphasisMissing)throw Error('E_DIRECT_TOP3_EMPHASIS_MISSING');
