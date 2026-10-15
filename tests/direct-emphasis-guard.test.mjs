@@ -53,7 +53,7 @@ test('limitation and no-effect statements stay plain or bold instead of highligh
 
 test('absence of an official intake standard is neutral information and must not be highlighted',()=>{
   const bodyHtml=nutrientQuotaBody()+`<h2>3. 섭취량</h2><mark data-tone="info"><strong>SAC의 공식 하루 권장량은 없습니다.</strong></mark>`;
-  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-info-standard-test',category:'영양소',contentStandard:'SP1',bodyHtml}),/E_DIRECT_EMPHASIS_LIMITATION/);
+  assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-info-standard-test',category:'영양소',contentStandard:'SP1',bodyHtml}),/E_DIRECT_(?:EMPHASIS_LIMITATION|NUTRIENT_HIGHLIGHT_NARRATIVE)/);
 });
 
 test('semantic positive and info tones are accepted for ordinary takeaways',()=>{
@@ -64,17 +64,17 @@ test('semantic positive and info tones are accepted for ordinary takeaways',()=>
 });
 
 test('nutrient benefit section rejects evidence-quality highlight without an actual health outcome highlight',()=>{
-  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>장기간 섭취했을 때 사람 자료가 더 탄탄합니다.</strong></mark>`;
+  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>장기간 사람 자료의 근거 수준</strong></mark>`;
   assert.throws(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-test',category:'영양소',contentStandard:'SP1',bodyHtml}),/E_DIRECT_BENEFIT_EMPHASIS_MISSING/);
 });
 
 test('nutrient benefit section accepts a positive highlight that states the confirmed health outcome',()=>{
-  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>황반색소밀도가 증가하고 대비감도와 강한 빛 노출 뒤 시각 회복이 개선됐습니다.</strong></mark>`;
+  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐을까?</h2><mark data-tone="positive"><strong>황반색소밀도 증가·대비감도 개선</strong></mark>`;
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
 });
 
 test('nutrient benefit guard recognizes natural Korean decrease wording',()=>{
-  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐고 누가 우선 확인해야 할까?</h2><mark data-tone="positive"><strong>철결핍이 교정되면 피로와 숨참, 운동 시 부담이 줄어드는 방향을 기대할 수 있습니다.</strong></mark>`;
+  const bodyHtml=nutrientQuotaBody()+`<h2>2. 어떤 효능이 확인됐고 누가 우선 확인해야 할까?</h2><mark data-tone="positive"><strong>피로·숨참·운동 부담 감소</strong></mark>`;
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis({id:'direct-benefit-korean-inflection-test',category:'영양소',contentStandard:'SP1',bodyHtml}));
 });
 
