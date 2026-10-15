@@ -6,7 +6,7 @@
 
 영양소 direct/SP1 원고의 **내용·소제목·문체·정보 배치**는 이 저장소에서 정하지 않는다. 유일한 편집 기준은 `ansqhd5774-Choi/nhunnhun_nutrients` 최신 main의 `PROJECT_INSTRUCTIONS.txt`다.
 
-이 저장소는 영양소에 대해 제출·구조 검사·이미지·강조 태그·source 무결성·공개 검증·원장 기록 같은 기술 역할만 담당한다. 상세 경계는 [NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R10](docs/NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R10.md)을 따른다.
+이 저장소는 영양소에 대해 제출·구조 검사·이미지·강조 태그·source 무결성·공개 검증·원장 기록 같은 기술 역할만 담당한다. 상세 경계는 [NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R11](docs/NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R11.md)을 따른다.
 
 다음 legacy 자료는 영양소 direct/SP1 작성 기준으로 사용하지 않는다.
 
@@ -15,7 +15,7 @@
 - `docs/CONTENT_REVIEW_FORMAT_R1.md`
 - `docs/content/DOMAIN_GUIDES_R1.md`
 - `workstreams/posts/templates/article.md`
-- legacy queue writer/research/review 코드와 과거 영양소 원고 예시
+- legacy 자동작성·검토 코드와 과거 영양소 원고 예시
 
 영양소 legacy single-pass writer는 `E_NUTRIENT_DIRECT_EDITORIAL_EXTERNAL`로 차단된다. 과거 파일은 복구·감사·호환 기록으로 보존할 수 있지만 새 영양소 원고의 편집 입력으로 재사용하지 않는다.
 

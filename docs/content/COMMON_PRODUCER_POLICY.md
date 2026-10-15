@@ -5,10 +5,10 @@
 영양소 direct/SP1은 이 문서의 Queue 작성·검토 정책을 사용하지 않는다.
 
 - 영양소 내용·소제목·문체·정보 배치는 `ansqhd5774-Choi/nhunnhun_nutrients` 최신 main의 `PROJECT_INSTRUCTIONS.txt`만 따른다.
-- 이 저장소의 legacy Queue/Ollama writer/research/review 경로는 영양소 direct/SP1 원고를 작성하지 않는다.
+- 이 저장소의 legacy 자동작성·검토 경로는 영양소 direct/SP1 원고를 작성하지 않는다.
 - 영양소 legacy single-pass writer 호출은 `E_NUTRIENT_DIRECT_EDITORIAL_EXTERNAL`로 중단한다.
 - `nhunnhun_blog`는 영양소에 대해 source 무결성·구조·이미지·강조 태그·제출·공개검증·원장만 담당한다.
-- 상세 경계는 `docs/NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R10.md`를 따른다.
+- 상세 경계는 `docs/NUTRIENT_DIRECT_EDITORIAL_BOUNDARY_R11.md`를 따른다.
 
 ## Legacy 공통 Producer
 
