@@ -8,6 +8,7 @@ import {imageReviewObservation} from '../publishing/image-review.mjs';
 import {observeEmphasis} from './emphasis-summary.mjs';
 import {pairingReview} from './pairing-review.mjs';
 import {buildFoodAxisReview} from './food-axis-review.mjs';
+import {observeFoodBenefitBreadth} from '../publishing/food-benefit-breadth.mjs';
 import {checkPost,checkPublishHtml} from '../publishing/core.mjs';
 import {directPreflight} from '../publishing/direct-preflight.mjs';
 
@@ -36,7 +37,7 @@ export function prepareDirectSource(source) {
   const foodAxisReview=source.category==='음식'?buildFoodAxisReview(source):null;
   const imageEditorialReview=imageReviewObservation(source);
   const editorialReview=foodAxisReview?foodEditorialReview(foodAxisReview):{status:'AUTHOR_REVIEW_REQUIRED',automatedSemanticVerdict:false,questions:[...GENERIC_EDITORIAL_QUESTIONS]};
-  return {report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),imageEditorialReview,...(foodAxisReview?{foodAxisReview}:{}),editorialReview},preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'};
+  return {report:{sourceId:source.id,preflight:directPreflight(source),...observation,focusReview,pairingReview:pairingReview(source.bodyHtml,source.category),imageEditorialReview,...(foodAxisReview?{foodAxisReview,foodBenefitBreadth:observeFoodBenefitBreadth(source)}:{}),editorialReview},preview:'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>원고 디자인 확인</title></head><body>'+renderDirectArticle(source.bodyHtml)+'</body></html>'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
   const source=JSON.parse(readFileSync(process.argv[2],'utf8'));
