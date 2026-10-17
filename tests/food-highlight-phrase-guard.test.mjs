@@ -80,10 +80,12 @@ test('full food article requires the food definition highlight in the first intr
 });
 
 test('full food article requires season, nutrition, change, caution, selection and storage highlight axes',()=>{
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({season:'종류 차이 · 식감·용도'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({nutrition:'핵심 영양 · 기본값 확인'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({caution:'담백한 맛 · 다양한 조리'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({storage:'조리 형태 · 용도별 선택'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,season:'종류 차이 · 식감·용도'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,nutrition:'핵심 정보 · 기본값 확인'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,change:'담백한 맛 · 다양한 조리'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,caution:'담백한 맛 · 다양한 조리'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,select:'조리 형태 · 용도별 구분'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,storage:'조리 형태 · 용도별 구분'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
 });
 
 test('full food article rejects technically covered but sparse highlight layer',()=>{
