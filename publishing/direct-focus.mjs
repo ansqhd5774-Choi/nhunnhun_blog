@@ -9,9 +9,31 @@ const TIME_PERIOD_PATTERN=/(?:(?:^|[^0-9])\d{1,3}(?:\.\d+)?\s*(?:일|주|개월|
 const AMOUNT_PATTERN=/(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(?:μg|mcg|mg|g|IU|국제단위|mL|ml|정|캡슐)(?:\/일|\s*\/\s*일|\s*하루)?/iu;
 const NUTRIENT_FOOD_RANKING_HEADING=/(?=.*(?:식품|음식))(?=.*(?:TOP\s*(?:7|5|3)|상위\s*(?:7|5|3)))/iu;
 const ESTIMATED_RANKING_VALUE_PATTERN=/(?:\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g)(?:\s*\/\s*(?:100\s*g|회|1회|일))?[^.!?\n]{0,24}(?:추정|환산|계산(?:값|치)?))|(?:(?:추정|환산|계산(?:값|치)?)[^.!?\n]{0,24}\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g))|(?:\d+(?:\.\d+)?\s*%[^.!?\n]{0,30}(?:배합|함유)[^.!?\n]{0,30}(?:적용|환산|계산))/iu;
+const NUTRIENT_PAIRING_HEADING=/(?:함께\s*섭취|같이\s*먹|조합|상호작용)/u;
+const NUTRIENT_DEFICIENCY_EXCESS_HEADING=/(?:결핍.*과다|과다.*결핍|결핍.*추천\s*제품|과다.*추천\s*제품)/u;
+const STRUCTURE_LOCK_TAGS=Object.freeze(['h2','h3','ul','ol','li','table','tr','img','blockquote']);
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
+
+function structureReview(bodyHtml=''){
+  const root=parseDocument(String(bodyHtml));
+  const totals=Object.fromEntries(STRUCTURE_LOCK_TAGS.map(tag=>[tag,0]));
+  const sections=[];
+  let current=null;
+  const visit=node=>{
+    if(node?.name&&Object.prototype.hasOwnProperty.call(totals,node.name))totals[node.name]++;
+    if(node.name==='h2'){
+      current={heading:clean(nodeText(node)).replace(/^\d+[.)]\s*/u,''),ul:0,ol:0,li:0,table:0,tr:0,h3:0,img:0};
+      sections.push(current);
+    } else if(current&&node?.name&&Object.prototype.hasOwnProperty.call(current,node.name)){
+      current[node.name]++;
+    }
+    for(const child of node.children??[])visit(child);
+  };
+  for(const child of root.children??[])visit(child);
+  return {totals,sections};
+}
 
 export function directFocusReview(bodyHtml='') {
   const root=parseDocument(String(bodyHtml));
@@ -68,6 +90,28 @@ export function assertDirectSubmissionFocus(source) {
       throw Error('E_DIRECT_NUTRIENT_EXPECTED_CHANGE_INCOMPLETE');
     if(review.nutrientFoodRankingSections.some(section=>section.hasEstimatedRankingValue))
       throw Error('E_DIRECT_NUTRIENT_FOOD_RANKING_ESTIMATED_VALUE');
+
+    const structure=structureReview(source.bodyHtml??'');
+    const foodSections=structure.sections.filter(section=>NUTRIENT_FOOD_RANKING_HEADING.test(section.heading));
+    if(foodSections.some(section=>section.table<1))throw Error('E_DIRECT_NUTRIENT_FOOD_TABLE_MISSING');
+
+    const pairingSections=structure.sections.filter(section=>NUTRIENT_PAIRING_HEADING.test(section.heading));
+    if(pairingSections.some(section=>section.table<1&&section.ul+section.ol<1))
+      throw Error('E_DIRECT_NUTRIENT_PAIRING_STRUCTURE_MISSING');
+
+    const safetyProductSections=structure.sections.filter(section=>NUTRIENT_DEFICIENCY_EXCESS_HEADING.test(section.heading));
+    if(safetyProductSections.some(section=>section.table<1&&section.ul+section.ol<1))
+      throw Error('E_DIRECT_NUTRIENT_SAFETY_PRODUCT_STRUCTURE_MISSING');
+
+    if(source.changeScope==='emphasis-only'||source.preserveStructure===true){
+      const baseline=source.structureBaseline;
+      if(!baseline||typeof baseline!=='object'||Array.isArray(baseline))throw Error('E_DIRECT_STRUCTURE_BASELINE_MISSING');
+      for(const tag of STRUCTURE_LOCK_TAGS){
+        const expected=Number(baseline[tag]??0);
+        if(!Number.isInteger(expected)||expected<0)throw Error('E_DIRECT_STRUCTURE_BASELINE_INVALID');
+        if(structure.totals[tag]<expected)throw Error('E_DIRECT_STRUCTURE_PRESERVATION');
+      }
+    }
   }
   return review;
 }
