@@ -7,7 +7,7 @@ import {validateAffiliateProducts} from './affiliate-products.mjs';
 
 export const BLOG = 'https://nhunnhun.tistory.com';
 export function checkPost(post, filename) {
-  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard', 'affiliateProducts'];
+  const allowed = ['id', 'title', 'category', 'tags', 'bodyHtml', 'representativeImageUrl', 'imageReview', 'scheduledAt', 'status', 'approved', 'contentStandard', 'affiliateProducts', 'foodBenefitScopeReview'];
   if (!post || typeof post !== 'object' || Array.isArray(post) || Object.keys(post).some(k => !allowed.includes(k))) throw new Error('E_POST_SCHEMA');
   if (post.contentStandard !== undefined && post.contentStandard !== 'R1' && !(post.contentStandard==='SP1'&&post.id?.startsWith('direct-'))) throw new Error('E_CONTENT_STANDARD_VERSION');
   if (!/^[a-z0-9][a-z0-9-]{2,79}$/.test(post.id) || filename !== `${post.id}.json`) throw new Error('E_POST_ID');
@@ -75,6 +75,7 @@ export function fingerprint(post) {
   if (post.scheduledAt) parts.push(post.scheduledAt);
   if (post.contentStandard) parts.push(post.contentStandard);
   if (post.affiliateProducts) parts.push(post.affiliateProducts);
+  if (post.foodBenefitScopeReview) parts.push(post.foodBenefitScopeReview);
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
 }
 export async function loadPosts(directory = 'posts', sourceId = process.env.PUBLISH_SOURCE_ID || null) {
