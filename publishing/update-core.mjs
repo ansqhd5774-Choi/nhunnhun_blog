@@ -6,7 +6,8 @@ import {assertDirectEmphasis} from './direct-emphasis.mjs';
 import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-source.mjs';
 import {validateAffiliateProducts} from './affiliate-products.mjs';
 
-const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts'];
+const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts','changeScope','preserveStructure','structureBaseline'];
+const STRUCTURE_BASELINE_KEYS=['h2','h3','ul','ol','li','table','tr','img','blockquote'];
 
 export function checkUpdateSource(update, filename){
   if(isNativeTextMaintenance(update))return checkNativeTextSource(update,filename);
@@ -16,6 +17,19 @@ export function checkUpdateSource(update, filename){
   if(unsupported.length) throw new Error(`E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:${unsupported.join(',')}`);
   if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
   if(update.contentStandard!==undefined&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
+  if(update.changeScope!==undefined&&update.changeScope!=='emphasis-only')throw new Error('E_UPDATE_CHANGE_SCOPE');
+  if(update.preserveStructure!==undefined&&typeof update.preserveStructure!=='boolean')throw new Error('E_UPDATE_PRESERVE_STRUCTURE');
+  if(update.structureBaseline!==undefined){
+    if(!update.structureBaseline||typeof update.structureBaseline!=='object'||Array.isArray(update.structureBaseline))throw new Error('E_UPDATE_STRUCTURE_BASELINE');
+    const keys=Object.keys(update.structureBaseline).sort();
+    const unknown=keys.filter(k=>!STRUCTURE_BASELINE_KEYS.includes(k));
+    if(unknown.length)throw new Error(`E_UPDATE_STRUCTURE_BASELINE_KEYS:${unknown.join(',')}`);
+    for(const key of STRUCTURE_BASELINE_KEYS){
+      const value=update.structureBaseline[key];
+      if(!Number.isInteger(value)||value<0)throw new Error('E_UPDATE_STRUCTURE_BASELINE');
+    }
+  }
+  if((update.changeScope==='emphasis-only'||update.preserveStructure===true)&&update.structureBaseline===undefined)throw new Error('E_UPDATE_STRUCTURE_BASELINE');
   if(!/^[a-z0-9][a-z0-9-]{2,79}$/.test(update.id) || filename!==`${update.id}.json`) throw new Error('E_UPDATE_ID');
   if(!/^\d+$/.test(update.articleId||'')) throw new Error('E_UPDATE_ARTICLE');
   if(update.targetUrl!==`${BLOG}/${update.articleId}`) throw new Error('E_UPDATE_URL');
@@ -40,7 +54,10 @@ export function updateFingerprint(update){
   return createHash('sha256').update(JSON.stringify([
     update.id,update.articleId,update.targetUrl,update.expectedCurrentTitle,update.title,update.representativeImageUrl,update.bodyHtml,
     ...(update.contentStandard ? [update.contentStandard,update.category] : []),
-    ...(update.affiliateProducts ? [update.affiliateProducts] : [])
+    ...(update.affiliateProducts ? [update.affiliateProducts] : []),
+    ...(update.changeScope!==undefined ? [update.changeScope] : []),
+    ...(update.preserveStructure!==undefined ? [update.preserveStructure] : []),
+    ...(update.structureBaseline!==undefined ? [update.structureBaseline] : [])
   ])).digest('hex');
 }
 export async function loadUpdates(directory='updates',sourceId=null){
