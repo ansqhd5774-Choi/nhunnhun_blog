@@ -56,7 +56,9 @@ function validNarrowScopeReview(review,covered){
     if(!entry||!Object.hasOwn(DOMAINS,entry.domain)||seen.has(entry.domain))return false;
     seen.add(entry.domain);
     if(!['included','insufficient','not_applicable'].includes(entry.verdict))return false;
-    if(!/^https:\/\/[^/\s]+\.[^/\s]+\/\S+/iu.test(String(entry.sourceUrl??'')))return false;
+    let sourceUrl;
+    try{sourceUrl=new URL(entry.sourceUrl);}catch{return false;}
+    if(sourceUrl.protocol!=='https:'||!sourceUrl.hostname.includes('.')||/\.(?:invalid|test|example)$/iu.test(sourceUrl.hostname)||/^example\.(?:com|org|net)$/iu.test(sourceUrl.hostname)||sourceUrl.username||sourceUrl.password)return false;
     if(CLEAN(entry.reason).length<18)return false;
     // An included domain needs to be visible in the same section's highlight layer.
     if(entry.verdict==='included'&&!covered.includes(entry.domain))return false;
