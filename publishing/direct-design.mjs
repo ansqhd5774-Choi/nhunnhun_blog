@@ -54,8 +54,11 @@ export function renderDirectArticle(html){
     const items=inside.replace(/<li>([\s\S]*?)<\/li>/g,(_whole,item)=>{
       const match=item.match(/^\s*(<strong>[\s\S]*?<\/strong>|<mark\b[^>]*>(?:<u>)?<strong>[\s\S]*?<\/strong>(?:<\/u>)?<\/mark>)([\s\S]*)$/);
       if(!match)throw Error('E_DIRECT_CARD_ITEM_STRUCTURE');
-      const label=match[1].replace(/[:：]\s*(<\/strong>|<\/mark>)$/,'$1');
-      return '<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label+'</h3><p>'+match[2].trim()+'</p></div></article>';
+      const label=match[1].startsWith('<strong>')
+        ? match[1].slice('<strong>'.length,-'</strong>'.length).replace(/[:：]\s*$/,'')
+        : match[1];
+      i++;
+      return '<article><span class="badge">'+(kind==='storage'?'✓':String(i).padStart(2,'0'))+'</span><div><h3>'+label+'</h3><p>'+match[2].trim()+'</p></div></article>';
     });
     if(i===0||/<li\b/i.test(items))throw Error('E_DIRECT_CARD_ITEM_STRUCTURE');
     return '<div class="'+kind+'">'+items+'</div>';
