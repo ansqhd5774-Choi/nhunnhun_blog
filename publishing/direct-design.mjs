@@ -47,7 +47,19 @@ export function renderDirectArticle(html){
   if(chunk.startsWith('<h2'))section++;
   const kind=kinds[section];
   if(!kind)return chunk;
-  return chunk.replace(/<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/g,(_,inside)=>{let i=0;return '<div class="'+kind+'">'+inside.replace(/<li><strong>([\s\S]*?)<\/strong>([\s\S]*?)<\/li>/g,(_,label,text)=>'<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label.replace(/[:：]\s*$/,'')+'</h3><p>'+text+'</p></div></article>')+'</div>';});
+  return chunk.replace(/<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/g,(_,inside)=>{
+    let i=0;
+    // A highlight can be the card's heading itself. Never leave an unmatched <li>
+    // inside the card container: the browser would render it as an unstyled paragraph.
+    const items=inside.replace(/<li>([\s\S]*?)<\/li>/g,(_whole,item)=>{
+      const match=item.match(/^\s*(<strong>[\s\S]*?<\/strong>|<mark\b[^>]*>(?:<u>)?<strong>[\s\S]*?<\/strong>(?:<\/u>)?<\/mark>)([\s\S]*)$/);
+      if(!match)throw Error('E_DIRECT_CARD_ITEM_STRUCTURE');
+      const label=match[1].replace(/[:：]\s*(<\/strong>|<\/mark>)$/,'$1');
+      return '<article><span class="badge">'+(kind==='storage'?'✓':String(++i).padStart(2,'0'))+'</span><div><h3>'+label+'</h3><p>'+match[2].trim()+'</p></div></article>';
+    });
+    if(i===0||/<li\b/i.test(items))throw Error('E_DIRECT_CARD_ITEM_STRUCTURE');
+    return '<div class="'+kind+'">'+items+'</div>';
+  });
  }).join('');
  body=body.replace(/<table>/g,'<div class="table-scroll"><table>').replace(/<\/table>/g,'</table></div>');
  return '<style>'+CSS+EFFECTS_CSS+QUICK_SUMMARY_CSS+DIRECT_HIGHLIGHT_CSS+'</style><div class="nh-direct-v2"><div class="article-body">'+body+'</div></div>';
