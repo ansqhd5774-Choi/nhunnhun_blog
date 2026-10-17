@@ -173,6 +173,8 @@ export async function verifyUpdatedPage(browser,update,width,expected,rendered,a
           tables:all('table').length,tableWraps:all('.table-scroll > table').length,
           images:all('img').length,marks:marks.length,boldMarks:all('mark strong').length,
           underlinedMarks:all('mark u strong').length,badges:all('.badge').length,
+          pairsArticles:all('.pairs > article').length,
+          pairsMarkedArticles:all('.pairs > article').filter(card=>card.querySelector('mark strong')).length,
           stylesVisible:marks.every(m=>{
             const s=getComputedStyle(m),b=m.querySelector('strong'),u=m.querySelector('u');
             return s.display!=='none'&&s.visibility!=='hidden'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&

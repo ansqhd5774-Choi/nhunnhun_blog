@@ -60,6 +60,8 @@ export async function verifyPublishedPublic({publicPage,publicBrowser,post,bodyH
         tables:all('table').length,tableWraps:all('.table-scroll > table').length,
         images:all('img').length,marks:marks.length,boldMarks:all('mark strong').length,
         underlinedMarks:all('mark u strong').length,badges:all('.badge').length,
+          pairsArticles:all('.pairs > article').length,
+          pairsMarkedArticles:all('.pairs > article').filter(card=>card.querySelector('mark strong')).length,
         stylesVisible:marks.every(m=>{
           const s=getComputedStyle(m),b=m.querySelector('strong');
           const u=m.querySelector('u');
