@@ -17,6 +17,10 @@ const source=directFixture();
 test('existing direct update reports new-post-only tags as the unsupported key',()=>{
  assert.throws(()=>checkUpdateSource({...source,tags:['히카마']},`${source.id}.json`),/E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags/);
 });
+test('existing direct update accepts the same declared change scopes as the nutrient direct contract',()=>{
+ for(const changeScope of ['content-update','full-rewrite'])assert.equal(checkUpdateSource({...source,changeScope},`${source.id}.json`).changeScope,changeScope);
+ assert.throws(()=>checkUpdateSource({...source,changeScope:'unknown-scope'},`${source.id}.json`),/E_UPDATE_CHANGE_SCOPE/);
+});
 test('local publication entry reads remote main and starts one update without another writer job',()=>{
  let starts=0;
  const run=args=>{
