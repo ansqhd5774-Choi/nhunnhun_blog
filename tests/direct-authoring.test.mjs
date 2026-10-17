@@ -17,6 +17,14 @@ const source=directFixture();
 test('existing direct update reports new-post-only tags as the unsupported key',()=>{
  assert.throws(()=>checkUpdateSource({...source,tags:['히카마']},`${source.id}.json`),/E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:tags/);
 });
+test('emphasis-only update accepts complete structure baseline and fingerprints it',()=>{
+ const baseline={h2:6,h3:0,ul:6,ol:0,li:18,table:1,tr:8,img:3,blockquote:1};
+ const scoped={...source,changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline};
+ assert.equal(checkUpdateSource(scoped,`${source.id}.json`),scoped);
+ assert.notEqual(updateFingerprint(scoped),updateFingerprint(source));
+ assert.throws(()=>checkUpdateSource({...source,changeScope:'emphasis-only'},`${source.id}.json`),/E_UPDATE_STRUCTURE_BASELINE/);
+ assert.throws(()=>checkUpdateSource({...scoped,structureBaseline:{...baseline,table:-1}},`${source.id}.json`),/E_UPDATE_STRUCTURE_BASELINE/);
+});
 test('local publication entry reads remote main and starts one update without another writer job',()=>{
  let starts=0;
  const run=args=>{
