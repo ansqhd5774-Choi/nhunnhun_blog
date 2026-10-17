@@ -7,6 +7,7 @@ import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-
 import {validateAffiliateProducts} from './affiliate-products.mjs';
 
 const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts','changeScope','preserveStructure','structureBaseline'];
+const UPDATE_CHANGE_SCOPES=new Set(['emphasis-only','content-update','full-rewrite']);
 const STRUCTURE_BASELINE_KEYS=['h2','h3','p','div','section','aside','ul','ol','li','table','thead','tbody','tr','th','td','img','figure','figcaption','blockquote','details','summary'];
 const STRUCTURE_BASELINE_REQUIRED_KEYS=['h2','h3','ul','ol','li','table','tr','img','blockquote'];
 
@@ -18,7 +19,7 @@ export function checkUpdateSource(update, filename){
   if(unsupported.length) throw new Error(`E_UPDATE_SCHEMA_UNSUPPORTED_KEYS:${unsupported.join(',')}`);
   if(update.contentStandard!==undefined&&!['R1','SP1'].includes(update.contentStandard)) throw new Error('E_CONTENT_STANDARD_VERSION');
   if(update.contentStandard!==undefined&&(typeof update.category!=='string'||!update.category.trim())) throw new Error('E_CONTENT_CATEGORY_MISMATCH');
-  if(update.changeScope!==undefined&&update.changeScope!=='emphasis-only')throw new Error('E_UPDATE_CHANGE_SCOPE');
+  if(update.changeScope!==undefined&&!UPDATE_CHANGE_SCOPES.has(update.changeScope))throw new Error('E_UPDATE_CHANGE_SCOPE');
   if(update.preserveStructure!==undefined&&typeof update.preserveStructure!=='boolean')throw new Error('E_UPDATE_PRESERVE_STRUCTURE');
   if(update.structureBaseline!==undefined){
     if(!update.structureBaseline||typeof update.structureBaseline!=='object'||Array.isArray(update.structureBaseline))throw new Error('E_UPDATE_STRUCTURE_BASELINE');
