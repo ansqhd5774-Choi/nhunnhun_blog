@@ -1,0 +1,2 @@
+source_id=direct-18-arginine-r3-one-month-change-20261018
+reason=preflight_time_period_korean_one_month_guard_fix
