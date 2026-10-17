@@ -7,7 +7,8 @@ import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-
 import {validateAffiliateProducts} from './affiliate-products.mjs';
 
 const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts','changeScope','preserveStructure','structureBaseline'];
-const STRUCTURE_BASELINE_KEYS=['h2','h3','ul','ol','li','table','tr','img','blockquote'];
+const STRUCTURE_BASELINE_KEYS=['h2','h3','p','div','section','aside','ul','ol','li','table','thead','tbody','tr','th','td','img','figure','figcaption','blockquote','details','summary'];
+const STRUCTURE_BASELINE_REQUIRED_KEYS=['h2','h3','ul','ol','li','table','tr','img','blockquote'];
 
 export function checkUpdateSource(update, filename){
   if(isNativeTextMaintenance(update))return checkNativeTextSource(update,filename);
@@ -24,7 +25,11 @@ export function checkUpdateSource(update, filename){
     const keys=Object.keys(update.structureBaseline).sort();
     const unknown=keys.filter(k=>!STRUCTURE_BASELINE_KEYS.includes(k));
     if(unknown.length)throw new Error(`E_UPDATE_STRUCTURE_BASELINE_KEYS:${unknown.join(',')}`);
-    for(const key of STRUCTURE_BASELINE_KEYS){
+    for(const key of STRUCTURE_BASELINE_REQUIRED_KEYS){
+      const value=update.structureBaseline[key];
+      if(!Number.isInteger(value)||value<0)throw new Error('E_UPDATE_STRUCTURE_BASELINE');
+    }
+    for(const key of keys){
       const value=update.structureBaseline[key];
       if(!Number.isInteger(value)||value<0)throw new Error('E_UPDATE_STRUCTURE_BASELINE');
     }
