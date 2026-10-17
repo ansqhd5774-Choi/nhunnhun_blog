@@ -11,10 +11,16 @@ const NUTRIENT_FOOD_RANKING_HEADING=/(?=.*(?:식품|음식))(?=.*(?:TOP\s*(?:7|5
 const ESTIMATED_RANKING_VALUE_PATTERN=/(?:\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g)(?:\s*\/\s*(?:100\s*g|회|1회|일))?[^.!?\n]{0,24}(?:추정|환산|계산(?:값|치)?))|(?:(?:추정|환산|계산(?:값|치)?)[^.!?\n]{0,24}\d[\d.,~～\-–—]*\s*(?:μg|mcg|mg|g))|(?:\d+(?:\.\d+)?\s*%[^.!?\n]{0,30}(?:배합|함유)[^.!?\n]{0,30}(?:적용|환산|계산))/iu;
 const NUTRIENT_PAIRING_HEADING=/(?:함께\s*섭취|같이\s*먹|조합|상호작용)/u;
 const NUTRIENT_DEFICIENCY_EXCESS_HEADING=/(?:결핍.*과다|과다.*결핍|결핍.*추천\s*제품|과다.*추천\s*제품)/u;
-const STRUCTURE_LOCK_TAGS=Object.freeze(['h2','h3','ul','ol','li','table','tr','img','blockquote']);
+const STRUCTURE_LOCK_TAGS=Object.freeze(['h2','h3','p','div','section','aside','ul','ol','li','table','thead','tbody','tr','th','td','img','figure','figcaption','blockquote','details','summary']);
+const NUTRIENT_SCOPE_ENFORCEMENT_DATE=20261018;
+const NUTRIENT_CHANGE_SCOPES=Object.freeze(new Set(['emphasis-only','content-update','full-rewrite']));
 
 const nodeText=node=>node?.type==='text'?(node.data??''):(node?.children??[]).map(nodeText).join('');
 const clean=value=>String(value??'').replace(/\s+/gu,' ').trim();
+const sourceDate=id=>{
+  const match=String(id??'').match(/(?:^|[-_])(20\d{6})(?:$|[-_])/u);
+  return match?Number(match[1]):null;
+};
 
 function structureReview(bodyHtml=''){
   const root=parseDocument(String(bodyHtml));
@@ -84,6 +90,11 @@ export function assertDirectSubmissionFocus(source) {
   const review=directFocusReview(source.bodyHtml??'');
   if(review.coreHeadings.length>DIRECT_AUTHORING_CONTRACT.coreHeadingMaximum)throw Error('E_DIRECT_FOCUS_SECTION_OVERLOAD');
   if(source.category==='영양소'){
+    const datedSource=sourceDate(source.id);
+    const isFutureReadyUpdate=datedSource!==null&&datedSource>=NUTRIENT_SCOPE_ENFORCEMENT_DATE&&source.status==='ready'&&source.approved===true&&Boolean(source.articleId)&&Boolean(source.targetUrl);
+    if(isFutureReadyUpdate&&!NUTRIENT_CHANGE_SCOPES.has(source.changeScope))throw Error('E_DIRECT_NUTRIENT_CHANGE_SCOPE_REQUIRED');
+    if(source.changeScope==='emphasis-only'&&source.preserveStructure!==true)throw Error('E_DIRECT_STRUCTURE_PRESERVE_FLAG_REQUIRED');
+
     if(!review.nutrientChangeSections.length)throw Error('E_DIRECT_NUTRIENT_EXPECTED_CHANGE_SECTION_MISSING');
     const targeted=review.nutrientChangeSections.filter(section=>section.hasTargetGroup);
     if(targeted.length&&targeted.every(section=>!(section.hasChange&&section.hasTimePeriod&&section.hasAmount)))
@@ -107,9 +118,13 @@ export function assertDirectSubmissionFocus(source) {
       const baseline=source.structureBaseline;
       if(!baseline||typeof baseline!=='object'||Array.isArray(baseline))throw Error('E_DIRECT_STRUCTURE_BASELINE_MISSING');
       for(const tag of STRUCTURE_LOCK_TAGS){
-        const expected=Number(baseline[tag]??0);
+        if(!Object.prototype.hasOwnProperty.call(baseline,tag))continue;
+        const expected=Number(baseline[tag]);
         if(!Number.isInteger(expected)||expected<0)throw Error('E_DIRECT_STRUCTURE_BASELINE_INVALID');
-        if(structure.totals[tag]<expected)throw Error('E_DIRECT_STRUCTURE_PRESERVATION');
+        if(structure.totals[tag]!==expected)throw Error('E_DIRECT_STRUCTURE_PRESERVATION');
+      }
+      for(const tag of ['h2','h3','ul','ol','li','table','tr','img','blockquote']){
+        if(!Object.prototype.hasOwnProperty.call(baseline,tag))throw Error('E_DIRECT_STRUCTURE_BASELINE_INVALID');
       }
     }
   }
