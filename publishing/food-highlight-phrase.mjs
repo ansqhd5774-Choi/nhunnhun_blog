@@ -15,10 +15,15 @@ const DEFINITION_SIGNAL_PATTERN=/(?:식품|음식|재료|원물|과일|채소|�
 const SEASON_SIGNAL_PATTERN=/(?:제철|수확|어획|유통|연중|사계절|봄|여름|가을|겨울|\d{1,2}\s*~\s*\d{1,2}월|\d{1,2}월)/u;
 const NUTRITION_SIGNAL_PATTERN=/(?:kcal|열량|탄수화물|단백질|지방|식이섬유|당류|나트륨|칼슘|철분?|칼륨|비타민|미네랄|오메가|베타카로틴|폴리페놀|이소플라본)/iu;
 const CHANGE_SIGNAL_PATTERN=/(?:감소|증가|개선|유지|보완|도움|관리|회복|포만감|배변|콜레스테롤|혈압|혈당|근육|뼈|면역|심혈관|장\s*건강)/u;
-const CAUTION_SIGNAL_PATTERN=/(?:주의|피하|제한|조절|확인|중단|의료|알레르기|나트륨|약물?|복용|과다|금기|응급)/u;
+const CAUTION_SIGNAL_PATTERN=/(?:주의|피하|제한|조절|확인|중단|의료|알레르기|나트륨|약물?|복용|과다|금기|응급|폐기)/u;
 const SELECT_SIGNAL_PATTERN=/(?:고르|선택|신선|껍질|색|무게|단단|포장|원재료|영양표|꼭지|향|탄력)/u;
 const STORAGE_SIGNAL_PATTERN=/(?:보관|냉장|냉동|밀폐|실온|서늘|개봉|소비기한|유통기한|해동)/u;
-const SUBSTANTIVE_BLOCK_MIN_CHARS=55;
+const SUBSTANTIVE_BLOCK_MIN_CHARS=45;
+const FIRST_BLOCK_MIN_CHARS=12;
+const MIN_TOTAL_MARKS=18;
+// Section floors prevent the old failure mode where a technically valid article had only one
+// highlight per axis. Caution stays low so negative content is never inflated just to hit a quota.
+const MIN_SECTION_MARKS=[3,3,3,3,1,4];
 // Limitation/no-effect highlights are already owned by direct-emphasis.mjs and must keep that
 // more specific diagnostic instead of also producing the generic food narrative error.
 const EXISTING_LIMITATION_PATTERN=/(?:근거|자료|증거)(?:가|는|를|도)?\s*(?:부족|충분하지|제한적)|(?:확인|입증|검증)(?:하지\s*못|되지\s*않)|단정(?:하기|할\s*수)?\s*어렵|(?:효과|변화|이득|개선)(?:가|은|는|을|를)?[^.!?]{0,30}(?:나타나지\s*않|없었|없습니다|확인하지\s*못|관찰되지\s*않)/u;
@@ -60,13 +65,13 @@ function collectCoreSections(html){
   return sections;
 }
 
-function collectSubstantiveBlocks(nodes,blocks=[]){
+function collectTextBlocks(nodes,minChars=SUBSTANTIVE_BLOCK_MIN_CHARS,blocks=[]){
   for(const node of nodes??[]){
     if(['p','li'].includes(node?.name)){
       const text=cleanText(nodeText(node));
-      if(Array.from(text).length>=SUBSTANTIVE_BLOCK_MIN_CHARS)blocks.push({node,text,hasMark:containsMark(node)});
+      if(Array.from(text).length>=minChars)blocks.push({node,text,hasMark:containsMark(node)});
     }
-    collectSubstantiveBlocks(node?.children??[],blocks);
+    collectTextBlocks(node?.children??[],minChars,blocks);
   }
   return blocks;
 }
@@ -83,8 +88,9 @@ function hasAnchorDefinition(section,anchor){
   if(!section||!anchor)return false;
   const escaped=anchor.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   const anchorPattern=new RegExp(escaped,'u');
-  const firstBlocks=collectSubstantiveBlocks(section.nodes).slice(0,2);
-  const firstBlockMarks=firstBlocks.flatMap(block=>collectMarkTextsFromNode(block.node,[]));
+  const firstBlock=collectTextBlocks(section.nodes,FIRST_BLOCK_MIN_CHARS)[0];
+  if(!firstBlock)return false;
+  const firstBlockMarks=collectMarkTextsFromNode(firstBlock.node,[]);
   return firstBlockMarks.some(text=>anchorPattern.test(text)&&DEFINITION_SIGNAL_PATTERN.test(text));
 }
 
@@ -99,7 +105,11 @@ function hasAxisCoverage(sections,anchor){
   if(!caution.marks.some(text=>CAUTION_SIGNAL_PATTERN.test(text)))throw Error('E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE');
   if(!storage.marks.some(text=>SELECT_SIGNAL_PATTERN.test(text))||!storage.marks.some(text=>STORAGE_SIGNAL_PATTERN.test(text)))throw Error('E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE');
 
-  const uncovered=sections.flatMap(section=>collectSubstantiveBlocks(section.nodes).filter(block=>!block.hasMark));
+  if(sections.some((section,index)=>section.marks.length<MIN_SECTION_MARKS[index]))throw Error('E_DIRECT_FOOD_HIGHLIGHT_DENSITY');
+  const totalMarks=sections.reduce((sum,section)=>sum+section.marks.length,0);
+  if(totalMarks<MIN_TOTAL_MARKS)throw Error('E_DIRECT_FOOD_HIGHLIGHT_DENSITY');
+
+  const uncovered=sections.flatMap(section=>collectTextBlocks(section.nodes).filter(block=>!block.hasMark));
   if(uncovered.length)throw Error('E_DIRECT_FOOD_HIGHLIGHT_BLOCK_COVERAGE');
 }
 
@@ -117,7 +127,8 @@ export function assertFoodHighlightPhrases(source){
     if(repeatedCount>=4&&repeatedCount>=Math.ceil(marks.length/2))throw Error('E_DIRECT_FOOD_HIGHLIGHT_SUBJECT_REPEAT');
   }
 
-  // Full six-section food articles must be understandable by scanning only highlights.
-  // This is coverage-driven, not a fixed global quota: more substantive blocks require more highlights.
+  // Full six-section food articles must remain readable from the highlight layer alone.
+  // Density floors are deliberately paired with semantic axis checks and block coverage:
+  // the goal is the /185-style scan experience, not a blind mark counter.
   hasAxisCoverage(collectCoreSections(source.bodyHtml),anchor);
 }
