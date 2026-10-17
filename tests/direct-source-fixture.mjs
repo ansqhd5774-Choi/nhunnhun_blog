@@ -4,7 +4,7 @@ export function directFixture(overrides={}){
  const images=review.map(r=>`<p><img src="${r.src}" alt="${r.alt}"></p>`).join('');
  const nutrientHeadings=[
   '정의와 주요 성분 및 작용은 무엇인가?',
-  '한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?',
+  '한 달 복용 후 기대되는 신체 변화는 무엇인가?',
   '일일 권장 섭취량과 효과적인 섭취법은 무엇인가?',
   '풍부한 식품 TOP7과 각 식품의 평균 함유량은 얼마인가?',
   '함께 섭취하면 좋은 영양소와 주의할 상호작용은 무엇인가?',
