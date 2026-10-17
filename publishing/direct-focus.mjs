@@ -98,8 +98,6 @@ export function assertDirectSubmissionFocus(source) {
     const pairingSections=structure.sections.filter(section=>NUTRIENT_PAIRING_HEADING.test(section.heading));
     if(pairingSections.some(section=>section.table<1&&section.ul+section.ol<1))
       throw Error('E_DIRECT_NUTRIENT_PAIRING_STRUCTURE_MISSING');
-    if(pairingSections.some(section=>section.table<1&&section.li<2))
-      throw Error('E_DIRECT_NUTRIENT_PAIRING_STRUCTURE_MISSING');
 
     const safetyProductSections=structure.sections.filter(section=>NUTRIENT_DEFICIENCY_EXCESS_HEADING.test(section.heading));
     if(safetyProductSections.some(section=>section.table<1&&section.ul+section.ol<1))
