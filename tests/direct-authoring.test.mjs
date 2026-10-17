@@ -1,4 +1,5 @@
 import {directFixture} from './direct-source-fixture.mjs';
+import './direct-pair-highlight-card.test.mjs';
 import './direct-emphasis-guard.test.mjs';
 import './direct-new-post.test.mjs';
 import test from 'node:test';
