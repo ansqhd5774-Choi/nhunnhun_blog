@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {assertDirectSubmissionFocus,directFocusReview} from '../publishing/direct-focus.mjs';
 
 const source=bodyHtml=>({id:'direct-nutrient-expected-change-test',contentStandard:'SP1',category:'영양소',bodyHtml});
-const h2='한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?';
+const h2='한 달 복용 후 기대되는 신체 변화는 무엇인가?';
 
 test('nutrient change section with a target group requires amount period and change together',()=>{
   const bodyHtml=`<h2>${h2}</h2><p>성인은 무릎 통증이 줄어들 수 있습니다.</p>`;
