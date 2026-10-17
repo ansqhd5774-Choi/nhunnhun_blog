@@ -17,12 +17,12 @@ const source=extra=>({
 });
 
 test('nutrient rejects a full narrative sentence inside mark',()=>{
-  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?</h2><mark data-tone="positive"><strong>약 4주 전후에는 일부 성인에서 혈압이 조금 낮아질 수 있지만 운동 능력 변화는 뚜렷하지 않을 수 있습니다.</strong></mark>';
+  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화는 무엇인가?</h2><mark data-tone="positive"><strong>약 4주 전후에는 일부 성인에서 혈압이 조금 낮아질 수 있지만 운동 능력 변화는 뚜렷하지 않을 수 있습니다.</strong></mark>';
   assert.throws(()=>assertDirectSubmissionEmphasis(source(html)),/E_DIRECT_NUTRIENT_HIGHLIGHT_NARRATIVE/);
 });
 
 test('nutrient accepts a short result phrase instead of narrative highlight',()=>{
-  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화와 권장 대상은 누구인가?</h2><mark data-tone="positive"><strong>수축기 혈압 평균 6.4mmHg 감소</strong></mark>';
+  const html='<h2>2. 한 달 복용 후 기대되는 신체 변화는 무엇인가?</h2><mark data-tone="positive"><strong>수축기 혈압 평균 6.4mmHg 감소</strong></mark>';
   assert.doesNotThrow(()=>assertDirectSubmissionEmphasis(source(html)));
 });
 
