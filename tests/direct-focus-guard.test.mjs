@@ -7,6 +7,8 @@ const h2=title=>`<h2>${title}</h2><p>독자가 필요한 설명입니다.</p>`;
 const FOOD_HEADINGS=['소개','영양소·핵심 성분','꾸준 섭취 변화','궁합·시너지','주의사항','고르는 법·보관법'];
 const nutrientChange='<h2>2. 한 달 복용 후 기대되는 신체 변화는 무엇인가?</h2><p>한 달 동안 하루 4g 섭취 시 혈압 감소가 관찰됐습니다.</p>';
 
+const baseline=(overrides={})=>({h2:1,h3:0,ul:1,ol:0,li:2,table:0,tr:0,img:0,blockquote:0,...overrides});
+
 test('focus review separates six core questions from utility sections',()=>{
   const html=FOOD_HEADINGS.map(h2).join('')+h2('자주 묻는 질문')+h2('핵심 정리')+h2('자료 출처');
   const review=directFocusReview(html);
@@ -60,14 +62,40 @@ test('nutrient deficiency and excess section must keep itemized structure',()=>{
   assert.throws(()=>assertDirectSubmissionFocus(source(html,'영양소')),/E_DIRECT_NUTRIENT_SAFETY_PRODUCT_STRUCTURE_MISSING/);
 });
 
+test('future ready nutrient updates must declare change scope',()=>{
+  const html=nutrientChange+'<ul><li>카드 1</li><li>카드 2</li></ul>';
+  const dated=source(html,'영양소',{id:'direct-18-highlight-20261018',status:'ready',approved:true,articleId:'18',targetUrl:'https://nhunnhun.tistory.com/18'});
+  assert.throws(()=>assertDirectSubmissionFocus(dated),/E_DIRECT_NUTRIENT_CHANGE_SCOPE_REQUIRED/);
+});
+
+test('emphasis-only nutrient maintenance requires explicit preserveStructure',()=>{
+  const html=nutrientChange+'<ul><li>카드 1</li><li>카드 2</li></ul>';
+  const locked=source(html,'영양소',{changeScope:'emphasis-only',structureBaseline:baseline()});
+  assert.throws(()=>assertDirectSubmissionFocus(locked),/E_DIRECT_STRUCTURE_PRESERVE_FLAG_REQUIRED/);
+});
+
 test('emphasis-only nutrient maintenance cannot reduce locked HTML structure counts',()=>{
   const html=nutrientChange+'<ul><li><strong>기존 카드 1개</strong></li></ul>';
-  const locked=source(html,'영양소',{changeScope:'emphasis-only',structureBaseline:{h2:1,h3:0,ul:1,ol:0,li:2,table:0,tr:0,img:0,blockquote:0}});
+  const locked=source(html,'영양소',{changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline()});
   assert.throws(()=>assertDirectSubmissionFocus(locked),/E_DIRECT_STRUCTURE_PRESERVATION/);
 });
 
-test('emphasis-only nutrient maintenance passes when locked HTML structure is preserved',()=>{
-  const html=nutrientChange+'<ul><li><strong>기존 카드 1</strong></li><li><strong>기존 카드 2</strong></li></ul>';
-  const locked=source(html,'영양소',{changeScope:'emphasis-only',structureBaseline:{h2:1,h3:0,ul:1,ol:0,li:2,table:0,tr:0,img:0,blockquote:0}});
+test('emphasis-only nutrient maintenance cannot add or reshape locked HTML structure either',()=>{
+  const html=nutrientChange+'<ul><li><strong>기존 카드 1</strong></li><li><strong>기존 카드 2</strong></li><li><mark>추가 카드</mark></li></ul>';
+  const locked=source(html,'영양소',{changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline()});
+  assert.throws(()=>assertDirectSubmissionFocus(locked),/E_DIRECT_STRUCTURE_PRESERVATION/);
+});
+
+test('emphasis-only nutrient maintenance preserves optional wrapper HTML when baseline records it',()=>{
+  const html=nutrientChange+'<div><ul><li><mark>기존 카드 1</mark></li><li><strong>기존 카드 2</strong></li></ul></div>';
+  const locked=source(html,'영양소',{changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline({div:1})});
+  assert.doesNotThrow(()=>assertDirectSubmissionFocus(locked));
+  const flattened=source(nutrientChange+'<ul><li><mark>기존 카드 1</mark></li><li><strong>기존 카드 2</strong></li></ul>','영양소',{changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline({div:1})});
+  assert.throws(()=>assertDirectSubmissionFocus(flattened),/E_DIRECT_STRUCTURE_PRESERVATION/);
+});
+
+test('emphasis-only nutrient maintenance passes when locked HTML structure is exactly preserved',()=>{
+  const html=nutrientChange+'<ul><li><mark><strong>기존 카드 1</strong></mark></li><li><strong>기존 카드 2</strong></li></ul>';
+  const locked=source(html,'영양소',{changeScope:'emphasis-only',preserveStructure:true,structureBaseline:baseline()});
   assert.doesNotThrow(()=>assertDirectSubmissionFocus(locked));
 });
