@@ -25,6 +25,13 @@ test('general-reader nutrient change passes without research-report wording',()=
   assert.equal('limitationHits' in review,false);
 });
 
+test('Korean one-month wording counts as the period required by the fixed H2',()=>{
+  const bodyHtml=`<h2>${h2}</h2><p>성인이 아르기닌 4g을 한 달 정도 섭취했을 때 혈압이 낮아지는 방향이 관찰됐습니다.</p>`;
+  const review=assertDirectSubmissionFocus(source(bodyHtml));
+  assert.equal(review.nutrientChangeSections[0].hasTimePeriod,true);
+  assert.doesNotThrow(()=>assertDirectSubmissionFocus(source(bodyHtml)));
+});
+
 test('study-design wording is not a target-group signal',()=>{
   const bodyHtml=`<h2>${h2}</h2><p>무작위 임상시험에서 커큐민 500mg을 8주 섭취했을 때 통증이 개선됐습니다.</p>`;
   const review=directFocusReview(bodyHtml);
