@@ -6,7 +6,7 @@ import {assertDirectEmphasis} from './direct-emphasis.mjs';
 import {isAltMaintenance,checkAltSource,altFingerprint} from './alt-maintenance-source.mjs';
 import {validateAffiliateProducts} from './affiliate-products.mjs';
 
-const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts','changeScope','preserveStructure','structureBaseline'];
+const ALLOWED=['id','articleId','targetUrl','expectedCurrentTitle','title','representativeImageUrl','imageReview','bodyHtml','status','approved','category','contentStandard','affiliateProducts','changeScope','preserveStructure','structureBaseline','foodBenefitScopeReview'];
 const UPDATE_CHANGE_SCOPES=new Set(['emphasis-only','content-update','full-rewrite']);
 const STRUCTURE_BASELINE_KEYS=['h2','h3','p','div','section','aside','ul','ol','li','table','thead','tbody','tr','th','td','img','figure','figcaption','blockquote','details','summary'];
 const STRUCTURE_BASELINE_REQUIRED_KEYS=['h2','h3','ul','ol','li','table','tr','img','blockquote'];
@@ -63,7 +63,8 @@ export function updateFingerprint(update){
     ...(update.affiliateProducts ? [update.affiliateProducts] : []),
     ...(update.changeScope!==undefined ? [update.changeScope] : []),
     ...(update.preserveStructure!==undefined ? [update.preserveStructure] : []),
-    ...(update.structureBaseline!==undefined ? [update.structureBaseline] : [])
+    ...(update.structureBaseline!==undefined ? [update.structureBaseline] : []),
+    ...(update.foodBenefitScopeReview!==undefined ? [update.foodBenefitScopeReview] : [])
   ])).digest('hex');
 }
 export async function loadUpdates(directory='updates',sourceId=null){
