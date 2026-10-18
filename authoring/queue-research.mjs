@@ -190,7 +190,10 @@ async function englishQuery(item,{model,fetcher}){
 }
 function topicTerms(query){
   const stop=new Set(['acid','food','foods','plant','plants','extract','extracts']);
-  return String(query).toLowerCase().split(/[^a-z0-9]+/).filter(term=>term.length>=4&&!stop.has(term));
+  // Short but unambiguous nutrient/food names must not lose all topic-specific evidence (DHA, EPA, egg).
+  const shortTopics=new Set(['dha','epa','egg','oat','pea','soy','cod','eel','yam','fig','nut','tea']);
+  return String(query).toLowerCase().split(/[^a-z0-9]+/)
+    .filter(term=>!stop.has(term)&&(term.length>=4||shortTopics.has(term)));
 }
 export function isTopicSpecificSource(source,query){
   const terms=topicTerms(query);if(!terms.length)return false;
@@ -224,7 +227,7 @@ export async function collectEvidence(item,publicHtml,{model,fetcher=fetch,advis
     :[query+' human clinical trial',query+' systematic review',query+' safety interactions'];
   const pubmedPromise=isNutritionTopic
     ?Promise.all(searches.map(term=>research(term,fetcher,{retmax:4,sort:'relevance',minResults:1}).catch(()=>[])))
-      .then(groups=>{const seen=new Set(),out=[];for(const s of groups.flat())if(!seen.has(s.id)){seen.add(s.id);out.push(s);}return out.slice(0,12);})
+      .then(async groups=>{const seen=new Set(),out=[];for(const s of groups.flat())if(!seen.has(s.id)){seen.add(s.id);out.push(s);}if(!out.length)return research(query,fetcher,{retmax:5,sort:'relevance',minResults:1}).catch(()=>[]);return out.slice(0,12);})
     :research(query,fetcher,{retmax:5,sort:'pub date',minResults:1}).catch(()=>[]);
   const externalPromise=Promise.all(external.map((url,i)=>fetchSource(url,item.domain,i+1,fetcher)));
   const fixedPromise=Promise.all(fixed.map(async([url,role],i)=>{
