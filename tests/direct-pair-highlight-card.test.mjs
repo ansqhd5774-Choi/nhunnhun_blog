@@ -120,3 +120,28 @@ test('phytosterol /140 source keeps left ingredient names and right effect highl
  assert.equal(rendered.split('<img ').length-1,3);
  assert.equal((rendered.match(/<table>/g)||[]).length,2);
 });
+
+test('glucoside /143 ⑤ places only ingredient names left, effects and cautions in marked right cards',()=>{
+ const source=JSON.parse(readFileSync(new URL('../updates/direct-143-glucoside-r1-20261018.json',import.meta.url),'utf8'));
+ const out=renderDirectArticle(source.bodyHtml),group=cards(out,'pairs');
+ const expected=[
+  ['비타민 C',/항산화 영양 보완/],
+  ['식이섬유',/섬유질 함께 섭취/],
+  ['카페인',/제품별 확인/],
+  ['혈당강하제',/시작 전 상담/]
+ ];
+ const textOf=n=>n.type==='text'?n.data:(n.children||[]).map(textOf).join('');
+ assert.equal(group.length,4);
+ for(let i=0;i<expected.length;i++){
+  const h=desc(group[i],'h3'),p=desc(group[i],'p');
+  assert.equal(h.length,1);assert.equal(p.length,1);
+  assert.equal(textOf(h[0]),expected[i][0]);
+  assert.equal(desc(h[0],'mark').length,0);
+  assert.equal(desc(p[0],'mark').length,1);
+  assert.match(textOf(desc(p[0],'mark')[0]),expected[i][1]);
+ }
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsArticles,4);
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsMarkedArticles,4);
+ assert.equal(out.split('<img ').length-1,3);
+ assert.equal((out.match(/<table>/g)||[]).length,2);
+});
