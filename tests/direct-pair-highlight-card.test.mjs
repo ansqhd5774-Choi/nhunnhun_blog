@@ -67,3 +67,29 @@ test('folate /124 R12 ⑤ left card titles are ONLY ingredient or drug names; ri
   assert.ok(content(p[0]).length>content(marked[0]).length,`right card ${i+1} must include useful explanatory text`);
  }
 });
+
+test('quercetin /128 ⑤ maps ingredient or drug names at left to effects and cautions at right',()=>{
+ const source=JSON.parse(readFileSync(new URL('../updates/direct-128-quercetin-r1-20261018.json',import.meta.url),'utf8'));
+ const out=renderDirectArticle(source.bodyHtml),group=cards(out,'pairs');
+ const expected=[
+  ['비타민 C',/항산화 영양 보완/],
+  ['브로멜라인',/효능과 알레르기 따로 확인/],
+  ['와파린',/INR 상호작용 상담/],
+  ['혈압약',/혈압 중복 저하/],
+  ['일부 처방약',/CYP3A4·2C19/]
+ ];
+ const content=n=>n.type==='text'?n.data:(n.children||[]).map(content).join('');
+ assert.equal(group.length,expected.length);
+ for(let i=0;i<expected.length;i++){
+  const h=desc(group[i],'h3'),p=desc(group[i],'p');
+  assert.equal(h.length,1);assert.equal(p.length,1);
+  assert.equal(content(h[0]),expected[i][0]);
+  assert.equal(desc(h[0],'mark').length,0);
+  assert.equal(desc(p[0],'mark').length,1);
+  assert.match(content(desc(p[0],'mark')[0]),expected[i][1]);
+ }
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsArticles,5);
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsMarkedArticles,5);
+ assert.equal(out.split('<img ').length-1,3);
+ assert.equal((out.match(/<table>/g)||[]).length,2);
+});
