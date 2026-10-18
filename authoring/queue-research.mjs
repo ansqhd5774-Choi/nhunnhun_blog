@@ -6,6 +6,7 @@ import { research, VERIFIED_ALIASES } from './keywords.mjs';
 import { ollamaJson } from './queue-ollama.mjs';
 import { todayInSeoul } from '../publishing/content-standards.mjs';
 import { EXTENSIONS, TOPIC_ENTITIES, TOPIC_EXTENSIONS, normTopic } from '../publishing/standards/common.mjs';
+import { selectDiverseEvidenceSources } from './evidence-diversity.mjs';
 
 export const CURATED_QUEUE_QUERIES=Object.freeze({
   '가지':'eggplant','간장':'soy sauce','갈치':'hairtail fish','감자':'potato','계란':'egg','고등어':'mackerel',
@@ -197,7 +198,8 @@ export function isTopicSpecificSource(source,query){
   return terms.some(term=>haystack.includes(term));
 }
 export function classifyEvidenceSufficiency(item,sources,nutrition=null){
-  const strong=(sources??[]).filter(s=>['official','guideline','systematic-review','trial','nutrition-database'].includes(s.kind)&&['health','safety','nutrition','authorization'].includes(s.role));
+  // A nutrient-composition table or generic safety leaflet cannot turn a benefit claim into full clinical evidence.
+  const strong=(sources??[]).filter(s=>s.topicSpecific===true&&['official','guideline','systematic-review','trial'].includes(s.kind)&&['health','safety','authorization'].includes(s.role));
   const direct=(sources??[]).filter(s=>s.topicSpecific===true&&(s.role==='health'||s.role==='nutrition'||s.role==='authorization'));
   // Food/nutrient articles may proceed conservatively with one direct source; medicine/disease retain strict source gates.
   if(item?.domain==='food'&&!nutrition&&!direct.length)throw new Error('E_QUEUE_RESEARCH_TOPIC_SPECIFIC');
@@ -207,37 +209,40 @@ export function classifyEvidenceSufficiency(item,sources,nutrition=null){
   return {directCount:direct.length,strongCount:strong.length,claimMode:strong.length>=2?'full':'conservative'};
 }
 
-export async function collectEvidence(item,publicHtml,{model,fetcher=fetch,advisory=false}={}){
+export async function collectEvidence(item,publicHtml,{model,fetcher=fetch,advisory=false,includeUsdaNutrition=false}={}){
   const query=await englishQuery(item,{model,fetcher});
   const external=externalLinks(publicHtml);
   const fixed=item.domain==='food'?[
     ['https://www.nhs.uk/healthier-families/food-facts/5-a-day/','health'],
     ['https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely','safety']
   ]:[];
-  const pubmedPromise=item.domain==='food'
-    ?Promise.all([
-      research(query+' nutrition',fetcher,{retmax:4,sort:'relevance',minResults:1}).catch(()=>[]),
-      research(query+' health',fetcher,{retmax:4,sort:'relevance',minResults:1}).catch(()=>[])
-    ]).then(groups=>{
-      const seen=new Set(),out=[];
-      for(const source of groups.flat())if(!seen.has(source.id)){seen.add(source.id);out.push(source);}
-      return out.slice(0,5);
-    })
+  // Diversify the *questions* researched: human outcomes, evidence syntheses, food composition.
+  // USDA is never an automatic default and is not used to establish clinical efficacy.
+  const isNutritionTopic=['food','nutrient'].includes(item.domain);
+  const searches=item.domain==='food'
+    ?[query+' human clinical trial',query+' systematic review',query+' food nutrient composition']
+    :[query+' human clinical trial',query+' systematic review',query+' safety interactions'];
+  const pubmedPromise=isNutritionTopic
+    ?Promise.all(searches.map(term=>research(term,fetcher,{retmax:4,sort:'relevance',minResults:1}).catch(()=>[])))
+      .then(groups=>{const seen=new Set(),out=[];for(const s of groups.flat())if(!seen.has(s.id)){seen.add(s.id);out.push(s);}return out.slice(0,12);})
     :research(query,fetcher,{retmax:5,sort:'pub date',minResults:1}).catch(()=>[]);
   const externalPromise=Promise.all(external.map((url,i)=>fetchSource(url,item.domain,i+1,fetcher)));
   const fixedPromise=Promise.all(fixed.map(async([url,role],i)=>{
     const source=await fetchSource(url,item.domain,external.length+i+1,fetcher);
     return source?{...source,kind:'official',role,scopeNote:'일반 식단·신선 식품 안전 안내이며 이 개별 식품의 질병 치료·임상 효과·전용 섭취량 근거가 아니다.'}:null;
   }));
-  const nutritionPromise=item.domain==='food'?usdaNutritionSource(query,fetcher):Promise.resolve({source:null,status:'not-applicable',provider:null});
+  // Explicit opt-in only for a quantitative composition lookup. Existing direct USDA lookup stays available.
+  const nutritionPromise=item.domain==='food'&&includeUsdaNutrition===true
+    ?usdaNutritionSource(query,fetcher)
+    :Promise.resolve({source:null,status:item.domain==='food'?'not-requested':'not-applicable',provider:null});
 
   const [pubmed,webFetched,fixedFetched,nutritionResult]=await Promise.all([pubmedPromise,externalPromise,fixedPromise,nutritionPromise]);
   const nutrition=nutritionResult?.source??null;
   const web=webFetched.filter(Boolean),official=fixedFetched.filter(Boolean);
   const map=new Map();
-  const ordered=[...(nutrition?[nutrition]:[]),...official,...web,...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 자료 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'}))];
+  const ordered=[...pubmed.map(s=>({...s,scopeNote:'PubMed 색인 초록을 실제 조회해 자료 대상·기간·결과의 적용 범위를 확인한다. 초록만으로 확인되지 않는 내용은 확정하지 않는다.'})),...web,...official,...(nutrition?[nutrition]:[])];
   for(const s of ordered)if(!map.has(s.url))map.set(s.url,s);
-  const sources=[...map.values()].slice(0,10).map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)}));
+  const sources=selectDiverseEvidenceSources([...map.values()].map(s=>({...s,topicSpecific:isTopicSpecificSource(s,query)})),{limit:10});
   let evidenceProfile;
   try{evidenceProfile=classifyEvidenceSufficiency(item,sources,nutrition);}catch(error){if(!advisory)throw error;evidenceProfile={warning:error.message};}
   return {
