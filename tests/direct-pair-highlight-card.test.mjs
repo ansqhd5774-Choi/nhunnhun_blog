@@ -145,3 +145,29 @@ test('glucoside /143 ⑤ places only ingredient names left, effects and cautions
  assert.equal(out.split('<img ').length-1,3);
  assert.equal((out.match(/<table>/g)||[]).length,2);
 });
+
+test('glutathione /147 ⑤ left ingredients and right effects render as distinct meaningful highlighted cards',()=>{
+ const source=JSON.parse(readFileSync(new URL('../updates/direct-147-glutathione-r1-20261018.json',import.meta.url),'utf8'));
+ const html=renderDirectArticle(source.bodyHtml),group=cards(html,'pairs');
+ const expected=[
+  ['시스테인·글리신',/글루타치온 합성 원료/],
+  ['비타민 C',/항산화 영양 보완/],
+  ['셀레늄',/GSH 효소 활동 지원/],
+  ['NAC',/복용약 상담/],
+  ['항암제',/종양내과에 병용 확인/]
+ ];
+ const textOf=n=>n.type==='text'?n.data:(n.children||[]).map(textOf).join('');
+ assert.equal(group.length,5);
+ for(let i=0;i<expected.length;i++){
+  const h=desc(group[i],'h3'),p=desc(group[i],'p');
+  assert.equal(h.length,1);assert.equal(p.length,1);
+  assert.equal(textOf(h[0]),expected[i][0]);
+  assert.equal(desc(h[0],'mark').length,0);
+  assert.equal(desc(p[0],'mark').length,1);
+  assert.match(textOf(desc(p[0],'mark')[0]),expected[i][1]);
+ }
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsArticles,5);
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsMarkedArticles,5);
+ assert.equal(html.split('<img ').length-1,3);
+ assert.equal((html.match(/<table>/g)||[]).length,2);
+});
