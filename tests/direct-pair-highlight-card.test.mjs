@@ -43,7 +43,7 @@ test('folate /124 preserves five highlighted pairing cards in actual renderer',(
 test('folate /124 R12 ⑤ left card titles are ONLY ingredient or drug names; right cards show marked effects',()=>{
  const r12=JSON.parse(readFileSync(new URL('../updates/direct-124-folate-r12-pair-role-alignment-20261018.json',import.meta.url),'utf8'));
  const r11=JSON.parse(readFileSync(new URL('../updates/direct-124-folate-r11-mark-card-render-fix-20261018.json',import.meta.url),'utf8'));
- const before=a=>a.split(/(?=<h2>5\\.)/)[0],after=a=>a.split(/(?=<h2>6\\.)/)[1];
+ const before=a=>a.split('<h2>5.')[0],after=a=>a.split('<h2>6.')[1];
  assert.equal(before(r12.bodyHtml),before(r11.bodyHtml),'all sections before ⑤ must remain unchanged');
  assert.equal(after(r12.bodyHtml),after(r11.bodyHtml),'all sections after ⑤ must remain unchanged');
  const rendered=renderDirectArticle(r12.bodyHtml),group=cards(rendered,'pairs');
