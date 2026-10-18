@@ -80,11 +80,15 @@ function safetyText(source){
 function sourcePriority(source,item){
   let score=0;
   if(source.topicSpecific===true)score+=10;
-  if(['official','guideline','nutrition-database'].includes(source.kind))score+=8;
-  else if(['systematic-review','trial'].includes(source.kind))score+=6;
+  if(['systematic-review','trial'].includes(source.kind)&&source.role==='health')score+=18;
+  else if(['official','guideline'].includes(source.kind)&&source.role==='health')score+=14;
+  else if(['official','guideline'].includes(source.kind))score+=8;
+  else if(source.kind==='nutrition-database')score+=1;
   if(['authorization','nutrition','safety','health'].includes(source.role))score+=4;
   if(item?.domain==='medicine'&&source.role==='authorization')score+=8;
-  if(item?.domain==='food'&&source.role==='nutrition')score+=6;
+  // Composition data are for the food table, never a reason to outrank clinical outcomes.
+  if(item?.domain==='food'&&source.role==='nutrition')score+=0;
+  if(item?.domain==='food'&&source.role==='health'&&source.topicSpecific===true)score+=8;
   if(looksAgricultural(source)&&source.role==='health')score-=5;
   return score;
 }
@@ -93,7 +97,7 @@ export function selectPlanSources(evidence,item,max=7){
   const chosen=[],seen=new Set();
   const take=source=>{if(source&&!seen.has(source.id)&&chosen.length<max){seen.add(source.id);chosen.push(source);}};
   const roleOrder=item?.domain==='medicine'?['authorization','safety','health']
-    :item?.domain==='food'?['nutrition','safety','health']
+    :item?.domain==='food'?['health','safety','nutrition']
     :item?.domain==='disease'?['health','safety']
     :['health','nutrition','safety'];
   for(const role of roleOrder)take(ranked.find(s=>s.role===role));
@@ -325,14 +329,14 @@ async function repairFailedClaims(item,evidence,plan,failures,sources,{model,fet
 
 async function requestPlan(item,evidence,scope,required,sources,skeleton,{model,fetcher,currentTitle}){
   const [min,max]=lengthBandForScope(scope);
-  const nutritionAvailable=item.domain!=='food'||evidence?.nutrition?.available===true;
+  const nutritionAvailable=item.domain!=='food'||evidence?.nutrition?.available===true||sources.some(s=>s.role==='nutrition'&&s.topicSpecific===true);
   const nutritionInstruction=nutritionAvailable
     ?'공식 영양 DB가 포함된 경우에만 그 source의 실제 수치와 단위를 사용할 수 있다.'
     :'이번 근거 묶음에는 공식 영양 DB가 없다. identity-nutrition 섹션은 숫자형 영양성분을 만들지 말고, 확인 가능한 정성 정보와 근거 한계를 설명한다. nutrition 타입의 수치 주장을 만들지 않는다.';
   const evidenceInstruction=evidence?.evidenceProfile?.claimMode==='conservative'
-    ?'현재 근거 강도가 제한적이므로 효능·권장량·안전성·상호작용을 새로 주장하지 말고, 확인된 자료 범위와 불확실성을 설명하는 정성 claim을 우선한다.'
-    :'직접 근거가 있는 claim만 작성한다.';
-  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치·claim id·type·risk·sourceIds는 코드가 결정하므로 출력하지 않는다. 각 claim은 text만 출력한다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} ${evidenceInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
+    ?'현재 강한 임상 근거가 제한적이므로 질병 치료·예방이나 확정적 효과는 주장하지 않는다. 확인된 건강상 역할과 실제로 지속할 수 있는 식사·섭취 행동을 독자에게 먼저 안내하고, 필요한 한계만 해당 부분에서 짧게 설명한다.'
+    :'직접 근거가 있는 건강상 변화와 실천 방법을 먼저 제시하고, 연구 지표·수치·기간은 이를 뒷받침하는 곳에 배치한다.';
+  const baseSystem=`한국어 건강정보 편집 설계자다. 본문을 쓰지 말고 근거 기반 작성 계획만 만든다. 임상 효과·예방은 인체시험·체계적 검토와 진료 지침을 기반으로 작성한다. USDA·식품성분 DB는 식품별 영양함량에만 사용하고 건강효과의 근거로 삼지 않는다. 독자의 기대효과를 먼저 쓰고, 연구 방법·DB명·한계 설명을 도입이나 효능 소제목의 주인공으로 삼지 않는다. canonicalSubject는 "${item.keyword} = ${evidence.query}"이며 다른 대상으로 재해석하지 않는다. 검색 범위는 ${scope}, 권장 공개 본문은 ${min}~${max}자이며 글자수를 채우기 위한 내용을 만들지 않는다. section id는 제공된 coreSkeleton을 정확히 한 번씩 사용한다. 모듈 배치·claim id·type·risk·sourceIds는 코드가 결정하므로 출력하지 않는다. 각 claim은 text만 출력한다. 각 섹션은 자료로 직접 뒷받침되는 핵심 주장 1~2개만 둔다. 수치는 인용한 source notes에 같은 값과 단위가 실제로 존재할 때만 쓴다. 근거에 없는 수치·기간·비율은 삭제하고 정성 설명으로 바꾼다. ${nutritionInstruction} ${evidenceInstruction} 질병 예방·치료·용량·상호작용은 직접적인 공식·가이드라인·체계적 문헌고찰·임상시험 근거가 없으면 주장하지 않는다. 농업·유전학 자료를 사람 효능으로 확대하지 않는다. JSON만 출력한다.`;
   return ollamaJson([
     {role:'system',content:baseSystem},
     {role:'user',content:JSON.stringify({keyword:item.keyword,currentTitle,domain:item.domain,scope,requiredCoreModules:required,coreSkeleton:skeleton,nutritionEvidence:evidence?.nutrition??null,sources:sourceBundle(sources)})}
