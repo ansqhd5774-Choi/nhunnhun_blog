@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {isUsdaSource,isHumanOutcomeSource,selectDiverseEvidenceSources} from '../authoring/evidence-diversity.mjs';
-import {collectEvidence,classifyEvidenceSufficiency} from '../authoring/queue-research.mjs';
+import {collectEvidence,classifyEvidenceSufficiency,isTopicSpecificSource} from '../authoring/queue-research.mjs';
 import {selectPlanSources} from '../authoring/queue-plan.mjs';
 
 const source=(id,kind,role,topicSpecific=true,url=`https://example.org/${id}`)=>({id,url,kind,role,topicSpecific,title:id,notes:id});
@@ -80,4 +80,11 @@ test('food article planning starts with a topical human outcome, not USDA',()=>{
   assert.equal(chosen[0].role,'health');
   assert.ok(chosen.some(s=>s.id==='usda'));
   assert.equal(chosen[0].id==='trial'||chosen[0].id==='review',true);
+});
+
+test('short DHA/EPA/egg queries keep topic-specific citations instead of disappearing',()=>{
+  assert.equal(isTopicSpecificSource({title:'DHA oral human trial',notes:''},'DHA'),true);
+  assert.equal(isTopicSpecificSource({title:'EPA clinical evidence',notes:''},'EPA'),true);
+  assert.equal(isTopicSpecificSource({title:'Egg yolk nutrient composition',notes:''},'egg'),true);
+  assert.equal(isTopicSpecificSource({title:'generic skin health',notes:''},'DHA'),false);
 });
