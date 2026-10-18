@@ -72,7 +72,7 @@ test('food-axis review reports all core H2 even though only six axis slots are d
   assert.equal(review.axes[5].heading,'6. 고르는 법·보관법');
 });
 
-test('food editorial review is reader-first and does not reintroduce research-centric prompts',()=>{
+test('food editorial review keeps native compound evidence without overbroad omission',()=>{
   const source={id:'direct-39-prepare-test',articleId:'39',targetUrl:'https://nhunnhun.tistory.com/39',expectedCurrentTitle:'껌',title:'껌',category:'음식',contentStandard:'SP1',status:'ready',approved:true,representativeImageUrl:'https://example.com/gum.jpg',bodyHtml:'<p><img src="https://example.com/gum.jpg" alt="껌"></p><h2>소개</h2><p>소개</p><h2>영양소·핵심 성분</h2><p>성분</p><h2>꾸준 섭취 변화</h2><ul><li><strong>조건</strong><mark><u><strong>중요한 행동</strong></u></mark></li></ul>'};
   const before=JSON.stringify(source);
   const result=prepareDirectSource(source);
@@ -88,7 +88,7 @@ test('food editorial review is reader-first and does not reintroduce research-ce
   assert.match(questions,/사용자 확정 6개 소제목/);
   assert.match(questions,/일반 독자/);
   assert.match(questions,/특징·영양·장점·활용·선택·섭취·보관/);
-  assert.match(questions,/확인해서 사용할 수 없는 내용은 생략/);
+  assert.match(questions,/음식 고유 성분의 함량·연구된 작용/);
   assert.match(questions,/소개/);
   assert.match(questions,/영양소·핵심 성분/);
   assert.match(questions,/꾸준 섭취 변화/);
