@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {isUsdaSource,isHumanOutcomeSource,selectDiverseEvidenceSources} from '../authoring/evidence-diversity.mjs';
 import {collectEvidence,classifyEvidenceSufficiency} from '../authoring/queue-research.mjs';
+import {selectPlanSources} from '../authoring/queue-plan.mjs';
 
 const source=(id,kind,role,topicSpecific=true,url=`https://example.org/${id}`)=>({id,url,kind,role,topicSpecific,title:id,notes:id});
 
@@ -68,4 +69,15 @@ test('USDA explicit opt-in still works for a food composition measurement',async
   assert.equal(res.nutrition.available,true);
   assert.ok(res.sources.some(s=>s.kind==='nutrition-database'));
   assert.notEqual(res.evidenceProfile.claimMode,'full');
+});
+
+test('food article planning starts with a topical human outcome, not USDA',()=>{
+  const nutrition=source('usda','nutrition-database','nutrition',true,'https://fdc.nal.usda.gov/food-details/9/nutrients');
+  const trial=source('trial','trial','health',true);
+  const review=source('review','systematic-review','health',true);
+  const safety=source('safety','official','safety',true);
+  const chosen=selectPlanSources({sources:[nutrition,safety,trial,review]},{domain:'food'});
+  assert.equal(chosen[0].role,'health');
+  assert.ok(chosen.some(s=>s.id==='usda'));
+  assert.equal(chosen[0].id==='trial'||chosen[0].id==='review',true);
 });
