@@ -93,3 +93,30 @@ test('quercetin /128 ⑤ maps ingredient or drug names at left to effects and ca
  assert.equal(out.split('<img ').length-1,3);
  assert.equal((out.match(/<table>/g)||[]).length,2);
 });
+
+test('phytosterol /140 source keeps left ingredient names and right effect highlights in five pairing cards',()=>{
+ const source=JSON.parse(readFileSync(new URL('../updates/direct-140-phytosterol-r1-20261018.json',import.meta.url),'utf8'));
+ const rendered=renderDirectArticle(source.bodyHtml);
+ const group=cards(rendered,'pairs');
+ const expected=[
+  ['베타글루칸',/LDL 관리 보완/],
+  ['불포화지방산',/식물성 기름·견과류 선택/],
+  ['베타카로틴',/카로티노이드 섭취 보완/],
+  ['스타틴계 약물',/처방 유지·의료진 상담/],
+  ['에제티미브',/병용 여부 상담/]
+ ];
+ const content=n=>n.type==='text'?n.data:(n.children||[]).map(content).join('');
+ assert.equal(group.length,expected.length);
+ for(let i=0;i<expected.length;i++){
+  const h=desc(group[i],'h3'),p=desc(group[i],'p');
+  assert.equal(h.length,1);assert.equal(p.length,1);
+  assert.equal(content(h[0]),expected[i][0]);
+  assert.equal(desc(h[0],'mark').length,0);
+  assert.equal(desc(p[0],'mark').length,1);
+  assert.match(content(desc(p[0],'mark')[0]),expected[i][1]);
+ }
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsArticles,5);
+ assert.equal(directPublicExpectations(source.bodyHtml).pairsMarkedArticles,5);
+ assert.equal(rendered.split('<img ').length-1,3);
+ assert.equal((rendered.match(/<table>/g)||[]).length,2);
+});
