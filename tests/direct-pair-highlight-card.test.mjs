@@ -90,6 +90,6 @@ test('quercetin /128 ⑤ maps ingredient or drug names at left to effects and ca
  }
  assert.equal(directPublicExpectations(source.bodyHtml).pairsArticles,5);
  assert.equal(directPublicExpectations(source.bodyHtml).pairsMarkedArticles,5);
- assert.equal((out.match(/<img\\b/g)||[]).length,3);
+ assert.equal(out.split('<img ').length-1,3);
  assert.equal((out.match(/<table>/g)||[]).length,2);
 });
