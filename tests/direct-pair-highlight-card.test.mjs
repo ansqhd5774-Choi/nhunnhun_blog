@@ -39,3 +39,31 @@ test('folate /124 preserves five highlighted pairing cards in actual renderer',(
  assert.equal(directPublicExpectations(json.bodyHtml).pairsArticles,5);
  assert.equal(directPublicExpectations(json.bodyHtml).pairsMarkedArticles,5);
 });
+
+test('folate /124 R12 ⑤ left card titles are ONLY ingredient or drug names; right cards show marked effects',()=>{
+ const r12=JSON.parse(readFileSync(new URL('../updates/direct-124-folate-r12-pair-role-alignment-20261018.json',import.meta.url),'utf8'));
+ const r11=JSON.parse(readFileSync(new URL('../updates/direct-124-folate-r11-mark-card-render-fix-20261018.json',import.meta.url),'utf8'));
+ const before=a=>a.split(/(?=<h2>5\\.)/)[0],after=a=>a.split(/(?=<h2>6\\.)/)[1];
+ assert.equal(before(r12.bodyHtml),before(r11.bodyHtml),'all sections before ⑤ must remain unchanged');
+ assert.equal(after(r12.bodyHtml),after(r11.bodyHtml),'all sections after ⑤ must remain unchanged');
+ const rendered=renderDirectArticle(r12.bodyHtml),group=cards(rendered,'pairs');
+ const expected=[
+  ['비타민 B12',/적혈구 형성·호모시스테인 대사 보완/],
+  ['철분',/빈혈·신경관결손 위험 감소/],
+  ['메토트렉세이트',/치료 목적에 따라 처방 확인/],
+  ['항경련제',/약물 상호작용 상담/],
+  ['설파살라진',/엽산 흡수 감소 가능/]
+ ];
+ const content=node=>node.type==='text'?node.data:(node.children||[]).map(content).join('');
+ assert.equal(group.length,5);
+ for(let i=0;i<expected.length;i++){
+  const h=desc(group[i],'h3'),p=desc(group[i],'p');
+  assert.equal(h.length,1);assert.equal(p.length,1);
+  assert.equal(content(h[0]),expected[i][0],`left card ${i+1} must be a short name`);
+  assert.equal(desc(h[0],'mark').length,0,`left card ${i+1} must not contain effect highlight`);
+  const marked=desc(p[0],'mark');
+  assert.equal(marked.length,1,`right card ${i+1} must contain exactly one meaningful highlight`);
+  assert.match(content(marked[0]),expected[i][1]);
+  assert.ok(content(p[0]).length>content(marked[0]).length,`right card ${i+1} must include useful explanatory text`);
+ }
+});
