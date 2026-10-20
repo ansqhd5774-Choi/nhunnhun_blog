@@ -1,2 +1,3 @@
 2026-10-20 open dedicated visible Tistory Chrome after E_TISTORY_AUTH_PRECHECK_RUNTIME on /229 and /230.
 Use existing saved profile and CDP port 9223. Login refresh only; NO post mutation.
+2026-10-20 16:50 KST repeat login-only check after /241 Run 39388601595 failed E_TISTORY_AUTH_PRECHECK_RUNTIME; retain saved profile, no post mutation.
