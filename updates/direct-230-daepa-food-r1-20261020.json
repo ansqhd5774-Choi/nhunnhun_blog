@@ -12,7 +12,6 @@
   "representativeImageUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/GreenOnions.jpg?width=960",
   "imageReview": [
     {
-      "file": "GreenOnions.jpg",
       "alt": "시장에 놓인 흰 줄기와 푸른 잎이 선명한 신선한 대파 여러 단",
       "role": "hero",
       "composition": "closeup",
@@ -22,7 +21,6 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:GreenOnions.jpg"
     },
     {
-      "file": "Chopped scallions.jpg",
       "alt": "요리를 위해 송송 썰어 놓은 실제 대파 흰 부분과 초록 잎",
       "role": "detail",
       "composition": "closeup",
@@ -32,7 +30,6 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Chopped_scallions.jpg"
     },
     {
-      "file": "Korean.cuisine-Pamuchim-01.jpg",
       "alt": "대파를 채 썰어 양념한 한국식 파무침 한 접시",
       "role": "context",
       "composition": "serving",
