@@ -1,0 +1,1 @@
+2026-10-20: resume unchanged /230 update source after Chrome saved-login SUCCESS. Earlier attempts failed before Tistory submission; source and ledger checked. Schedule through source-preserving standard retry mechanism; no new content.
