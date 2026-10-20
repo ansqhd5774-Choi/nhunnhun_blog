@@ -1,0 +1,8 @@
+retry: source-preserving
+source_id: direct-233-cineole-r1-r18-20261020
+reason: BLOCKED_SOURCE_DRIFT from stale runner checkout
+previous_run: 39373815699
+previous_attempt: 2
+previous_failure_stage: runner-gate before submission
+article_id: 233
+preserve_source: true
