@@ -25,6 +25,31 @@ export async function selectEditorMode(page,mode){
     const menuReady=await menu.waitFor({state:'visible',timeout:10000}).then(()=>true,()=>false);
     if(!menuReady){
       await diagnostic();
+      if(mode==='html'){
+        // On some edit sessions the HTML option exists but the whole toolbar
+        // is hidden. Use only the known editor mode controls and require a
+        // live, visible CodeMirror API before returning. No submit is involved.
+        const used=await page.evaluate(()=>{
+          for(const id of ['editor-mode-html','editor-mode-html-text','editor-mode-html-tistory']){
+            const control=document.getElementById(id);
+            if(!control)continue;
+            control.click();
+            return id;
+          }
+          return null;
+        }).catch(()=>null);
+        if(used){
+          await page.waitForFunction(()=>
+            [...document.querySelectorAll('.CodeMirror')].some(el=>
+              el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'
+              &&typeof el.CodeMirror?.getValue==='function'
+            ),null,{timeout:10000,polling:100}).catch(error=>{
+              throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});
+            });
+          console.log('UPDATE_HTML_MODE_DOM_TRANSITION_VERIFIED '+used);
+          return;
+        }
+      }
       if(mode==='basic'){
         // DOM evidence: the basic-mode control exists but its toolbar is hidden
         // after HTML inspection. Invoke only the known mode control, and require
