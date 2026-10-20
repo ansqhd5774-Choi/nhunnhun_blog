@@ -4,3 +4,6 @@ sourceCommit=cade0f575762058c7d5383d152e37021e9258043
 previousRun=39385927499
 previousAttempt=2
 publicMutation=not-observed
+loginRecoveredRun=39389142998
+loginStatus=LOGIN_SAVED
+retryReason=pre-submit-auth-preflight-only
