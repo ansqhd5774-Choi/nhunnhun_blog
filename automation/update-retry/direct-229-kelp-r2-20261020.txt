@@ -1,0 +1,1 @@
+2026-10-20: resume existing unchanged /229 source after successful saved-session Chrome login. Earlier update runs failed before Tistory submission; no ledger. Only use standard direct-author source-preserving retry mechanism.
