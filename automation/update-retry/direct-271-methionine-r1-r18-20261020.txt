@@ -1,0 +1,11 @@
+retry: source-preserving
+source_id: direct-271-methionine-r1-r18-20261020
+reason: E_TISTORY_AUTH_PRECHECK_RUNTIME at read-only auth stage
+failed_run: 39386313932
+failed_step: Tistory 로그인 세션 사전 확인 — 읽기 전용
+submission_started: false
+ledger_created: false
+article_id: 271
+preserve_source: true
+recovery: use current main with auth-preflight stage-aware transient CDP/navigation retry
+retry_request: 2026-10-21
