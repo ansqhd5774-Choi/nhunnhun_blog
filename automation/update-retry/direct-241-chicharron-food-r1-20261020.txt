@@ -1,0 +1,6 @@
+direct-241-chicharron-food-r1-20261020
+reason=source-preserving-retry-after-pre-submit-runner-gate-BLOCKED_SOURCE_DRIFT
+sourceCommit=cade0f575762058c7d5383d152e37021e9258043
+previousRun=39385927499
+previousAttempt=2
+publicMutation=not-observed
