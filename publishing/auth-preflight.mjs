@@ -17,27 +17,38 @@ export async function assertTistoryAuthenticated(page) {
   }
 }
 
+// Read-only session checks retry transient CDP/navigation faults only; never bypass authentication.
 export async function runTistoryAuthPreflight() {
-  let connection;
-  let page;
-  try {
-    const config = await localBrowserConfig();
-    connection = await openEditorConnection(config);
-    page = await connection.context.newPage();
-    await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded', timeout:30000});
-    await assertTistoryAuthenticated(page);
-    await page.reload({waitUntil:'domcontentloaded', timeout:30000});
-    await assertTistoryAuthenticated(page);
-    console.log('TISTORY_AUTH_READY');
-  } catch (error) {
-    const code = error?.message === 'E_TISTORY_AUTH_REQUIRED_PRECHECK'
-      ? error.message
-      : 'E_TISTORY_AUTH_PRECHECK_RUNTIME';
-    console.error(`TISTORY_AUTH_PREFLIGHT ${code}`);
-    process.exitCode = 1;
-  } finally {
-    try { await page?.close({runBeforeUnload:false}); } catch {}
-    try { if (connection) await closeEditorConnection(connection); } catch {}
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    let connection;
+    let page;
+    let stage = 'CONFIG';
+    try {
+      const config = await localBrowserConfig();
+      stage = 'CDP_CONNECT';
+      connection = await openEditorConnection(config);
+      stage = 'PAGE_CREATE';
+      page = await connection.context.newPage();
+      stage = 'FIRST_NAVIGATION';
+      await page.goto(`${BLOG}/manage/posts`, {waitUntil:'domcontentloaded', timeout:30000});
+      stage = 'FIRST_AUTH';
+      await assertTistoryAuthenticated(page);
+      stage = 'RELOAD';
+      await page.reload({waitUntil:'domcontentloaded', timeout:30000});
+      stage = 'SECOND_AUTH';
+      await assertTistoryAuthenticated(page);
+      console.log('TISTORY_AUTH_READY');
+      return;
+    } catch (error) {
+      const authRequired = error?.message === 'E_TISTORY_AUTH_REQUIRED_PRECHECK';
+      const code = authRequired ? error.message : 'E_TISTORY_AUTH_PRECHECK_RUNTIME';
+      console.error(`TISTORY_AUTH_PREFLIGHT ${code} stage=${stage} attempt=${attempt}`);
+      if (authRequired || attempt === 2) { process.exitCode = 1; return; }
+    } finally {
+      try { await page?.close({runBeforeUnload:false}); } catch {}
+      try { if (connection) await closeEditorConnection(connection); } catch {}
+    }
+    await new Promise(resolve => setTimeout(resolve, 1500));
   }
 }
 
