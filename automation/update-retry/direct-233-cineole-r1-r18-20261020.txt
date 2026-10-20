@@ -6,3 +6,13 @@ previous_attempt: 2
 previous_failure_stage: runner-gate before submission
 article_id: 233
 preserve_source: true
+
+retry_request: html-editor-mode-recovery-20261020
+prior_run: 39380153154
+prior_stage: stage-content
+prior_error: E_UPDATE_EDITOR_MODE_MENU
+prior_submission: not-started
+fix_commit: 898754a43b90e728e49e42c64ebe14c85f79a0fb
+source_id: direct-233-cineole-r1-r18-20261020
+article_id: 233
+preserve_source_id: true
