@@ -1,0 +1,1 @@
+2026-10-22 one-shot read-only CDP diagnosis after /248 pre-submit E_TISTORY_AUTH_PRECHECK_RUNTIME stage=CDP_CONNECT. No Tistory mutation.
