@@ -1,0 +1,1 @@
+Safe retry of immutable eggplant article /327 source direct-327-eggplant-food-r3-20261022 after merge of PR #270. Prior update workflow 39746814963 timed out at original-mode-menu before content write or submit. Retain the existing full rewrite source unchanged; use standard Tistory update workflow and public verification.
