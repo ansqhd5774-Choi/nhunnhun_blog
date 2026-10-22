@@ -6,5 +6,16 @@
   "sourceCommit": "bc1b06cb48d81b945809289acb576a1047d2dd5f",
   "editorialTemplateVersion": "R4",
   "timestamp": "2026-10-22T12:56:59.059Z",
-  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39780835026"
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39780835026",
+  "publicResult": {
+    "sourceId": "direct-397-flu-return-20261022",
+    "url": "https://nhunnhun.tistory.com/397",
+    "sourceCommit": "bc1b06cb48d81b945809289acb576a1047d2dd5f",
+    "fingerprint": "47d2bc7cc7e38e605312cbefad3a5045a44df07bab7355eb67ae60b084c024e8",
+    "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39780835026",
+    "checkedAt": "2026-10-22T12:57:01.999Z",
+    "verificationRunUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39780835026",
+    "status": "PUBLIC_VERIFICATION_MISMATCH",
+    "code": "E_DIRECT_PUBLIC_PAIRSARTICLES"
+  }
 }
