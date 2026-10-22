@@ -1,0 +1,4 @@
+SOURCE_ID=direct-288-magnesium-r1-20261022
+REASON=retry-after-tistory-login-restored-20261022
+PREVIOUS_RUN=39718083529
+SUBMISSION_STATE=not-submitted
