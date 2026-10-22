@@ -1,0 +1,16 @@
+{
+  "sourceId": "direct-393-shiitake-food-r2-20261022",
+  "articleId": "393",
+  "title": "표고버섯 효능·영양｜4주 섭취 연구·생표고와 건표고·궁합·보관법",
+  "sourceSha256": "1b12e41254da6e92919758bfe480be908f333e61e6837453ee6ce3041fbefee2",
+  "checks": {
+    "contentReview": "AUTHOR_REVIEWED",
+    "automatedSemanticVerdict": false,
+    "images": "LICENSE_AND_VISUAL_VERIFIED",
+    "seasonBenchmark": "TWO_DOMESTIC_BLOGS_PLUS_OFFICIAL",
+    "benefitStudy": "FOUR_WEEK_HUMAN_DIETARY_STUDY_VERIFIED"
+  },
+  "scope": "FOOD_ONLY",
+  "createdAt": "2026-10-22",
+  "baseMainSha": "cdda5093cac7017f0d3387edefa2b624e465418e"
+}
