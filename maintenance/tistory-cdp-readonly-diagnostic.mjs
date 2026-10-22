@@ -1,6 +1,6 @@
 import { chromium } from 'playwright-core';
 import { localBrowserConfig } from '../publishing/local-browser.mjs';
-const classify = error => ({name:String(error?.name??'Error'),code:String(error?.code??''),timeout:/timeout|timed out/i.test(String(error?.message??'')),refused:/ECONNREFUSED|refused/i.test(String(error?.message??'')),closed:/closed|disconnected|close/i.test(String(error?.message??'')),http:/unexpected status|400|401|403|404|500/i.test(String(error?.message??''))});
+const classify = error => ({name:String(error?.name??'Error'),code:String(error?.code??''),causeName:String(error?.cause?.name??''),causeCode:String(error?.cause?.code??''),causeErrno:String(error?.cause?.errno??''),timeout:/timeout|timed out/i.test(String(error?.message??'')),refused:/ECONNREFUSED|refused/i.test(String(error?.message??'')),closed:/closed|disconnected|close/i.test(String(error?.message??'')),http:/unexpected status|400|401|403|404|500/i.test(String(error?.message??''))});
 const url=process.env.TISTORY_CDP_URL || 'http://127.0.0.1:9223';
 let ws;
 try {
@@ -12,7 +12,8 @@ try {
  const body=await r.json();
  console.log('CDP_VERSION '+JSON.stringify({browser:String(body.Browser??'').slice(0,80),hasWs:!!body.webSocketDebuggerUrl}));
  ws=body.webSocketDebuggerUrl;
-} catch(e){console.log('CDP_HTTP_FAILURE '+JSON.stringify(classify(e)));process.exit(1)}
+} catch(e){console.log('CDP_HTTP_FAILURE '+JSON.stringify(classify(e)))}
+if(!ws){ const {get}=await import('node:http');await new Promise(resolve=>{const req=get(url+'/json/version',res=>{console.log('CDP_NODE_HTTP '+JSON.stringify({status:res.statusCode}));res.resume();res.on('end',resolve)});req.on('error',e=>{console.log('CDP_NODE_HTTP_FAIL '+JSON.stringify(classify(e)));resolve()});req.setTimeout(5000,()=>{req.destroy();console.log('CDP_NODE_HTTP_TIMEOUT');resolve()})});}
 if(ws){
  await new Promise(resolve=>{
    const socket=new WebSocket(ws);let done=false;
