@@ -2,3 +2,4 @@
 Use existing saved profile and CDP port 9223. Login refresh only; NO post mutation.
 2026-10-20 16:50 KST repeat login-only check after /241 Run 39388601595 failed E_TISTORY_AUTH_PRECHECK_RUNTIME; retain saved profile, no post mutation.
 2026-10-22 /241 R2 Chrome CDP read-only session restoration after Run 39715798521 failed at CDP_CONNECT. No post mutation.
+2026-10-22 REQUEST: open visible dedicated Tistory Chrome for manual login on Windows publisher using existing saved profile; login-only, no post mutation.
