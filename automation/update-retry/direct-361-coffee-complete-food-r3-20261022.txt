@@ -1,0 +1,3 @@
+source_id=direct-361-coffee-complete-food-r3-20261022
+reason=retry-on-latest-main-after-source-drift; previous update step never ran
+requested_at=2026-10-22
