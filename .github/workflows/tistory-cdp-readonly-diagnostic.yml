@@ -1,0 +1,25 @@
+name: Read-only Tistory CDP connectivity diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/tistory-cdp-readonly-diagnostic.txt'
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-tistory-mutation
+  queue: max
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 8
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-node-pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Check local CDP HTTP, WebSocket and Playwright without posting
+        run: node maintenance/tistory-cdp-readonly-diagnostic.mjs
