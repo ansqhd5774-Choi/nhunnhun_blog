@@ -1,0 +1,15 @@
+{
+  "sourceId": "direct-382-shrimp-food-r1-20261022",
+  "articleId": "382",
+  "title": "대하·새우 효능·영양｜흰다리새우 차이·콜레스테롤·제철·보관법",
+  "sourceSha256": "1c3d08d45455df3571ddfad611005a8f081c904df499866f826f9eb688e0afff",
+  "checks": {
+    "contentReview": "AUTHOR_REVIEWED",
+    "automatedSemanticVerdict": false,
+    "images": "LICENSE_VERIFIED",
+    "seasonBenchmark": "TWO_DOMESTIC_BLOGS_PLUS_OFFICIAL"
+  },
+  "scope": "FOOD_ONLY",
+  "createdAt": "2026-10-22",
+  "baseMainSha": "fc2f1fde107d82e2b47babcffa5fe71a29b7b91a"
+}
