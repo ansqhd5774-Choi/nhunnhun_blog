@@ -22,6 +22,7 @@ function renderQuickSummary(html){
   // Existing food guides used several reader-facing summary titles.
   // Convert only labelled line summaries, leaving narrative quotations intact.
   if(!/^(?:핵심만 먼저:?|이 글의 핵심|먼저 기억할 네 가지|.+\s한눈에 보기)$/u.test(title.trim()))return full;
+  if(!/<br\s*\/?>/iu.test(full))return full;
   const rows=inside.split(/<br\s*\/?>/iu).map(value=>value.trim()).filter(Boolean).map(line=>{
    const match=line.match(/^<strong>([^<]+)<\/strong>\s*([\s\S]+)$/u);
    return match?{label:match[1].trim(),text:match[2].trim()}:null;
