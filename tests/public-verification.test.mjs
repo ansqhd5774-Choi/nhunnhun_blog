@@ -61,6 +61,24 @@ test('approved direct quick summary renders six cards with responsive two-column
   assert.match(rendered,/30초 안에 보는 핵심 기준/);
 });
 
+test('food guide headings render as summary cards instead of raw blockquotes',()=>{
+ for(const title of ['망고 한눈에 보기','이 글의 핵심','먼저 기억할 네 가지','핵심만 먼저:']){
+  const html='<p>시작</p><blockquote><strong>'+title+'</strong><br><strong>영양</strong> 100g 기준<br><strong>궁합</strong> 요거트<br><strong>보관</strong> 냉장</blockquote>';
+  const rendered=renderDirectArticle(html);
+  assert.equal((rendered.match(/class="quick-summary-item"/g)||[]).length,3,title);
+  assert.doesNotMatch(rendered,/<blockquote>/,title);
+  assert.match(rendered,/QUICK GUIDE/,title);
+ }
+});
+test('malformed summary is rejected and narrative quotation is preserved',()=>{
+ const broken='<blockquote><strong>망고 한눈에 보기</strong><br>영양 수치<br><strong>보관</strong> 냉장<br><strong>궁합</strong> 요거트</blockquote>';
+ assert.throws(()=>renderDirectArticle(broken),/E_DIRECT_QUICK_SUMMARY_STRUCTURE/);
+ const narrative='<blockquote><strong>핵심 먼저</strong> 향신료에 대한 서술형 요약입니다.</blockquote>';
+ assert.match(renderDirectArticle(narrative),/<blockquote>/);
+ const labelledNarrative='<blockquote><strong>이 글의 핵심</strong> 서술형 요약은 카드가 아닙니다.</blockquote>';
+ assert.match(renderDirectArticle(labelledNarrative),/<blockquote>/);
+});
+
 test('direct public verification follows the varied renderer and rejects lost emphasis or styling',()=>{
   const html='<h2>소개</h2><p><mark><u><strong>핵심</strong></u></mark></p><table><tr><td>자료</td></tr></table>';
   const snapshot={...directPublicExpectations(html),stylesVisible:true};
