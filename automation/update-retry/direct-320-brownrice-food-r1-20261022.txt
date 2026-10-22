@@ -1,0 +1,1 @@
+Retry existing immutable brown rice /320 source after HTML editor mode readiness fix (PR #267). First attempt stopped before publish dialog; no update ledger; public title unchanged.
