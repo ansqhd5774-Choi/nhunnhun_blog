@@ -6,6 +6,12 @@ on:
     paths:
       - 'automation/tistory-login-refresh.txt'
   workflow_dispatch:
+    inputs:
+      runner_label:
+        description: Dedicated runner label for this login session
+        required: false
+        default: tistory-publisher
+        type: string
 
 permissions:
   contents: read
@@ -16,7 +22,7 @@ concurrency:
 
 jobs:
   login-refresh:
-    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    runs-on: [self-hosted, windows, x64, "${{ inputs.runner_label || 'tistory-publisher' }}"]
     timeout-minutes: 7
     defaults:
       run:
