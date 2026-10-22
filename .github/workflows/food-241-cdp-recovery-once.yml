@@ -1,0 +1,38 @@
+name: One-shot Tistory CDP recovery for food 241
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/food-241-cdp-recovery.txt'
+permissions:
+  contents: read
+concurrency:
+  group: nhunnhun-tistory-mutation
+  cancel-in-progress: false
+jobs:
+  recover-cdp:
+    runs-on: [self-hosted, windows, x64, tistory-publisher]
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node-pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Stop only the dedicated Tistory Chrome CDP listener and restore watchdog marker
+        run: |
+          node maintenance/stop-tistory-chrome.mjs
+          set "STOP_RC=%ERRORLEVEL%"
+          if exist "C:\actions-runner\maintenance.stop" del /q "C:\actions-runner\maintenance.stop"
+          if not "%STOP_RC%"=="0" exit /b %STOP_RC%
+      - name: Reopen saved-profile dedicated Chrome, without posting
+        run: |
+          set "RUNNER_TRACKING_ID="
+          call maintenance\ensure-tistory-chrome.cmd
+          if errorlevel 1 exit /b %ERRORLEVEL%
+          call maintenance\check-tistory-chrome.cmd
+      - name: Read-only Tistory CDP and authenticated session check
+        run: node publishing/auth-preflight.mjs
