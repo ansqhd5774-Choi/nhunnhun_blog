@@ -68,11 +68,14 @@ export async function selectEditorMode(page,mode){
         // after HTML inspection. Invoke only the known mode control, and require
         // CodeMirror to disappear before continuing to any image operation.
         const used=await page.evaluate(()=>{
-          const control=document.getElementById('editor-mode-kakao');
-          if(!control)return false;
-          control.click();
-          return true;
-        }).catch(()=>false);
+          for(const id of ['editor-mode-kakao','editor-mode-kakao-text','editor-mode-kakao-tistory']){
+            const control=document.getElementById(id);
+            if(!control)continue;
+            control.click();
+            return id;
+          }
+          return null;
+        }).catch(()=>null);
         if(used){
           await page.waitForFunction(()=>
             [...document.querySelectorAll('.CodeMirror')].every(el=>
@@ -80,7 +83,7 @@ export async function selectEditorMode(page,mode){
             ),null,{timeout:10000,polling:100}).catch(error=>{
               throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});
             });
-          console.log('UPDATE_BASIC_MODE_DOM_TRANSITION_VERIFIED');
+          console.log('UPDATE_BASIC_MODE_DOM_TRANSITION_VERIFIED '+used);
           return;
         }
       }
