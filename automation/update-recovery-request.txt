@@ -1,2 +1,2 @@
-direct-121-prostaglandin-r1-20261016
-2026-10-16T06:01:00+09:00
+direct-397-flu-return-20261022
+READ_ONLY_PUBLIC_VERIFICATION; submitted source stays unchanged
