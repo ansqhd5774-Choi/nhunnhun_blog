@@ -1,0 +1,7 @@
+sourceId=direct-248-pine-nuts-food-r1-20261022
+originalSourceCommit=22dda504e2045665b151080b0409b72c273de216
+originalRun=39718845542
+previousFailure=E_TISTORY_AUTH_PRECHECK_RUNTIME stage=CDP_CONNECT
+loginWindowRun=39720011030
+retryReason=user-confirmed-manual-login-after-login-window
+noPreviousSubmit=true
