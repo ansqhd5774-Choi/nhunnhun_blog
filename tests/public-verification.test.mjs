@@ -75,6 +75,8 @@ test('malformed summary is rejected and narrative quotation is preserved',()=>{
  assert.throws(()=>renderDirectArticle(broken),/E_DIRECT_QUICK_SUMMARY_STRUCTURE/);
  const narrative='<blockquote><strong>핵심 먼저</strong> 향신료에 대한 서술형 요약입니다.</blockquote>';
  assert.match(renderDirectArticle(narrative),/<blockquote>/);
+ const labelledNarrative='<blockquote><strong>이 글의 핵심</strong> 서술형 요약은 카드가 아닙니다.</blockquote>';
+ assert.match(renderDirectArticle(labelledNarrative),/<blockquote>/);
 });
 
 test('direct public verification follows the varied renderer and rejects lost emphasis or styling',()=>{
