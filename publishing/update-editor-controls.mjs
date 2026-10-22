@@ -5,7 +5,20 @@ export async function selectEditorMode(page,mode){
     ? '#editor-mode-html:visible, #editor-mode-html-text:visible, #editor-mode-html-tistory:visible'
     : '#editor-mode-kakao:visible, #editor-mode-kakao-text:visible, #editor-mode-kakao-tistory:visible';
   const visibleEditors=await page.locator('.CodeMirror:visible').count();
-  if(mode==='html'&&visibleEditors)return;
+  if(mode==='html'&&visibleEditors){
+    // A visible CodeMirror can linger while Tistory is still in basic mode
+    // after image uploads. Only trust the actual HTML mode and a usable editor.
+    const htmlReady=await page.evaluate(()=>{
+      const current=(document.getElementById('editor-mode-layer-btn-open')?.textContent||'').trim();
+      return /HTML/i.test(current)&&[...document.querySelectorAll('.CodeMirror')].some(el=>
+        el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden'
+        &&typeof el.CodeMirror?.getValue==='function'
+        &&!!el.querySelector('.CodeMirror-code')?.getClientRects().length
+      );
+    });
+    if(htmlReady)return;
+    console.log('UPDATE_HTML_MODE_STALE_CODEMIRROR '+JSON.stringify({visibleEditors}));
+  }
   if(mode==='basic'&&!visibleEditors)return;
   const option=page.locator(selector).first();
   const diagnostic=async()=>{
@@ -40,9 +53,11 @@ export async function selectEditorMode(page,mode){
         }).catch(()=>null);
         if(used){
           await page.waitForFunction(()=>
-            [...document.querySelectorAll('.CodeMirror')].some(el=>
+            /HTML/i.test(document.getElementById('editor-mode-layer-btn-open')?.textContent||'')
+            &&[...document.querySelectorAll('.CodeMirror')].some(el=>
               el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'
               &&typeof el.CodeMirror?.getValue==='function'
+              &&!!el.querySelector('.CodeMirror-code')?.getClientRects().length
             ),null,{timeout:10000,polling:100}).catch(error=>{
               throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});
             });
@@ -106,7 +121,11 @@ export async function selectEditorMode(page,mode){
   });
   await page.waitForFunction(expected=>{
     const visibleEditors=[...document.querySelectorAll('.CodeMirror')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
-    return expected==='html'?visibleEditors.some(el=>typeof el.CodeMirror?.getValue==='function'):visibleEditors.length===0;
+    return expected==='html'
+      ? /HTML/i.test(document.getElementById('editor-mode-layer-btn-open')?.textContent||'')
+        &&visibleEditors.some(el=>typeof el.CodeMirror?.getValue==='function'
+          &&!!el.querySelector('.CodeMirror-code')?.getClientRects().length)
+      : visibleEditors.length===0;
   },mode,{timeout:10000,polling:100}).catch(error=>{throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause:error});});
 }
 
