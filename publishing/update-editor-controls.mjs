@@ -86,10 +86,41 @@ export async function selectEditorMode(page,mode){
       }
       throw Error('E_UPDATE_EDITOR_MODE_MENU');
     }
+    let domOptionTransitionVerified=false;
     await menu.click({timeout:10000}).catch(async error=>{
-      await diagnostic();
-      throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});
+      // A visible mode toggle can be blocked by an overlay even though the
+      // exact Tistory mode control exists. Recover only via those known IDs,
+      // then prove the editor mode transition before any content mutation.
+      const used=await page.evaluate(targetMode=>{
+        const ids=targetMode==='html'
+          ? ['editor-mode-html','editor-mode-html-text','editor-mode-html-tistory']
+          : ['editor-mode-kakao','editor-mode-kakao-text','editor-mode-kakao-tistory'];
+        for(const id of ids){
+          const control=document.getElementById(id);
+          if(!control)continue;
+          control.click();
+          return id;
+        }
+        return null;
+      },mode).catch(()=>null);
+      if(!used){
+        await diagnostic();
+        throw Object.assign(Error('E_UPDATE_EDITOR_MODE_MENU'),{cause:error});
+      }
+      await page.waitForFunction(expected=>{
+        const editors=[...document.querySelectorAll('.CodeMirror')].filter(el=>
+          el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+        return expected==='html'
+          ? editors.some(el=>typeof el.CodeMirror?.getValue==='function'
+              &&!!el.querySelector('.CodeMirror-code')?.getClientRects().length)
+          : editors.length===0;
+      },mode,{timeout:10000,polling:100}).catch(cause=>{
+        throw Object.assign(Error('E_UPDATE_EDITOR_MODE_TRANSITION'),{cause});
+      });
+      domOptionTransitionVerified=true;
+      console.log('UPDATE_EDITOR_MENU_DOM_OPTION_FALLBACK '+JSON.stringify({mode,id:used}));
     });
+    if(domOptionTransitionVerified)return;
   }
   await option.waitFor({state:'visible',timeout:10000}).catch(async error=>{
     await diagnostic();
