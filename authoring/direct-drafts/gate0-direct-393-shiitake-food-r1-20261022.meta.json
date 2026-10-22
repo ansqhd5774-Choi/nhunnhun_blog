@@ -1,0 +1,15 @@
+{
+  "sourceId": "direct-393-shiitake-food-r1-20261022",
+  "articleId": "393",
+  "title": "표고버섯 효능·영양｜생표고·말린표고 차이·비타민 D·불리기·보관법",
+  "sourceSha256": "fdecab1f3712a67fe54b88fae37555b4b4c9e9fb9294b0a25951b68bc0e60f09",
+  "checks": {
+    "contentReview": "AUTHOR_REVIEWED",
+    "automatedSemanticVerdict": false,
+    "images": "LICENSE_AND_VISUAL_VERIFIED",
+    "seasonBenchmark": "TWO_DOMESTIC_BLOGS_PLUS_OFFICIAL"
+  },
+  "scope": "FOOD_ONLY",
+  "createdAt": "2026-10-22",
+  "baseMainSha": "55ad2dda8e10426a8628d35079b4c1fe1d67af34"
+}
