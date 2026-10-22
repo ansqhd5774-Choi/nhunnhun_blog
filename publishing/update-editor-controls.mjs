@@ -7,7 +7,7 @@ export async function selectEditorMode(page,mode){
   const visibleEditors=await page.locator('.CodeMirror:visible').count();
   if(mode==='html'&&visibleEditors){
     // A visible CodeMirror can linger while Tistory is still in basic mode
-    // after image uploads. Only trust the actual HTML mode and a usable editor.
+    // after image uploads. Only trust a usable visible editor code surface.
     const htmlReady=await page.evaluate(()=>{
       return [...document.querySelectorAll('.CodeMirror')].some(el=>
         el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden'
