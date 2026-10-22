@@ -18,12 +18,15 @@ function sectionKind(title,section){
  return FALLBACK_SECTION_KIND[section]??null;
 }
 function renderQuickSummary(html){
- return String(html).replace(/<blockquote>\s*<strong>핵심만 먼저:<\/strong>\s*([\s\S]*?)<\/blockquote>/iu,(full,inside)=>{
+ return String(html).replace(/<blockquote>\s*<strong>([^<]+)<\/strong>\s*(?:<br\s*\/?>)?\s*([\s\S]*?)<\/blockquote>/giu,(full,title,inside)=>{
+  // Existing food guides used several reader-facing summary titles.
+  // Convert only labelled line summaries, leaving narrative quotations intact.
+  if(!/^(?:핵심만 먼저:?|이 글의 핵심|먼저 기억할 네 가지|.+\s한눈에 보기)$/u.test(title.trim()))return full;
   const rows=inside.split(/<br\s*\/?>/iu).map(value=>value.trim()).filter(Boolean).map(line=>{
    const match=line.match(/^<strong>([^<]+)<\/strong>\s*([\s\S]+)$/u);
    return match?{label:match[1].trim(),text:match[2].trim()}:null;
   });
-  if(rows.length<3||rows.some(row=>!row))return full;
+  if(rows.length<3||rows.some(row=>!row))throw Error('E_DIRECT_QUICK_SUMMARY_STRUCTURE');
   const cards=rows.map((row,index)=>'<article class="quick-summary-item"><span class="quick-summary-index">'+String(index+1).padStart(2,'0')+'</span><div><div class="quick-summary-label">'+row.label+'</div><p>'+row.text+'</p></div></article>').join('');
   return '<section class="quick-summary" aria-label="핵심 요약"><div class="quick-summary-head"><div class="quick-summary-title"><span class="quick-summary-kicker">QUICK GUIDE</span><strong>핵심 요약</strong></div><span class="quick-summary-note">30초 안에 보는 핵심 기준</span></div><div class="quick-summary-grid">'+cards+'</div></section>';
  });
