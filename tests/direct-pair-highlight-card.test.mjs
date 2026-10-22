@@ -171,3 +171,15 @@ test('glutathione /147 ⑤ left ingredients and right effects render as distinct
  assert.equal(html.split('<img ').length-1,3);
  assert.equal((html.match(/<table>/g)||[]).length,2);
 });
+
+test('disease /397 public verifier counts cards produced by the shared positional renderer',()=>{
+ const source=JSON.parse(readFileSync(new URL('../updates/direct-397-flu-return-20261022.json',import.meta.url),'utf8'));
+ const rendered=renderDirectArticle(source.bodyHtml);
+ const visibleCards=cards(rendered,'pairs');
+ const expected=directPublicExpectations(source.bodyHtml);
+ assert.equal(visibleCards.length,5);
+ assert.equal(expected.pairsArticles,visibleCards.length);
+ assert.equal(expected.pairsMarkedArticles,visibleCards.filter(x=>desc(x,'mark').some(m=>desc(m,'strong').length>0)).length);
+ assert.throws(()=>assertDirectPublicSnapshot({...expected,pairsArticles:0,stylesVisible:true},source.bodyHtml),/E_DIRECT_PUBLIC_PAIRSARTICLES/);
+ assert.doesNotThrow(()=>assertDirectPublicSnapshot({...expected,stylesVisible:true},source.bodyHtml));
+});
