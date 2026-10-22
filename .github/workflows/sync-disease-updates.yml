@@ -28,6 +28,8 @@ jobs:
           persist-credentials: true
       - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Test source validation and no-mutation guards
+        run: node --test tests/disease-handoff-bridge.test.mjs
       - name: Pin approved disease source, confirm Gate 0 and dispatch same-repo workflow
         run: node authoring/sync-disease-updates.mjs
         env:
