@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "ef086cb1eb57ed74ac3b12fa7c26bfa44b05f11ba5a12951f9f1357b9351dabc",
-  "sourceCommit": "eaba29103ee7df2146e275bce51a1a0993873917",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-23T14:20:56.619Z",
   "url": "https://nhunnhun.tistory.com/454",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-23T14:21:28.991Z",
+  "sourceCommit": "eaba29103ee7df2146e275bce51a1a0993873917",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39968593049",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-bay-leaf-20261023",
+    "url": "https://nhunnhun.tistory.com/454",
+    "checkedAt": "2026-10-23T14:21:28.991Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
