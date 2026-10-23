@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "8e23c07a622f639ed4883cf1e70fc61e1e9a278a09a293246b5515a095544d26",
-  "sourceCommit": "0cb7ff2d80a0a88b37eb5046d1e896610b8647ae",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-23T08:08:00.489Z",
   "url": "https://nhunnhun.tistory.com/449",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-23T08:08:32.691Z",
+  "sourceCommit": "0cb7ff2d80a0a88b37eb5046d1e896610b8647ae",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39922253852",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-atrial-fibrillation-20261023",
+    "url": "https://nhunnhun.tistory.com/449",
+    "checkedAt": "2026-10-23T08:08:32.691Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
