@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "6f7b7ea274485991f2b440d0cbce186d934714b805e92f8574dc1997306bd194",
-  "sourceCommit": "5e2a0f7ab1aa49ebf1c6e911dd7c04b1f8a95777",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-23T06:39:15.825Z",
   "url": "https://nhunnhun.tistory.com/445",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-23T06:39:47.652Z",
+  "sourceCommit": "5e2a0f7ab1aa49ebf1c6e911dd7c04b1f8a95777",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39912627708",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-myocardial-infarction-20261023",
+    "url": "https://nhunnhun.tistory.com/445",
+    "checkedAt": "2026-10-23T06:39:47.652Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
