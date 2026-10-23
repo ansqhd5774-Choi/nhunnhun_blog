@@ -1,0 +1,10 @@
+{
+  "sourceId": "direct-myocardial-infarction-20261023",
+  "requestDigest": "453d72c7ce3dee3eb975eac1b3d42b23a77982aca7ef29c522e67fdb45490850",
+  "decision": "new",
+  "scanned": 390,
+  "candidates": [],
+  "resolvedAt": "2026-10-23T06:23:30.708Z",
+  "requestCommit": "a387a744c1da7d82ab205a21d728e0eee6eca771",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39911114244"
+}
