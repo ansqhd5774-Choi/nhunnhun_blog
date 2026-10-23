@@ -17,16 +17,6 @@
       "visualChecked": true
     },
     {
-      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Scomber_japonicus_%28RFEIMG-0346%29.jpg?width=960",
-      "alt": "고등어의 살과 껍질을 보여주는 손질된 필렛",
-      "role": "detail",
-      "composition": "closeup",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Scomber_japonicus_(RFEIMG-0346).jpg",
-      "author": "U.S. Food and Drug Administration",
-      "license": "Public domain",
-      "visualChecked": true
-    },
-    {
       "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Scomber_japonicus_Mackrel%21_%285625008836%29.jpg?width=960",
       "alt": "물속에서 헤엄치는 고등어 무리",
       "role": "context",
@@ -34,6 +24,16 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Scomber_japonicus_Mackrel!_(5625008836).jpg",
       "author": "Brian Gratwicke",
       "license": "CC BY 2.0",
+      "visualChecked": true
+    },
+    {
+      "src": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Scomber_japonicus_%28RFEIMG-0346%29.jpg?width=960",
+      "alt": "고등어의 살과 껍질을 보여주는 손질된 필렛",
+      "role": "detail",
+      "composition": "closeup",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Scomber_japonicus_(RFEIMG-0346).jpg",
+      "author": "U.S. Food and Drug Administration",
+      "license": "Public domain",
       "visualChecked": true
     }
   ],
