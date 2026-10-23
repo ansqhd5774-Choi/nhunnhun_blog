@@ -1,0 +1,19 @@
+{
+  "sourceId": "direct-myocardial-infarction-20261023",
+  "operation": "create",
+  "topic": "심근경색",
+  "aliases": [
+    "급성 심근경색",
+    "심장마비",
+    "심장발작",
+    "심근경색 초기증상",
+    "심근경색 전조증상",
+    "심근경색증",
+    "myocardial infarction",
+    "heart attack",
+    "STEMI",
+    "NSTEMI"
+  ],
+  "proposedTitle": "심근경색 초기증상｜집에서 확인할 신호·119 대처·검사·치료·재발 예방",
+  "reviewed": true
+}
