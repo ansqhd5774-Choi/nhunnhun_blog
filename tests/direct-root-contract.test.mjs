@@ -67,3 +67,18 @@ test('direct update dispatch는 안전한 상세 오류를 첫 실패에서 보�
  assert.equal(directDispatchErrorMessage(Error('E_DIRECT_SOURCE_ID')),'E_DIRECT_SOURCE_ID');
  assert.equal(directDispatchErrorMessage(Error('sensitive token=abc')),'E_DIRECT_DISPATCH_FAILED');
 });
+
+
+test('음식 전면 재작성·요약 복구는 실 렌더링된 핵심 요약 6개 카드를 필수로 확인한다',()=>{
+ const source=directFixture({changeScope:'full-rewrite'});
+ assert.ok(directPreflight(source).errors.includes('E_DIRECT_FOOD_QUICK_SUMMARY_MISSING'));
+ const rows=Array.from({length:6},(_,i)=>'<strong>항목 '+(i+1)+'</strong> 음식의 정체와 영양 및 안전한 섭취에 대한 구체적인 비교 '+(i+1));
+ const fixed={...source,bodyHtml:'<blockquote><strong>이 글의 핵심</strong><br>'+rows.join('<br>')+'</blockquote>'+source.bodyHtml};
+ assert.equal(directPreflight(fixed).checks.quickSummary,'PASS');
+ const partial={...fixed,bodyHtml:fixed.bodyHtml.replace(rows[5],'')};
+ assert.ok(directPreflight(partial).errors.includes('E_DIRECT_FOOD_QUICK_SUMMARY_COUNT'));
+ const oldStockLead={...fixed,bodyHtml:fixed.bodyHtml.replace('이 글의 핵심','핵심만 먼저')};
+ assert.ok(directPreflight(oldStockLead).errors.includes('E_DIRECT_FOOD_STOCK_LEAD'));
+ const repair={...fixed,id:'direct-395-fruit-summary-r2-20261023',changeScope:'content-update'};
+ assert.equal(directPreflight(repair).checks.quickSummary,'PASS');
+});
