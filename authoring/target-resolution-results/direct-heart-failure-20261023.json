@@ -1,0 +1,10 @@
+{
+  "sourceId": "direct-heart-failure-20261023",
+  "requestDigest": "ade24631b0c0f622c23878eeb67183ca6dabf79fec750e21228cf5a8bec9fea8",
+  "decision": "new",
+  "scanned": 393,
+  "candidates": [],
+  "resolvedAt": "2026-10-23T06:46:06.864Z",
+  "requestCommit": "bf7ae8eeb7ea3480cb1af8d964b7a68eb8bcbda4",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39913443454"
+}
