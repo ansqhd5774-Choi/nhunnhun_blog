@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "3dab4ff7018f60585a9f2ff65a7d88473ca6b2d60cd3510f99202e43c46332c2",
-  "sourceCommit": "513ede147a9033da6df2b50d4ae073c15026d93d",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-23T13:13:13.546Z",
   "url": "https://nhunnhun.tistory.com/453",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-23T13:13:45.703Z",
+  "sourceCommit": "513ede147a9033da6df2b50d4ae073c15026d93d",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/39959125969",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-dried-chili-20261023",
+    "url": "https://nhunnhun.tistory.com/453",
+    "checkedAt": "2026-10-23T13:13:45.703Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
