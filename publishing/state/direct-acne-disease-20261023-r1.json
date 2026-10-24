@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "43c37b1ad346caf5f48d565d3e2bbdc250efd25ab49ae8d58fe73c03865b2300",
-  "sourceCommit": "d45e2ace8271327e5bcc0681034284b037ff8263",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-24T02:23:04.676Z",
   "url": "https://nhunnhun.tistory.com/455",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-24T02:23:36.587Z",
+  "sourceCommit": "d45e2ace8271327e5bcc0681034284b037ff8263",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40053791106",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-acne-disease-20261023-r1",
+    "url": "https://nhunnhun.tistory.com/455",
+    "checkedAt": "2026-10-24T02:23:36.588Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
