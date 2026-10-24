@@ -77,8 +77,7 @@ export function assertImageReview(item){
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
-    const page=assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
-    if(page.hostname!=='commons.wikimedia.org'||!/^\/wiki\/File:/i.test(page.pathname))throw new Error('E_IMAGE_REVIEW_SOURCE');
+    assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
     if(!String(r.author||'').trim()||!LICENSE.test(String(r.license||'').trim()))throw new Error('E_IMAGE_REVIEW_LICENSE');
     if(!sourceLinks.has(r.sourcePage))throw new Error('E_IMAGE_REVIEW_ATTRIBUTION');
     const srcKey=canonicalUrl(r.src),pageKey=canonicalUrl(r.sourcePage);
