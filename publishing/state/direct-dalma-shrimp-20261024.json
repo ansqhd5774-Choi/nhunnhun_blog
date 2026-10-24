@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "607a3086ba63bdb73c6535d8bb81f23275f33ee074cf5dcd82f28e9b9ea2063c",
-  "sourceCommit": "b63d2e464222c0ef1dd8fae07d7041ca01fd2511",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-24T08:21:50.117Z",
   "url": "https://nhunnhun.tistory.com/460",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-24T08:22:19.208Z",
+  "sourceCommit": "b63d2e464222c0ef1dd8fae07d7041ca01fd2511",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40077651312",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-dalma-shrimp-20261024",
+    "url": "https://nhunnhun.tistory.com/460",
+    "checkedAt": "2026-10-24T08:22:19.208Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
