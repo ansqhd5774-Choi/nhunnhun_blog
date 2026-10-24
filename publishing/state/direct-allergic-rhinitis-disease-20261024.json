@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "e977cd184f21b21f866d293140754646fc209740f36236bb0f68f7513815b427",
-  "sourceCommit": "715f0b7c2b147b024f38b6c641178a66e2955b79",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-24T05:48:05.202Z",
   "url": "https://nhunnhun.tistory.com/458",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-24T05:48:35.059Z",
+  "sourceCommit": "715f0b7c2b147b024f38b6c641178a66e2955b79",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40067574481",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-allergic-rhinitis-disease-20261024",
+    "url": "https://nhunnhun.tistory.com/458",
+    "checkedAt": "2026-10-24T05:48:35.059Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
