@@ -1,0 +1,30 @@
+{
+  "sourceId": "direct-dalma-shrimp-20261024",
+  "operation": "create",
+  "topic": "달마새우(대롱수염새우; Solenocera melantho)",
+  "targetResolution": {
+    "path": "authoring/target-resolution-results/direct-dalma-shrimp-20261024.json",
+    "decision": "new",
+    "scanned": 406,
+    "requestCommit": "99cbab964acd9900dafbff0f5abf96eb97bede75"
+  },
+  "sourceArchive": {
+    "path": "authoring/post-source-archive/direct-dalma-shrimp-20261024.json",
+    "archiveCommit": "4e8fe35f9c8b61e076e2b9b25e5a133a7bb3437d",
+    "archiveBlobSha": "a2038f15e29b57e449159deb360c49b617a532d6",
+    "sha256": "06623d68552b78e11daa4ed72838bf0fab5aa29f40cc5ab344f3dd6e3794f72a"
+  },
+  "preflight": {
+    "strong": 79,
+    "mark": 39,
+    "markUnderlineStrong": 16,
+    "images": 3,
+    "coreSections": 6,
+    "summaryCardCount": 6,
+    "photoLicenseChecked": true,
+    "speciesIdentificationChecked": true,
+    "genericNutritionClearlyLabeled": true
+  },
+  "stage": "GATE0_ARCHIVED_BEFORE_SUBMISSION",
+  "publicationStatus": "NOT_YET_SUBMITTED"
+}
