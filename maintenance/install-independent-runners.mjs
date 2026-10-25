@@ -30,7 +30,7 @@ async function main(){
    if(!fs.existsSync(marker))fs.writeFileSync(marker,JSON.stringify({repository:repo,host:os.hostname()}),{flag:'wx'});
    if(!fs.existsSync(runner)){
      for(const dir of ['bin','externals'])fs.cpSync(path.join(source,dir),path.join(root,dir),{recursive:true});
-     for(const name of fs.readdirSync(source).filter(n=>/\.cmd(?:\.template)?$/.test(n)))fs.copyFileSync(path.join(source,name),path.join(root,name));
+     for(const name of ['config.cmd','run.cmd','run-helper.cmd.template','env.cmd'])if(fs.existsSync(path.join(source,name)))fs.copyFileSync(path.join(source,name),path.join(root,name));
      const command=`call "${path.join(root,'config.cmd')}" --unattended --url ${url} --token ${token} --name ${os.hostname()}-${key} --labels tistory-${key} --work _work`;
      // Do not print the command, error object, or config output: token is an argument.
      try{execFileSync(process.env.ComSpec,['/d','/s','/c',command],{cwd:root,env:clean,stdio:'pipe',windowsHide:true,timeout:120000});}
