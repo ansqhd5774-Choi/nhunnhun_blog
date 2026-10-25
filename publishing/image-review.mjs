@@ -4,6 +4,9 @@ const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','serving','field','process','diagram']);
 const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
+// An explicit license is one route, not the only route, for using an informative image.
+// Other bases are editorial declarations, not automated legal determinations.
+const USAGE_BASES=new Set(['original','authorized','product-identification','quotation']);
 const NUTRIENT_ABSTRACT_HERO=/(?:structure|skeletal|formula|molecule|molecular|crystal|kristall|microscop|polarized|polarised|polariseeritud|chemical[_ -]?structure)/i;
 function imageTags(html=''){return [...String(html).matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]);}
 function attr(tag,name){return (tag.match(new RegExp('\\b'+name+'=(["\\\'])(.*?)\\1','i'))||[])[2]||'';}
@@ -71,18 +74,20 @@ export function assertImageReview(item){
   if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
   const mismatches=mismatchIssues(tags,review);
   if(mismatches.length){console.error('IMAGE_REVIEW_MISMATCH_DIAG '+JSON.stringify(mismatches));throw new Error('E_IMAGE_REVIEW_MISMATCH');}
-  const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
+  const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
+    if(r.usageBasis!==undefined&&!USAGE_BASES.has(r.usageBasis))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
     assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
-    if(!String(r.author||'').trim()||!LICENSE.test(String(r.license||'').trim()))throw new Error('E_IMAGE_REVIEW_LICENSE');
+    if(!String(r.author||'').trim()||(!LICENSE.test(String(r.license||'').trim())&&!USAGE_BASES.has(r.usageBasis)))throw new Error('E_IMAGE_REVIEW_LICENSE');
     if(!sourceLinks.has(r.sourcePage))throw new Error('E_IMAGE_REVIEW_ATTRIBUTION');
-    const srcKey=canonicalUrl(r.src),pageKey=canonicalUrl(r.sourcePage);
-    if(seenSrc.has(srcKey)||seenPages.has(pageKey))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
-    seenSrc.add(srcKey);seenPages.add(pageKey);
+    // Several distinct photos may legitimately be documented on one original page.
+    const srcKey=canonicalUrl(r.src);
+    if(seenSrc.has(srcKey))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
+    seenSrc.add(srcKey);
   }
   return item;
 }

@@ -97,8 +97,10 @@
 
 ## 이미지
 - 신규 및 direct/SP1 전체 수정은 서로 다른 본문 이미지 최소 3개를 준비한다.
-- 대표 이미지와 본문 이미지의 src/alt 및 원출처·저작자·라이선스를 확인한다.
-- `imageReview` 허용 키는 `src, alt, role, composition, sourcePage, author, license`와 선택적 boolean `visualChecked`다.
+- 대표 이미지와 본문 이미지의 src/alt 및 원출처·저작자 또는 제공자·이용 근거를 기록한다.
+- `imageReview` 허용 키는 `src, alt, role, composition, sourcePage, author, license, usageBasis`와 선택적 boolean `visualChecked`다.
+- CC·퍼블릭도메인 등 자유이용 표시가 없어도 `usageBasis`로 직접 촬영·허락·제품 식별·정당한 인용 중 해당 경로를 명시할 수 있다. 법적 허용을 자동으로 확정하지는 않으며, 명백한 이용 금지 사진은 별도 확인한다.
+- 독자의 제품 식별이나 상태 이해에 도움이 되는 실제 사진을 우선하고, 필요한 사진을 출처 링크만으로 대체하지 않는다.
 - `visualChecked`는 실제 확인한 경우에만 true로 기록하며 필수 게이트가 아니다.
 - `imageReview.sourcePage`는 본문 자료 출처에도 같은 HTTPS 링크로 한 번씩 연결한다.
 

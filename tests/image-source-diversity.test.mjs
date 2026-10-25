@@ -47,14 +47,45 @@ test('original source still requires a matching attribution link',()=>{
   assert.throws(()=>assertImageReview(item),/E_IMAGE_REVIEW_ATTRIBUTION/);
 });
 
-test('unlicensed, missing-author and repeated image evidence remains rejected',()=>{
-  const badLicense=fixture();
-  badLicense.imageReview[0].license='All rights reserved';
-  assert.throws(()=>assertImageReview(badLicense),/E_IMAGE_REVIEW_LICENSE/);
+test('a missing license needs a documented usage basis; authorship still matters',()=>{
+  const noBasis=fixture();
+  noBasis.imageReview[0].license='Not specified';
+  assert.throws(()=>assertImageReview(noBasis),/E_IMAGE_REVIEW_LICENSE/);
+  const unknownBasis=fixture();
+  unknownBasis.imageReview[0].license='Not specified';
+  unknownBasis.imageReview[0].usageBasis='any-photo-is-free';
+  assert.throws(()=>assertImageReview(unknownBasis),/E_IMAGE_REVIEW_SCHEMA/);
   const noAuthor=fixture();
   noAuthor.imageReview[0].author='';
   assert.throws(()=>assertImageReview(noAuthor),/E_IMAGE_REVIEW_LICENSE/);
+});
+
+test('source-attributed product-identification photos are not blocked just for lacking CC metadata',()=>{
+  const item=fixture();
+  const productPage='https://manufacturer.example.org/products/cetirizine-10mg';
+  item.imageReview[0]={...item.imageReview[0],license:'Not specified',
+    author:'Example manufacturer',usageBasis:'product-identification',sourcePage:productPage};
+  item.imageReview[1]={...item.imageReview[1],license:'',
+    author:'Example manufacturer',usageBasis:'product-identification',sourcePage:productPage};
+  item.bodyHtml=item.bodyHtml.replace('https://wwwn.cdc.gov/phil/Details.aspx?pid=24355',productPage)
+    .replace('https://medical.example.org/source/a',productPage);
+  assert.doesNotThrow(()=>assertImageReview(item));
+  item.bodyHtml=item.bodyHtml.replaceAll('https://manufacturer.example.org/products/cetirizine-10mg','https://manufacturer.example.org/other');
+  assert.throws(()=>assertImageReview(item),/E_IMAGE_REVIEW_ATTRIBUTION/);
+});
+
+test('original, authorized and properly cited quotation routes are supported',()=>{
+  for(const usageBasis of ['original','authorized','quotation']){
+    const item=fixture();
+    item.imageReview[0].license='Not specified';
+    item.imageReview[0].usageBasis=usageBasis;
+    assert.doesNotThrow(()=>assertImageReview(item));
+  }
+});
+
+test('repeating the exact same image is rejected even when its source is valid',()=>{
   const duplicate=fixture();
-  duplicate.imageReview[1].sourcePage=duplicate.imageReview[0].sourcePage;
+  duplicate.imageReview[1].src=duplicate.imageReview[0].src;
+  duplicate.bodyHtml=duplicate.bodyHtml.replace('https://medical.example.org/photos/a.jpg',duplicate.imageReview[0].src);
   assert.throws(()=>assertImageReview(duplicate),/E_IMAGE_REVIEW_DUPLICATE/);
 });
