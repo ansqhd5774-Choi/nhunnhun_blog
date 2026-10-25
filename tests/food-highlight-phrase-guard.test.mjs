@@ -73,31 +73,31 @@ test('food name remains allowed when genuinely useful and not mechanically repea
   assert.doesNotThrow(()=>assertFoodHighlightPhrases(source(marks)));
 });
 
-test('full food article requires the food definition highlight in the first introduction paragraph',()=>{
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({definition:'종류 차이 · 수분·단단함·용도 차이'})),/E_DIRECT_FOOD_HIGHLIGHT_DEFINITION_MISSING/);
+test('food introduction can explain identity without compulsory definition highlighting',()=>{
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({definition:'종류 차이 · 수분·단단함·용도 차이'})));
   const article=fullFood({firstIntroPrefix:`<p>두부는 여러 요리에 쓰는 식품이라 조리법에 따라 식감이 달라집니다. ${m('종류 선택 · 조리법 기준')}</p>`});
-  assert.throws(()=>assertFoodHighlightPhrases(article),/E_DIRECT_FOOD_HIGHLIGHT_DEFINITION_MISSING/);
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(article));
 });
 
-test('full food article requires season, nutrition, change, caution, selection and storage highlight axes',()=>{
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,season:'종류 차이 · 식감·용도'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,nutrition:'핵심 정보 · 기본값 확인'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,change:'담백한 맛 · 다양한 조리'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,caution:'담백한 맛 · 다양한 조리'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,select:'조리 형태 · 용도별 구분'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true,storage:'조리 형태 · 용도별 구분'})),/E_DIRECT_FOOD_HIGHLIGHT_AXIS_COVERAGE/);
+test('food sections can contain important facts without forced highlight labels',()=>{
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,season:'종류 차이 · 식감·용도'})));
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,nutrition:'핵심 정보 · 기본값 확인'})));
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,change:'담백한 맛 · 다양한 조리'})));
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,caution:'담백한 맛 · 다양한 조리'})));
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,select:'조리 형태 · 용도별 구분'})));
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true,storage:'조리 형태 · 용도별 구분'})));
 });
 
-test('full food article rejects technically covered but sparse highlight layer',()=>{
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({sparse:true})),/E_DIRECT_FOOD_HIGHLIGHT_DENSITY/);
+test('food accepts meaningful sparse emphasis without numeric quotas',()=>{
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({sparse:true})));
 });
 
-test('every substantive paragraph or list item in six food sections needs a scan highlight',()=>{
+test('substantive paragraphs do not need decorative scan highlights',()=>{
   const extraNutrition='<p>칼슘은 어떤 응고제를 사용했는지에 따라 제품별 차이가 크게 날 수 있으므로 라벨의 실제 수치를 확인하는 것이 가장 정확합니다.</p>';
-  assert.throws(()=>assertFoodHighlightPhrases(fullFood({extraNutrition})),/E_DIRECT_FOOD_HIGHLIGHT_BLOCK_COVERAGE/);
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(fullFood({extraNutrition})));
 });
 
-test('coverage has no global highlight cap once minimum scan density is satisfied',()=>{
+test('there is no global cap on naturally meaningful short highlights',()=>{
   const article=fullFood();
   article.bodyHtml=article.bodyHtml.replace('<h2>자료 출처</h2>',Array.from({length:24},(_,i)=>m(`추가 핵심 ${i+1} · 확인 항목`)).join('')+'<h2>자료 출처</h2>');
   assert.doesNotThrow(()=>assertFoodHighlightPhrases(article));
