@@ -31,10 +31,17 @@ async function main(){
    if(!fs.existsSync(runner)){
      for(const dir of ['bin','externals'])fs.cpSync(path.join(source,dir),path.join(root,dir),{recursive:true});
      for(const name of ['config.cmd','run.cmd','run-helper.cmd.template','env.cmd'])if(fs.existsSync(path.join(source,name)))fs.copyFileSync(path.join(source,name),path.join(root,name));
-     const command=`call "${path.join(root,'config.cmd')}" --unattended --url ${url} --token ${token} --name ${os.hostname()}-${key} --labels tistory-${key} --work _work`;
+     const args=['configure','--unattended','--url',url,'--token',token,'--name',os.hostname()+'-'+key,'--labels','tistory-'+key,'--work','_work'];
      // Do not print the command, error object, or config output: token is an argument.
-     try{execFileSync(process.env.ComSpec,['/d','/s','/c',command],{cwd:root,env:clean,stdio:'pipe',windowsHide:true,timeout:120000});}
-     catch{throw Error('E_INDEPENDENT_REGISTRATION_FAILED');}
+     try{execFileSync(path.join(root,'bin','Runner.Listener.exe'),args,{cwd:root,env:clean,stdio:'pipe',windowsHide:true,timeout:120000});}
+     catch(error){
+       const text=String(error.stdout??'')+' '+String(error.stderr??'');
+       const code=/access is denied|unauthorizedaccess/i.test(text)?'E_INDEPENDENT_CONFIG_ACCESS':
+         /already configured/i.test(text)?'E_INDEPENDENT_CONFIG_ALREADY_EXISTS':
+         /not found|404|401|403|bad credentials/i.test(text)?'E_INDEPENDENT_CONFIG_AUTH':
+         /not recognized|cannot find|specified path|invalid argument/i.test(text)?'E_INDEPENDENT_CONFIG_EXECUTION':'E_INDEPENDENT_REGISTRATION_FAILED';
+       throw Error(code);
+     }
    }
    const config=JSON.parse(fs.readFileSync(runner,'utf8'));
    if(String(config.gitHubUrl??'').replace(/\/$/,'')!==url)throw Error('E_INDEPENDENT_REGISTERED_TARGET');
