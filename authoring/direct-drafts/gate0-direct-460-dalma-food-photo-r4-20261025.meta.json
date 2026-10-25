@@ -1,0 +1,24 @@
+{
+  "sourceId": "direct-460-dalma-food-photo-r4-20261025",
+  "articleId": "460",
+  "title": "달마새우 제철·영양·먹는 법｜대롱수염새우 사진·손질·보관법",
+  "sourceSha256": "0b78a190a0b81198ea54b711cfc78817799d7e924940b6376e0c601a98aa0639",
+  "baseMainSha": "c57adec536bb475516338bb4725698ce6d7934e6",
+  "status": "FULL_SOURCE_PRESERVED_BEFORE_PUBLICATION",
+  "checks": {
+    "contentReview": "PASS",
+    "preflight": "PREFLIGHT_PASS",
+    "bold": 64,
+    "mark": 22,
+    "markUnderlineStrong": 7,
+    "images": 3,
+    "coreH2": 6,
+    "quickSummaryCards": 6,
+    "duplicateIntentReview": "EXISTING_460",
+    "visualChecked": 3
+  },
+  "photoRights": "product-identification editorial basis declared; external photo owners retain copyright; attribution given",
+  "linkedSite": "https://nhunnhun.tistory.com/460",
+  "note": "This gate0 source is the immutable candidate for updates/direct-460-dalma-food-photo-r4-20261025.json."
+}
+
