@@ -6,6 +6,10 @@ on:
         description: Read-only independent runner host readiness
         type: boolean
         default: false
+      install_independent:
+        description: Configure the three independent user-level runners
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -26,10 +30,24 @@ jobs:
           if /I not "%RUNNER_NAME%"=="ansqh-tistory-publisher" (echo WRONG_PUBLISH_RUNNER & exit /b 1)
           echo PUBLISH_RUNNER_PASS %RUNNER_NAME%
       - name: Independent repository host readiness (read only)
-        if: inputs.independence_host == true
+        if: inputs.independence_host == true || inputs.install_independent == true
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+      - uses: actions/checkout@v5
+        if: inputs.install_independent == true
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Configure independent repository runners without administrator services
+        if: inputs.install_independent == true
+        shell: cmd
+        run: node maintenance/install-independent-runners.mjs
+        env:
+          INDEPENDENT_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
+          INDEPENDENT_TOKEN_DISEASE: ${{ secrets.INDEPENDENT_TOKEN_DISEASE }}
+          INDEPENDENT_TOKEN_NUTRIENTS: ${{ secrets.INDEPENDENT_TOKEN_NUTRIENTS }}
+          INDEPENDENT_TOKEN_PHARMACOLOGY: ${{ secrets.INDEPENDENT_TOKEN_PHARMACOLOGY }}
       - name: Read independent runner host configuration
         if: inputs.independence_host == true
         shell: cmd
