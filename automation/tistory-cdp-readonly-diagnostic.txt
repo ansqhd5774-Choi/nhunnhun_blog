@@ -1,2 +1,3 @@
 2026-10-22 one-shot read-only CDP diagnosis after /248 pre-submit E_TISTORY_AUTH_PRECHECK_RUNTIME stage=CDP_CONNECT. No Tistory mutation.
 2026-10-22 second read-only pass: distinguish Node fetch cause and Node core HTTP. No post mutation.
+2026-10-25 /460 R4 post-merge pre-submit read-only CDP investigation after browser HTTP readiness PASS but Playwright CDP_CONNECT twice failed. No posting or browser restart.
