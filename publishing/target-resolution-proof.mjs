@@ -12,7 +12,7 @@ async function readJson(path,missingCode,readCode){
 export async function assertTargetResolutionProof({root=process.cwd(),sourceId=process.env.PUBLISH_SOURCE_ID}={}){
   if(!sourceId)throw Error('E_TARGET_SOURCE_REQUIRED');
   const [post]=await loadPosts('posts',sourceId);
-  const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
+  const required=post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
   if(!required)return {required:false};
   const identity=validateCreateIdentity(post,await readJson(
     resolve(root,'authoring','target-resolution',post.id+'.json'),

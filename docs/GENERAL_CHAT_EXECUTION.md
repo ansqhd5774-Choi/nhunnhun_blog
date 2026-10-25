@@ -78,3 +78,9 @@
 
 ## 보고
 최종적으로 target 판정, source SHA, Run 링크, 공개 URL, 원장 상태, 실제 중요한 문제만 짧게 보고한다. 확인하지 않은 결과를 PASS로 쓰지 않는다.
+
+
+## 저장소 독립화 — 2026-10-25
+- 최신 독립 실행 계약은 PROJECT_INSTRUCTIONS.txt와 docs/REPOSITORY_INDEPENDENCE.md를 따른다. 공통 문서는 이 저장소 안의 로컬 사본만 사용한다.
+- 다른 분야 원고를 받거나 다른 저장소로 전달하지 않는다. 카테고리 간 자동 전달은 종료한다.
+- 제출은 package.json의 publish/update 명령이 호출하는 writer-session.mjs 안에서만 수행한다. 같은 물리 호스트의 잠금과 TISTORY_WRITER_HOST 검증을 유지한다.

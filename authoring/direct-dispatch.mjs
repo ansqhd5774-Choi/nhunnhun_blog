@@ -1,3 +1,4 @@
+import {assertRepositorySource} from '../publishing/repository-scope.mjs';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -54,6 +55,7 @@ export async function resolveDirectSourceId({eventName,sourceId,eventPayload,tok
 export async function dispatchDirectSource({sourceId,commitSha,token,root=process.cwd(),dispatch=dispatchQueuedUpdate,confirmSource=confirmGithubSource}={}){
   if(!/^direct-[a-z0-9-]{2,70}$/.test(sourceId??''))throw Error('E_DIRECT_SOURCE_ID');
   const source=JSON.parse(await readFile(resolve(root,'updates',sourceId+'.json'),'utf8'));
+  assertRepositorySource(source);
   checkUpdateSource(source,sourceId+'.json');
   assertDirectEmphasis(source);
   if(!source.representativeImageUrl)throw Error('E_UPDATE_REPRESENTATIVE');

@@ -123,6 +123,7 @@ jobs:
       - name: 신규 글 단일 제출·공개 검증
         run: pnpm run publish
         env:
+          TISTORY_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
           PUBLISH_ENABLED: "true"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUTHORITATIVE_PREFLIGHT_SHA: ${{ github.sha }}
