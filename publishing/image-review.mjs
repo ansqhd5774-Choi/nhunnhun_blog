@@ -3,7 +3,13 @@ import {isRejectedHeroSource} from './rejected-hero-sources.mjs';
 const REVIEW_KEYS=DIRECT_AUTHORING_CONTRACT.imageReviewKeys;
 const ROLES=new Set(['hero','detail','context','process','diagram']);
 const COMPOSITIONS=new Set(['closeup','cross-section','context','serving','field','process','diagram']);
-const LICENSE=/^(?:CC0|CC BY(?:-SA)?(?: [1-9](?:\.\d)?)?|Public Domain|GFDL)(?:\b|$)/i;
+// A license label is provenance, not an automated legal ruling. Do not restrict
+// explanatory identification photos to Creative Commons-only sources.
+const UNKNOWN_CREDIT=/^(?:unknown|unverified|none|n\/a|not checked|미상|불명|미확인|없음)$/i;
+function hasImageCredit(value){
+  const credit=String(value??'').trim();
+  return !!credit&&!UNKNOWN_CREDIT.test(credit);
+}
 const NUTRIENT_ABSTRACT_HERO=/(?:structure|skeletal|formula|molecule|molecular|crystal|kristall|microscop|polarized|polarised|polariseeritud|chemical[_ -]?structure)/i;
 function imageTags(html=''){return [...String(html).matchAll(/<img\b[^>]*>/gi)].map(m=>m[0]);}
 function attr(tag,name){return (tag.match(new RegExp('\\b'+name+'=(["\\\'])(.*?)\\1','i'))||[])[2]||'';}
@@ -65,24 +71,24 @@ export function assertImageReview(item){
   if(hasAuthoritativePreflight())return item;
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
-  if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
+  if(review[0]?.role!=='hero'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
   if(isRejectedHeroSource(review[0]?.sourcePage)||isAbstractNutrientHero(item,review[0]))throw new Error('E_IMAGE_HERO_REJECTED');
   const issues=metadataIssues(review);
   if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
   const mismatches=mismatchIssues(tags,review);
   if(mismatches.length){console.error('IMAGE_REVIEW_MISMATCH_DIAG '+JSON.stringify(mismatches));throw new Error('E_IMAGE_REVIEW_MISMATCH');}
-  const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set(),seenPages=new Set();
+  const sourceLinks=hrefs(sourceBlock(item.bodyHtml)),seenSrc=new Set();
   for(let i=0;i<review.length;i++){
     const r=review[i];
     if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!REVIEW_KEYS.includes(k)))throw new Error('E_IMAGE_REVIEW_SCHEMA');
     if(r.visualChecked!==undefined&&typeof r.visualChecked!=='boolean')throw new Error('E_IMAGE_REVIEW_SCHEMA');
     assertHttps(r.src,'E_IMAGE_REVIEW_URL');
     assertHttps(r.sourcePage,'E_IMAGE_REVIEW_SOURCE');
-    if(!String(r.author||'').trim()||!LICENSE.test(String(r.license||'').trim()))throw new Error('E_IMAGE_REVIEW_LICENSE');
+    if(!hasImageCredit(r.author)||!hasImageCredit(r.license))throw new Error('E_IMAGE_REVIEW_LICENSE');
     if(!sourceLinks.has(r.sourcePage))throw new Error('E_IMAGE_REVIEW_ATTRIBUTION');
-    const srcKey=canonicalUrl(r.src),pageKey=canonicalUrl(r.sourcePage);
-    if(seenSrc.has(srcKey)||seenPages.has(pageKey))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
-    seenSrc.add(srcKey);seenPages.add(pageKey);
+    const srcKey=canonicalUrl(r.src);
+    if(seenSrc.has(srcKey))throw new Error('E_IMAGE_REVIEW_DUPLICATE');
+    seenSrc.add(srcKey);
   }
   return item;
 }
