@@ -55,7 +55,8 @@ test('missing source or rights description and repeated image URLs remain reject
   noAuthor.imageReview[0].author='';
   assert.throws(()=>assertImageReview(noAuthor),/E_IMAGE_REVIEW_LICENSE/);
   const duplicate=fixture();
-  duplicate.imageReview[1].sourcePage=duplicate.imageReview[0].sourcePage;
+  duplicate.imageReview[1].src=duplicate.imageReview[0].src;
+  duplicate.bodyHtml=duplicate.bodyHtml.replace('https://medical.example.org/photos/a.jpg',duplicate.imageReview[0].src);
   assert.throws(()=>assertImageReview(duplicate),/E_IMAGE_REVIEW_DUPLICATE/);
 });
 
