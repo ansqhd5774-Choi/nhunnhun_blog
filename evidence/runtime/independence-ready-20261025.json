@@ -1,0 +1,15 @@
+{
+  "status": "RUNTIME_READINESS_PASS",
+  "key": "food",
+  "repository": "ansqhd5774-Choi/nhunnhun_blog",
+  "category": "음식",
+  "runId": 40181013948,
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40181013948",
+  "sourceCommit": "4347331da801b17df94697391c59f8e816acf154",
+  "host": "DESKTOP-N62L0NG",
+  "lockAcquired": true,
+  "chromeReady": true,
+  "publicationAttempted": false,
+  "publishEnabled": true,
+  "articleSubmissionVerified": false
+}
