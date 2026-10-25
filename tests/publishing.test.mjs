@@ -209,7 +209,7 @@ test('validation and public publisher use the Windows CMD self-hosted runner wit
   assert.deepEqual(w.jobs.validate.defaults,{run:{shell:'cmd'}});
   assert.deepEqual(w.jobs.publish['runs-on'],['self-hosted','windows','x64','tistory-publisher']);
   assert.deepEqual(w.jobs.publish.defaults,{run:{shell:'cmd'}});
-  assert.equal(w.jobs.publish['timeout-minutes'],12);
+  assert.equal(w.jobs.publish['timeout-minutes'],55);
   assert.equal(w.jobs.publish.permissions.contents,'write');
   assert.doesNotMatch(JSON.stringify(w),/BROWSERBASE_|upload-artifact|actions\/cache|powershell|pwsh/i);
 });
