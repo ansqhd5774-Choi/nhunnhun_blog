@@ -40,6 +40,7 @@
 ## 이미지 기술 계약
 - 신규 및 음식 direct/SP1 전체 수정은 서로 다른 관련 본문 이미지 최소 3개를 준비한다.
 - 대표 이미지·본문 이미지의 src/alt와 원출처·촬영자 또는 제공 주체·이용 근거를 기록한다. 실제 제품 식별이나 질환 설명에 필요한 관련 사진을 우선한다.
+- 대표사진은 `closeup`만 강제하지 않는다. 실제 대상과 일치하면 `serving`·`context`·`field` 등도 가능하며, 대표 이미지 URL과 출처 검증은 유지한다.
 - `imageReview` 허용 키: `src, alt, role, composition, sourcePage, author, license, usageBasis, visualChecked`.
 - 기존 CC/퍼블릭도메인/GFDL 사진은 `license`만으로 통과한다. 이를 모든 이미지의 필수 자격으로 강제하지 않는다.
 - 명시적 자유이용 라이선스가 없는 사진은 `usageBasis`를 기록한다: `original`(직접 촬영), `authorized`(이용 허락), `product-identification`(제품 외형 식별), `quotation`(설명·비평·교육 목적의 정당한 인용).
