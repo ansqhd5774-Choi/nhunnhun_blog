@@ -2,7 +2,7 @@
 export const DIRECT_AUTHORING_CONTRACT=Object.freeze({
   version:'direct-authoring-20261018-nutrient-highlight-html-lock',
   imageMinimum:3,
-  imageReviewKeys:Object.freeze(['src','alt','role','composition','sourcePage','author','license','visualChecked']),
+  imageReviewKeys:Object.freeze(['src','alt','role','composition','sourcePage','author','license','usageBasis','visualChecked']),
   emphasisMinimums:Object.freeze({bold:18,highlight:8,underline:2}),
   nutrientEmphasisMinimums:Object.freeze({bold:25,highlight:14,underline:8}),
   coreHeadingMaximum:6,
