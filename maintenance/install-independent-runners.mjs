@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import {execFileSync,spawn} from 'node:child_process';
+let setupStage='host';
 
 async function main(){
  if(process.env.GITHUB_ACTIONS!=='true'||process.platform!=='win32'||
@@ -19,6 +20,7 @@ async function main(){
  const escape=s=>String(s).replaceAll('"','""');
  const result=[];
  for(const [key,repo] of [['disease','nhunnhun_disease'],['nutrients','nhunnhun_nutrients'],['pharmacology','nhunnhun_pharmacology']]){
+   setupStage=key+'-prepare';
    const token=process.env['INDEPENDENT_TOKEN_'+key.toUpperCase()];
    if(!/^[A-Za-z0-9_.-]{20,200}$/.test(token??''))throw Error('E_INDEPENDENT_REGISTRATION_TOKEN');
    const root=path.resolve(home,key),url='https://github.com/ansqhd5774-Choi/'+repo;
@@ -43,9 +45,11 @@ async function main(){
        throw Error(code);
      }
    }
-   const config=JSON.parse(fs.readFileSync(runner,'utf8'));
+   setupStage=key+'-read-registration';
+   const config=JSON.parse(fs.readFileSync(runner,'utf8').replace(/^\uFEFF/,''));
    if(String(config.gitHubUrl??'').replace(/\/$/,'')!==url)throw Error('E_INDEPENDENT_REGISTERED_TARGET');
    const file=path.join(startup,'NHUNNHUN-Independent-'+key+'.vbs');
+   setupStage=key+'-startup';
    const lines=['Set shell = CreateObject("WScript.Shell")',`shell.CurrentDirectory = "${escape(root)}"`,'shell.Environment("PROCESS")("RUNNER_TRACKING_ID") = ""'];
    for(const name of ['TISTORY_CHROME_PATH','TISTORY_PROFILE_DIR','TISTORY_CDP_URL'])if(process.env[name])lines.push(`shell.Environment("PROCESS")("${name}") = "${escape(process.env[name])}"`);
    lines.push(`shell.Run Chr(34) & "${escape(path.join(root,'run.cmd'))}" & Chr(34), 0, False`);
@@ -61,4 +65,4 @@ async function main(){
  }
  console.log('INDEPENDENT_RUNNER_CONFIGURED '+JSON.stringify(result));
 }
-main().catch(error=>{console.error(/^E_[A-Z_]+$/.test(error?.message??'')?error.message:'E_INDEPENDENT_SETUP_STOPPED_REVIEW_STATE');process.exitCode=1;});
+main().catch(error=>{console.error(/^E_[A-Z_]+$/.test(error?.message??'')?error.message:'E_INDEPENDENT_SETUP_STOPPED_REVIEW_STATE');console.error('INDEPENDENT_SETUP_STAGE '+setupStage);process.exitCode=1;});
