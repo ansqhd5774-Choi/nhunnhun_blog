@@ -39,8 +39,12 @@
 
 ## 이미지 기술 계약
 - 신규 및 음식 direct/SP1 전체 수정은 서로 다른 관련 본문 이미지 최소 3개를 준비한다.
-- 대표 이미지·본문 이미지의 src/alt와 원출처·저작자·라이선스 정보를 확인한다.
-- `imageReview` 허용 키: `src, alt, role, composition, sourcePage, author, license, visualChecked`.
+- 대표 이미지·본문 이미지의 src/alt와 원출처·촬영자 또는 제공 주체·이용 근거를 기록한다. 실제 제품 식별이나 질환 설명에 필요한 관련 사진을 우선한다.
+- `imageReview` 허용 키: `src, alt, role, composition, sourcePage, author, license, usageBasis, visualChecked`.
+- 기존 CC/퍼블릭도메인/GFDL 사진은 `license`만으로 통과한다. 이를 모든 이미지의 필수 자격으로 강제하지 않는다.
+- 명시적 자유이용 라이선스가 없는 사진은 `usageBasis`를 기록한다: `original`(직접 촬영), `authorized`(이용 허락), `product-identification`(제품 외형 식별), `quotation`(설명·비평·교육 목적의 정당한 인용).
+- `license`가 확인되지 않았다면 임의로 CC 라이선스를 붙이지 않는다. `usageBasis`는 작성자의 검토 기록이며 자동으로 저작권 적법성을 보증하지 않는다. 명시적인 재사용 금지나 창작성 있는 광고·연출 사진은 별도 판단한다.
+- 구체적 제품·의약품 사진은 상자와 성분·함량·제조사 등이 본문과 일치하는지 확인한다. 사진이 필요한 설명을 외부 링크만으로 대체하지 않는다.
 - `visualChecked`는 선택적 boolean 관찰 기록이며 실제 확인한 경우에만 true로 기록한다.
 - `visualChecked` 누락이나 false만으로 제출을 막지 않는다.
 - 기존 원고·archive 이미지를 재사용할 때 자산·귀속 정보는 재사용할 수 있지만 `visualChecked`는 자동 승계하지 않는다.
