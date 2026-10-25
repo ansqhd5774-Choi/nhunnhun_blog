@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '24'
       - uses: actions/checkout@v5
-        if: inputs.install_independent == true
+        if: inputs.install_independent == true || inputs.independence_host == true
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
@@ -54,3 +54,9 @@ jobs:
         run: |
           node -e "const fs=require('node:fs'),p=require('node:path'),os=require('node:os'),cp=require('node:child_process');const root=p.dirname(p.dirname(process.env.RUNNER_WORKSPACE));let admin=false;try{cp.execFileSync('net',['session'],{stdio:'ignore'});admin=true;}catch{}const disk=fs.statfsSync(process.env.LOCALAPPDATA);console.log('INDEPENDENCE_HOST_READY '+JSON.stringify({hostName:os.hostname(),administrator:admin,runnerConfigAvailable:fs.existsSync(p.join(root,'config.cmd')),runnerBinariesAvailable:fs.existsSync(p.join(root,'bin/Runner.Listener.exe')),freeGB:Math.round(disk.bavail*disk.bsize/1024**3)}));"
           node -e "const fs=require('node:fs'),p=require('node:path');const home=p.join(process.env.LOCALAPPDATA,'NHUNNHUN','IndependentRunners'),startup=p.join(process.env.APPDATA,'Microsoft','Windows','Start Menu','Programs','Startup');console.log('INDEPENDENCE_LOCAL_STATE '+JSON.stringify({startupAvailable:fs.existsSync(startup),repositories:['disease','nutrients','pharmacology'].map(key=>({category:key,marker:fs.existsSync(p.join(home,key,'independent-runner.json')),registered:fs.existsSync(p.join(home,key,'.runner')),binary:fs.existsSync(p.join(home,key,'bin/Runner.Listener.exe')),startup:fs.existsSync(p.join(startup,'NHUNNHUN-Independent-'+key+'.vbs'))}))}));"
+      - name: Verify real shared lock and Chrome configuration without publication
+        if: inputs.independence_host == true
+        shell: cmd
+        run: node maintenance/independent-runtime-smoke.mjs
+        env:
+          TISTORY_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
