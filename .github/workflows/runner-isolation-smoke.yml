@@ -27,17 +27,11 @@ jobs:
           echo PUBLISH_RUNNER_PASS %RUNNER_NAME%
       - name: Independent repository host readiness (read only)
         if: inputs.independence_host == true
-        shell: powershell
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Read independent runner host configuration
+        if: inputs.independence_host == true
+        shell: cmd
         run: |
-          $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-          $principal = New-Object Security.Principal.WindowsPrincipal($identity)
-          $runnerRoot = Split-Path (Split-Path $env:RUNNER_WORKSPACE -Parent) -Parent
-          $drive = Get-PSDrive -Name ([IO.Path]::GetPathRoot($env:LOCALAPPDATA).Substring(0,1))
-          $result = @{
-            hostName = [Environment]::MachineName
-            administrator = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-            runnerConfigAvailable = (Test-Path -LiteralPath (Join-Path $runnerRoot 'config.cmd'))
-            runnerBinariesAvailable = (Test-Path -LiteralPath (Join-Path $runnerRoot 'bin/Runner.Listener.exe'))
-            freeGB = [math]::Round($drive.Free / 1GB)
-          }
-          Write-Output ('INDEPENDENCE_HOST_READY ' + ($result | ConvertTo-Json -Compress))
+          node -e "const fs=require('node:fs'),p=require('node:path'),os=require('node:os'),cp=require('node:child_process');const root=p.dirname(p.dirname(process.env.RUNNER_WORKSPACE));let admin=false;try{cp.execFileSync('net',['session'],{stdio:'ignore'});admin=true;}catch{}const disk=fs.statfsSync(process.env.LOCALAPPDATA);console.log('INDEPENDENCE_HOST_READY '+JSON.stringify({hostName:os.hostname(),administrator:admin,runnerConfigAvailable:fs.existsSync(p.join(root,'config.cmd')),runnerBinariesAvailable:fs.existsSync(p.join(root,'bin/Runner.Listener.exe')),freeGB:Math.round(disk.bavail*disk.bsize/1024**3)}));"
