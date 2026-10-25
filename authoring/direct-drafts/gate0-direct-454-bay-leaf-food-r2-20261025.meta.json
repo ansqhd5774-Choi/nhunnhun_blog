@@ -1,0 +1,20 @@
+{
+  "sourceId": "direct-454-bay-leaf-food-r2-20261025",
+  "articleId": "454",
+  "title": "월계수 잎(Bay Leaf) 효능·영양｜혈당 연구·고기 잡내·궁합·보관법",
+  "sourceSha256": "acca4ba80f357e3cc2626738996e19bf9e2b9c0d3d2af4648a1e42138e150ba8",
+  "checks": {
+    "contentReview": "AUTHOR_REVIEWED",
+    "automatedSemanticVerdict": false,
+    "preflight": "PREFLIGHT_PASS",
+    "renderedQuickSummaryItems": 6,
+    "renderedCards": "EFFECTS_PAIRS_CAUTIONS_STORAGE_PASS",
+    "imageVisualReview": "THREE_ORIGINAL_IMAGES_VIEWED",
+    "seasonBenchmark": "TWO_DOMESTIC_BLOGS_PLUS_UCCE_RHS",
+    "nutritionReference": "USDA_SR28_NDB02004",
+    "benefitResearch": "WHO_2009_HUMAN_TRIAL_2017_COOKIE_TRIAL_2010_EXTRACT_STUDY"
+  },
+  "scope": "FOOD_ONLY",
+  "createdAt": "2026-10-25",
+  "baseMainSha": "61fa2b70d1c99f21aded8b1853014bab0d3919e9"
+}
