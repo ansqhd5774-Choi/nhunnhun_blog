@@ -54,4 +54,4 @@ async function main(){
  }
  console.log('INDEPENDENT_RUNNER_CONFIGURED '+JSON.stringify(result));
 }
-main().catch(()=>{console.error('E_INDEPENDENT_SETUP_STOPPED_REVIEW_STATE');process.exitCode=1;});
+main().catch(error=>{console.error(/^E_[A-Z_]+$/.test(error?.message??'')?error.message:'E_INDEPENDENT_SETUP_STOPPED_REVIEW_STATE');process.exitCode=1;});
