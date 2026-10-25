@@ -71,6 +71,7 @@ jobs:
         run: node publishing/auth-preflight.mjs
       - run: pnpm run update
         env:
+          TISTORY_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
           UPDATE_ENABLED: 'true'
           UPDATE_SOURCE_ID: ${{ inputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

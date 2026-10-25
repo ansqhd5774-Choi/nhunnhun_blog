@@ -49,7 +49,7 @@ export function validateResolutionProof(identity,resolution,{sourceId=identity?.
   return resolution;
 }
 export function validateCreateIdentity(post,identity){
-  const required=post?.category==='음식'&&post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
+  const required=post?.contentStandard==='SP1'&&String(post?.id||'').startsWith('direct-');
   if(!required)return null;
   validateIdentityRequest(identity,{sourceId:post.id});
   // proposedTitle belongs to the pre-authoring duplicate review. Runtime duplicate detection uses the final post.title plus reviewed aliases.
@@ -108,7 +108,7 @@ async function readJson(path,missingCode,readCode){
   catch(error){if(error?.code==='ENOENT')throw Error(missingCode);throw Error(readCode);}
 }
 async function readIdentity(root,post){
-  const required=post.category==='음식'&&post.contentStandard==='SP1'&&post.id.startsWith('direct-');
+  const required=post.contentStandard==='SP1'&&post.id.startsWith('direct-');
   if(!required)return {identity:null,resolution:null};
   const identity=validateCreateIdentity(post,await readJson(resolve(root,'authoring','target-resolution',post.id+'.json'),'E_TARGET_IDENTITY_REQUIRED','E_TARGET_IDENTITY_READ'));
   const resolution=await readJson(resolve(root,'authoring','target-resolution-results',post.id+'.json'),'E_TARGET_RESOLUTION_RESULT_REQUIRED','E_TARGET_RESOLUTION_RESULT_READ');

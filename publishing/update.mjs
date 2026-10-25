@@ -1,3 +1,5 @@
+import {assertSelectedSource} from './repository-scope.mjs';
+import {assertWriterLease} from './writer-lock.mjs';
 import {assertDirectPreflight} from './direct-preflight.mjs';
 import {isNativeTextMaintenance} from './native-text-contract.mjs';
 import {runNativeTextMaintenance} from './native-text-runner.mjs';
@@ -157,6 +159,8 @@ try{
   if(process.env.UPDATE_ENABLED!=='true'){
     console.log('UPDATE_DISABLED');
   }else{
+    assertSelectedSource('updates',process.env.UPDATE_SOURCE_ID);
+    await assertWriterLease();
     assertLocalGit();
     assertCurrentSource();
     const sourceId=process.env.UPDATE_SOURCE_ID;

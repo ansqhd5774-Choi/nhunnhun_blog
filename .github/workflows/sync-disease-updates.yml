@@ -1,36 +1,10 @@
-name: Sync approved disease updates into shared Tistory runner
+name: Retired cross-repository disease handoff
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/sync-disease-updates.yml'
-      - 'authoring/sync-disease-updates.mjs'
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:
 permissions:
-  contents: write
-  actions: write
-concurrency:
-  group: nhunnhun-disease-handoff-sync
-  queue: max
-  cancel-in-progress: false
+  contents: read
 jobs:
-  sync:
-    if: github.ref == 'refs/heads/main'
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: main
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: ./.github/actions/setup-node-pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Test source validation and no-mutation guards
-        run: node --test tests/disease-handoff-bridge.test.mjs
-      - name: Pin approved disease source, confirm Gate 0 and dispatch same-repo workflow
-        run: node authoring/sync-disease-updates.mjs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "Cross-repository handoff retired; use the disease repository workflows."

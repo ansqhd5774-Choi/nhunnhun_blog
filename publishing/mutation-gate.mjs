@@ -1,3 +1,4 @@
+import {assertSelectedSource} from './repository-scope.mjs';
 import { readFileSync, appendFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
@@ -59,6 +60,7 @@ if (eventName === 'workflow_dispatch') {
   }
 }
 
+if(shouldMutate)assertSelectedSource(kind,sourceId);
 const value = shouldMutate ? 'true' : 'false';
 if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `should_mutate=${value}\n`);
 if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `source_id=${sourceId}\n`);

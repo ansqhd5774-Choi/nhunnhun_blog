@@ -1,3 +1,5 @@
+import {assertSelectedSource} from './repository-scope.mjs';
+import {assertWriterLease} from './writer-lock.mjs';
 import {assertDirectPreflight} from './direct-preflight.mjs';
 import { verifyPublishedPublic } from './verify-published-public.mjs';
 import { assertEmphasisContract } from './content-emphasis.mjs';
@@ -110,6 +112,8 @@ try {
   if (process.env.PUBLISH_ENABLED !== 'true') {
     console.log('DISABLED: 발행 활성화 전에는 게시하지 않습니다.');
   } else {
+    assertSelectedSource('posts',process.env.PUBLISH_SOURCE_ID);
+    await assertWriterLease();
     assertLocalGit();
     assertCurrentSource();
     const ledger = new Ledger();

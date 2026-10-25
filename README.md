@@ -71,3 +71,11 @@ ChatGPT 인수인계: [docs/CHATGPT_HANDOFF.md](docs/CHATGPT_HANDOFF.md). GitHub
 `scripts/*.ps1`은 과거 수동 점검용 기록이며 active publish/update workflow에는 사용하지 않는다. 현재 실제 발행·수정 runtime은 Windows CMD shell + self-hosted runner를 사용한다. 공개 검증은 workflow의 anonymous browser 또는 무료 공개 조회를 우선한다.
 
 후속 요청 예: “nhunnhun_blog의 기준 문서를 읽고 /352의 잔여 문구 수정안을 만들어라. 실제 저장 전 원본을 백업하고 적용 범위를 확인하라.”
+
+
+## 저장소 독립화 — 2026-10-25
+- 최신 독립 실행 계약은 PROJECT_INSTRUCTIONS.txt와 docs/REPOSITORY_INDEPENDENCE.md를 따른다. 공통 문서는 이 저장소 안의 로컬 사본만 사용한다.
+- 다른 분야 원고를 받거나 다른 저장소로 전달하지 않는다. 카테고리 간 자동 전달은 종료한다.
+- 제출은 package.json의 publish/update 명령이 호출하는 writer-session.mjs 안에서만 수행한다. 같은 물리 호스트의 잠금과 TISTORY_WRITER_HOST 검증을 유지한다.
+
+프로젝트 설정에 붙여넣는 8,000자 이하 지침: [PROJECT_PROMPT.txt](PROJECT_PROMPT.txt).
