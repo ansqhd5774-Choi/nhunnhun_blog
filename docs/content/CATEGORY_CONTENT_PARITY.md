@@ -14,7 +14,8 @@
 
 - 신규 및 direct/SP1 전체 수정은 서로 다른 본문 이미지 최소 3개를 준비한다.
 - HTTPS, alt, 주제 적합성, 대표 이미지, 원출처, 저작자, 라이선스, 출처 연결, 중복을 확인한다.
-- `imageReview` 허용 키는 `src`, `alt`, `role`, `composition`, `sourcePage`, `author`, `license`, 선택적 boolean `visualChecked`다.
+- 실제 대상이 선명하고 정확하다면 대표사진의 구도를 `closeup`으로 강제하지 않는다. 식재료·완제품·생물 등 주제에 맞는 사진 구도를 허용한다.
+- `imageReview` 허용 키는 `src`, `alt`, `role`, `composition`, `sourcePage`, `author`, `license`, `usageBasis`, 선택적 boolean `visualChecked`다.
 - `visualChecked`는 실제로 현재 source/revision에서 이미지를 확인한 경우에만 true로 기록한다. 누락 또는 false는 제출 차단 사유가 아니다.
 - 실제 확인 없이 visualChecked를 자동 생성하거나 과거 source의 값을 승계하지 않는다.
 
