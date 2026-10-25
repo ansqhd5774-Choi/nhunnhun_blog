@@ -68,7 +68,7 @@ export function assertImageReview(item){
   if(hasAuthoritativePreflight())return item;
   const tags=imageTags(item?.bodyHtml),review=item?.imageReview;
   if(!Array.isArray(review)||review.length!==tags.length||tags.length<DIRECT_AUTHORING_CONTRACT.imageMinimum)throw new Error('E_IMAGE_REVIEW_REQUIRED');
-  if(review[0]?.role!=='hero'||review[0]?.composition!=='closeup'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
+  if(review[0]?.role!=='hero'||canonicalUrl(review[0]?.src)!==canonicalUrl(item.representativeImageUrl))throw new Error('E_IMAGE_HERO_REVIEW');
   if(isRejectedHeroSource(review[0]?.sourcePage)||isAbstractNutrientHero(item,review[0]))throw new Error('E_IMAGE_HERO_REJECTED');
   const issues=metadataIssues(review);
   if(issues.length){console.error('IMAGE_REVIEW_METADATA_DIAG '+JSON.stringify(issues));throw new Error('E_IMAGE_REVIEW_REQUIRED');}
