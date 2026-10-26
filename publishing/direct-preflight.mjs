@@ -4,6 +4,7 @@ import {assertDirectSubmissionFocus} from './direct-focus.mjs';
 import {assertImageReview} from './image-review.mjs';
 import {assertFoodHighlightPhrases} from './food-highlight-phrase.mjs';
 import {assertFoodBenefitBreadth} from './food-benefit-breadth.mjs';
+import {assertFoodReaderLanguage} from './food-reader-language.mjs';
 import {renderDirectArticle} from './direct-design.mjs';
 import {assertVerifiedFoodStockLeadRemoval} from './food-stock-lead-removal.mjs';
 
@@ -47,7 +48,7 @@ export function directPreflight(source){
   }
   if(hasAuthoritativePreflight())return {status:'PREFLIGHT_REUSED',contractVersion:DIRECT_AUTHORING_CONTRACT.version,validatedSha:process.env.GITHUB_SHA,checks:{stockLead:'REUSED',quickSummary:'REUSED',emphasis:'REUSED',foodHighlightPhrase:'REUSED',foodBenefitBreadth:'REUSED',focus:'REUSED',images:'REUSED'},errors:[],automatedSemanticVerdict:false};
   const checks={},errors=[];
-  for(const [name,check] of [['stockLead',assertFoodNoStockLead],['quickSummary',assertFoodQuickSummary],['emphasis',assertDirectSubmissionEmphasis],['foodHighlightPhrase',assertFoodHighlightPhrases],['foodBenefitBreadth',assertFoodBenefitBreadth],['focus',assertDirectSubmissionFocus],['images',assertImageReview]]){
+  for(const [name,check] of [['stockLead',assertFoodNoStockLead],['quickSummary',assertFoodQuickSummary],['emphasis',assertDirectSubmissionEmphasis],['foodHighlightPhrase',assertFoodHighlightPhrases],['foodBenefitBreadth',assertFoodBenefitBreadth],['foodReaderLanguage',assertFoodReaderLanguage],['focus',assertDirectSubmissionFocus],['images',assertImageReview]]){
     try{check(source);checks[name]='PASS';}
     catch(error){const code=/^E_[A-Z0-9_]+$/.test(error.message)?error.message:'E_DIRECT_PREFLIGHT_RUNTIME';checks[name]=code;errors.push(code);}
   }
