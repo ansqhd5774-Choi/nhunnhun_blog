@@ -1,0 +1,3 @@
+sourceId=direct-460-dalma-food-photo-r4-20261025
+reason=login-restored
+previous-run=40207592290
