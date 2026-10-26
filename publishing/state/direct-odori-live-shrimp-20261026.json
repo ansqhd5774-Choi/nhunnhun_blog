@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "07af4dfc151a0896010e264f4596e3dd1b35e427c2c1233455f99a55f845c8c2",
-  "sourceCommit": "d97846bfe8bf212dec707a67fee3ff9d6af28c66",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-10-26T08:17:33.202Z",
   "url": "https://nhunnhun.tistory.com/461",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-10-26T08:18:03.549Z",
+  "sourceCommit": "d97846bfe8bf212dec707a67fee3ff9d6af28c66",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40291022035",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-odori-live-shrimp-20261026",
+    "url": "https://nhunnhun.tistory.com/461",
+    "checkedAt": "2026-10-26T08:18:03.549Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
