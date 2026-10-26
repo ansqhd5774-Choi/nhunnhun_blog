@@ -1,0 +1,18 @@
+{
+  "sourceId": "direct-juldum-20261026",
+  "requestDigest": "66938d6eb163910ecf7b60c9db1477d6de1b6db5c7ba0eff9d77dea01ffde066",
+  "decision": "existing_candidate",
+  "scanned": 415,
+  "candidates": [
+    {
+      "id": "468",
+      "title": "돌돔 제철·칼로리·영양｜줄돔과 차이, 횟감 고르기·보관법",
+      "visibility": "PUBLIC",
+      "exact": false,
+      "aliasHit": true
+    }
+  ],
+  "resolvedAt": "2026-10-26T15:51:13.489Z",
+  "requestCommit": "ee0eb11e9f5df265db20a3586722b3765b7db207",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/40353212916"
+}
