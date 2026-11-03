@@ -31,7 +31,7 @@ test('workflow entry points use host-locked package scripts and self repository'
     const workflow=YAML.parse(readFileSync('.github/workflows/'+name,'utf8'));
     const actualLabels=workflow.jobs[job]['runs-on'].map(s=>s.toLowerCase());
     for(const label of RUNNER_LABELS)assert.ok(actualLabels.includes(label.toLowerCase()));
-    const step=workflow.jobs[job].steps.find(s=>s.run==='pnpm run '+command);
+    const step=workflow.jobs[job].steps.find(s=>s.run?.split(/\r?\n/).some(line=>line.trim()==='pnpm run '+command));
     assert.ok(step,command);
     assert.equal(step.env.TISTORY_WRITER_HOST,'${{ vars.TISTORY_WRITER_HOST }}');
     assert.equal(pkg.scripts[command],'node publishing/writer-session.mjs '+command);
