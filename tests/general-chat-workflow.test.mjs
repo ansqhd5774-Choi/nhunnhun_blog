@@ -35,16 +35,21 @@ test('general Chat pipeline has runner preparation and read-only recovery withou
  const verify=read('publishing/verify-updated-public.mjs');assert.doesNotMatch(verify,/SP1'\) return/);assert.match(verify,/assertDirectPublicSnapshot\(snapshot/);
  const finalize=read('publishing/finalize-update.mjs');assert.doesNotMatch(finalize,/submit\.click|openEditorConnection|UPDATE_ENABLED/);
 });
-test('mutation workflows require authenticated Tistory preflight after Chrome readiness',()=>{
+test('mutation workflows keep Chrome alive for locked auth preflight and single update',()=>{
  const read=f=>readFileSync(f,'utf8');
  const update=read('.github/workflows/update-posts.yml');
  const publish=read('.github/workflows/publish-posts.yml');
- for (const [workflow,mutation] of [[update,'pnpm run update'],[publish,'pnpm run publish']]) {
-   const chrome=workflow.indexOf('maintenance\\check-tistory-chrome.cmd');
-   const auth=workflow.indexOf('node publishing/auth-preflight.mjs');
-   const mutate=workflow.indexOf(mutation);
-   assert.ok(chrome>=0 && auth>chrome && mutate>auth, `${mutation} must follow Chrome and auth preflight`);
- }
+ const sameStep=update.match(/- name: Ensure Chrome and update one source inside the same runner step\s+run: \|([\s\S]*?)\s+env:/)?.[1]??'';
+ assert.match(sameStep,/call maintenance\\\\check-tistory-chrome\.cmd/);
+ assert.match(sameStep,/pnpm run update/);
+ assert.doesNotMatch(update,/run: node publishing\/auth-preflight\.mjs/);
+ const writer=read('publishing/writer-session.mjs');
+ assert.match(writer,/const entries=\['auth-preflight\.mjs'/);
+ assert.match(writer,/acquireWriterLock\(/);
+ const chrome=publish.indexOf('maintenance\\\\check-tistory-chrome.cmd');
+ const auth=publish.indexOf('node publishing/auth-preflight.mjs');
+ const mutate=publish.indexOf('pnpm run publish');
+ assert.ok(chrome>=0 && auth>chrome && mutate>auth, 'publish must follow Chrome and auth preflight');
  const preflight=read('publishing/auth-preflight.mjs');
  assert.match(preflight,/\/manage\/posts/);
  assert.match(preflight,/E_TISTORY_AUTH_REQUIRED_PRECHECK/);
