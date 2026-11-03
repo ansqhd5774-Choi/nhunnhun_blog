@@ -56,7 +56,7 @@ test('신규·수정 워크플로는 검증 후 동일 SHA 결과를 재사용�
  assert.equal(prep.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');assert.equal(submit.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');
  const updateWorkflow=YAML.parse(await readFile('.github/workflows/update-posts.yml','utf8'));
  const updatePrep=updateWorkflow.jobs.update.steps.find(s=>s.run?.startsWith('node authoring/prepare-selected-source.mjs'));
- const updateSubmit=updateWorkflow.jobs.update.steps.find(s=>s.run==='pnpm run update');
+ const updateSubmit=updateWorkflow.jobs.update.steps.find(s=>s.run?.split(/\r?\n/).some(line=>line.trim()==='pnpm run update'));
  assert.equal(updatePrep.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');assert.equal(updateSubmit.env.AUTHORITATIVE_PREFLIGHT_SHA,'${{ github.sha }}');
  const validate=await readFile('publishing/validate.mjs','utf8');assert.match(validate,/directPreflight\(post\)/);assert.doesNotMatch(validate,/assertImageReview\(post\)/);assert.doesNotMatch(validate,/assertDirectPreflight\(post\)/);
  const prepare=await readFile('authoring/prepare-selected-source.mjs','utf8');assert.match(prepare,/hasAuthoritativePreflight\(\)/);assert.match(prepare,/if\(!reused\)assertDirectPreflight\(source\)/);
