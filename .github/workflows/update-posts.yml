@@ -3,6 +3,9 @@ run-name: Update ${{ inputs.source_id }}
 # Chrome is ensured inside the same mutation job, then checked before auth/update.
 # Existing-post mutation is source-scoped by the hosted mutation gate.
 on:
+  push:
+    branches: [main]
+    paths: ['automation/food-highlight-restoration-trigger.txt']
   workflow_dispatch:
     inputs:
       update:
@@ -31,7 +34,7 @@ jobs:
       group: nhunnhun-tistory-mutation
       queue: max
       cancel-in-progress: false
-    if: github.event_name == 'workflow_dispatch' && inputs.update == true && vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' && inputs.update == true || github.event_name == 'push') && vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
     runs-on: [ self-hosted, windows, x64, tistory-publisher ]
     defaults:
       run:
@@ -50,6 +53,10 @@ jobs:
           enable-cache: ${{ runner.environment == 'github-hosted' }}
           cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           cache-restore-key: ${{ runner.os }}-pnpm-store-
+      - name: Resolve approved one-time food source
+        if: github.event_name == 'push'
+        run: >-
+          node --input-type=module -e "import {readFileSync,appendFileSync} from 'node:fs';const id=readFileSync('automation/food-highlight-restoration-trigger.txt','utf8').trim();if(!['direct-466-highlight-restoration-20261103','direct-468-highlight-restoration-20261103'].includes(id))throw Error('E_ONE_TIME_SOURCE_NOT_APPROVED');appendFileSync(process.env.GITHUB_ENV,'UPDATE_SOURCE_ID='+id+'\n');"
       - name: Runner evidence and source drift Gate A
         run: node publishing/runner-gate.mjs
       - run: pnpm install --frozen-lockfile --ignore-scripts
@@ -72,7 +79,6 @@ jobs:
         env:
           TISTORY_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
           UPDATE_ENABLED: 'true'
-          UPDATE_SOURCE_ID: ${{ inputs.source_id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ansqhd5774-Choi/nhunnhun_blog
           AUTHORITATIVE_PREFLIGHT_SHA: ${{ github.sha }}
