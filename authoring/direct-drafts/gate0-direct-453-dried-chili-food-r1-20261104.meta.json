@@ -1,0 +1,23 @@
+{
+  "sourceId": "direct-453-dried-chili-food-r1-20261104",
+  "articleId": "453",
+  "targetUrl": "https://nhunnhun.tistory.com/453",
+  "title": "건고추(Dried Chili) 효능·영양｜고춧가루와 차이·제철·보관법",
+  "sourceDigestSha256": "d2bde5ea7de5d67e39963665d09a95c1efdc810d8cd526410a7bccad9b1e1dc1",
+  "status": "PREFLIGHT_PASS",
+  "checks": {
+    "directPreflight": "PASS",
+    "schema": "PASS",
+    "quickSummaryCards": 6,
+    "coreSections": 6,
+    "renderedCardTypes": ["effects", "pairs", "cautions", "storage"],
+    "imageCount": 3,
+    "highlightCount": 30,
+    "underlineCount": 10,
+    "foodFocusedRegressionTests": "30 PASS"
+  },
+  "githubSourceVerified": false,
+  "submission": "NOT_STARTED",
+  "publicVerification": "NOT_STARTED",
+  "notes": "Original existing article /453 preserved by numeric ID. Complete rewritten source checked from independent references. This record does not claim editorial semantic certification."
+}
