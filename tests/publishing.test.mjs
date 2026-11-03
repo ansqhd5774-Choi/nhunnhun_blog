@@ -375,7 +375,8 @@ test('existing-post update workflow is separated from new publication on the Win
   assert.equal(w.jobs.update.if,"github.event_name == 'workflow_dispatch' && inputs.update == true && vars.TISTORY_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'");
   assert.equal(w.jobs.update.env.UPDATE_SOURCE_ID,'${{ inputs.source_id }}');
   const runs=w.jobs.update.steps.map(step=>step.run);
-  assert.ok(runs.indexOf('pnpm run validate:update')<runs.indexOf('pnpm run update'));
+  const updateIndex=runs.findIndex(run=>String(run??'').split(/\r?\n/).some(line=>line.trim()==='pnpm run update'));
+  assert.ok(updateIndex>=0 && runs.indexOf('pnpm run validate:update')<updateIndex);
   assert.equal(w.jobs.update.steps.find(step=>step.uses==='actions/checkout@v5').with.ref,'${{ github.sha }}');
 });
 
