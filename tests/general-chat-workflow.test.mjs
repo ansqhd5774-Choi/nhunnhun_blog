@@ -40,13 +40,13 @@ test('mutation workflows keep Chrome alive for locked auth preflight and single 
  const update=read('.github/workflows/update-posts.yml');
  const publish=read('.github/workflows/publish-posts.yml');
  const sameStep=update.match(/- name: Ensure Chrome and update one source inside the same runner step\s+run: \|([\s\S]*?)\s+env:/)?.[1]??'';
- assert.match(sameStep,/call maintenance\\\\check-tistory-chrome\.cmd/);
+ assert.match(sameStep,/call maintenance\\check-tistory-chrome\.cmd/);
  assert.match(sameStep,/pnpm run update/);
  assert.doesNotMatch(update,/run: node publishing\/auth-preflight\.mjs/);
  const writer=read('publishing/writer-session.mjs');
  assert.match(writer,/const entries=\['auth-preflight\.mjs'/);
  assert.match(writer,/acquireWriterLock\(/);
- const chrome=publish.indexOf('maintenance\\\\check-tistory-chrome.cmd');
+ const chrome=publish.indexOf('maintenance\\check-tistory-chrome.cmd');
  const auth=publish.indexOf('node publishing/auth-preflight.mjs');
  const mutate=publish.indexOf('pnpm run publish');
  assert.ok(chrome>=0 && auth>chrome && mutate>auth, 'publish must follow Chrome and auth preflight');
