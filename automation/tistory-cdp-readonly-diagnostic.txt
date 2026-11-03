@@ -2,3 +2,4 @@
 2026-10-22 second read-only pass: distinguish Node fetch cause and Node core HTTP. No post mutation.
 2026-10-25 /460 R4 post-merge pre-submit read-only CDP investigation after browser HTTP readiness PASS but Playwright CDP_CONNECT twice failed. No posting or browser restart.
 2026-10-26 /460 one-shot Chrome restart succeeded, but preflight CDP_CONNECT still failed; run read-only HTTP/WS/Playwright differential again. No submission.
+2026-11-03 /466 + /468 highlight restoration follow-up: run the existing read-only CDP HTTP, WebSocket, Playwright differential after both update-posts runs failed before any submission (CDP_CONNECT). No Chrome restart, auth changes, or post mutation.
