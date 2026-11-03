@@ -44,3 +44,10 @@ test('food scan accepts short actionable highlights without any per-section quot
   assert.doesNotThrow(()=>assertFoodHighlightPhrases(scanSource(foodSixSections({openingMark:true,emergencyMark:true}))));
   assert.doesNotThrow(()=>assertFoodHighlightPhrases(scanSource('<h2>1. 소개</h2><mark data-tone="info"><strong>단백질 반찬으로 활용</strong></mark>')));
 });
+
+test('food scan recognizes a highlighted immediate stop instruction with Korean particles',()=>{
+  const html=foodSixSections({openingMark:true})
+    .replace('즉시 119에 도움을 요청하세요',
+      '<mark data-tone="caution"><u><strong>즉시 섭취를 중단</strong></u></mark>하고 119에 도움을 요청하세요');
+  assert.doesNotThrow(()=>assertFoodHighlightPhrases(scanSource(html)));
+});
