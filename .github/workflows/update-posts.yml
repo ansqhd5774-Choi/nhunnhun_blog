@@ -61,15 +61,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUTHORITATIVE_PREFLIGHT_SHA: ${{ github.sha }}
-      - name: Tistory Chrome ensure and readiness check
+      - name: Ensure Chrome and update one source inside the same runner step
         run: |
           set "RUNNER_TRACKING_ID="
           call maintenance\ensure-tistory-chrome.cmd
           if errorlevel 1 exit /b %ERRORLEVEL%
           call maintenance\check-tistory-chrome.cmd
-      - name: Tistory 로그인 세션 사전 확인 — 읽기 전용
-        run: node publishing/auth-preflight.mjs
-      - run: pnpm run update
+          if errorlevel 1 exit /b %ERRORLEVEL%
+          pnpm run update
         env:
           TISTORY_WRITER_HOST: ${{ vars.TISTORY_WRITER_HOST }}
           UPDATE_ENABLED: 'true'
