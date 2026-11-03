@@ -33,5 +33,6 @@ jobs:
           call maintenance\check-tistory-chrome.cmd
           if errorlevel 1 exit /b %ERRORLEVEL%
           node maintenance/tistory-cdp-readonly-diagnostic.mjs
+          node maintenance/tistory-auth-state-readonly.mjs
       - name: Inspect CDP after the step boundary - read-only
         run: node maintenance/tistory-cdp-readonly-diagnostic.mjs
