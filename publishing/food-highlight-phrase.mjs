@@ -65,6 +65,6 @@ export function assertFoodHighlightPhrases(source){
       &&/(?:손질|조리|고르|선택|구입|보관|냉장|확인)/u.test(opening.text))
     throw Error('E_DIRECT_FOOD_HIGHLIGHT_OPENING_GAP');
   if(hasSixSections&&safety&&/(?:119|호흡곤란|호흡이 어려워|응급 도움)/u.test(safety.text)
-      &&!safety.marks.some(mark=>/(?:119|호흡|응급|즉시\s*(?:섭취|복용)\s*중단)/u.test(mark)))
+      &&!safety.marks.some(mark=>/(?:119|호흡|응급|즉시\s*(?:섭취|복용)(?:을|를)?\s*중단)/u.test(mark)))
     throw Error('E_DIRECT_FOOD_HIGHLIGHT_EMERGENCY_GAP');
 }
