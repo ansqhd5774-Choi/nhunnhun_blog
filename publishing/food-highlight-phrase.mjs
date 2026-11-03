@@ -37,7 +37,7 @@ export function assertFoodHighlightPhrases(source){
   const anchor=foodAnchor(source.title);
   if(anchor&&marks.length>=6){
     const escaped=anchor.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const repeated=new RegExp(`^${escaped}(?:\s|[·+→:-])`,'u');
+    const repeated=new RegExp(`^${escaped}(?:\\s|[·+→:-])`,'u');
     const repeatedCount=marks.filter(text=>repeated.test(text)).length;
     if(repeatedCount>=4&&repeatedCount>=Math.ceil(marks.length/2))throw Error('E_DIRECT_FOOD_HIGHLIGHT_SUBJECT_REPEAT');
   }

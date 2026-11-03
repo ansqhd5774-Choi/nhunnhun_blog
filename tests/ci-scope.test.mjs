@@ -22,14 +22,17 @@ test('standard hosted validation is isolated from dedicated PC mutation jobs',()
   const workflow=read(file);
   for(const [name,job] of Object.entries(workflow.jobs)){
    if(job.uses) continue;
-   if(job['runs-on']==='windows-latest'){
-    assert.ok(!['publish','update','disable-auto-open','publisher'].includes(name),`${file}/${name}: PC operation requires dedicated runner`);
+   if(['windows-latest','ubuntu-latest','macos-latest'].includes(job['runs-on'])){
+    assert.ok(!['publish','update','disable-auto-open','publisher','login-refresh'].includes(name),`${file}/${name}: PC operation requires dedicated runner`);
     continue;
    }
    assert.ok(Array.isArray(job['runs-on']),`${file}/${name}: only standard hosted or explicit PC labels allowed`);
    const labels=job['runs-on'].map(s=>s.toLowerCase());
    assert.ok(labels.includes('self-hosted'),`${file}/${name}: hosted execution prohibited`);
-   assert.ok(labels.includes('tistory-publisher'),`${file}/${name}: dedicated publishing runner required`);
+   const dedicated=labels.includes('tistory-publisher')
+     ||(file==='tistory-login-refresh.yml'&&name==='login-refresh'
+       &&labels.some(label=>label.includes("inputs.runner_label || 'tistory-publisher'")));
+   assert.ok(dedicated,`${file}/${name}: dedicated publishing runner required`);
   }
  }
 });
