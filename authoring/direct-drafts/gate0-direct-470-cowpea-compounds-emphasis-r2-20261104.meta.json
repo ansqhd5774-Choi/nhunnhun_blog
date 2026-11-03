@@ -1,0 +1,24 @@
+{
+  "sourceId": "direct-470-cowpea-compounds-emphasis-r2-20261104",
+  "articleId": "470",
+  "title": "동부콩 효능·칼로리｜팥과 차이, 삶는 법·콩밥·보관법",
+  "originalSourceId": "direct-470-cowpea-compounds-r1-20261104",
+  "sourceSha256": "32c52d9b431839007a6c496dfee9e581b8a8512e9430aaf798250b19ee817183",
+  "preflight": {
+    "status": "PREFLIGHT_PASS",
+    "contractVersion": "direct-authoring-20261018-nutrient-highlight-html-lock",
+    "checks": {
+      "stockLead": "PASS",
+      "quickSummary": "PASS",
+      "emphasis": "PASS",
+      "foodHighlightPhrase": "PASS",
+      "foodBenefitBreadth": "PASS",
+      "foodReaderLanguage": "PASS",
+      "focus": "PASS",
+      "images": "PASS"
+    },
+    "errors": [],
+    "automatedSemanticVerdict": false
+  },
+  "revisionScope": "cowpea-special-compounds-emphasis-only"
+}
