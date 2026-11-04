@@ -1,9 +1,25 @@
 {
-  "phase": "submitting",
+  "phase": "published",
   "fingerprint": "2f1994532b433a150c2fe8fe4a9fd7449ecf4f9b841db4154156a6825d2e39e3",
-  "sourceCommit": "bc75a8306fe9f371075b0c796bc29c227d5b9a08",
-  "editorialTemplateVersion": "R4",
-  "timestamp": "2026-11-04T06:18:25.166Z",
   "url": "https://nhunnhun.tistory.com/471",
-  "verificationPhase": "public-verification"
+  "editorialTemplateVersion": "SP1",
+  "timestamp": "2026-11-04T06:18:54.368Z",
+  "sourceCommit": "bc75a8306fe9f371075b0c796bc29c227d5b9a08",
+  "runUrl": "https://github.com/ansqhd5774-Choi/nhunnhun_blog/actions/runs/41784464228",
+  "publicResult": {
+    "status": "PUBLIC_VERIFIED",
+    "sourceId": "direct-romaine-lettuce-20261104",
+    "url": "https://nhunnhun.tistory.com/471",
+    "checkedAt": "2026-11-04T06:18:54.368Z",
+    "checks": [
+      "title",
+      "body",
+      "images",
+      "representative",
+      "emphasis",
+      "desktop",
+      "mobile"
+    ],
+    "semanticVerification": "not-performed"
+  }
 }
