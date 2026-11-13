@@ -1,0 +1,52 @@
+# No second CNG run: query the existing WinPE process return code through its CMD.
+# Fixed VM, owner, branch and single-run guard. Guest output only; no blog changes.
+name: C996 WinPE CNG process exit code (no rerun)
+on:
+  push:
+    branches: [codex/c996-vbox-user-readonly-once-20261113]
+    paths: [.github/workflows/c996-isolated-guest-exitcode-once.yml]
+permissions:
+  contents: read
+concurrency:
+  group: c996-guest-exitcode-single-run
+  cancel-in-progress: false
+jobs:
+  owner-cng-existing-exit:
+    if: >-
+      github.repository == 'ansqhd5774-Choi/nhunnhun_blog' &&
+      github.actor == 'ansqhd5774-Choi' &&
+      github.run_attempt == 1
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Match existing interactive VM owner and live guest
+        run: |
+          if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" (echo C996_HOST_STOP & exit /b 1)
+          if /I not "%USERNAME%"=="ansqh" (echo C996_OWNER_STOP & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "if ([System.Diagnostics.Process]::GetCurrentProcess().SessionId -eq 0) { exit 1 }"
+          if errorlevel 1 (echo C996_SESSION_STOP & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_CNG_EXIT_PREFLIGHT.txt"
+          if errorlevel 1 (echo C996_VM_STOP & exit /b 1)
+          findstr /x /c:"VMState=\"running\"" "%RUNNER_TEMP%\C996_CNG_EXIT_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_NOT_RUNNING_STOP & exit /b 1)
+          echo C996_GUEST_EXIT_QUERY_GATES_PASS
+      - name: Type exit-code echo in existing WinPE CMD without running CNG again
+        run: |
+          powershell.exe -NoProfile -NonInteractive -Command "$exe='C:\Program Files\Oracle\VirtualBox\VBoxManage.exe'; $cmd='echo C996_CNG_EXIT_CODE=' + [char]37 + 'ERRORLEVEL' + [char]37; & $exe controlvm '03620b4b-7ca3-47a0-9a20-df8818ee068f' keyboardputstring $cmd; if ($LASTEXITCODE -ne 0) { exit 1 }"
+          if errorlevel 1 (echo C996_EXIT_QUERY_TYPE_FAIL & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f keyboardputscancode 1c 9c
+          if errorlevel 1 (echo C996_EXIT_QUERY_ENTER_FAIL & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "Start-Sleep -Seconds 2"
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f screenshotpng "%RUNNER_TEMP%\C996_GUEST_EXIT_CODE.png" 0
+          if errorlevel 1 (echo C996_EXIT_SCREEN_FAIL & exit /b 1)
+          echo C996_GUEST_EXIT_SCREEN_PASS
+      - name: Upload fixed guest exit screen only
+        uses: actions/upload-artifact@v4
+        with:
+          name: C996-Guest-CNG-ExistingExit
+          path: ${{ runner.temp }}/C996_GUEST_EXIT_CODE.png
+          retention-days: 1
+          if-no-files-found: error
