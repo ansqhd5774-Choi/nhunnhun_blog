@@ -1,0 +1,50 @@
+# Isolated #996 test VM screenshot: same user, host, UUID; no host/VM mutations.
+# Branch only; no blog authoring, publication, credentials or other VM access.
+name: C996 WinPE guest display screenshot (one shot)
+on:
+  push:
+    branches:
+      - codex/c996-vbox-user-readonly-once-20261113
+    paths:
+      - .github/workflows/c996-isolated-vm-screenshot-once.yml
+permissions:
+  contents: read
+concurrency:
+  group: c996-isolated-guest-screen-once
+  cancel-in-progress: false
+jobs:
+  pinned-vm-guest-screenshot:
+    if: >-
+      github.repository == 'ansqhd5774-Choi/nhunnhun_blog' &&
+      github.actor == 'ansqhd5774-Choi' &&
+      github.run_attempt == 1
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Exact host owner and interactive-session gate
+        run: |
+          if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" (echo C996_HOST_STOP & exit /b 1)
+          if /I not "%USERNAME%"=="ansqh" (echo C996_OWNER_STOP & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "if ([System.Diagnostics.Process]::GetCurrentProcess().SessionId -eq 0) { exit 1 }"
+          if errorlevel 1 (echo C996_INTERACTIVE_STOP & exit /b 1)
+          echo C996_OWNER_SESSION_PASS
+      - name: Screenshot only if fixed VM is currently running
+        run: |
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_VM_SCREEN_PREFLIGHT.txt"
+          if errorlevel 1 (echo C996_UUID_ACCESS_STOP & exit /b 1)
+          findstr /x /c:"VMState=\"running\"" "%RUNNER_TEMP%\C996_VM_SCREEN_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_VM_NOT_RUNNING_STOP & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f screenshotpng "%RUNNER_TEMP%\C996_WINPE_GUEST_DISPLAY.png" 0
+          if errorlevel 1 (echo C996_GUEST_SCREENSHOT_FAIL & exit /b 1)
+          if not exist "%RUNNER_TEMP%\C996_WINPE_GUEST_DISPLAY.png" (echo C996_SCREENSHOT_MISSING & exit /b 1)
+          echo C996_GUEST_SCREENSHOT_PASS
+      - name: Store guest-only screenshot as expiring private Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: C996-WinPE-GuestScreen-TEST_ONLY
+          path: ${{ runner.temp }}/C996_WINPE_GUEST_DISPLAY.png
+          retention-days: 1
+          if-no-files-found: error
