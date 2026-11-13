@@ -1,0 +1,62 @@
+# Approved #996 isolation-only WinPE CNG test, one fixed VM and one execution.
+# Existing interactive owner Runner only. No other repos, guest disks, network or blog writes.
+name: C996 WinPE CNG fixed guest test (one shot)
+on:
+  push:
+    branches: [codex/c996-vbox-user-readonly-once-20261113]
+    paths: [.github/workflows/c996-isolated-guest-cng-once.yml]
+permissions:
+  contents: read
+concurrency:
+  group: c996-isolated-fixed-cng-single-run
+  cancel-in-progress: false
+jobs:
+  owner-guest-cng-once:
+    if: >-
+      github.repository == 'ansqhd5774-Choi/nhunnhun_blog' &&
+      github.actor == 'ansqhd5774-Choi' &&
+      github.run_attempt == 1
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 4
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Require pinned physical host and interactive VM owner
+        run: |
+          if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" (echo C996_HOST_STOP & exit /b 1)
+          if /I not "%USERNAME%"=="ansqh" (echo C996_OWNER_STOP & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "if ([System.Diagnostics.Process]::GetCurrentProcess().SessionId -eq 0) { exit 1 }"
+          if errorlevel 1 (echo C996_SESSION_STOP & exit /b 1)
+          echo C996_PINNED_OWNER_PASS
+      - name: Check exact VM is running and isolated before input
+        run: |
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_CNG_FIXED_PREFLIGHT.txt"
+          if errorlevel 1 (echo C996_UUID_STOP & exit /b 1)
+          findstr /x /c:"VMState=\"running\"" "%RUNNER_TEMP%\C996_CNG_FIXED_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_VM_NOT_RUNNING_STOP & exit /b 1)
+          findstr /x /c:"nic1=\"none\"" "%RUNNER_TEMP%\C996_CNG_FIXED_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_NIC_STOP & exit /b 1)
+          findstr /x /c:"usb=\"off\"" "%RUNNER_TEMP%\C996_CNG_FIXED_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_USB_STOP & exit /b 1)
+          findstr /c:"C996_WINPE_CNG_TEST_ONLY.iso" "%RUNNER_TEMP%\C996_CNG_FIXED_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_ISO_STOP & exit /b 1)
+          echo C996_GUEST_INPUT_GATES_PASS
+      - name: Send approved fixed CNG executable path once into WinPE guest console
+        run: |
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f keyboardputstring "X:\Tools\c996_winpe_cng_test.exe"
+          if errorlevel 1 (echo C996_GUEST_TYPE_FAIL & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f keyboardputscancode 1c 9c
+          if errorlevel 1 (echo C996_GUEST_ENTER_FAIL & exit /b 1)
+          echo C996_GUEST_COMMAND_SENT_ONCE
+          powershell.exe -NoProfile -NonInteractive -Command "Start-Sleep -Seconds 12"
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f screenshotpng "%RUNNER_TEMP%\C996_GUEST_CNG_AFTER_ONCE.png" 0
+          if errorlevel 1 (echo C996_GUEST_POST_SCREEN_FAIL & exit /b 1)
+          echo C996_GUEST_POST_SCREEN_CAPTURE_PASS
+      - name: Upload guest-only screen with one-day retention
+        uses: actions/upload-artifact@v4
+        with:
+          name: C996-Guest-CNG-Once-Output
+          path: ${{ runner.temp }}/C996_GUEST_CNG_AFTER_ONCE.png
+          retention-days: 1
+          if-no-files-found: error
