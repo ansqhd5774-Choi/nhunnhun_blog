@@ -1,0 +1,42 @@
+# One-shot opt-in TEST_ONLY preflight for an already existing ZGMINI ISO-only VM.
+# Kept on a dedicated branch. No Tistory/blog publication or operational writes.
+name: C996 ISO-only VM owner-context readback (one shot)
+on:
+  push:
+    branches:
+      - codex/c996-vbox-user-readonly-once-20261113
+    paths:
+      - .github/workflows/c996-isolated-user-vm-readonly-once.yml
+permissions:
+  contents: read
+concurrency:
+  group: c996-isolated-owner-readback-once
+  cancel-in-progress: false
+jobs:
+  pinned-owner-vm-readonly:
+    if: >-
+      github.repository == 'ansqhd5774-Choi/nhunnhun_blog' &&
+      github.actor == 'ansqhd5774-Choi' &&
+      github.run_attempt == 1
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Verify exact physical host and interactive Windows user
+        run: |
+          if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" (echo C996_HOST_STOP & exit /b 1)
+          if /I not "%USERNAME%"=="ansqh" (echo C996_OWNER_STOP & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "if ([System.Diagnostics.Process]::GetCurrentProcess().SessionId -eq 0) { exit 1 } else { Write-Output 'C996_INTERACTIVE_SESSION_PASS' }"
+          if errorlevel 1 (echo C996_SESSION_STOP & exit /b 1)
+          echo C996_PINNED_OWNER_HOST_PASS
+      - name: Read VM accessibility without writes or remote command execution
+        run: |
+          if not exist "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" (echo C996_VBOX_NOT_FOUND & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_PINNED_VM_READBACK.txt"
+          if errorlevel 1 (echo C996_USER_VM_ACCESS_FAIL & exit /b 1)
+          echo C996_USER_VM_ACCESS_PASS
+          findstr /b /i /c:"VMState=" /c:"memory=" /c:"cpus=" /c:"firmware=" /c:"nic1=" /c:"nic2=" /c:"nic3=" /c:"nic4=" /c:"usb=" "%RUNNER_TEMP%\C996_PINNED_VM_READBACK.txt"
+          if errorlevel 1 (echo C996_VM_READBACK_FAIL & exit /b 1)
+          echo C996_READONLY_DONE
