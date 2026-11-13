@@ -1,0 +1,56 @@
+# One-shot approved WinPE TEST_ONLY graceful shutdown after CNG 6/6 and exit=0.
+# Existing interactive user Runner, exact fixed VM. Do not alter blog content.
+name: C996 WinPE graceful shutdown and ISO hash (one shot)
+on:
+  push:
+    branches: [codex/c996-vbox-user-readonly-once-20261113]
+    paths: [.github/workflows/c996-isolated-guest-shutdown-once.yml]
+permissions:
+  contents: read
+concurrency:
+  group: c996-isolated-guest-graceful-shutdown
+  cancel-in-progress: false
+jobs:
+  shutdown-exact-guest-once:
+    if: >-
+      github.repository == 'ansqhd5774-Choi/nhunnhun_blog' &&
+      github.actor == 'ansqhd5774-Choi' &&
+      github.run_attempt == 1
+    runs-on: [self-hosted, Windows, X64, tistory-publisher]
+    timeout-minutes: 4
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Guard exact host user and VM
+        run: |
+          if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" (echo C996_HOST_STOP & exit /b 1)
+          if /I not "%USERNAME%"=="ansqh" (echo C996_OWNER_STOP & exit /b 1)
+          powershell.exe -NoProfile -NonInteractive -Command "if ([System.Diagnostics.Process]::GetCurrentProcess().SessionId -eq 0) { exit 1 }"
+          if errorlevel 1 (echo C996_SESSION_STOP & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_SHUTDOWN_PREFLIGHT.txt"
+          if errorlevel 1 (echo C996_UUID_STOP & exit /b 1)
+          findstr /x /c:"VMState=\"running\"" "%RUNNER_TEMP%\C996_SHUTDOWN_PREFLIGHT.txt" >nul
+          if errorlevel 1 (echo C996_GUEST_NOT_RUNNING_STOP & exit /b 1)
+          echo C996_GUEST_SHUTDOWN_GATES_PASS
+      - name: Guest-only wpeutil shutdown once, no forced host or VM termination
+        run: |
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f keyboardputstring "wpeutil shutdown"
+          if errorlevel 1 (echo C996_GUEST_SHUTDOWN_TYPE_FAIL & exit /b 1)
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm 03620b4b-7ca3-47a0-9a20-df8818ee068f keyboardputscancode 1c 9c
+          if errorlevel 1 (echo C996_GUEST_SHUTDOWN_ENTER_FAIL & exit /b 1)
+          echo C996_GUEST_SHUTDOWN_SENT_ONCE
+          powershell.exe -NoProfile -NonInteractive -Command "Start-Sleep -Seconds 15"
+          "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" showvminfo 03620b4b-7ca3-47a0-9a20-df8818ee068f --machinereadable > "%RUNNER_TEMP%\C996_POST_SHUTDOWN_STATE.txt"
+          if errorlevel 1 (echo C996_POST_SHUTDOWN_QUERY_FAIL & exit /b 1)
+          findstr /x /c:"VMState=\"poweroff\"" "%RUNNER_TEMP%\C996_POST_SHUTDOWN_STATE.txt" >nul
+          if errorlevel 1 (echo C996_GUEST_POWEROFF_NOT_OBSERVED & exit /b 1)
+          echo C996_VM_POWEROFF_PASS
+      - name: Verify original ISO unchanged without reading its contents into logs
+        run: |
+          certutil -hashfile "C:\Users\ansqh\AppData\Local\Temp\C996_ISO_R5_80f18cafcbd44c82af95082138eb51e7\ISO_ATTEMPT_187cd12b4d2a4789b9ef549ba9cda886\iso\C996_WINPE_CNG_TEST_ONLY.iso" SHA256 > "%RUNNER_TEMP%\C996_POST_ISO_SHA.txt"
+          if errorlevel 1 (echo C996_ISO_HASH_READ_FAIL & exit /b 1)
+          findstr /i /c:"63d6dccf67e470c28842cc3eccbcd552275588b921a969a076d6fe4788e4c588" "%RUNNER_TEMP%\C996_POST_ISO_SHA.txt" >nul
+          if errorlevel 1 (echo C996_ISO_SHA_MISMATCH_STOP & exit /b 1)
+          echo C996_ISO_SHA256_UNCHANGED_PASS
+          echo C996_NO_HOST_DISK_OR_NETWORK_CHANGED
