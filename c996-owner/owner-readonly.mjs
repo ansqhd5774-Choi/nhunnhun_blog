@@ -94,7 +94,22 @@ export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFile
   const commitObserved=logs.some(x=>x.commitRequests>0);
   return {schema:'C996_OWNER_FIXED_READONLY_V1',status:inputVerified&&logsReadable&&commitObserved?'COLLECTED_STAGE_UNPROVEN':'PARTIAL',rootCauseStage:'UNKNOWN',inputVerified,logScanComplete:logsReadable,commitObserved,files,logs,logErrors,rawLogIncluded:false,operationalWrites:0};
 }
+export function identifyRequest(event,env){
+  const o=JSON.parse(event?.issue?.body??'null');
+  if(event?.action!=='opened'||!Number.isSafeInteger(event?.issue?.number)||event.issue.number<=0||
+    event.issue.title!=='c996-owner-fixed-readonly'||
+    event.issue.user?.login!=='ansqhd5774-Choi'||event.repository?.full_name!=='ansqhd5774-Choi/nhunnhun_blog'||
+    o?.schema!=='C996_OWNER_FIXED_READONLY_REQUEST_V1'||o?.operation!=='c996-owner-fixed-readonly'||
+    Object.keys(o).sort().join(',')!=='operation,requestId,schema'||
+    !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(o.requestId)||
+    !/^[1-9][0-9]{0,17}$/.test(env.GITHUB_RUN_ID??'')||env.GITHUB_RUN_ATTEMPT!=='1')
+    throw new Error('C996_REQUEST_SCOPE_DENIED');
+  return {requestId:o.requestId,issueNumber:event.issue.number,runId:env.GITHUB_RUN_ID,attempt:'1'};
+}
 if(process.argv.includes('--run')){
   if(!authorizedOwnerContext())throw new Error('FIXED_OWNER_CONTEXT_DENIED');
-  console.log('C996_SANITIZED_RESULT='+JSON.stringify(await collect()));
+  const ctx=identifyRequest(JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')),process.env);
+  const result=await collect();
+  console.log('C996_SANITIZED_RESULT='+JSON.stringify({...result,...ctx}));
+  if(result.status==='PARTIAL')process.exitCode=2;
 }
