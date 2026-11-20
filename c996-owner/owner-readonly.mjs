@@ -71,16 +71,16 @@ export async function verifyLog({id,file}, {stat=noLink,stream=p=>fs.createReadS
 export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFileTypes:true}),stream=p=>fs.createReadStream(p)}={}){
   const files=[];
   for(const [id,file,expected] of FILES) files.push(await verifyFile({id,file,expected},{stat,stream}));
-  const logs=[],logErrors=[];
+  const logs=[],logErrors=[]; let logCount=0;
   for(const [dirId,dir] of LOGDIRS){
     try{
       if(!stat(dir).isDirectory())throw Object.assign(new Error('Not directory'),{code:'ENOTDIR'});
       const names=readdir(dir).filter(x=>x.isFile()&&isLog(x.name)).map(x=>x.name).sort();
-      if(names.length>16){logErrors.push({id:dirId,code:'LOG_COUNT_LIMIT'});continue;}
-      for(const name of names)logs.push(await verifyLog({id:dirId+'_'+logs.length,file:path.win32.join(dir,name)},{stat,stream}));
+      if(logCount+names.length>16){logErrors.push({id:dirId,code:'LOG_COUNT_LIMIT'});continue;}
+      for(const name of names){logCount++;logs.push(await verifyLog({id:dirId+'_'+logs.length,file:path.win32.join(dir,name)},{stat,stream}));}
     }catch(e){logErrors.push({id:dirId,code:errorCode(e)});}
   }
-  return {schema:'C996_OWNER_FIXED_READONLY_V1',status:files.every(x=>x.status==='MATCHED')&&logs.every(x=>x.status==='READABLE')&&logErrors.length===0?'COMPLETE':'PARTIAL',files,logs,logErrors,rawLogIncluded:false,operationalWrites:0};
+  return {schema:'C996_OWNER_FIXED_READONLY_V1',status:files.every(x=>x.status==='MATCHED')&&logs.length>0&&logs.every(x=>x.status==='READABLE')&&logErrors.length===0?'COMPLETE':'PARTIAL',files,logs,logErrors,rawLogIncluded:false,operationalWrites:0};
 }
 if(process.argv.includes('--run')){
   if(!authorizedOwnerContext())throw new Error('FIXED_OWNER_CONTEXT_DENIED');
