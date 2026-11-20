@@ -14,3 +14,4 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node --test tests/repository-isolation.test.mjs
+      - run: node --test c996-owner/owner-readonly.test.mjs
