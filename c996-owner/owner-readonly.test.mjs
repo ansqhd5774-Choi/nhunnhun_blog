@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {authorizedOwnerContext,identifyRequest,verifyFile,verifyLog,collect} from './owner-readonly.mjs';
+import {authorizedOwnerContext,identifyRequest,verifyFile,verifyLog,collect,inspectFixedEvidence,collectFixedEvidence} from './owner-readonly.mjs';
 import crypto from 'node:crypto';
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const stream=x=>({async *[Symbol.asyncIterator](){yield Buffer.from(x)}});
@@ -87,4 +87,45 @@ test('request binding requires authenticated exact issue and first run attempt',
  assert.throws(()=>identifyRequest(evt,{...env,GITHUB_RUN_ATTEMPT:'2'}),/C996_REQUEST_SCOPE_DENIED/);
  assert.throws(()=>identifyRequest({...evt,issue:{...evt.issue,body:'{}'}},env),/C996_REQUEST_SCOPE_DENIED/);
  assert.throws(()=>identifyRequest({...evt,issue:{...evt.issue,user:{login:'other'}}},env),/C996_REQUEST_SCOPE_DENIED/);
+});
+
+test('missing optional log subdirectories do not invalidate scanned fixed log directories',async()=>{
+ const fileAndDir={isFile:()=>true,isDirectory:()=>true,size:3};
+ const e={name:'DISM.log',isFile:()=>true};
+ const missing=()=>Object.assign(new Error('optional directory absent'),{code:'ENOENT'});
+ const x=await collect({
+  stat:p=>p.toLowerCase().endsWith('\\logs')?(()=>{throw missing();})():fileAndDir,
+  readdir:p=>p.includes('ISO_ATTEMPT_')?[e]:[],
+  stream:()=>stream('DismUnmountImageHandle commit failed to execute')
+ });
+ assert.equal(x.logErrors.length,0);
+ assert.equal(x.logScanComplete,true);
+ assert.equal(x.commitObserved,true);
+ assert.equal(x.status,'PARTIAL'); // only synthetic input hashes differ
+});
+test('fixed evidence reports bounded hashes and allowlisted statuses, never source content',async()=>{
+ const raw=JSON.stringify({status:'PASS',code:'DISM_RESULT_OK',secret:'private original path'});
+ const x=await inspectFixedEvidence({id:'ISO_RESULT',file:'C:\\fixed\\result.json'},{stat:()=>regular,stream:()=>stream(raw)});
+ assert.equal(x.status,'PRESENT');
+ assert.deepEqual(x.markers,{status:'PASS',code:'DISM_RESULT_OK'});
+ assert.equal(JSON.stringify(x).includes('private original path'),false);
+});
+test('fixed evidence-only mode never reads heavy WIM or ISO paths',async()=>{
+ const seen=[];
+ const x=await collectFixedEvidence({
+  stat:p=>{seen.push(p);throw Object.assign(new Error('missing'),{code:'ENOENT'});},
+  stream:()=>{throw new Error('no file content should be streamed')}
+ });
+ assert.equal(x.status,'PARTIAL');
+ assert.equal(x.evidence.length,6);
+ assert.equal(x.evidence.every(a=>a.status==='MISSING'),true);
+ assert.equal(seen.length,6);
+ assert.equal(seen.some(p=>/boot\\.wim$|CNG_TEST_ONLY\\.iso$/i.test(p)),false);
+});
+test('request accepts only exact fixed evidence mode and preserves unique request identity',()=>{
+ const req={schema:'C996_OWNER_FIXED_READONLY_REQUEST_V1',operation:'c996-owner-fixed-readonly',requestId:'b5409f61-ff0c-4ad1-a874-7cebb56594f3',mode:'fixed-evidence-only'};
+ const evt={action:'opened',issue:{number:308,title:'c996-owner-fixed-readonly',user:{login:'ansqhd5774-Choi'},body:JSON.stringify(req)},repository:{full_name:'ansqhd5774-Choi/nhunnhun_blog'}};
+ const env={GITHUB_RUN_ID:'44664374082',GITHUB_RUN_ATTEMPT:'1'};
+ assert.equal(identifyRequest(evt,env).mode,'fixed-evidence-only');
+ assert.throws(()=>identifyRequest({...evt,issue:{...evt.issue,body:JSON.stringify({...req,mode:'arbitrary'})}},env),/C996_REQUEST_SCOPE_DENIED/);
 });
