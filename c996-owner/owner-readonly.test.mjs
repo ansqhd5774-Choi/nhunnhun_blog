@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {authorizedOwnerContext,verifyFile,verifyLog,collect} from './owner-readonly.mjs';
+import {authorizedOwnerContext,identifyRequest,verifyFile,verifyLog,collect} from './owner-readonly.mjs';
 import crypto from 'node:crypto';
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const stream=x=>({async *[Symbol.asyncIterator](){yield Buffer.from(x)}});
@@ -77,4 +77,14 @@ test('DISM event list has deterministic size bound',async()=>{
  assert.equal(x.events.length,64);
  assert.equal(x.omittedEvents,6);
  assert.equal(x.errorMentions,70);
+});
+
+test('request binding requires authenticated exact issue and first run attempt',()=>{
+ const req={schema:'C996_OWNER_FIXED_READONLY_REQUEST_V1',operation:'c996-owner-fixed-readonly',requestId:'b5409f61-ff0c-4ad1-a874-7cebb56594f3'};
+ const evt={action:'opened',issue:{number:307,title:'c996-owner-fixed-readonly',user:{login:'ansqhd5774-Choi'},body:JSON.stringify(req)},repository:{full_name:'ansqhd5774-Choi/nhunnhun_blog'}};
+ const env={GITHUB_RUN_ID:'44663981507',GITHUB_RUN_ATTEMPT:'1'};
+ assert.deepEqual(identifyRequest(evt,env),{requestId:req.requestId,issueNumber:307,runId:env.GITHUB_RUN_ID,attempt:'1'});
+ assert.throws(()=>identifyRequest(evt,{...env,GITHUB_RUN_ATTEMPT:'2'}),/C996_REQUEST_SCOPE_DENIED/);
+ assert.throws(()=>identifyRequest({...evt,issue:{...evt.issue,body:'{}'}},env),/C996_REQUEST_SCOPE_DENIED/);
+ assert.throws(()=>identifyRequest({...evt,issue:{...evt.issue,user:{login:'other'}}},env),/C996_REQUEST_SCOPE_DENIED/);
 });
