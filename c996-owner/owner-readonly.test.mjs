@@ -45,3 +45,21 @@ test('total log bound is enforced before reading a large directory',async()=>{
  assert.equal(x.logs.length,0);
  assert.equal(x.logErrors.some(e=>e.code==='LOG_COUNT_LIMIT'),true);
 });
+
+test('matching hashes with no commit evidence cannot establish a DISM stage',async()=>{
+ const fileAndDir={isFile:()=>true,isDirectory:()=>true,size:3};
+ const entry={name:'DISM.log',isFile:()=>true};
+ const x=await collect({stat:()=>fileAndDir,readdir:()=>[entry],stream:()=>stream('no commit recorded')});
+ assert.equal(x.status,'PARTIAL');
+ assert.equal(x.rootCauseStage,'UNKNOWN');
+ assert.equal(x.commitObserved,false);
+ assert.equal(x.logScanComplete,true);
+});
+test('commit mention is still evidence of attempt not proof of successful DISM effect',async()=>{
+ const fileAndDir={isFile:()=>true,isDirectory:()=>true,size:3};
+ const entry={name:'DISM.log',isFile:()=>true};
+ const x=await collect({stat:()=>fileAndDir,readdir:()=>[entry],stream:()=>stream('DismUnmountImageHandle commit failed to execute')});
+ assert.equal(x.status,'PARTIAL'); // synthetic input hashes do not match pins
+ assert.equal(x.commitObserved,true);
+ assert.equal(x.rootCauseStage,'UNKNOWN');
+});
