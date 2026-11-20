@@ -17,6 +17,14 @@ const LOGDIRS = Object.freeze([
   ['ISO_LOGS',path.win32.join(ATTEMPT,'logs')],
   ['R5_LOGS',path.win32.join(ROOT,'logs')]
 ]);
+const EVIDENCE = Object.freeze([
+  ['ISO_RESULT',path.win32.join(ATTEMPT,'result.json')],
+  ['FINAL_INDEX_1',path.win32.join(ATTEMPT,'FINAL_INDEX_1.txt')],
+  ['MAKE_ISO',path.win32.join(ATTEMPT,'make-iso.txt')],
+  ['MOUNT_STATUS',path.win32.join(ATTEMPT,'MOUNT_STATUS.txt')],
+  ['DISCARD_RESULT',path.win32.join(ROOT,'cleanup-result.json')],
+  ['ISO_PASS',path.win32.join(ROOT,'ISO_ONLY_PASS.json')]
+]);
 function errorCode(err){
   return ['EACCES','EPERM','ENOENT','ENOTDIR'].includes(err?.code)?err.code:'UNAVAILABLE';
 }
@@ -77,6 +85,43 @@ export async function verifyLog({id,file}, {stat=noLink,stream=p=>fs.createReadS
     return {id,status:'READABLE',bytes,sha256:hash.digest('hex'),lines,commitRequests:commit,errorMentions:error,events,omittedEvents};
   }catch(e){return {id,status:'UNVERIFIED',code:errorCode(e)};}
 }
+// Only fixed evidence metadata and whitelisted status markers; never publish raw contents.
+export async function inspectFixedEvidence({id,file},{stat=noLink,stream=p=>fs.createReadStream(p)}={}){
+  try {
+    const st=stat(file);
+    if(!st.isFile()||st.size>16*1024*1024) return {id,status:'UNVERIFIED',code:'FILE_INVALID_OR_TOO_LARGE'};
+    const h=crypto.createHash('sha256');let bytes=0;const chunks=[];
+    for await(const chunk of stream(file)){
+      bytes+=chunk.length;
+      if(bytes>16*1024*1024)return {id,status:'UNVERIFIED',code:'EVIDENCE_SIZE_LIMIT'};
+      h.update(chunk);chunks.push(chunk);
+    }
+    const raw=Buffer.concat(chunks).toString('utf8');
+    let object=null;
+    if(file.toLowerCase().endsWith('.json')) {
+      try {object=JSON.parse(raw);}catch{}
+    } else {
+      object={};
+      for(const m of raw.matchAll(/^(status|code|result|stage|rootCauseStage)\s*[:=]\s*([A-Z0-9_:-]{1,64})\s*$/gm))object[m[1]]=m[2];
+    }
+    const markers={};
+    for(const key of ['status','code','result','stage','rootCauseStage']){
+      const v=object?.[key];
+      if(typeof v==='string'&&/^[A-Z0-9_:-]{1,64}$/.test(v))markers[key]=v;
+    }
+    return {id,status:'PRESENT',bytes,sha256:h.digest('hex'),markers};
+  }catch(e){
+    const code=errorCode(e);
+    return {id,status:code==='ENOENT'?'MISSING':'UNVERIFIED',...(code==='ENOENT'?{}:{code})};
+  }
+}
+export async function collectFixedEvidence(io={}){
+  const evidence=[];
+  for(const [id,file] of EVIDENCE)evidence.push(await inspectFixedEvidence({id,file},io));
+  return {schema:'C996_OWNER_FIXED_EVIDENCE_V1',
+    status:evidence.every(x=>x.status==='PRESENT')?'EVIDENCE_METADATA_COLLECTED':'PARTIAL',
+    rootCauseStage:'UNKNOWN',evidence,rawContentsIncluded:false,operationalWrites:0};
+}
 export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFileTypes:true}),stream=p=>fs.createReadStream(p)}={}){
   const files=[];
   for(const [id,file,expected] of FILES) files.push(await verifyFile({id,file,expected},{stat,stream}));
@@ -87,7 +132,7 @@ export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFile
       const names=readdir(dir).filter(x=>x.isFile()&&isLog(x.name)).map(x=>x.name).sort();
       if(logCount+names.length>16){logErrors.push({id:dirId,code:'LOG_COUNT_LIMIT'});continue;}
       for(const name of names){logCount++;logs.push(await verifyLog({id:dirId+'_'+logs.length,file:path.win32.join(dir,name)},{stat,stream}));}
-    }catch(e){logErrors.push({id:dirId,code:errorCode(e)});}
+    }catch(e){if(errorCode(e)!=='ENOENT')logErrors.push({id:dirId,code:errorCode(e)});}
   }
   const inputVerified=files.every(x=>x.status==='MATCHED');
   const logsReadable=logs.length>0&&logs.every(x=>x.status==='READABLE')&&logErrors.length===0;
@@ -100,16 +145,17 @@ export function identifyRequest(event,env){
     event.issue.title!=='c996-owner-fixed-readonly'||
     event.issue.user?.login!=='ansqhd5774-Choi'||event.repository?.full_name!=='ansqhd5774-Choi/nhunnhun_blog'||
     o?.schema!=='C996_OWNER_FIXED_READONLY_REQUEST_V1'||o?.operation!=='c996-owner-fixed-readonly'||
-    Object.keys(o).sort().join(',')!=='operation,requestId,schema'||
+    !['operation,requestId,schema','mode,operation,requestId,schema'].includes(Object.keys(o).sort().join(','))||
+    (o.mode!==undefined&&o.mode!=='fixed-evidence-only')||
     !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(o.requestId)||
     !/^[1-9][0-9]{0,17}$/.test(env.GITHUB_RUN_ID??'')||env.GITHUB_RUN_ATTEMPT!=='1')
     throw new Error('C996_REQUEST_SCOPE_DENIED');
-  return {requestId:o.requestId,issueNumber:event.issue.number,runId:env.GITHUB_RUN_ID,attempt:'1'};
+  return {requestId:o.requestId,issueNumber:event.issue.number,runId:env.GITHUB_RUN_ID,attempt:'1',mode:o.mode??'full'};
 }
 if(process.argv.includes('--run')){
   if(!authorizedOwnerContext())throw new Error('FIXED_OWNER_CONTEXT_DENIED');
   const ctx=identifyRequest(JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')),process.env);
-  const result=await collect();
+  const result=ctx.mode==='fixed-evidence-only'?await collectFixedEvidence():await collect();
   console.log('C996_SANITIZED_RESULT='+JSON.stringify({...result,...ctx}));
   if(result.status==='PARTIAL')process.exitCode=2;
 }
