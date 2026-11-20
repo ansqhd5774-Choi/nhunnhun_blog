@@ -63,3 +63,18 @@ test('commit mention is still evidence of attempt not proof of successful DISM e
  assert.equal(x.commitObserved,true);
  assert.equal(x.rootCauseStage,'UNKNOWN');
 });
+
+test('DISM events preserve bounded order and numeric error code without source text',async()=>{
+ const original='DismMountImage called\nDismUnmountImageHandle commit failed to execute\nHRESULT=0x80070005\nThe operation completed successfully\n';
+ const x=await verifyLog({id:'LOG',file:'fixed'},{stat:()=>regular,stream:()=>stream(original)});
+ assert.equal(x.status,'READABLE');
+ assert.deepEqual(x.events.map(e=>e.code),['MOUNT_REQUEST','COMMIT_REQUEST','ERROR_MENTION','ERROR_MENTION','OPERATION_SUCCESS']);
+ assert.equal(x.events.find(e=>e.errorCode)?.errorCode,'0x80070005');
+ assert.equal(JSON.stringify(x).includes('DismUnmountImageHandle'),false);
+});
+test('DISM event list has deterministic size bound',async()=>{
+ const x=await verifyLog({id:'LOG',file:'fixed'},{stat:()=>regular,stream:()=>stream('HRESULT=0x80070005\n'.repeat(70))});
+ assert.equal(x.events.length,64);
+ assert.equal(x.omittedEvents,6);
+ assert.equal(x.errorMentions,70);
+});
