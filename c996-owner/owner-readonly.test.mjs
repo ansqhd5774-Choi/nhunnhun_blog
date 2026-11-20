@@ -29,3 +29,19 @@ test('directory permission errors do not become completed inspection',async()=>{
  assert.equal(x.status,'PARTIAL');assert.equal(x.files.length,4);assert.equal(x.logErrors.length,4);
  assert.equal(JSON.stringify(x).includes('private'),false);
 });
+
+test('empty logs never prove completed DISM inspection',async()=>{
+ const fileAndDir={isFile:()=>true,isDirectory:()=>true,size:1};
+ const x=await collect({stat:()=>fileAndDir,readdir:()=>[],stream:()=>stream('abc')});
+ assert.equal(x.status,'PARTIAL');
+ assert.equal(x.logs.length,0);
+ assert.equal(x.logErrors.length,0);
+});
+test('total log bound is enforced before reading a large directory',async()=>{
+ const fileAndDir={isFile:()=>true,isDirectory:()=>true,size:1};
+ const names=Array.from({length:17},(_,i)=>({name:'DISM'+i+'.log',isFile:()=>true}));
+ const x=await collect({stat:()=>fileAndDir,readdir:()=>names,stream:()=>stream('abc')});
+ assert.equal(x.status,'PARTIAL');
+ assert.equal(x.logs.length,0);
+ assert.equal(x.logErrors.some(e=>e.code==='LOG_COUNT_LIMIT'),true);
+});
