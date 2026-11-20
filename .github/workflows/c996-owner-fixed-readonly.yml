@@ -29,7 +29,7 @@ jobs:
         env:
           REQUEST_BODY: ${{ github.event.issue.body }}
         run: |
-          node --input-type=module -e "const o=JSON.parse(process.env.REQUEST_BODY);if(Object.keys(o).sort().join(',')!=='operation,schema'||o.schema!=='C996_OWNER_FIXED_READONLY_REQUEST_V1'||o.operation!=='c996-owner-fixed-readonly')process.exit(2)"
+          node --input-type=module -e "try{const o=JSON.parse(process.env.REQUEST_BODY);if(Object.keys(o).sort().join(',')!=='operation,requestId,schema'||o.schema!=='C996_OWNER_FIXED_READONLY_REQUEST_V1'||o.operation!=='c996-owner-fixed-readonly'||!(/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/).test(o.requestId))process.exit(2)}catch{process.exit(2)}"
           if errorlevel 1 exit /b 2
           if /I not "%COMPUTERNAME%"=="DESKTOP-N62L0NG" exit /b 2
           if /I not "%USERNAME%"=="ansqh" exit /b 2
