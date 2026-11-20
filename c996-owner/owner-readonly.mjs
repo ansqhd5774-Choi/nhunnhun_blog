@@ -80,7 +80,10 @@ export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFile
       for(const name of names){logCount++;logs.push(await verifyLog({id:dirId+'_'+logs.length,file:path.win32.join(dir,name)},{stat,stream}));}
     }catch(e){logErrors.push({id:dirId,code:errorCode(e)});}
   }
-  return {schema:'C996_OWNER_FIXED_READONLY_V1',status:files.every(x=>x.status==='MATCHED')&&logs.length>0&&logs.every(x=>x.status==='READABLE')&&logErrors.length===0?'COMPLETE':'PARTIAL',files,logs,logErrors,rawLogIncluded:false,operationalWrites:0};
+  const inputVerified=files.every(x=>x.status==='MATCHED');
+  const logsReadable=logs.length>0&&logs.every(x=>x.status==='READABLE')&&logErrors.length===0;
+  const commitObserved=logs.some(x=>x.commitRequests>0);
+  return {schema:'C996_OWNER_FIXED_READONLY_V1',status:inputVerified&&logsReadable&&commitObserved?'COLLECTED_STAGE_UNPROVEN':'PARTIAL',rootCauseStage:'UNKNOWN',inputVerified,logScanComplete:logsReadable,commitObserved,files,logs,logErrors,rawLogIncluded:false,operationalWrites:0};
 }
 if(process.argv.includes('--run')){
   if(!authorizedOwnerContext())throw new Error('FIXED_OWNER_CONTEXT_DENIED');
