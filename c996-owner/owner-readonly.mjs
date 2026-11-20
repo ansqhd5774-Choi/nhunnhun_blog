@@ -50,11 +50,20 @@ export async function verifyLog({id,file}, {stat=noLink,stream=p=>fs.createReadS
     const s=stat(file);
     if(!s.isFile()||s.size>64*1024*1024)return {id,status:'UNVERIFIED',code:'FILE_INVALID_OR_TOO_LARGE'};
     const hash=crypto.createHash('sha256');let bytes=0,lines=0,commit=0,error=0;
+    const events=[];let omittedEvents=0;
     let partial='';
     const onLine = ln=>{
       lines++;
-      if(/\/Unmount-Image[^\r\n]*\/Commit|DismUnmountImageHandle[^\r\n]*commit/i.test(ln))commit++;
-      if(/\b(?:error\s*[:#=]?\s*(?:0x[0-9a-f]+|[1-9][0-9]*)|failed\s+to|HRESULT\s*[:=]\s*0x[0-9a-f]+)\b/i.test(ln))error++;
+      const codes=[];
+      if(/\/Unmount-Image[^\r\n]*\/Commit|DismUnmountImageHandle[^\r\n]*commit/i.test(ln)){commit++;codes.push('COMMIT_REQUEST');}
+      if(/\/Mount-Image|DismMountImage/i.test(ln))codes.push('MOUNT_REQUEST');
+      if(/\b(?:error\s*[:#=]?\s*(?:0x[0-9a-f]+|[1-9][0-9]*)|failed\s+to|HRESULT\s*[:=]\s*0x[0-9a-f]+)\b/i.test(ln)){error++;codes.push('ERROR_MENTION');}
+      if(/The operation completed successfully|successfully committed/i.test(ln))codes.push('OPERATION_SUCCESS');
+      const matched=ln.match(/\b(?:HRESULT\s*[:=]\s*|error\s*[:#=]?\s*)(0x[0-9a-f]{1,8}|[1-9][0-9]{0,9})\b/i);
+      for(const code of codes){
+        if(events.length<64)events.push({line:lines,code,...(code==='ERROR_MENTION'&&matched?{errorCode:matched[1].toLowerCase()}: {})});
+        else omittedEvents++;
+      }
     };
     for await(const b of stream(file)){
       bytes+=b.length;if(bytes>64*1024*1024)return {id,status:'UNVERIFIED',code:'LOG_SIZE_LIMIT'};
@@ -65,7 +74,7 @@ export async function verifyLog({id,file}, {stat=noLink,stream=p=>fs.createReadS
       for(const line of chunks)onLine(line);
     }
     if(partial)onLine(partial);
-    return {id,status:'READABLE',bytes,sha256:hash.digest('hex'),lines,commitRequests:commit,errorMentions:error};
+    return {id,status:'READABLE',bytes,sha256:hash.digest('hex'),lines,commitRequests:commit,errorMentions:error,events,omittedEvents};
   }catch(e){return {id,status:'UNVERIFIED',code:errorCode(e)};}
 }
 export async function collect({stat=noLink,readdir=p=>fs.readdirSync(p,{withFileTypes:true}),stream=p=>fs.createReadStream(p)}={}){
